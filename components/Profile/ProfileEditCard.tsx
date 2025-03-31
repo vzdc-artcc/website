@@ -21,6 +21,7 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
     const router = useRouter();
 
     const handleSubmit = async (formData: FormData) => {
+        console.log(formData.get('preferredName') as string)
         const User = z.object({
             preferredName: z.string().max(40, "Preferred name must not be over 40 characters").optional(),
             bio: z.string().max(400, "Bio must not be over 400 characters").optional(),
@@ -32,12 +33,14 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
 
         const result = User.safeParse({
             preferredName: formData.get('preferredName') as string,
-            teamspeakUid: formData.get('teamspeakUid') as string,
+            teamspeakUid: !admin ? formData.get('teamspeakUid') as string : user.teamspeakUid,
             bio: formData.get('bio') as string,
             operatingInitials: formData.get('operatingInitials') as string || user.operatingInitials,
             receiveEmail: true,
             newEventNotifications: formData.get('newEventNotifications') === 'on',
         });
+
+        console.log(result)
 
         if (!result.success) {
             toast(result.error.errors.map((e) => e.message).join(".  "), {type: 'error'})
