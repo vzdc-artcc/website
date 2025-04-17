@@ -1,7 +1,21 @@
 import React from 'react';
 import prisma from "@/lib/db";
 import {notFound} from "next/navigation";
-import {Box, Card, CardContent, Container, Grid2, Stack, Typography} from "@mui/material";
+import {
+    Box,
+    Card,
+    CardContent,
+    Container,
+    Grid2,
+    Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography
+} from "@mui/material";
 import Image from "next/image";
 import Markdown from "react-markdown";
 import Placeholder from "@/public/img/logo_large.png";
@@ -39,7 +53,40 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 userId: session?.user.id || '',
             },
         },
+        include: {
+            user: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                },
+            },
+        },
     });
+
+    const otherEventPositions = await prisma.eventPosition.findMany({
+        where: {
+            eventId: event.id,
+            userId: {
+                not: session?.user.id,
+            },
+            published: true,
+        },
+        orderBy: {
+            user: {
+                lastName: 'asc',
+            },
+        },
+        include: {
+            user: {
+                select: {
+                    firstName: true,
+                    lastName: true,
+                },
+            },
+        },
+    });
+
+    const allPositions = [...otherEventPositions, eventPosition].filter(Boolean).filter(position => position?.published);
 
     return (
         <Container maxWidth="md">
@@ -82,6 +129,36 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                         <Typography variant="subtitle2" textAlign="center" gutterBottom>{formatZuluDate(eventPosition.finalStartTime || event.start)} - {formatZuluDate(eventPosition.finalEndTime || event.end)}</Typography>
                         <Typography textAlign="center" sx={{ mb: 4 }}>{eventPosition.finalNotes}</Typography>
                         <Typography variant="caption">Contact the events team if you have any questions.</Typography>
+                    </CardContent>
+                </Card>}
+                {session && <Card>
+                    <CardContent>
+                        <Typography variant="h6" gutterBottom>Published Positions</Typography>
+                        {allPositions.length === 0 && <Typography>No positions have been published.</Typography>}
+                        {allPositions.length > 0 && <TableContainer>
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Controller</TableCell>
+                                        <TableCell>Position</TableCell>
+                                        <TableCell>Start</TableCell>
+                                        <TableCell>End</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {allPositions.map((position) => (
+                                        <TableRow key={position?.id}>
+                                            <TableCell>
+                                                {position?.user?.firstName} {position?.user?.lastName}
+                                            </TableCell>
+                                            <TableCell>{position?.finalPosition}</TableCell>
+                                            <TableCell>{position?.finalStartTime?.getTime() === event.start.getTime() ? 'EVENT' : formatZuluDate(position?.finalStartTime || event.start)}</TableCell>
+                                            <TableCell>{position?.finalEndTime?.getTime() === event.end.getTime() ? 'EVENT' : formatZuluDate(position?.finalEndTime || event.end)}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>}
                     </CardContent>
                 </Card>}
             </Stack>
