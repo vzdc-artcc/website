@@ -81,8 +81,8 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
                         <TextField fullWidth disabled variant="filled" label="Rating" value={getRating(user.rating)}/>
                         <Divider/>
                         {!admin && <>
-                            <Alert severity="info">The Teamspeak UID form has been moved to the profile dropdown above
-                                'Refresh VATUSA Account Information'</Alert>
+                            <Alert severity="info">The Teamspeak UID form has been moved to the profile dropdown
+                                above &quot;Refresh VATUSA Account Information&quot;</Alert>
                             <Divider/>
                         </>}
                         <TextField fullWidth variant="filled" name="preferredName" label="Preferred Name"

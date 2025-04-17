@@ -31,12 +31,15 @@ export default function TeamspeakUidDialog({user, open, onClose}: { user: User, 
                 </DialogContentText>
                 <br/>
                 <DialogContentText>
-                    To find your TeamSpeak Unique I.D., open TeamSpeak and click on the "Connections" menu, then select
-                    "Connect".
-                    In the "Server Nickname or Address" field, enter the address of our TeamSpeak server.
-                    Click on the "Connect" button, and once you are connected, click on the "Tools" menu, then select
-                    "Identities".
-                    In the "Identities" menu, you will see your Unique I.D. listed under "Unique ID".
+                    To find your TeamSpeak Unique I.D., open TeamSpeak and click on the &quot;Connections&quot; menu,
+                    then select
+                    &quot;Connect&quot;.
+                    In the &quot;Server Nickname or Address&quot; field, enter the address of our TeamSpeak server.
+                    Click on the &quot;Connect&quot; button, and once you are connected, click on
+                    the &quot;Tools&quot; menu, then select
+                    &quot;Identities&quot;.
+                    In the &quot;Identities&quot; menu, you will see your Unique I.D. listed under &quot;Unique
+                    ID&quot;.
                 </DialogContentText>
                 <br/>
                 <DialogContentText>
