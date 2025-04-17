@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import {getRating} from "@/lib/vatsim";
 import {Metadata} from "next";
+import MatrixName from "@/components/Misc/MatrixName";
 
 export const metadata: Metadata = {
     title: 'Staff | vZDC',
@@ -282,7 +283,7 @@ export default async function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Webmaster (WM)</Typography>
-                        <Typography variant="h4">{wm?.firstName} {wm?.lastName}</Typography>
+                        <MatrixName firstName={wm?.firstName ?? ''} lastName={wm?.lastName ?? ''}/>
                         <Typography>wm@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Webmasters (AWMs)</Typography>
                         <TableContainer sx={{maxHeight: 400}}>

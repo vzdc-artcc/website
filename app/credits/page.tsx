@@ -23,19 +23,18 @@ export default async function Home() {
                 <Card>
                     <CardContent>
                         <Typography variant="h4" gutterBottom>Main Contributors</Typography>
-                        <Stack direction="column" spacing={8} sx={{m: 8,}}>
-                            <Typography variant="h5" fontWeight="bold" fontSize={50}
-                                        letterSpacing={9} {...fancyFont.style}>Aneesh Reddy <Link
+                        <Stack direction="column" spacing={4} sx={{m: 8,}}>
+                            <Typography color="darkred" variant="h5" fontWeight="bold" fontSize={70}
+                                        letterSpacing={15} {...fancyFont.style}>Aneesh&nbsp;&nbsp;Reddy <Link
                                 href="https://github.com/beabravedude" target="_blank"
                                 style={{color: 'inherit',}}><GitHub fontSize="large"/></Link></Typography>
-                            <Typography variant="h5" fontWeight="bold" fontSize={37}
-                                        letterSpacing={7} {...fancyFont.style}>Carson Berget <Link
+                            <Typography variant="h5">Carson Berget <Link
                                 href="https://github.com/Vainnor" target="_blank" style={{color: 'inherit',}}><GitHub
                                 fontSize="medium"/></Link></Typography>
-                            <Typography variant="h5" fontWeight="bold" letterSpacing={7} {...fancyFont.style}>Harry
+                            <Typography variant="h5">Harry
                                 Xu <Link href="https://github.com/harryxu2626" target="_blank"
                                          style={{color: 'inherit',}}><GitHub fontSize="small"/></Link></Typography>
-                            <Typography variant="h5" fontWeight="bold" letterSpacing={7} {...fancyFont.style}>Leo
+                            <Typography variant="h5">Leo
                                 Roberts <Link href="https://github.com/monty23monty" target="_blank"
                                               style={{color: 'inherit',}}><GitHub fontSize="small"/></Link></Typography>
                         </Stack>

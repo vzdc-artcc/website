@@ -1,23 +1,41 @@
 'use client';
 
-import { useTheme } from "@emotion/react";
-import { CheckCircle, ExpandMore, Info, Pending, Visibility } from "@mui/icons-material";
-import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Box, Button, Chip, CircularProgress, FormControl, FormControlLabel, FormLabel, Grid2, Radio, RadioGroup, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Event, EventType } from "@prisma/client";
+import {useTheme} from "@emotion/react";
+import {CheckCircle, ExpandMore, Info} from "@mui/icons-material";
+import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Autocomplete,
+    Box,
+    Button,
+    Chip,
+    CircularProgress,
+    FormControl,
+    FormControlLabel,
+    Grid2,
+    Radio,
+    RadioGroup,
+    Stack,
+    TextField,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography
+} from "@mui/material";
+import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {Event, EventType} from "@prisma/client";
 import MarkdownEditor from "@uiw/react-markdown-editor";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, {Dayjs} from "dayjs";
 import utc from "dayjs/plugin/utc";
 import Form from "next/form";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import {ReactNode, useEffect, useMemo, useState} from "react";
 import FormSaveButton from "../Form/FormSaveButton";
-import { upsertEvent, validateEvent } from "@/actions/event";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
-import { SafeParseReturnType, ZodIssue } from "zod";
+import {upsertEvent, validateEvent} from "@/actions/event";
+import {toast} from "react-toastify";
+import {useRouter} from "next/navigation";
 import Markdown from "react-markdown";
-import { ZodErrorSlimResponse } from "@/types";
+import {ZodErrorSlimResponse} from "@/types";
 
 export default function EventForm({ event }: { event?: Event, }) {
     
@@ -96,7 +114,7 @@ export default function EventForm({ event }: { event?: Event, }) {
 
         if (errors) {
             toast.error(errors.map((error) => error.message).join('.  '));
-            return false;
+            return;
         }
 
         if (event) {
