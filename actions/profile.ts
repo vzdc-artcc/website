@@ -42,3 +42,28 @@ export const updateCurrentProfile = async (user: User) => {
     revalidatePath(`/admin/controller/${user.cid}`);
     revalidatePath('/controllers/roster', "layout");
 }
+
+export const updateTeamspeakUid = async (user: User, teamspeakUid: string) => {
+    const TeamspeakUid = z.object({
+        teamspeakUid: z.string().optional(),
+    });
+
+    const result = TeamspeakUid.parse({teamspeakUid});
+
+    if (result.teamspeakUid === user.teamspeakUid) {
+        return;
+    }
+
+    await prisma.user.update({
+        data: {
+            teamspeakUid: result.teamspeakUid,
+        },
+        where: {
+            id: user.id
+        },
+    });
+
+    console.log('updated');
+
+    revalidatePath('/profile/overview');
+}

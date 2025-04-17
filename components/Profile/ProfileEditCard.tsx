@@ -2,7 +2,7 @@
 import React from 'react';
 import {User} from "next-auth";
 import {Filter} from 'bad-words';
-import {Card, CardContent, Divider, Stack, Switch, TextField, Tooltip, Typography} from "@mui/material";
+import {Alert, Card, CardContent, Divider, Stack, Switch, TextField, Tooltip} from "@mui/material";
 import {getRating} from "@/lib/vatsim";
 import {z} from "zod";
 import {toast} from "react-toastify";
@@ -21,7 +21,6 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
     const router = useRouter();
 
     const handleSubmit = async (formData: FormData) => {
-        console.log(formData.get('preferredName') as string)
         const User = z.object({
             preferredName: z.string().max(40, "Preferred name must not be over 40 characters").optional(),
             bio: z.string().max(400, "Bio must not be over 400 characters").optional(),
@@ -39,8 +38,6 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
             receiveEmail: true,
             newEventNotifications: formData.get('newEventNotifications') === 'on',
         });
-
-        console.log(result)
 
         if (!result.success) {
             toast(result.error.errors.map((e) => e.message).join(".  "), {type: 'error'})
@@ -84,11 +81,8 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
                         <TextField fullWidth disabled variant="filled" label="Rating" value={getRating(user.rating)}/>
                         <Divider/>
                         {!admin && <>
-                            <TextField fullWidth variant="filled" name="teamspeakUid" label="Teamspeak UID"
-                                       defaultValue={user.teamspeakUid || ''}
-                                       helperText="This is required to access the vZDC Teamspeak server.  In order to find your ID in TeamSpeak, connect to the vZDC teamspeak server, then select 'Tools', then select 'Identities', then at the bottom, select 'Go Advanced' and copy EXACTLY the 'Unique ID'."/>
-                            <Typography color="red" fontWeight="bold">Do NOT share this I.D. with anyone. By doing so,
-                                you might be giving access to your VATSIM details.</Typography>
+                            <Alert severity="info">The Teamspeak UID form has been moved to the profile dropdown above
+                                'Refresh VATUSA Account Information'</Alert>
                             <Divider/>
                         </>}
                         <TextField fullWidth variant="filled" name="preferredName" label="Preferred Name"
