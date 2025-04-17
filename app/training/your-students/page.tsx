@@ -1,13 +1,17 @@
 import React from 'react';
 import {
     Card,
-    CardContent, Chip, IconButton,
+    CardContent,
+    Chip,
+    IconButton,
     Stack,
-    Table, TableBody,
+    Table,
+    TableBody,
     TableCell,
     TableContainer,
     TableHead,
-    TableRow, Tooltip,
+    TableRow,
+    Tooltip,
     Typography
 } from "@mui/material";
 import prisma from "@/lib/db";
@@ -177,8 +181,8 @@ const getTable = (students: Student[]) => (
                     </TableCell>
                     <TableCell>{student.lastSession ? student.lastSession.tickets.map((ticket) =>
                         <Chip size="small"
-                            key={ticket.lesson.name}
-                            label={ticket.lesson.name}
+                              key={ticket.lesson.id}
+                              label={ticket.lesson.identifier}
                             color={ticket.passed ? 'success' : 'error'}
                         />) : 'N/A'}
                     </TableCell>
