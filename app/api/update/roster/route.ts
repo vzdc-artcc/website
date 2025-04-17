@@ -23,6 +23,21 @@ export async function GET() {
             let newOperatingInitials = user.operatingInitials;
             if (vatusaData.controllerStatus === "NONE") {
                 newOperatingInitials = null;
+                await prisma.trainingAssignmentRequest.deleteMany({
+                    where: {
+                        studentId: user.id,
+                    },
+                });
+                await prisma.trainingAssignment.deleteMany({
+                    where: {
+                        studentId: user.id,
+                    },
+                });
+                await prisma.lOA.deleteMany({
+                    where: {
+                        userId: user.id,
+                    },
+                });
             } else if (user.controllerStatus === "NONE") {
                 newOperatingInitials = await getOperatingInitials(user.firstName || '', user.lastName || '', users.map(user => user.operatingInitials).filter(initial => initial !== null) as string[]);
             }

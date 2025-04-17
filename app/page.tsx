@@ -112,10 +112,10 @@ export default async function Home() {
                     xs: 8,
                     lg: 2
                 }}>
-                <Card sx={{minHeight: 600,}}>
+                <Card sx={{height: 600, overflowY: 'auto',}}>
                     <CardContent>
                         <Typography {...headingFont.style} variant="h5" sx={{mb: 1,}}>Online ATC</Typography>
-                        <Stack direction="column" spacing={1} sx={{maxHeight: 600,}}>
+                        <Stack direction="column" spacing={1}>
                             {onlineAtc.length > 0 ? onlineAtc.map(position => (
                                 <Card elevation={0} key={position.position + position.log.userId}>
                                     <CardContent>
@@ -140,7 +140,7 @@ export default async function Home() {
                     xs: 8,
                     lg: 4
                 }}>
-                <Card sx={{minHeight: 600,}}>
+                <Card sx={{height: 600, overflowY: 'auto',}}>
                     <CardContent>
                         <Typography {...headingFont.style} variant="h5" sx={{mb: 1,}}>Top 3 Controllers</Typography>
                         <Stack direction="column" spacing={1}>
@@ -174,7 +174,7 @@ export default async function Home() {
                     xs: 8,
                     lg: 2
                 }}>
-                <Card sx={{minHeight: 600,}}>
+                <Card sx={{height: 600, overflowY: 'auto',}}>
                     <CardContent>
                         <Typography {...headingFont.style} variant="h5" sx={{mb: 1,}}>Solo Certifications</Typography>
                         <Stack direction="column" spacing={1}>

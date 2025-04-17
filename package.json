@@ -1,6 +1,6 @@
 {
   "name": "vzdc_website",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "author": "Aneesh Reddy & vZDC",
   "private": true,
   "scripts": {
@@ -39,7 +39,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "mjml": "^4.15.3",
-    "next": "^15.1.7",
+    "next": "^15.3.1",
     "next-auth": "^4.24.10",
     "nodemailer": "^6.9.16",
     "nodemailer-trap-plugin": "^4.0.0",

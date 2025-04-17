@@ -104,17 +104,6 @@ export default function TrainingSessionTable({admin, isInstructor, mentorCID, on
             filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
         {
-            field: 'tickets',
-            renderCell: (params) => params.row.tickets.reduce((acc: number, ticket: {
-                mistakes: CommonMistake[],
-            }) => acc + ticket.mistakes.length, 0),
-            flex: 1,
-            headerName: 'Mistakes',
-            type: 'number',
-            sortable: false,
-            filterable: false,
-        },
-        {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',

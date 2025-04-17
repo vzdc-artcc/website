@@ -118,7 +118,7 @@ export const createOrUpdateFile = async (formData: FormData) => {
     const inputFile = formData.get('file') as File | null;
     let fileKey = fileExists?.key || '';
 
-    if (inputFile) {
+    if (inputFile && inputFile.size > 0) {
         const res = await ut.uploadFiles(inputFile);
         if (res.error) {
             console.log(res.error);

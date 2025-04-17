@@ -636,8 +636,8 @@ model Event {
 
   bannerKey String?
 
-  hidden              Boolean @default(true)
-  positionsLocked     Boolean @default(true)
+  hidden              Boolean @default(false)
+  positionsLocked     Boolean @default(false)
   manualPositionsOpen Boolean @default(false)
 
   archived DateTime?

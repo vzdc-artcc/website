@@ -8,7 +8,6 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
     FormControlLabel,
     ListItemIcon,
@@ -17,7 +16,18 @@ import {
     Typography
 } from "@mui/material";
 import {Session} from "next-auth";
-import {AdminPanelSettings, CalendarMonth, Cancel, Class, Login, Logout, Person, Refresh, Settings} from "@mui/icons-material";
+import {
+    AdminPanelSettings,
+    CalendarMonth,
+    Cancel,
+    Class,
+    Login,
+    Logout,
+    Person,
+    Radio,
+    Refresh,
+    Settings
+} from "@mui/icons-material";
 import NavDropdown from "@/components/Navbar/NavDropdown";
 import Link from "next/link";
 import {getRating} from "@/lib/vatsim";
@@ -27,6 +37,7 @@ import NavSidebar from "@/components/Sidebar/NavSidebar";
 import {usePathname} from "next/navigation";
 import {refreshAccountData} from "@/actions/user";
 import {toast} from "react-toastify";
+import TeamspeakUidDialog from "@/components/TeamspeakUID/TeamspeakUidDialog";
 
 export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
     session: Session | null,
@@ -37,6 +48,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
     const [dropdownAnchor, setDropdownAnchor] = React.useState<null | HTMLElement>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [openAlert, setOpenAlert] = useState(false);
+    const [openTeamspeakUidDialog, setOpenTeamspeakUidDialog] = useState(false);
     const pathname = usePathname();
     const [accepted, setAccepted] = useState(false);
 
@@ -66,7 +78,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
     const handleAlertClose = () => {
         setOpenAlert(false);
         setAccepted(false);
-    };//New
+    };
 
     const handleSignIn = () => {
         signIn('vatsim', {
@@ -96,6 +108,8 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
 
     return (
         <>
+            {session && <TeamspeakUidDialog user={session.user} open={openTeamspeakUidDialog}
+                                            onClose={() => setOpenTeamspeakUidDialog(false)}/>}
             {sidebar && <NavSidebarButton icon={<Person/>}
                                           text={session ? `${session.user.fullName} - ${getRating(session.user.rating)}` : 'Login'}
                                           isSidebar onClick={handleClick}/>}
@@ -120,6 +134,9 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                     <Link href="/events/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                         <NavSidebarButton icon={<CalendarMonth />} text="Events Administration"/>
                     </Link>}
+                    {session && <NavSidebarButton icon={<Radio/>} text="TeamSpeak UID" onClick={() => {
+                        setOpenTeamspeakUidDialog(true);
+                    }}/>}
                     <NavSidebarButton icon={<Refresh/>} text="Refresh VATUSA Account Information"
                                       onClick={handleClick}/>
                     <NavSidebarButton icon={<Logout/>} text="Logout" onClick={logout}/>
@@ -165,6 +182,15 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                         <ListItemText>Events Administration</ListItemText>
                     </MenuItem>
                 </Link>}
+                {session && <MenuItem onClick={() => {
+                    setOpenTeamspeakUidDialog(true);
+                    closeDropdown();
+                }}>
+                    <ListItemIcon>
+                        <Radio/>
+                    </ListItemIcon>
+                    <ListItemText>TeamSpeak UID</ListItemText>
+                </MenuItem>}
                 <MenuItem onClick={handleRefresh}>
                     <ListItemIcon>
                         <Refresh/>
