@@ -56,7 +56,14 @@ export default async function Page(
                     months: true,
                 },
             },
-            trainingSessionsGiven: true,
+            trainingSessionsGiven: {
+                where: {
+                    start: {
+                        gte: new Date(Number(year), Number(startMonth), 1),
+                        lte: new Date(Number(year), Number(endMonth), 0),
+                    },
+                },
+            },
         },
     });
 
@@ -120,6 +127,5 @@ export default async function Page(
                 </CardContent>
             </Card>
         </Stack>
-
     );
 }
