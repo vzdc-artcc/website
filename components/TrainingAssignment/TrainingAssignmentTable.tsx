@@ -27,7 +27,7 @@ export default function TrainingAssignmentTable({manageMode}: { manageMode: bool
 
                 return (
                     <Tooltip title={`${params.row.student.controllerStatus}`}>
-                        <Link href={`/admin/controller/${params.row.student.cid}`} target="_blank"
+                        <Link href={`/training/controller/${params.row.student.cid}`} target="_blank"
                                               style={{textDecoration: 'none',}}>
                             <Chip
                                 key={params.row.student.id}
