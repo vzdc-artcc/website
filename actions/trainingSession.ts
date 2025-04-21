@@ -82,6 +82,7 @@ export async function createOrUpdateTrainingSession(
         enableMarkdown: z.boolean().optional(),
     });
 
+
     const result = trainingSessionZ.safeParse({
         id,
         student,
@@ -104,7 +105,7 @@ export async function createOrUpdateTrainingSession(
         },
     });
 
-    if (fetchedPi && (!performanceIndicator || !performanceIndicator.categories.every((category) => category.criteria.every((criteria) => !!criteria.marker)))) {
+    if (!fetchedPi && (!performanceIndicator || !performanceIndicator.categories.every((category) => category.criteria.every((criteria) => !!criteria.marker)))) {
         return {
             errors: [{
                 message: "You must fill out ALL the performance indicators to submit this ticket."

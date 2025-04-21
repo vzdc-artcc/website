@@ -102,7 +102,7 @@ export default function LessonForm({lesson}: { lesson?: Lesson, }) {
                 <Grid2 size={2}>
                     <FormGroup>
                         <FormControlLabel control={<Switch defaultChecked={lesson?.instructorOnly}/>}
-                                          name="instructorOnly" label="Instructor Only?"/>
+                                          name="instructorOnly" label="Mark as VATUSA OTS?"/>
                         <FormControlLabel control={<Switch defaultChecked={lesson?.notifyInstructorOnPass}/>}
                                           name="notifyInstructorOnPass" label="Notify Instructors on PASS?"/>
                     </FormGroup>
