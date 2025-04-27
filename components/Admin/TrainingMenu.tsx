@@ -54,7 +54,7 @@ export default async function TrainingMenu() {
                     <ListItemIcon>
                         <School/>
                     </ListItemIcon>
-                    <ListItemText primary="Your Students"/>
+                    <ListItemText primary="Your Students & Schedule"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/sessions" style={{textDecoration: 'none', color: 'inherit',}}>

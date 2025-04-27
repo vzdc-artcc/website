@@ -23,6 +23,7 @@ export default function LessonForm({lesson}: { lesson?: Lesson, }) {
     const theme = useTheme();
     const router = useRouter();
     const [description, setDescription] = React.useState<string>(lesson?.description || '')
+    const [traineePreparation, setTraineePreparation] = React.useState<string>(lesson?.traineePreparation || '');
 
     const handleSubmit = async (formData: FormData) => {
         const {id, error,} = await createOrUpdateLessonDetails(formData);
@@ -42,6 +43,7 @@ export default function LessonForm({lesson}: { lesson?: Lesson, }) {
         (<form action={handleSubmit}>
             <input type="hidden" name="lessonId" value={lesson?.id || ''}/>
             <input type="hidden" name="description" value={description}/>
+            <input type="hidden" name="traineePreparation" value={traineePreparation}/>
             <Grid2 container columns={2} spacing={2}>
                 <Grid2
                     size={{
@@ -74,6 +76,13 @@ export default function LessonForm({lesson}: { lesson?: Lesson, }) {
                     }}>
                     <TextField fullWidth variant="filled" name="position" label="Position"
                                defaultValue={lesson?.position || ''} required/>
+                </Grid2>
+                <Grid2
+                    size={{
+                        xs: 2,
+                    }}>
+                    <TextField variant="filled" name="duration" type="number" label="Duration (minutes)"
+                               defaultValue={lesson?.duration || 0} required helperText="Give an approximation"/>
                 </Grid2>
                 <Grid2
                     size={{
@@ -115,6 +124,17 @@ export default function LessonForm({lesson}: { lesson?: Lesson, }) {
                             minHeight="300px"
                             value={description}
                             onChange={(d) => setDescription(d)}
+                        />
+                    </Box>
+                </Grid2>
+                <Grid2 size={2}>
+                    <Box sx={{maxWidth: '700px',}} data-color-mode={theme.palette.mode}>
+                        <Typography variant="subtitle1" sx={{mb: 1,}}>Trainee Preparation</Typography>
+                        <MarkdownEditor
+                            enableScroll={false}
+                            minHeight="300px"
+                            value={traineePreparation}
+                            onChange={(d) => setTraineePreparation(d)}
                         />
                     </Box>
                 </Grid2>
