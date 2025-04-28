@@ -14,6 +14,7 @@ import {
     MilitaryTech,
     People,
     PersonAdd,
+    Schedule,
     School,
     ViewWeek,
     WorkspacePremium,
@@ -71,6 +72,14 @@ export default async function TrainingMenu() {
                         <ManageSearch/>
                     </ListItemIcon>
                     <ListItemText primary="Training History"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/training/appointments" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <Schedule/>
+                    </ListItemIcon>
+                    <ListItemText primary="Training Appointments"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/assignments" style={{textDecoration: 'none', color: 'inherit',}}>

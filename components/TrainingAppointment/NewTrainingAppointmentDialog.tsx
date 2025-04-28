@@ -64,7 +64,7 @@ export default function NewTrainingAppointmentDialog({trainingAppointment, assig
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
             {!trainingAppointment && <Button variant="contained" startIcon={<Add/>} onClick={() => setOpen(true)}>
-                New Training Appointment
+                New Appointment
             </Button>}
             {trainingAppointment && <IconButton size="small" onClick={() => setOpen(true)}>
                 <Edit fontSize="small"/>

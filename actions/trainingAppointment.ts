@@ -7,6 +7,92 @@ import {authOptions} from "@/auth/auth";
 import {revalidatePath} from "next/cache";
 import {log} from "@/actions/log";
 import {formatZuluDate} from "@/lib/date";
+import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
+import {Prisma} from "@prisma/client";
+
+export const fetchTrainingAppointments = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
+    const orderBy: Prisma.TrainingAppointmentOrderByWithRelationInput = {};
+    if (sort.length > 0) {
+        orderBy[sort[0].field as keyof Prisma.TrainingAppointmentOrderByWithRelationInput] = sort[0].sort === 'asc' ? 'asc' : 'desc';
+    }
+
+    return prisma.$transaction([
+        prisma.trainingAppointment.count({
+            where: getWhere(filter),
+        }),
+        prisma.trainingAppointment.findMany({
+            orderBy,
+            where: getWhere(filter),
+            include: {
+                student: true,
+                trainer: true,
+                lessons: true,
+            },
+            take: pagination.pageSize,
+            skip: pagination.page * pagination.pageSize,
+        })
+    ]);
+}
+
+const getWhere = (filter?: GridFilterItem): Prisma.TrainingAppointmentWhereInput => {
+    if (!filter) {
+        return {};
+    }
+
+    switch (filter.field) {
+        case 'student':
+            return {
+                student: {
+                    OR: [
+                        {
+                            cid: {
+                                [filter.operator]: filter.value as string,
+                                mode: 'insensitive',
+                            }
+                        },
+                        {
+                            fullName: {
+                                [filter.operator]: filter.value as string,
+                                mode: 'insensitive',
+                            }
+                        },
+                    ],
+                },
+            };
+        case 'trainer':
+            return {
+                trainer: {
+                    OR: [
+                        {
+                            cid: {
+                                [filter.operator]: filter.value as string,
+                                mode: 'insensitive',
+                            }
+                        },
+                        {
+                            fullName: {
+                                [filter.operator]: filter.value as string,
+                                mode: 'insensitive',
+                            }
+                        },
+                    ],
+                },
+            };
+        case 'lessons':
+            return {
+                lessons: {
+                    some: {
+                        identifier: {
+                            [filter.operator]: filter.value,
+                            mode: 'insensitive',
+                        }
+                    }
+                }
+            };
+        default:
+            return {};
+    }
+}
 
 export const createOrUpdateTrainingAppointment = async (studentId: string, start: string, lessonIds: string[], id?: string) => {
 
@@ -78,7 +164,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
     return {};
 }
 
-export const deleteTrainingAppointment = async (id: string) => {
+export const deleteTrainingAppointment = async (id: string, fromAdmin?: boolean) => {
     const ta = await prisma.trainingAppointment.delete({
         where: {
             id,

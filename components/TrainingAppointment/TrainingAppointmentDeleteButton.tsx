@@ -6,14 +6,15 @@ import {IconButton, Tooltip} from "@mui/material";
 import {Delete} from "@mui/icons-material";
 import {deleteTrainingAppointment} from "@/actions/trainingAppointment";
 
-export default function TrainingAppointmentDeleteButton({trainingAppointment}: {
-    trainingAppointment: TrainingAppointment
+export default function TrainingAppointmentDeleteButton({trainingAppointment, fromAdmin}: {
+    trainingAppointment: TrainingAppointment,
+    fromAdmin?: boolean,
 }) {
     const [clicked, setClicked] = useState(false);
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteTrainingAppointment(trainingAppointment.id);
+            await deleteTrainingAppointment(trainingAppointment.id, fromAdmin);
             toast(`Appointment deleted successfully!`, {type: 'success'});
         } else {
             toast.warn(`Are you sure you want to delete this training appointment?`);
