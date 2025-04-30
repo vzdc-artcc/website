@@ -44,8 +44,9 @@ export default async function LessonCard({lessonId}: { lessonId: string }) {
                     </Link>
                     <Typography variant="h5">{lesson.facility} - {lesson.name}</Typography>
                 </Stack>
-                <Typography variant="h6">{lesson.identifier}</Typography>
-                <Typography variant="h6">{lesson.position}</Typography>
+                <Typography variant="subtitle2">{lesson.identifier}</Typography>
+                <Typography variant="subtitle2">{lesson.position}</Typography>
+                <Typography variant="subtitle2">{lesson.duration} minutes</Typography>
                 <Markdown>
                     {lesson.description}
                 </Markdown>

@@ -19,11 +19,13 @@ import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
-import {LocalActivity, MilitaryTech, People} from "@mui/icons-material";
+import {Check, Close, LocalActivity, MilitaryTech, People} from "@mui/icons-material";
 import {Lesson} from "@prisma/client";
 import {formatZuluDate, getTimeAgo} from "@/lib/date";
+import NewTrainingAppointmentDialog from "@/components/TrainingAppointment/NewTrainingAppointmentDialog";
+import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 
-type Student = {
+export type Student = {
     user: User,
     trainingAssignmentId?: string,
     lastSession: {
@@ -43,6 +45,29 @@ export default async function Page() {
     if (!session) {
         throw new Error('User not authenticated');
     }
+
+    const allUsers = await prisma.user.findMany({
+        where: {
+            controllerStatus: {
+                not: 'NONE',
+            },
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            cid: true,
+        }
+    });
+
+    const allLessons = await prisma.lesson.findMany({
+        select: {
+            id: true,
+            identifier: true,
+            name: true,
+            duration: true,
+        },
+    });
 
     const primaryStudentsData = await prisma.user.findMany({
         where: {
@@ -118,8 +143,81 @@ export default async function Page() {
         } : undefined,
     }));
 
+    const trainingAppointments = await prisma.trainingAppointment.findMany({
+        where: {
+            trainerId: session.user.id,
+        },
+        include: {
+            student: true,
+            lessons: true,
+        },
+        orderBy: {
+            start: 'asc',
+        }
+    });
+
     return (
         <Stack direction="column" spacing={2}>
+            <Card>
+                <CardContent>
+                    <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center" sx={{mb: 1,}}>
+                        <Typography variant="h5">Your Upcoming Sessions</Typography>
+                        <NewTrainingAppointmentDialog assignedStudents={[...primaryStudents, ...otherStudents]}
+                                                      allStudents={allUsers as User[]}
+                                                      allLessons={allLessons as Lesson[]}/>
+                    </Stack>
+                    {trainingAppointments.length === 0 &&
+                        <Typography>You have no upcoming training appointments.</Typography>}
+                    <Typography sx={{mb: 2,}}>Appointments are automatically deleted 15 minutes after the start
+                        time.</Typography>
+                    {trainingAppointments.length > 0 && <TableContainer>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Start (Zulu)</TableCell>
+                                    <TableCell>Duration (min)</TableCell>
+                                    <TableCell>Student</TableCell>
+                                    <TableCell>Preparation Completed</TableCell>
+                                    <TableCell>Lesson(s)</TableCell>
+                                    <TableCell>Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {trainingAppointments.map((ta) => (
+                                    <TableRow key={ta.id}>
+                                        <TableCell>{formatZuluDate(ta.start)}</TableCell>
+                                        <TableCell>{ta.lessons.map((l) => l.duration).reduce((p, c, i) => {
+                                            return i == 0 ? c : p + c;
+                                        })}</TableCell>
+                                        <TableCell>{`${ta.student.fullName} - ${getRating(ta.student.rating)}`}</TableCell>
+                                        <TableCell>{ta.preparationCompleted ? <Check color="success"/> :
+                                            <Close color="error"/>}</TableCell>
+                                        <TableCell>{ta.lessons.map((l) => (
+                                            <Chip size="small"
+                                                  key={l.id}
+                                                  label={l.identifier}
+                                                  color="info"
+                                                  sx={{margin: '2px'}}
+                                            />
+                                        ))}</TableCell>
+                                        <TableCell>
+                                            <NewTrainingAppointmentDialog trainingAppointment={{
+                                                id: ta.id,
+                                                studentId: ta.studentId,
+                                                start: ta.start,
+                                                lessonIds: ta.lessons.map(l => l.id),
+                                            }} assignedStudents={[...primaryStudents, ...otherStudents]}
+                                                                          allStudents={allUsers as User[]}
+                                                                          allLessons={allLessons as Lesson[]}/>
+                                            <TrainingAppointmentDeleteButton trainingAppointment={ta}/>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>}
+                </CardContent>
+            </Card>
             <Card>
                 <CardContent>
                     <Typography variant="h5" sx={{mb: 1,}}>Primary Students</Typography>
@@ -183,7 +281,8 @@ const getTable = (students: Student[]) => (
                         <Chip size="small"
                               key={ticket.lesson.id}
                               label={ticket.lesson.identifier}
-                            color={ticket.passed ? 'success' : 'error'}
+                              color={ticket.passed ? 'success' : 'error'}
+                              sx={{mr: 1,}}
                         />) : 'N/A'}
                     </TableCell>
                     <TableCell>
