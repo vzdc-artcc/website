@@ -136,10 +136,13 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
             },
             where: {
                 id: result.data.id,
-            }
+            },
+            include: {
+                student: true,
+            },
         });
 
-        await log("UPDATE", "TRAINING_APPOINTMENT", `Updated training appointment with ${ta.studentId} on ${formatZuluDate(ta.start)}`);
+        await log("UPDATE", "TRAINING_APPOINTMENT", `Updated training appointment with ${ta.student.fullName} on ${formatZuluDate(ta.start)}`);
     } else {
         const ta = await prisma.trainingAppointment.create({
             data: {
@@ -160,6 +163,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
 
     revalidatePath('/training/your-students');
     revalidatePath(`/training/appointments`);
+    revalidatePath(`/profile/overview`);
 
     return {};
 }
@@ -176,6 +180,29 @@ export const deleteTrainingAppointment = async (id: string, fromAdmin?: boolean)
 
     revalidatePath('/training/your-students');
     revalidatePath(`/training/appointments`);
+    revalidatePath(`/profile/overview`);
 
     await log("DELETE", "TRAINING_APPOINTMENT", `Deleted training appointment with ${ta.student.fullName} on ${formatZuluDate(ta.start)}`)
+}
+
+export const completePreparation = async (id: string) => {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user.id) {
+        return {errors: [{message: 'User not authenticated'}]};
+    }
+
+    await prisma.trainingAppointment.update({
+        where: {
+            id,
+            studentId: session.user.id,
+        },
+        data: {
+            preparationCompleted: true,
+        },
+    });
+
+    revalidatePath('/training/your-students');
+    revalidatePath(`/training/appointments`);
+    revalidatePath(`/profile/overview`);
 }

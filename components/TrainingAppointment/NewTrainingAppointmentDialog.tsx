@@ -52,13 +52,13 @@ export default function NewTrainingAppointmentDialog({trainingAppointment, assig
         }
 
         toast.success(`Training appointment ${trainingAppointment?.id ? 'updated' : 'created'} successfully`);
+        setOpen(false);
         if (!trainingAppointment) {
             setStudent('');
             setStart(dayjs.utc(new Date()));
             setLessons([]);
         }
         setLoading(false);
-        setOpen(false);
     }
 
     return (

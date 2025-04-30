@@ -85,9 +85,23 @@ export async function GET() {
         await refreshAccountData(user as User, true);
     }
 
+    await deleteOldTrainingAppointments();
+
     await updateSyncTime({roster: new Date()});
 
     return Response.json({ok: true,});
+}
+
+const deleteOldTrainingAppointments = async () => {
+    let now = new Date();
+    now.setTime(now.getTime() - (1000 * 60 * 15)); // 15 minutes ago
+    await prisma.trainingAppointment.deleteMany({
+        where: {
+            start: {
+                lte: now,
+            },
+        },
+    });
 }
 
 const updateProgressionAssignments = async (user: User) => {

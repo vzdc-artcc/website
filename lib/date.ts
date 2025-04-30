@@ -24,6 +24,25 @@ export const getTimeAgo = (date: Date) => {
     }
 }
 
+export const getTimeIn = (date: Date) => {
+    const now = new Date();
+    const diff = date.getTime() - now.getTime();
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (seconds < 60) {
+        return `In ${seconds} second(s)`;
+    } else if (minutes < 60) {
+        return `In ${minutes} minute(s)`;
+    } else if (hours < 24) {
+        return `In ${hours} hour(s)`;
+    } else {
+        return `In ${days} day(s)`;
+    }
+}
+
 export const getMonth = (month: number) => {
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     return months[month];

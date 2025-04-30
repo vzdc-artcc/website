@@ -24,7 +24,7 @@ export const submitFeedback = async (formData: FormData) => {
         pilotCallsign: z.string().trim().min(1),
         controllerId: z.string().trim().min(1),
         controllerPosition: z.string().min(1),
-        rating: z.number(),
+        rating: z.number({required_error: 'Rating is required', invalid_type_error: 'Rating is required'}),
         comments: z.string().trim(),
     });
 
