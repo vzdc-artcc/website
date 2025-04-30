@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
             id: true,
             controllerStatus: true,
             rating: true,
+            cid: true,
         },
     });
 
@@ -47,5 +48,6 @@ export async function POST(request: NextRequest) {
         controllerStatus: user.controllerStatus,
         rating: user.rating,
         onlinePosition: posName,
+        cid: user.cid
     });
 }
