@@ -21,7 +21,7 @@ import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
 import {Check, Close, LocalActivity, MilitaryTech, People} from "@mui/icons-material";
 import {Lesson} from "@prisma/client";
-import {formatZuluDate, getTimeAgo} from "@/lib/date";
+import {formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
 import TrainingAppointmentFormDialog from "@/components/TrainingAppointment/TrainingAppointmentFormDialog";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 
@@ -36,6 +36,16 @@ export type Student = {
             passed: boolean,
         }[],
     } | undefined,
+    trainingAppointmentStudent: {
+        start: Date,
+        trainer: {
+            fullName: string | null,
+        },
+        lessons: {
+            id: string,
+            identifier: string,
+        }[],
+    }[],
 }
 
 export default async function Page() {
@@ -77,6 +87,30 @@ export default async function Page() {
         },
         include: {
             trainingAssignmentStudent: true,
+            trainingAppointmentStudent: {
+                orderBy: {
+                    start: 'asc',
+                },
+                where: {
+                    start: {
+                        gte: new Date(),
+                    }
+                },
+                include: {
+                    trainer: {
+                        select: {
+                            fullName: true,
+                        },
+                    },
+                    lessons: {
+                        select: {
+                            id: true,
+                            identifier: true,
+                        }
+                    },
+                },
+                take: 1,
+            },
             trainingSessions: {
                 orderBy: {start: 'desc'},
                 take: 1,
@@ -103,6 +137,29 @@ export default async function Page() {
         },
         include: {
             trainingAssignmentStudent: true,
+            trainingAppointmentStudent: {
+                orderBy: {
+                    start: 'asc',
+                },
+                where: {
+                    start: {
+                        gte: new Date(),
+                    }
+                },
+                include: {
+                    trainer: {
+                        select: {
+                            fullName: true,
+                        },
+                    },
+                    lessons: {
+                        select: {
+                            id: true,
+                            identifier: true,
+                        }
+                    },
+                },
+            },
             trainingSessions: {
                 orderBy: {start: 'desc'},
                 take: 1,
@@ -128,6 +185,7 @@ export default async function Page() {
                 passed: ticket.passed,
             })),
         } : undefined,
+        trainingAppointmentStudent: student.trainingAppointmentStudent,
     }));
 
     const otherStudents: Student[] = otherStudentsData.map(student => ({
@@ -141,6 +199,7 @@ export default async function Page() {
                 passed: ticket.passed,
             })),
         } : undefined,
+        trainingAppointmentStudent: student.trainingAppointmentStudent,
     }));
 
     const trainingAppointments = await prisma.trainingAppointment.findMany({
@@ -247,6 +306,7 @@ const getTable = (students: Student[]) => (
                     <TableCell>Rating</TableCell>
                     <TableCell>Last Session Date</TableCell>
                     <TableCell>Last Session Lesson(s)</TableCell>
+                    <TableCell>Future Session</TableCell>
                     <TableCell>Actions</TableCell>
                 </TableRow>
             </TableHead>
@@ -285,6 +345,21 @@ const getTable = (students: Student[]) => (
                               color={ticket.passed ? 'success' : 'error'}
                               sx={{mr: 1,}}
                         />) : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                        {student.trainingAppointmentStudent.length > 0 ? (
+                            <Tooltip
+                                title={`${formatZuluDate(student.trainingAppointmentStudent[0].start)} with ${student.trainingAppointmentStudent[0].trainer.fullName}: ${student.trainingAppointmentStudent[0].lessons.map((l) => l.identifier).join(', ')}`}>
+                                <Link
+                                    href={`/training/appointments?sortField=start&sortDirection=asc&filterField=student&filterValue=${student.user.cid}&filterOperator=equals`}>
+                                    <Chip
+                                        label={getTimeIn(student.trainingAppointmentStudent[0].start)}
+                                        size="small"
+                                        color="info"
+                                    />
+                                </Link>
+                            </Tooltip>
+                        ) : ''}
                     </TableCell>
                     <TableCell>
                         {student.lastSession ? (

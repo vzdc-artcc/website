@@ -127,11 +127,14 @@ export default function TrainingAssignmentTable({manageMode}: { manageMode: bool
                 return (
                     <Tooltip
                         title={`${formatZuluDate(startDate)} with ${appointment.trainer.fullName}: ${appointment.lessons.map((l: Lesson) => l.identifier).join(', ')}`}>
-                        <Chip
-                            label={getTimeIn(startDate)}
-                            size="small"
-                            color="info"
-                        />
+                        <Link
+                            href={`/training/appointments?sortField=start&sortDirection=asc&filterField=student&filterValue=${params.row.student.cid}&filterOperator=equals`}>
+                            <Chip
+                                label={getTimeIn(startDate)}
+                                size="small"
+                                color="info"
+                            />
+                        </Link>
                     </Tooltip>
                 );
             },
