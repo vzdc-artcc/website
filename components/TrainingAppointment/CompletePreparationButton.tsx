@@ -12,9 +12,11 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    IconButton,
+    Tooltip,
     Typography
 } from "@mui/material";
-import {Check, ExpandMore, LocalLibrary} from "@mui/icons-material";
+import {Check, ExpandMore, LocalLibrary, Visibility} from "@mui/icons-material";
 import Markdown from "react-markdown";
 import {completePreparation} from "@/actions/trainingAppointment";
 import {toast} from "react-toastify";
@@ -38,6 +40,11 @@ export default function CompletePreparationButton({trainingAppointment, lessons}
                     startIcon={trainingAppointment.preparationCompleted ? <Check/> : <LocalLibrary/>}
                     disabled={trainingAppointment.preparationCompleted}
                     onClick={() => setOpen(true)}>{trainingAppointment.preparationCompleted ? 'Preparation Completed' : 'Complete Preparation'}</Button>
+            {trainingAppointment.preparationCompleted &&
+                <Tooltip title="View Preparation">
+                    <IconButton size="small" onClick={() => setOpen(true)}><Visibility fontSize="small"/></IconButton>
+                </Tooltip>
+            }
             <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
                 <DialogTitle>Trainee Preparation</DialogTitle>
                 <DialogContent>
@@ -69,7 +76,8 @@ export default function CompletePreparationButton({trainingAppointment, lessons}
                 </DialogContent>
                 <DialogActions>
                     <Button size="small" color="inherit" onClick={() => setOpen(false)}>Close</Button>
-                    <Button variant="contained" size="small" startIcon={<Check/>} onClick={handleCompletePreparation}>Complete
+                    <Button variant="contained" size="small" startIcon={<Check/>} onClick={handleCompletePreparation}
+                            disabled={trainingAppointment.preparationCompleted}>Complete
                         Preparation</Button>
                 </DialogActions>
             </Dialog>

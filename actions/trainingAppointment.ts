@@ -127,12 +127,30 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
     }
 
     if (result.data.id) {
+        const oldTA = await prisma.trainingAppointment.findUnique({
+            where: {
+                id: result.data.id,
+            },
+            include: {
+                lessons: {
+                    select: {
+                        id: true,
+                    },
+                },
+            },
+        });
+
+        if (!oldTA) {
+            return {errors: [{message: 'Training appointment not found'}]};
+        }
+
         const ta = await prisma.trainingAppointment.update({
             data: {
                 start: result.data.start,
                 lessons: {
                     connect: result.data.lessonIds.map((lessonId) => ({id: lessonId})),
                 },
+                preparationCompleted: (!oldTA.lessons.every((lesson) => result.data.lessonIds.includes(lesson.id)) || result.data.lessonIds.length !== oldTA.lessons.length) ? false : oldTA.preparationCompleted,
             },
             where: {
                 id: result.data.id,
