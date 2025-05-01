@@ -135,7 +135,8 @@ export default async function Page() {
                 <Card>
                     <CardContent>
                         <Typography variant="h5" gutterBottom>Upcoming Sessions</Typography>
-                        {upcomingAppointments.length === 0 && <Typography>No upcoming appointments</Typography>}
+                        {upcomingAppointments.length === 0 &&
+                            <Typography>No upcoming training appointments.</Typography>}
                         {upcomingAppointments.length > 0 &&
                             <TableContainer>
                                 <Table size="small">

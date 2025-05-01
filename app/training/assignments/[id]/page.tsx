@@ -14,9 +14,11 @@ export default async function Page(props: { params: Promise<{ id: string, }> }) 
 
     const session = await getServerSession(authOptions);
 
-    if (!session || (!session.user.staffPositions.includes("TA") && !session.user.staffPositions.includes("ATA"))) {
+    if (!session) {
         permanentRedirect('/training/assignments');
     }
+
+    const allowedEdit = session.user.staffPositions.includes("TA") || session.user.staffPositions.includes("ATA");
 
     const assignment = await prisma.trainingAssignment.findUnique({
         where: {
@@ -46,13 +48,15 @@ export default async function Page(props: { params: Promise<{ id: string, }> }) 
             <CardContent>
                 <Stack direction="row" justifyContent="space-between" spacing={1}>
                     <Typography variant="h5">Training Assignment</Typography>
-                    <TrainingAssignmentDeleteButton assignment={assignment} noTable/>
+                    {allowedEdit && <TrainingAssignmentDeleteButton assignment={assignment} noTable/>}
                 </Stack>
                 <Typography variant="subtitle2"
                             sx={{mb: 2,}}>{assignment.student.fullName} ({assignment.student.cid})</Typography>
                 <TrainingAssignmentForm allUsers={allUsers as User[]} requestStudent={assignment.student as User}
                                         trainingAssignment={assignment}
-                                        otherTrainerIds={assignment.otherTrainers.map(ot => ot.id)}/>
+                                        otherTrainerIds={assignment.otherTrainers.map(ot => ot.id)}
+                                        disabled={!allowedEdit}
+                />
             </CardContent>
         </Card>
     );

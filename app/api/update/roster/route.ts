@@ -7,6 +7,7 @@ import {getOperatingInitials} from "@/actions/lib/oi";
 import {getRating} from "@/lib/vatsim";
 import {sendProgressionAssignedEmail} from "@/actions/mail/progression";
 import {assignNextProgressionOrRemove, getProgressionStatus} from "@/actions/progressionAssignment";
+import {sendTrainingAppointmentWarningEmail} from "@/actions/mail/trainingAppointment";
 
 export const dynamic = 'force-dynamic';
 
@@ -87,9 +88,42 @@ export async function GET() {
 
     await deleteOldTrainingAppointments();
 
+    await sendTrainingAppointmentWarningEmails();
+
     await updateSyncTime({roster: new Date()});
 
     return Response.json({ok: true,});
+}
+
+const sendTrainingAppointmentWarningEmails = async () => {
+    const now = new Date();
+    now.setTime(now.getTime() + (1000 * 60 * 60 * 24)); // 24 hours from now
+    const trainingAppointments = await prisma.trainingAppointment.findMany({
+        where: {
+            start: {
+                gte: new Date(),
+                lte: now,
+            },
+            warningEmailSent: false,
+        },
+        include: {
+            student: true,
+            trainer: true,
+        },
+    });
+
+    for (const trainingAppointment of trainingAppointments) {
+        await sendTrainingAppointmentWarningEmail(trainingAppointment, trainingAppointment.student as User, trainingAppointment.trainer as User).catch(console.error);
+
+        await prisma.trainingAppointment.update({
+            where: {
+                id: trainingAppointment.id,
+            },
+            data: {
+                warningEmailSent: true,
+            },
+        });
+    }
 }
 
 const deleteOldTrainingAppointments = async () => {

@@ -13,21 +13,30 @@ type TrainingAppointmentWithAll = TrainingAppointment & {
     lessons: Lesson[],
 }
 
-export default function TrainingAppointmentInformationDialog({trainingAppointment}: {
-    trainingAppointment: TrainingAppointmentWithAll
+export default function TrainingAppointmentInformationDialog({trainingAppointment, manualOpen, onClose}: {
+    trainingAppointment: TrainingAppointmentWithAll,
+    manualOpen?: boolean,
+    onClose?: () => void,
 }) {
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(manualOpen || false);
+
+    const close = () => {
+        setOpen(false);
+        if (onClose) {
+            onClose();
+        }
+    }
 
     return (
         <>
-            <GridActionsCellItem
+            {!manualOpen && <GridActionsCellItem
                 key={trainingAppointment.id}
                 icon={<Visibility/>}
                 label="View Appointment"
                 onClick={() => setOpen(true)}
-            />
-            <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+            />}
+            <Dialog open={open} onClose={() => close()} fullWidth maxWidth="sm">
                 <DialogTitle>Training Appointment</DialogTitle>
                 <DialogContent>
                     <DialogContentText>Trainer: {trainingAppointment.trainer.fullName}</DialogContentText>
@@ -35,6 +44,8 @@ export default function TrainingAppointmentInformationDialog({trainingAppointmen
                     <br/>
                     <DialogContentText>Start: {formatZuluDate(trainingAppointment.start)}</DialogContentText>
                     <DialogContentText>Duration: {trainingAppointment.lessons.map((l) => l.duration).reduce((acc, c) => acc + c, 0)} minutes</DialogContentText>
+                    <DialogContentText>Estimated
+                        End: {formatZuluDate(new Date(trainingAppointment.start.getTime() + trainingAppointment.lessons.map(l => l.duration).reduce((a, b) => a + b, 0) * 60000))}</DialogContentText>
                     <br/>
                     <DialogContentText>Preparation
                         Complete: {trainingAppointment.preparationCompleted ? 'YES' : 'NO'}</DialogContentText>
@@ -47,7 +58,7 @@ export default function TrainingAppointmentInformationDialog({trainingAppointmen
                     ))}
                 </DialogContent>
                 <DialogActions>
-                    <Button color="inherit" onClick={() => setOpen(false)}>Close</Button>
+                    <Button color="inherit" onClick={() => close()}>Close</Button>
                 </DialogActions>
             </Dialog>
         </>

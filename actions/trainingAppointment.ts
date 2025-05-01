@@ -2,13 +2,19 @@
 
 import {z} from "zod";
 import prisma from "@/lib/db";
-import {getServerSession} from "next-auth";
+import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {revalidatePath} from "next/cache";
 import {log} from "@/actions/log";
 import {formatZuluDate} from "@/lib/date";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
 import {Prisma} from "@prisma/client";
+import {
+    sendTrainingAppointmentCanceledEmail,
+    sendTrainingAppointmentCancelledTrainerEmail,
+    sendTrainingAppointmentScheduledEmail,
+    sendTrainingAppointmentUpdatedEmail
+} from "@/actions/mail/trainingAppointment";
 
 export const fetchTrainingAppointments = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
     const orderBy: Prisma.TrainingAppointmentOrderByWithRelationInput = {};
@@ -96,9 +102,10 @@ const getWhere = (filter?: GridFilterItem): Prisma.TrainingAppointmentWhereInput
 
 export const createOrUpdateTrainingAppointment = async (studentId: string, start: string, lessonIds: string[], id?: string) => {
 
-    const trainerId = (await getServerSession(authOptions))?.user.id;
+    const trainer = await getServerSession(authOptions);
+    const trainerId = trainer?.user.id;
 
-    if (!trainerId) {
+    if (!trainer || !trainerId) {
         return {errors: [{message: 'User not authenticated'}]};
     }
 
@@ -161,6 +168,8 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
         });
 
         await log("UPDATE", "TRAINING_APPOINTMENT", `Updated training appointment with ${ta.student.fullName} on ${formatZuluDate(ta.start)}`);
+
+        sendTrainingAppointmentUpdatedEmail(ta, ta.student as User, trainer.user).then();
     } else {
         const ta = await prisma.trainingAppointment.create({
             data: {
@@ -177,6 +186,8 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
         });
 
         await log("CREATE", "TRAINING_APPOINTMENT", `Created training appointment with ${ta.student.fullName} on ${formatZuluDate(ta.start)}`);
+
+        sendTrainingAppointmentScheduledEmail(ta, ta.student as User, trainer.user).then();
     }
 
     revalidatePath('/training/your-students');
@@ -193,6 +204,7 @@ export const deleteTrainingAppointment = async (id: string, fromAdmin?: boolean)
         },
         include: {
             student: true,
+            trainer: true,
         },
     });
 
@@ -201,6 +213,11 @@ export const deleteTrainingAppointment = async (id: string, fromAdmin?: boolean)
     revalidatePath(`/profile/overview`);
 
     await log("DELETE", "TRAINING_APPOINTMENT", `Deleted training appointment with ${ta.student.fullName} on ${formatZuluDate(ta.start)}`)
+
+    sendTrainingAppointmentCanceledEmail(ta, ta.student as User, ta.trainer as User).then();
+    if (fromAdmin) {
+        sendTrainingAppointmentCancelledTrainerEmail(ta, ta.student as User, ta.trainer as User).then();
+    }
 }
 
 export const completePreparation = async (id: string) => {

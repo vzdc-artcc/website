@@ -26,7 +26,12 @@ import {createOrUpdateTrainingAppointment} from "@/actions/trainingAppointment";
 import {toast} from "react-toastify";
 import {formatZuluDate} from "@/lib/date";
 
-export default function NewTrainingAppointmentDialog({trainingAppointment, assignedStudents, allStudents, allLessons}: {
+export default function TrainingAppointmentFormDialog({
+                                                          trainingAppointment,
+                                                          assignedStudents,
+                                                          allStudents,
+                                                          allLessons
+                                                      }: {
     trainingAppointment?: { id: string, studentId: string, start: Date, lessonIds: string[], },
     assignedStudents: Student[],
     allStudents: User[],
@@ -77,11 +82,11 @@ export default function NewTrainingAppointmentDialog({trainingAppointment, assig
                             options={allStudents}
                             disabled={!!trainingAppointment}
                             groupBy={(option) =>
-                                assignedStudents.some((s) => s.user.id === option.id) ? 'Your Students' : 'All Students'
+                                assignedStudents.some((s) => s.user.id === option.id) ? 'Your Students' : 'All Controllers'
                             }
                             renderGroup={(params) => (
                                 <Box key={params.key}>
-                                    <Typography variant="h6" sx={{p: 1,}}>{params.group}</Typography>
+                                    <Typography variant="subtitle2" sx={{ml: 1, py: 0.5,}}>{params.group}</Typography>
                                     {params.children}
                                 </Box>
                             )}

@@ -22,7 +22,7 @@ import Link from "next/link";
 import {Check, Close, LocalActivity, MilitaryTech, People} from "@mui/icons-material";
 import {Lesson} from "@prisma/client";
 import {formatZuluDate, getTimeAgo} from "@/lib/date";
-import NewTrainingAppointmentDialog from "@/components/TrainingAppointment/NewTrainingAppointmentDialog";
+import TrainingAppointmentFormDialog from "@/components/TrainingAppointment/TrainingAppointmentFormDialog";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 
 export type Student = {
@@ -162,14 +162,15 @@ export default async function Page() {
                 <CardContent>
                     <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center" sx={{mb: 1,}}>
                         <Typography variant="h5">Your Upcoming Sessions</Typography>
-                        <NewTrainingAppointmentDialog assignedStudents={[...primaryStudents, ...otherStudents]}
-                                                      allStudents={allUsers as User[]}
-                                                      allLessons={allLessons as Lesson[]}/>
+                        <TrainingAppointmentFormDialog assignedStudents={[...primaryStudents, ...otherStudents]}
+                                                       allStudents={allUsers as User[]}
+                                                       allLessons={allLessons as Lesson[]}/>
                     </Stack>
                     {trainingAppointments.length === 0 &&
                         <Typography>You have no upcoming training appointments.</Typography>}
-                    <Typography sx={{mb: 2,}}>Appointments are automatically deleted 15 minutes after the start
-                        time.</Typography>
+                    {trainingAppointments.length > 0 &&
+                        <Typography sx={{mb: 2,}}>Appointments are automatically deleted 15 minutes after the start
+                            time.</Typography>}
                     {trainingAppointments.length > 0 && <TableContainer>
                         <Table size="small">
                             <TableHead>
@@ -201,14 +202,14 @@ export default async function Page() {
                                             />
                                         ))}</TableCell>
                                         <TableCell>
-                                            <NewTrainingAppointmentDialog trainingAppointment={{
+                                            <TrainingAppointmentFormDialog trainingAppointment={{
                                                 id: ta.id,
                                                 studentId: ta.studentId,
                                                 start: ta.start,
                                                 lessonIds: ta.lessons.map(l => l.id),
                                             }} assignedStudents={[...primaryStudents, ...otherStudents]}
-                                                                          allStudents={allUsers as User[]}
-                                                                          allLessons={allLessons as Lesson[]}/>
+                                                                           allStudents={allUsers as User[]}
+                                                                           allLessons={allLessons as Lesson[]}/>
                                             <TrainingAppointmentDeleteButton trainingAppointment={ta}/>
                                         </TableCell>
                                     </TableRow>

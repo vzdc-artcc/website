@@ -71,7 +71,7 @@ export const deleteTrainingAssignment = async (id: string) => {
 
     await log("DELETE", "TRAINING_ASSIGNMENT", `Deleted training request for ${request.student.fullName} (${request.student.cid})`);
 
-    await sendTrainingAssignmentDeletedEmail(request.student as User, [request.primaryTrainer as User, ...request.otherTrainers as User[]]);
+    sendTrainingAssignmentDeletedEmail(request.student as User, [request.primaryTrainer as User, ...request.otherTrainers as User[]]).then();
     revalidatePath('/training/requests');
 }
 
@@ -163,16 +163,16 @@ export const saveTrainingAssignment = async (formData: FormData) => {
         const addedTrainers = assignment.otherTrainers.filter(trainer => !oldTrainerIds.includes(trainer.id));
 
         await log("UPDATE", "TRAINING_ASSIGNMENT", `Updated training assignment for ${assignment.student.fullName} (${assignment.student.cid})`);
-        await sendTrainingAssignmentUpdatedEmail(
+        sendTrainingAssignmentUpdatedEmail(
             assignment.student as User,
             assignment.primaryTrainer as User,
             removedTrainers as User[],
             addedTrainers as User[],
             oldAssignment?.primaryTrainer.id !== assignment.primaryTrainer.id,
-        );
+        ).then();
     } else {
         await log("CREATE", "TRAINING_ASSIGNMENT", `Created training assignment for ${assignment.student.fullName} (${assignment.student.cid})`);
-        await sendTrainingRequestFulfilledEmail(assignment.student as User, assignment.primaryTrainer as User, assignment.otherTrainers as User[]);
+        sendTrainingRequestFulfilledEmail(assignment.student as User, assignment.primaryTrainer as User, assignment.otherTrainers as User[]).then();
     }
 
     revalidatePath('/training/assignments');
@@ -202,6 +202,30 @@ export const fetchTrainingAssignments = async (pagination: GridPaginationModel, 
             include: {
                 student: {
                     include: {
+                        trainingAppointmentStudent: {
+                            orderBy: {
+                                start: 'asc',
+                            },
+                            where: {
+                                start: {
+                                    gte: new Date(),
+                                }
+                            },
+                            include: {
+                                trainer: {
+                                    select: {
+                                        fullName: true,
+                                    },
+                                },
+                                lessons: {
+                                    select: {
+                                        id: true,
+                                        identifier: true,
+                                    }
+                                },
+                            },
+                            take: 1,
+                        },
                         trainingSessions: {
                             orderBy: {start: 'desc'},
                             take: 1,
