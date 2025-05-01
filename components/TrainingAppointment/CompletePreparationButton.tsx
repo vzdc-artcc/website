@@ -63,7 +63,8 @@ export default function CompletePreparationButton({trainingAppointment, lessons}
                             </Accordion>
                         ))}
                     </Box>
-                    <DialogContentText sx={{mb: 1,}}>By selecting 'Complete Preparation' below, you agree that all
+                    <DialogContentText sx={{mb: 1,}}>By selecting &apos;Complete Preparation&apos; below, you agree that
+                        all
                         preparation for this session, which includes lesson preparation and trainer initiated
                         preparation, has been completed.</DialogContentText>
                     <DialogContentText sx={{mb: 1,}}>You also understand that <b>the trainer may cancel or end the
