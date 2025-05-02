@@ -452,20 +452,23 @@ enum HighlightColorType {
 }
 
 model Lesson {
-  id                     String                    @id @default(cuid())
-  identifier             String
-  location               Int
-  name                   String
-  description            String
-  position               String
-  facility               String
-  rubric                 LessonRubric?             @relation(fields: [rubricId], references: [id])
-  rubricId               String?                   @unique
-  updatedAt              DateTime
-  instructorOnly         Boolean
-  notifyInstructorOnPass Boolean
-  trainingTickets        TrainingTicket[]
-  progressions           TrainingProgressionStep[]
+  id          String        @id @default(cuid())
+  identifier  String
+  location    Int
+  name        String
+  description String
+  position    String
+  facility    String
+  rubric      LessonRubric? @relation(fields: [rubricId], references: [id])
+  rubricId    String?       @unique
+  updatedAt   DateTime
+
+  instructorOnly                 Boolean
+  notifyInstructorOnPass         Boolean
+  deleteTrainingAssignmentOnPass Boolean @default(false)
+
+  trainingTickets TrainingTicket[]
+  progressions    TrainingProgressionStep[]
 
   performanceIndicator   LessonPerformanceIndicator?
   performanceIndicatorId String?

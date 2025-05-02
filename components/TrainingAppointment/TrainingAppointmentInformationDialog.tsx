@@ -6,6 +6,7 @@ import {Visibility} from "@mui/icons-material";
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
 import {formatZuluDate} from "@/lib/date";
+import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 
 type TrainingAppointmentWithAll = TrainingAppointment & {
     student: User,
@@ -13,10 +14,16 @@ type TrainingAppointmentWithAll = TrainingAppointment & {
     lessons: Lesson[],
 }
 
-export default function TrainingAppointmentInformationDialog({trainingAppointment, manualOpen, onClose}: {
+export default function TrainingAppointmentInformationDialog({
+                                                                 trainingAppointment,
+                                                                 manualOpen,
+                                                                 onClose,
+                                                                 isTrainingStaff
+                                                             }: {
     trainingAppointment: TrainingAppointmentWithAll,
     manualOpen?: boolean,
     onClose?: () => void,
+    isTrainingStaff: boolean,
 }) {
 
     const [open, setOpen] = useState(manualOpen || false);
@@ -58,7 +65,11 @@ export default function TrainingAppointmentInformationDialog({trainingAppointmen
                     ))}
                 </DialogContent>
                 <DialogActions>
-                    <Button color="inherit" onClick={() => close()}>Close</Button>
+                    {isTrainingStaff &&
+                        <TrainingAppointmentDeleteButton trainingAppointment={trainingAppointment} fromAdmin
+                                                         onDelete={close}/>
+                    }
+                    <Button variant="contained" size="small" onClick={() => close()}>Close</Button>
                 </DialogActions>
             </Dialog>
         </>

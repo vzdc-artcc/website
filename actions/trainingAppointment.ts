@@ -192,6 +192,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
 
     revalidatePath('/training/your-students');
     revalidatePath(`/training/appointments`);
+    revalidatePath(`/training/calendar`);
     revalidatePath(`/profile/overview`);
 
     return {};
@@ -210,6 +211,7 @@ export const deleteTrainingAppointment = async (id: string, fromAdmin?: boolean)
 
     revalidatePath('/training/your-students');
     revalidatePath(`/training/appointments`);
+    revalidatePath(`/training/calendar`);
     revalidatePath(`/profile/overview`);
 
     await log("DELETE", "TRAINING_APPOINTMENT", `Deleted training appointment with ${ta.student.fullName} on ${formatZuluDate(ta.start)}`)
@@ -239,5 +241,6 @@ export const completePreparation = async (id: string) => {
 
     revalidatePath('/training/your-students');
     revalidatePath(`/training/appointments`);
+    revalidatePath(`/training/calendar`);
     revalidatePath(`/profile/overview`);
 }

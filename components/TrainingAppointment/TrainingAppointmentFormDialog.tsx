@@ -2,7 +2,6 @@
 import React, {useState} from 'react';
 import {
     Autocomplete,
-    Box,
     Button,
     Dialog,
     DialogActions,
@@ -11,8 +10,7 @@ import {
     DialogTitle,
     IconButton,
     Stack,
-    TextField,
-    Typography
+    TextField
 } from "@mui/material";
 import {Add, Edit, Save} from "@mui/icons-material";
 import {Student} from "@/app/training/your-students/page";
@@ -79,17 +77,26 @@ export default function TrainingAppointmentFormDialog({
                 <DialogContent>
                     <Stack direction="column" spacing={2} sx={{p: 1,}}>
                         <Autocomplete
-                            options={allStudents}
+                            options={allStudents.sort((a, b) => {
+                                if (assignedStudents.some((s) => s.user.id === a.id) && assignedStudents.some((s) => s.user.id === b.id)) {
+                                    return a.lastName.localeCompare(b.lastName);
+                                } else if (assignedStudents.some((s) => s.user.id === a.id)) {
+                                    return -1;
+                                } else if (assignedStudents.some((s) => s.user.id === b.id)) {
+                                    return 1;
+                                }
+                                return 0;
+                            })}
                             disabled={!!trainingAppointment}
                             groupBy={(option) =>
-                                assignedStudents.some((s) => s.user.id === option.id) ? 'Your Students' : 'All Controllers'
+                                assignedStudents.some((s) => s.user.id === option.id) ? 'Your Students' : 'All Students'
                             }
-                            renderGroup={(params) => (
-                                <Box key={params.key}>
-                                    <Typography variant="subtitle2" sx={{ml: 1, py: 0.5,}}>{params.group}</Typography>
-                                    {params.children}
-                                </Box>
-                            )}
+                            // renderGroup={(params) => (
+                            //     <Box key={params.key}>
+                            //         <Typography variant="subtitle2" sx={{ml: 1, py: 0.5,}}>{params.group}</Typography>
+                            //         {params.children}
+                            //     </Box>
+                            // )}
                             getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.cid})`}
                             value={allStudents.find((u) => u.id === student) || null}
                             onChange={(event, newValue) => {

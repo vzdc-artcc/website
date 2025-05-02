@@ -13,13 +13,17 @@ export type TrainingAppointmentWithAll = TrainingAppointment & {
     lessons: Lesson[],
 }
 
-export default function TrainingAppointmentCalendar({appointments}: { appointments: TrainingAppointmentWithAll[], }) {
+export default function TrainingAppointmentCalendar({appointments, isTrainingStaff}: {
+    appointments: TrainingAppointmentWithAll[],
+    isTrainingStaff: boolean
+}) {
 
     const [openId, setOpenId] = React.useState<string | null>(null);
 
     return (
         <>
             {openId && <TrainingAppointmentInformationDialog
+                isTrainingStaff={isTrainingStaff}
                 trainingAppointment={appointments.find(a => a.id === openId) as TrainingAppointmentWithAll} manualOpen
                 onClose={() => setOpenId(null)}/>}
             <FullCalendar

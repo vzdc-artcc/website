@@ -1,7 +1,7 @@
 import React from 'react';
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
-import {Button, Card, CardActions, CardContent, Chip, Grid2, Stack, Typography} from "@mui/material";
+import {Alert, Button, Card, CardActions, CardContent, Chip, Grid2, Stack, Typography} from "@mui/material";
 import ProfileCard from "@/components/Profile/ProfileCard";
 import CertificationsCard from "@/components/Profile/CertificationsCard";
 import FeedbackCard from "@/components/Profile/FeedbackCard";
@@ -76,10 +76,9 @@ export default async function Page() {
                                 <Chip key={lesson.id} size="small" label={lesson.identifier} sx={{mr: 1,}}/>
                             )
                         })}
-                        <br/>
-                        <Typography variant="caption">To reschedule this session or to cancel it, contact the
+                        <Alert severity="info" sx={{mt: 2,}}>To reschedule this session or to cancel it, contact the
                             trainer. Last minute changes might not be honored and may result in disciplinary
-                            action.</Typography>
+                            action.</Alert>
                     </CardContent>
                     <CardActions>
                         <SessionJoinInstructionsButton trainingAppointment={trainingAppointment}/>

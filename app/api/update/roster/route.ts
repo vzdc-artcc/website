@@ -97,7 +97,7 @@ export async function GET() {
 
 const sendTrainingAppointmentWarningEmails = async () => {
     const now = new Date();
-    now.setTime(now.getTime() + (1000 * 60 * 60 * 24)); // 24 hours from now
+    now.setTime(now.getTime() + (1000 * 60 * 60 * 12)); // 12 hours from now
     const trainingAppointments = await prisma.trainingAppointment.findMany({
         where: {
             start: {
