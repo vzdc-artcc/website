@@ -9,7 +9,8 @@ import {User} from "next-auth";
 export const appointmentCanceled = async (trainingAppointment: TrainingAppointment, student: User, trainer: User) => {
     return renderReactToMjml(
         <SingleRecipientEmailWrapper recipient={student} headerText="Training Appointment Canceled">
-            <p>Your training appointment on <b>{formatEasternDate(trainingAppointment.start)}</b> has been canceled.</p>
+            <p>Your training appointment on <b>{formatEasternDate(trainingAppointment.start)}</b> (ET) has been
+                canceled.</p>
             <p>You are no longer required to attend this appointment.</p>
             <br/>
             <p>Contact your trainer if you have any questions.</p>

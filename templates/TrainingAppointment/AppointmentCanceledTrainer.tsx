@@ -8,7 +8,7 @@ export const appointmentCanceledTrainer = async (trainingAppointment: TrainingAp
     return renderReactToMjml(
         <SingleRecipientEmailWrapper recipient={trainer} headerText="Training Appointment Canceled">
             <p>Your training appointment
-                with <b>{student.fullName}</b> on <b>{formatEasternDate(trainingAppointment.start)}</b> has been
+                with <b>{student.fullName}</b> on <b>{formatEasternDate(trainingAppointment.start)}</b> (ET) has been
                 cancelled
                 by staff.</p>
             <p>You are no longer required to attend this appointment.</p>

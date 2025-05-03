@@ -9,7 +9,7 @@ export const appointmentScheduled = async (trainingAppointment: TrainingAppointm
     return renderReactToMjml(
         <SingleRecipientEmailWrapper recipient={student} headerText="Training Appointment Scheduled">
             <p>A training appointment has been scheduled for you
-                on <b>{formatEasternDate(trainingAppointment.start)}</b>.
+                on <b>{formatEasternDate(trainingAppointment.start)}</b> (ET).
             </p>
             <p>The estimated duration for this appointment can be found on your profile.</p>
             <br/>

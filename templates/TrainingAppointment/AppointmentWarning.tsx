@@ -9,7 +9,7 @@ export const appointmentWarning = async (trainingAppointment: TrainingAppointmen
     return renderReactToMjml(
         <SingleRecipientEmailWrapper recipient={student} headerText="Training Appointment Soon">
             <p>This is a reminder about your training appointment scheduled
-                on <b>{formatEasternDate(trainingAppointment.start)}</b>.</p>
+                on <b>{formatEasternDate(trainingAppointment.start)}</b> (ET).</p>
             <p>You are required to attend this appointment unless you contact your trainer prior to the start time.</p>
             <br/>
             {!trainingAppointment.preparationCompleted && <>
