@@ -5,7 +5,7 @@ import {User} from "next-auth";
 import {Visibility} from "@mui/icons-material";
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
-import {formatZuluDate} from "@/lib/date";
+import {formatEasternDate} from "@/lib/date";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 
 type TrainingAppointmentWithAll = TrainingAppointment & {
@@ -49,10 +49,11 @@ export default function TrainingAppointmentInformationDialog({
                     <DialogContentText>Trainer: {trainingAppointment.trainer.fullName}</DialogContentText>
                     <DialogContentText>Student: {trainingAppointment.student.fullName}</DialogContentText>
                     <br/>
-                    <DialogContentText>Start: {formatZuluDate(trainingAppointment.start)}</DialogContentText>
+                    <DialogContentText>Start (Eastern
+                        Time): {formatEasternDate(trainingAppointment.start)}</DialogContentText>
                     <DialogContentText>Duration: {trainingAppointment.lessons.map((l) => l.duration).reduce((acc, c) => acc + c, 0)} minutes</DialogContentText>
                     <DialogContentText>Estimated
-                        End: {formatZuluDate(new Date(trainingAppointment.start.getTime() + trainingAppointment.lessons.map(l => l.duration).reduce((a, b) => a + b, 0) * 60000))}</DialogContentText>
+                        End: {formatEasternDate(new Date(trainingAppointment.start.getTime() + trainingAppointment.lessons.map(l => l.duration).reduce((a, b) => a + b, 0) * 60000))}</DialogContentText>
                     <br/>
                     <DialogContentText>Preparation
                         Complete: {trainingAppointment.preparationCompleted ? 'YES' : 'NO'}</DialogContentText>

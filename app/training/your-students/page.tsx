@@ -19,11 +19,35 @@ import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
-import {Check, Close, LocalActivity, MilitaryTech, People} from "@mui/icons-material";
+import {Check, Close, Event, LocalActivity, MilitaryTech, People} from "@mui/icons-material";
 import {Lesson} from "@prisma/client";
-import {formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
+import {formatEasternDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
 import TrainingAppointmentFormDialog from "@/components/TrainingAppointment/TrainingAppointmentFormDialog";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
+import {format} from "date-fns";
+
+const createCalendarLink = (
+    startDate: Date,
+    durationMinutes: number,
+    timezone: string,
+    studentName: string,
+    sessionDetails: string
+): string => {
+    // Convert startDate to GMT
+    const startDateGMT = new Date(startDate.toLocaleString("en-US", {timeZone: "GMT"}));
+    const endDateGMT = new Date(startDateGMT.getTime() + durationMinutes * 60 * 1000);
+
+    // Format dates in Google Calendar format
+    const formatDate = (date: Date) => format(date, "yyyyMMdd'T'HHmmss");
+
+    const start = formatDate(startDateGMT);
+    const end = formatDate(endDateGMT);
+
+    // Generate the calendar link
+    return `https://www.google.com/calendar/render?action=TEMPLATE&text=Session%20with%20${encodeURIComponent(
+        studentName
+    )}&details=${encodeURIComponent(sessionDetails)}&dates=${start}/${end}&ctz=${timezone}`;
+};
 
 export type Student = {
     user: User,
@@ -234,7 +258,7 @@ export default async function Page() {
                         <Table size="small">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Start (Zulu)</TableCell>
+                                    <TableCell>Start (Eastern Time)</TableCell>
                                     <TableCell>Duration (min)</TableCell>
                                     <TableCell>Student</TableCell>
                                     <TableCell>Preparation Completed</TableCell>
@@ -245,7 +269,7 @@ export default async function Page() {
                             <TableBody>
                                 {trainingAppointments.map((ta) => (
                                     <TableRow key={ta.id}>
-                                        <TableCell>{formatZuluDate(ta.start)}</TableCell>
+                                        <TableCell>{formatEasternDate(ta.start)}</TableCell>
                                         <TableCell>{ta.lessons.map((l) => l.duration).reduce((p, c) => {
                                             return p + c;
                                         }, 0)}</TableCell>
@@ -261,6 +285,21 @@ export default async function Page() {
                                             />
                                         ))}</TableCell>
                                         <TableCell>
+                                            <Link
+                                                href={createCalendarLink(
+                                                    ta.start,
+                                                    ta.lessons.map((l) => l.duration).reduce((p, c) => p + c, 0),
+                                                    'GMT',
+                                                    ta.student.fullName || '',
+                                                    `Session with ${ta.student.fullName} covering lessons: ${ta.lessons.map((l) => l.identifier).join(', ')}`
+                                                )}
+                                            >
+                                                <Tooltip title="Add to Calendar">
+                                                    <IconButton>
+                                                        <Event/>
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Link>
                                             <TrainingAppointmentFormDialog trainingAppointment={{
                                                 id: ta.id,
                                                 studentId: ta.studentId,
