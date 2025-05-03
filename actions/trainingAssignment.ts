@@ -71,7 +71,7 @@ export const deleteTrainingAssignment = async (id: string) => {
 
     await log("DELETE", "TRAINING_ASSIGNMENT", `Deleted training request for ${request.student.fullName} (${request.student.cid})`);
 
-    sendTrainingAssignmentDeletedEmail(request.student as User, [request.primaryTrainer as User, ...request.otherTrainers as User[]]).then();
+    sendTrainingAssignmentDeletedEmail(request.student as User, [request.primaryTrainer as User, ...request.otherTrainers as User[]]);
     revalidatePath('/training/requests');
 }
 

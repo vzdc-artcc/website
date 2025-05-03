@@ -112,18 +112,21 @@ const sendTrainingAppointmentWarningEmails = async () => {
         },
     });
 
-    for (const trainingAppointment of trainingAppointments) {
-        await sendTrainingAppointmentWarningEmail(trainingAppointment, trainingAppointment.student as User, trainingAppointment.trainer as User).catch(console.error);
-
-        await prisma.trainingAppointment.update({
-            where: {
-                id: trainingAppointment.id,
-            },
-            data: {
-                warningEmailSent: true,
-            },
-        });
-    }
+    await Promise.all(trainingAppointments.map(async (trainingAppointment) => {
+        try {
+            await sendTrainingAppointmentWarningEmail(trainingAppointment, trainingAppointment.student as User, trainingAppointment.trainer as User);
+            await prisma.trainingAppointment.update({
+                where: {
+                    id: trainingAppointment.id,
+                },
+                data: {
+                    warningEmailSent: true,
+                },
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    }));
 }
 
 const deleteOldTrainingAppointments = async () => {

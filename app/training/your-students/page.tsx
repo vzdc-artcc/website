@@ -246,9 +246,9 @@ export default async function Page() {
                                 {trainingAppointments.map((ta) => (
                                     <TableRow key={ta.id}>
                                         <TableCell>{formatZuluDate(ta.start)}</TableCell>
-                                        <TableCell>{ta.lessons.map((l) => l.duration).reduce((p, c, i) => {
-                                            return i == 0 ? c : p + c;
-                                        })}</TableCell>
+                                        <TableCell>{ta.lessons.map((l) => l.duration).reduce((p, c) => {
+                                            return p + c;
+                                        }, 0)}</TableCell>
                                         <TableCell>{`${ta.student.fullName} - ${getRating(ta.student.rating)}`}</TableCell>
                                         <TableCell>{ta.preparationCompleted ? <Check color="success"/> :
                                             <Close color="error"/>}</TableCell>
