@@ -28,7 +28,7 @@ export default function TrainingAppointmentCalendar({appointments, isTrainingSta
                 onClose={() => setOpenId(null)}/>}
             <FullCalendar
                 plugins={[dayGridPlugin]}
-                timeZone="UTC"
+                timeZone="local"
                 editable={false}
                 events={appointments.map((a) => ({
                     id: a.id,

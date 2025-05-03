@@ -2,13 +2,13 @@ import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
 import {TrainingAppointment} from "@prisma/client";
 import {User} from "next-auth";
-import {formatZuluDate} from "@/lib/date";
+import {formatEasternDate} from "@/lib/date";
 import {getRating} from "@/lib/vatsim";
 
 export const appointmentUpdated = async (trainingAppointment: TrainingAppointment, student: User, trainer: User) => {
     return renderReactToMjml(
         <SingleRecipientEmailWrapper recipient={student} headerText="Training Appointment Updated">
-            <p>Your training appointment on <b>{formatZuluDate(trainingAppointment.start)}</b> has been updated.</p>
+            <p>Your training appointment on <b>{formatEasternDate(trainingAppointment.start)}</b> has been updated.</p>
             <p>Make sure you are familiar with the updates prior to the start time.</p>
             <br/>
             <p>Please check <a href="https://vzdc.org/profile/overview">your profile</a> for more details.</p>

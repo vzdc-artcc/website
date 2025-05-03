@@ -1,5 +1,6 @@
 'use client';
 import React, {useState} from 'react';
+import timezone from "dayjs/plugin/timezone";
 import {
     Autocomplete,
     Button,
@@ -37,16 +38,17 @@ export default function TrainingAppointmentFormDialog({
 }) {
 
     dayjs.extend(utc);
+    dayjs.extend(timezone);
 
     const [open, setOpen] = useState(false);
     const [student, setStudent] = useState(trainingAppointment?.studentId || '');
-    const [start, setStart] = useState<Dayjs | null>(dayjs.utc(trainingAppointment?.start || new Date()));
+    const [start, setStart] = useState<Dayjs | null>(dayjs.utc(trainingAppointment?.start || new Date()).tz("America/New_York"));
     const [lessons, setLessons] = useState<Lesson[]>(trainingAppointment?.lessonIds.map((id) => allLessons.find((l) => l.id === id)).filter((l) => l !== undefined) as Lesson[] || []);
     const [loading, setLoading] = useState(false);
 
     const handleCreate = async () => {
         setLoading(true);
-        const {errors} = await createOrUpdateTrainingAppointment(student, start?.toISOString() || '', lessons.map((l) => l.id), trainingAppointment?.id);
+        const {errors} = await createOrUpdateTrainingAppointment(student, start?.utc().toISOString() || '', lessons.map((l) => l.id), trainingAppointment?.id);
 
         if (errors) {
             toast.error(errors.map((e) => e.message).join(', '));
@@ -58,7 +60,7 @@ export default function TrainingAppointmentFormDialog({
         setOpen(false);
         if (!trainingAppointment) {
             setStudent('');
-            setStart(dayjs.utc(new Date()));
+            setStart(dayjs.utc(new Date()).tz("America/New_York"));
             setLessons([]);
         }
         setLoading(false);
@@ -104,7 +106,7 @@ export default function TrainingAppointmentFormDialog({
                             }}
                             renderInput={(params) => <TextField {...params} required label="Student"/>}
                         />
-                        <DateTimePicker sx={{width: '100%',}} name="start" label="Start (zulu)" value={start}
+                        <DateTimePicker sx={{width: '100%',}} name="start" label="Start (Eastern Time)" value={start}
                                         disablePast ampm={false} onChange={setStart}/>
                         <Autocomplete
                             options={allLessons}

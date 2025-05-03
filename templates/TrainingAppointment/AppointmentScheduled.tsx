@@ -2,13 +2,14 @@ import {TrainingAppointment} from "@prisma/client";
 import {User} from "next-auth";
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
-import {formatZuluDate} from "@/lib/date";
+import {formatEasternDate} from "@/lib/date";
 import {getRating} from "@/lib/vatsim";
 
 export const appointmentScheduled = async (trainingAppointment: TrainingAppointment, student: User, trainer: User) => {
     return renderReactToMjml(
         <SingleRecipientEmailWrapper recipient={student} headerText="Training Appointment Scheduled">
-            <p>A training appointment has been scheduled for you on <b>{formatZuluDate(trainingAppointment.start)}</b>.
+            <p>A training appointment has been scheduled for you
+                on <b>{formatEasternDate(trainingAppointment.start)}</b>.
             </p>
             <p>The estimated duration for this appointment can be found on your profile.</p>
             <br/>

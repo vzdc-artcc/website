@@ -1,3 +1,11 @@
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 export const getDaysLeft = (date: Date): string => {
     const now = new Date();
     const diff = date.getTime() - now.getTime();
@@ -85,3 +93,7 @@ export const eventGetDuration = (start: Date, end: Date, days?: boolean) => {
     }
     return hours + minutes / 60;
 }
+
+export const formatEasternDate = (date: Date) => {
+    return dayjs.utc(date).tz("America/New_York").format("MM/DD/YY HH:mm");
+};
