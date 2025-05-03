@@ -91,7 +91,8 @@ export default function TrainingAppointmentTable({sessionUser}: { sessionUser: U
             type: 'actions',
             headerName: 'Actions',
             getActions: (params) => [
-                <TrainingAppointmentInformationDialog trainingAppointment={params.row} key={params.id}/>,
+                <TrainingAppointmentInformationDialog trainingAppointment={params.row} key={params.id}
+                                                      isTrainingStaff={["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as StaffPosition))}/>,
                 ["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as StaffPosition)) || sessionUser.cid == `${params.row.trainer.cid}` ?
                     <TrainingAppointmentDeleteButton trainingAppointment={params.row} fromAdmin/>
                     : <></>,
