@@ -1,7 +1,7 @@
 import React from 'react';
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
-import {Button, Card, CardActions, CardContent, Chip, Grid2, Stack, Typography} from "@mui/material";
+import {Alert, Button, Card, CardActions, CardContent, Chip, Grid2, Stack, Typography} from "@mui/material";
 import ProfileCard from "@/components/Profile/ProfileCard";
 import CertificationsCard from "@/components/Profile/CertificationsCard";
 import FeedbackCard from "@/components/Profile/FeedbackCard";
@@ -15,6 +15,9 @@ import {Edit} from "@mui/icons-material";
 import {LOAStatus} from "@prisma/client";
 import AssignedMentorsCard from "@/components/Profile/AssignedMentorsCard";
 import ProgressionCard from "@/components/Profile/ProgressionCard";
+import {formatZuluDate, getTimeIn} from "@/lib/date";
+import CompletePreparationButton from "@/components/TrainingAppointment/CompletePreparationButton";
+import SessionJoinInstructionsButton from "@/components/TrainingAppointment/SessionJoinInstructionsButton";
 
 export default async function Page() {
 
@@ -29,6 +32,16 @@ export default async function Page() {
                 not: "INACTIVE",
             },
         },
+    });
+
+    const trainingAppointment = await prisma.trainingAppointment.findFirst({
+        where: {
+            studentId: user?.id || "",
+        },
+        include: {
+            trainer: true,
+            lessons: true,
+        }
     });
 
     const getLoaColor = (status: LOAStatus) => {
@@ -49,6 +62,31 @@ export default async function Page() {
             <Grid2 size={6}>
                 <Typography variant="h4">Your Profile</Typography>
             </Grid2>
+            {trainingAppointment && <Grid2 size={6}>
+                <Card>
+                    <CardContent>
+                        <Typography variant="h6">Training
+                            Appointment: {trainingAppointment.trainer.fullName}</Typography>
+                        <Typography
+                            variant="subtitle2">{formatZuluDate(trainingAppointment.start)} - {trainingAppointment.start.getTime() < (new Date()).getTime() ? 'NOW' : getTimeIn(trainingAppointment.start)}</Typography>
+                        <Typography variant="subtitle2" gutterBottom>{trainingAppointment.lessons.map(l => l.duration)
+                            .reduce((acc: number, curr: number) => acc + curr, 0)} minutes</Typography>
+                        {trainingAppointment.lessons.map((lesson) => {
+                            return (
+                                <Chip key={lesson.id} size="small" label={lesson.identifier} sx={{mr: 1,}}/>
+                            )
+                        })}
+                        <Alert severity="info" sx={{mt: 2,}}>To reschedule this session or to cancel it, contact the
+                            trainer. Last minute changes might not be honored and may result in disciplinary
+                            action.</Alert>
+                    </CardContent>
+                    <CardActions>
+                        <SessionJoinInstructionsButton trainingAppointment={trainingAppointment}/>
+                        <CompletePreparationButton trainingAppointment={trainingAppointment}
+                                                   lessons={trainingAppointment.lessons}/>
+                    </CardActions>
+                </Card>
+            </Grid2>}
             {loa && <Grid2 size={6}>
                 <Card>
                     <CardContent>

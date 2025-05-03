@@ -5,13 +5,13 @@ import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import {Chip, Stack, Tooltip} from "@mui/material";
 import {User} from "next-auth";
 import {fetchTrainingAssignments} from "@/actions/trainingAssignment";
-import {Edit} from "@mui/icons-material";
+import {Visibility} from "@mui/icons-material";
 import TrainingAssignmentDeleteButton from "@/components/TrainingAssignment/TrainingAssignmentDeleteButton";
 import {useRouter} from "next/navigation";
 import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
 import {Lesson} from "@prisma/client";
-import {formatZuluDate, getTimeAgo} from "@/lib/date";
+import {formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
 
 export default function TrainingAssignmentTable({manageMode}: { manageMode: boolean }) {
 
@@ -89,7 +89,7 @@ export default function TrainingAssignmentTable({manageMode}: { manageMode: bool
         {
             field: 'lastSession',
             flex: 1,
-            headerName: 'Last Training Session',
+            headerName: 'Last Session',
             renderCell: (params) => params.row.student.trainingSessions[0]?.tickets.map((ticket: {
                 id: string,
                 lesson: Lesson,
@@ -109,6 +109,35 @@ export default function TrainingAssignmentTable({manageMode}: { manageMode: bool
             filterable: false,
             sortable: false,
             filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+        },
+        {
+            field: 'appointment',
+            flex: 1,
+            headerName: 'Future Session',
+            filterable: false,
+            sortable: false,
+            renderCell: (params) => {
+                const appointment = params.row.student.trainingAppointmentStudent[0];
+                if (!appointment) {
+                    return '';
+                }
+
+                const startDate = new Date(appointment.start);
+
+                return (
+                    <Tooltip
+                        title={`${formatZuluDate(startDate)} with ${appointment.trainer.fullName}: ${appointment.lessons.map((l: Lesson) => l.identifier).join(', ')}`}>
+                        <Link
+                            href={`/training/appointments?sortField=start&sortDirection=asc&filterField=student&filterValue=${params.row.student.cid}&filterOperator=equals`}>
+                            <Chip
+                                label={getTimeIn(startDate)}
+                                size="small"
+                                color="info"
+                            />
+                        </Link>
+                    </Tooltip>
+                );
+            },
         },
         {
             field: 'primaryTrainer',
@@ -144,15 +173,15 @@ export default function TrainingAssignmentTable({manageMode}: { manageMode: bool
             field: 'actions',
             headerName: 'Actions',
             type: 'actions',
-            getActions: (params) => manageMode ? [
+            getActions: (params) => [
                 <GridActionsCellItem
                     key={params.row.id}
-                    icon={<Edit/>}
-                    label="Edit Assignment"
+                    icon={<Visibility/>}
+                    label="View/Edit Assignment"
                     onClick={() => router.push(`/training/assignments/${params.row.id}`)}
                 />,
-                <TrainingAssignmentDeleteButton key={params.row.id} assignment={params.row}/>,
-            ] : [],
+                manageMode ? <TrainingAssignmentDeleteButton key={params.row.id} assignment={params.row}/> : <></>,
+            ],
             flex: 1
         },
     ];

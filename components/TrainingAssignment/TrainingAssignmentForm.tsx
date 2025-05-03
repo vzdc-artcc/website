@@ -15,12 +15,14 @@ export default function TrainingAssignmentForm({
                                                    trainingRequest,
                                                    requestStudent,
                                                    allUsers,
+                                                   disabled,
                                                }: {
     trainingAssignment?: TrainingAssignment,
     otherTrainerIds?: string[],
     trainingRequest?: TrainingAssignmentRequest,
     requestStudent?: User,
     allUsers: User[],
+    disabled?: boolean,
 }) {
     const [student, setStudent] = useState(requestStudent?.id);
     const [primaryTrainer, setPrimaryTrainer] = useState(trainingAssignment?.primaryTrainerId);
@@ -71,7 +73,7 @@ export default function TrainingAssignmentForm({
         <form action={handleSubmit}>
             <Stack direction="column" spacing={2}>
                 <Autocomplete
-                    disabled={!!trainingRequest || !!trainingAssignment}
+                    disabled={!!trainingRequest || !!trainingAssignment || disabled}
                     options={allUsers}
                     getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.cid})`}
                     value={allUsers.find((u) => u.id === student) || null}
@@ -82,6 +84,7 @@ export default function TrainingAssignmentForm({
                 />
                 <Autocomplete
                     options={allTrainers}
+                    disabled={disabled}
                     getOptionLabel={(option) => `${getRating(option.rating)} - ${option.primary}P ${option.secondary}S - ${option.firstName} ${option.lastName} (${option.cid})`}
                     value={allTrainers.find((u) => u.id === primaryTrainer) || null}
                     onChange={(event, newValue) => {
@@ -95,6 +98,7 @@ export default function TrainingAssignmentForm({
                 />
                 <Autocomplete
                     multiple
+                    disabled={disabled}
                     options={allTrainers}
                     getOptionLabel={(option) => `${getRating(option.rating)} - ${option.primary}P ${option.secondary}S - ${option.firstName} ${option.lastName} (${option.cid})`}
                     value={allTrainers.filter((u) => otherTrainers.includes(u.id))}
@@ -114,9 +118,9 @@ export default function TrainingAssignmentForm({
                     renderInput={(params) => <TextField {...params} label="Other Trainers"
                                                         helperText="Key: <RATING> - <# PRIMARY STUDENTS>P <# SECONDARY STUDENTS>S - <NAME + CID>"/>}
                 />
-                <Box>
+                {!disabled && <Box>
                     <FormSaveButton/>
-                </Box>
+                </Box>}
             </Stack>
         </form>
     );

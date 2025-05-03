@@ -168,7 +168,6 @@ export default function FeedbackForm({controllers, user}: { controllers: User[],
                         <Typography component="legend">Rating*</Typography>
                         <Rating
                             name="rating"
-                            defaultValue={4}
                         />
                     </Grid2>
                     <Grid2 size={2}>

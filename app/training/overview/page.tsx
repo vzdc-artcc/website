@@ -2,6 +2,7 @@ import React from 'react';
 import {
     Card,
     CardContent,
+    Chip,
     Grid2,
     Table,
     TableBody,
@@ -11,9 +12,10 @@ import {
     TableRow,
     Typography
 } from "@mui/material";
-import {getMonth, getTimeAgo} from "@/lib/date";
+import {getMonth, getTimeAgo, getTimeIn} from "@/lib/date";
 import prisma from "@/lib/db";
 import {TRAINING_ONLY_LOG_MODELS} from "@/lib/log";
+import {Lesson} from "@prisma/client";
 
 export default async function Page() {
 
@@ -52,6 +54,23 @@ export default async function Page() {
         },
         include: {
             user: true
+        },
+    });
+
+    const upcomingAppointments = await prisma.trainingAppointment.findMany({
+        where: {
+            start: {
+                gte: now
+            }
+        },
+        orderBy: {
+            start: 'asc'
+        },
+        take: 5,
+        include: {
+            student: true,
+            trainer: true,
+            lessons: true,
         },
     });
 
@@ -106,6 +125,66 @@ export default async function Page() {
                     <CardContent>
                         <Typography>{getMonth(now.getMonth())} Training Hours</Typography>
                         <Typography variant="h4">{totalHours}</Typography>
+                    </CardContent>
+                </Card>
+            </Grid2>
+            <Grid2
+                size={{
+                    xs: 4,
+                }}>
+                <Card>
+                    <CardContent>
+                        <Typography variant="h5" gutterBottom>Upcoming Sessions</Typography>
+                        {upcomingAppointments.length === 0 &&
+                            <Typography>No upcoming training appointments.</Typography>}
+                        {upcomingAppointments.length > 0 &&
+                            <TableContainer>
+                                <Table size="small">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Trainer</TableCell>
+                                            <TableCell>Student</TableCell>
+                                            <TableCell>Start</TableCell>
+                                            <TableCell>Duration</TableCell>
+                                            <TableCell>Lesson(s)</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {upcomingAppointments.map((appointment) => (
+                                            <TableRow key={appointment.id}>
+                                                <TableCell>
+                                                    <Chip
+                                                        label={`${appointment.trainer.firstName} ${appointment.trainer.lastName}` || 'Unknown'}
+                                                        size="small"
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        label={`${appointment.student.firstName} ${appointment.student.lastName}` || 'Unknown'}
+                                                        size="small"
+                                                    />
+                                                </TableCell>
+                                                <TableCell>{getTimeIn(appointment.start)}</TableCell>
+                                                <TableCell>{appointment.lessons.map((l: Lesson) => l.duration)
+                                                    .reduce((acc: number, curr: number) => acc + curr, 0)}</TableCell>
+                                                <TableCell>
+                                                    {appointment.lessons.map((lesson: Lesson) => {
+                                                        return (
+                                                            <Chip
+                                                                key={`${appointment.id}-${lesson.id}`}
+                                                                label={lesson.identifier}
+                                                                size="small"
+                                                                color="info"
+                                                                style={{margin: '2px'}}
+                                                            />
+                                                        )
+                                                    })}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>}
                     </CardContent>
                 </Card>
             </Grid2>

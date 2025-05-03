@@ -119,6 +119,9 @@ model User {
   changesUnseen ChangeBroadcast[] @relation("unseenByUsers")
   changesSeen   ChangeBroadcast[] @relation("seenByUsers")
   changesAgreed ChangeBroadcast[] @relation("agreedByUsers")
+
+  trainingAppointmentStudent TrainingAppointment[] @relation("TrainingAppointmentStudent")
+  trainingAppointmentTrainer TrainingAppointment[] @relation("TrainingAppointmentTrainer")
 }
 
 model TrainingAssignment {
@@ -321,6 +324,8 @@ enum LogModel {
   PERFORMANCE_INDICATOR_CRITERIA_CATEGORY
   PERFORMANCE_INDICATOR_CRITERIA
   LESSON_PERFORMANCE_INDICATOR
+
+  TRAINING_APPOINTMENT
 }
 
 model Log {
@@ -447,23 +452,31 @@ enum HighlightColorType {
 }
 
 model Lesson {
-  id                     String                    @id @default(cuid())
-  identifier             String
-  location               Int
-  name                   String
-  description            String
-  position               String
-  facility               String
-  rubric                 LessonRubric?             @relation(fields: [rubricId], references: [id])
-  rubricId               String?                   @unique
-  updatedAt              DateTime
-  instructorOnly         Boolean
-  notifyInstructorOnPass Boolean
-  trainingTickets        TrainingTicket[]
-  progressions           TrainingProgressionStep[]
+  id          String        @id @default(cuid())
+  identifier  String
+  location    Int
+  name        String
+  description String
+  position    String
+  facility    String
+  rubric      LessonRubric? @relation(fields: [rubricId], references: [id])
+  rubricId    String?       @unique
+  updatedAt   DateTime
+
+  instructorOnly                 Boolean
+  notifyInstructorOnPass         Boolean
+  deleteTrainingAssignmentOnPass Boolean @default(false)
+
+  trainingTickets TrainingTicket[]
+  progressions    TrainingProgressionStep[]
 
   performanceIndicator   LessonPerformanceIndicator?
   performanceIndicatorId String?
+
+  duration           Int     @default(60)
+  traineePreparation String?
+
+  appointments TrainingAppointment[]
 }
 
 model LessonRubric {
@@ -786,6 +799,23 @@ model TrainingSessionPerformanceIndicatorCriteria {
 
   category   TrainingSessionPerformanceIndicatorCategory @relation(fields: [categoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   categoryId String
+}
+
+model TrainingAppointment {
+  id String @id @default(cuid())
+
+  student   User   @relation("TrainingAppointmentStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  studentId String
+
+  trainer   User   @relation("TrainingAppointmentTrainer", fields: [trainerId], references: [id], onDelete: Cascade)
+  trainerId String
+
+  start DateTime
+
+  preparationCompleted Boolean @default(false)
+  warningEmailSent     Boolean @default(false)
+
+  lessons Lesson[]
 }
 
 enum PerformanceIndicatorMarker {

@@ -3,6 +3,7 @@ import {Badge, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import Link from "next/link";
 import {
     Assignment,
+    CalendarMonth,
     Checklist,
     Class,
     Clear,
@@ -14,6 +15,7 @@ import {
     MilitaryTech,
     People,
     PersonAdd,
+    Schedule,
     School,
     ViewWeek,
     WorkspacePremium,
@@ -54,7 +56,7 @@ export default async function TrainingMenu() {
                     <ListItemIcon>
                         <School/>
                     </ListItemIcon>
-                    <ListItemText primary="Your Students"/>
+                    <ListItemText primary="Your Students & Schedule"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/sessions" style={{textDecoration: 'none', color: 'inherit',}}>
@@ -71,6 +73,22 @@ export default async function TrainingMenu() {
                         <ManageSearch/>
                     </ListItemIcon>
                     <ListItemText primary="Training History"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/training/calendar" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <CalendarMonth/>
+                    </ListItemIcon>
+                    <ListItemText primary="Training Calendar"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/training/appointments" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <Schedule/>
+                    </ListItemIcon>
+                    <ListItemText primary="Training Appointments"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/assignments" style={{textDecoration: 'none', color: 'inherit',}}>
