@@ -12,7 +12,6 @@ export const updateCurrentProfile = async (user: User) => {
         operatingInitials: z.string().length(2, "Operating Initials must be 2 characters").toUpperCase(),
         receiveEmail: z.boolean(),
         newEventNotifications: z.boolean(),
-        teamspeakUid: z.string().optional(),
     });
 
     const result = User.parse(user);
