@@ -27,12 +27,10 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
             operatingInitials: z.string().length(2, "Operating Initials must be 2 characters").toUpperCase(),
             receiveEmail: z.boolean(),
             newEventNotifications: z.boolean(),
-            teamspeakUid: z.string().optional(),
         });
 
         const result = User.safeParse({
             preferredName: formData.get('preferredName') as string,
-            teamspeakUid: !admin ? formData.get('teamspeakUid') as string : user.teamspeakUid,
             bio: formData.get('bio') as string,
             operatingInitials: formData.get('operatingInitials') as string || user.operatingInitials,
             receiveEmail: true,
