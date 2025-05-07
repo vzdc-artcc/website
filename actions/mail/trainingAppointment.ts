@@ -8,15 +8,33 @@ import {appointmentUpdated} from "@/templates/TrainingAppointment/AppointmentUpd
 import {appointmentCanceled} from "@/templates/TrainingAppointment/AppointmentCanceled";
 import {appointmentWarning} from "@/templates/TrainingAppointment/AppointmentWarning";
 import {appointmentCanceledTrainer} from "@/templates/TrainingAppointment/AppointmentCanceledTrainer";
+import {createEvent} from "ics";
 
-export const sendTrainingAppointmentScheduledEmail = async (trainingAppointment: TrainingAppointment, student: User, trainer: User) => {
+export const sendTrainingAppointmentScheduledEmail = async (trainingAppointment: TrainingAppointment, student: User, trainer: User, duration: number) => {
     const {html} = await appointmentScheduled(trainingAppointment, student, trainer);
+
+    const event = {
+        start: trainingAppointment.start.toUTCString(),
+        duration: {hours: duration, minutes: 0},
+        title: `Training Appointment with ${trainer.fullName}`,
+    };
+
+    const {error, value} = createEvent(event);
+    if (error) throw new Error(`Failed to create ICS file: ${error.message}`);
 
     await mailTransport.sendMail({
         from: FROM_EMAIL,
         to: student.email,
+        bcc: trainer.email,
         subject: "Training Appointment Scheduled",
         html,
+        attachments: [
+            {
+                filename: "training-appointment.ics",
+                content: value,
+                contentType: "text/calendar",
+            },
+        ],
     })
 }
 
@@ -31,14 +49,31 @@ export const sendTrainingAppointmentWarningEmail = async (trainingAppointment: T
     })
 }
 
-export const sendTrainingAppointmentUpdatedEmail = async (trainingAppointment: TrainingAppointment, student: User, trainer: User) => {
+export const sendTrainingAppointmentUpdatedEmail = async (trainingAppointment: TrainingAppointment, student: User, trainer: User, duration: number) => {
     const {html} = await appointmentUpdated(trainingAppointment, student, trainer);
+
+    const event = {
+        start: trainingAppointment.start.toUTCString(),
+        duration: {hours: duration, minutes: 0},
+        title: `Training Appointment with ${trainer.fullName}`,
+    };
+
+    const {error, value} = createEvent(event);
+    if (error) throw new Error(`Failed to create ICS file: ${error.message}`);
 
     await mailTransport.sendMail({
         from: FROM_EMAIL,
         to: student.email,
+        bcc: trainer.email,
         subject: "Training Appointment Updated",
         html,
+        attachments: [
+            {
+                filename: "training-appointment.ics",
+                content: value,
+                contentType: "text/calendar",
+            },
+        ],
     })
 }
 

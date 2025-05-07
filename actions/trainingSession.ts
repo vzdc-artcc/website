@@ -105,7 +105,7 @@ export async function createOrUpdateTrainingSession(
         },
     });
 
-    if (!fetchedPi && (!performanceIndicator || !performanceIndicator.categories.every((category) => category.criteria.every((criteria) => !!criteria.marker)))) {
+    if (fetchedPi && (!performanceIndicator || !performanceIndicator.categories.every((category) => category.criteria.every((criteria) => !!criteria.marker)))) {
         return {
             errors: [{
                 message: "You must fill out ALL the performance indicators to submit this ticket."
@@ -223,6 +223,30 @@ export async function createOrUpdateTrainingSession(
             return {};
         }
 
+        let release = null;
+
+        if (trainingSession.tickets.some((t) => t.lesson.releaseRequestOnPass && t.passed)) {
+            const assignment = await prisma.trainingAssignment.findUnique({
+                where: {
+                    studentId: trainingSession.student.id,
+                },
+            });
+            const releaseRequest = await prisma.trainerReleaseRequest.findFirst({
+                where: {
+                    studentId: trainingSession.student.id,
+                },
+            });
+
+            if (assignment && !releaseRequest) {
+                release = await prisma.trainerReleaseRequest.create({
+                    data: {
+                        studentId: trainingSession.student.id,
+                        submittedAt: new Date(),
+                    }
+                });
+            }
+        }
+
         revalidatePath('/training/sessions', "layout");
 
         for (const newTicket of trainingSession.tickets) {
@@ -233,7 +257,7 @@ export async function createOrUpdateTrainingSession(
             }
         }
 
-        return {session: trainingSession};
+        return {session: trainingSession, release};
 
     } else if (session) {
 
@@ -314,6 +338,31 @@ export async function createOrUpdateTrainingSession(
 
         const vatusaId = await createVatusaTrainingSession(trainingSession.tickets[0].lesson.location, trainingSession.student.cid, session.user.cid, start, trainingSession.tickets[0].lesson.position, getDuration(trainingSession.start, trainingSession.end), `${ticketComment}\n\nRefer to your training ticket in the vZDC website to see the scoring rubric.`, getOtsStatus(trainingSession.tickets));
 
+        let release = null;
+
+        if (trainingSession.tickets.some((t) => t.lesson.releaseRequestOnPass && t.passed)) {
+            const assignment = await prisma.trainingAssignment.findUnique({
+                where: {
+                    studentId: trainingSession.student.id,
+                },
+            });
+
+            const releaseRequest = await prisma.trainerReleaseRequest.findFirst({
+                where: {
+                    studentId: trainingSession.student.id,
+                },
+            });
+
+            if (assignment && !releaseRequest) {
+                release = await prisma.trainerReleaseRequest.create({
+                    data: {
+                        studentId: trainingSession.student.id,
+                        submittedAt: new Date(),
+                    }
+                });
+            }
+        }
+
         await prisma.trainingSession.update({
             where: {id: trainingSession.id},
             data: {
@@ -334,7 +383,7 @@ export async function createOrUpdateTrainingSession(
         }
 
 
-        return {session: trainingSession};
+        return {session: trainingSession, release};
     } else {
         return {
             errors: [{

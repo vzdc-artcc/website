@@ -9,6 +9,7 @@ import {useRouter} from "next/navigation";
 import {useGoogleReCaptcha} from "react-google-recaptcha-v3";
 import FeedbackFormSubmitButton from "@/components/Feedback/FeedbackFormSubmitButton";
 import {checkCaptcha} from "@/lib/captcha";
+import Form from "next/form";
 
 const groupedPositions = [
     {
@@ -90,7 +91,7 @@ export default function FeedbackForm({controllers, user}: { controllers: User[],
 
     return (
         (<Box sx={{mt: 2,}}>
-            <form action={handleSubmit}>
+            <Form action={handleSubmit}>
                 <input type="hidden" name="pilotId" value={user.id}/>
                 <input type="hidden" name="controllerId" value={controller}/>
                 <input type="hidden" name="controllerPosition" value={controllerPosition}/>
@@ -124,7 +125,7 @@ export default function FeedbackForm({controllers, user}: { controllers: User[],
                             xs: 2,
                             sm: 1
                         }}>
-                        <TextField fullWidth variant="filled" name="pilotCallsign" label="Your Callsign*"/>
+                        <TextField fullWidth variant="filled" name="pilotCallsign" label="Your Callsign" required/>
                     </Grid2>
                     <Grid2
                         size={{
@@ -178,7 +179,7 @@ export default function FeedbackForm({controllers, user}: { controllers: User[],
                         <FeedbackFormSubmitButton/>
                     </Grid2>
                 </Grid2>
-            </form>
+            </Form>
         </Box>)
     );
 }

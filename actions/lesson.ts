@@ -28,6 +28,7 @@ export const createOrUpdateLessonDetails = async (formData: FormData) => {
         traineePreparation: z.string(),
         instructorOnly: z.boolean(),
         notifyInstructorOnPass: z.boolean(),
+        releaseRequestOnPass: z.boolean(),
         lessonId: z.string().optional(),
     });
 
@@ -42,6 +43,7 @@ export const createOrUpdateLessonDetails = async (formData: FormData) => {
         traineePreparation: formData.get("traineePreparation") as string,
         instructorOnly: formData.get("instructorOnly") === "on",
         notifyInstructorOnPass: formData.get("notifyInstructorOnPass") === "on",
+        releaseRequestOnPass: formData.get("releaseRequestOnPass") === "on",
         lessonId: formData.get("lessonId") as string,
     });
 
@@ -63,6 +65,7 @@ export const createOrUpdateLessonDetails = async (formData: FormData) => {
                 traineePreparation: result.data.traineePreparation,
                 instructorOnly: result.data.instructorOnly,
                 notifyInstructorOnPass: result.data.notifyInstructorOnPass,
+                releaseRequestOnPass: result.data.releaseRequestOnPass,
                 updatedAt: new Date(),
             },
         });
@@ -81,6 +84,7 @@ export const createOrUpdateLessonDetails = async (formData: FormData) => {
                 traineePreparation: result.data.traineePreparation,
                 instructorOnly: result.data.instructorOnly,
                 notifyInstructorOnPass: result.data.notifyInstructorOnPass,
+                releaseRequestOnPass: result.data.releaseRequestOnPass,
                 updatedAt: new Date(),
             },
         });

@@ -427,7 +427,10 @@ model FileCategory {
 }
 
 model File {
-  id             String             @id @default(cuid())
+  id String @id @default(cuid())
+
+  alias String? @unique
+
   name           String
   order          Int                @default(0)
   description    String
@@ -463,9 +466,9 @@ model Lesson {
   rubricId    String?       @unique
   updatedAt   DateTime
 
-  instructorOnly                 Boolean
-  notifyInstructorOnPass         Boolean
-  deleteTrainingAssignmentOnPass Boolean @default(false)
+  instructorOnly         Boolean
+  notifyInstructorOnPass Boolean
+  releaseRequestOnPass   Boolean @default(false)
 
   trainingTickets TrainingTicket[]
   progressions    TrainingProgressionStep[]

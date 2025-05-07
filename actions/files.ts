@@ -93,6 +93,7 @@ export const createOrUpdateFile = async (formData: FormData) => {
         categoryId: z.string(),
         id: z.string().optional(),
         name: z.string().min(1, 'Name is required').max(100, 'Name is too long'),
+        alias: z.string().optional(),
         description: z.string().max(255, 'Description is too long'),
         highlightColor: z.string().min(1, "Type is required"),
     });
@@ -101,6 +102,7 @@ export const createOrUpdateFile = async (formData: FormData) => {
         categoryId: formData.get('categoryId') as string,
         id: formData.get('id') as string,
         name: formData.get('name') as string,
+        alias: formData.get('alias') as string,
         description: formData.get('description') as string,
         highlightColor: formData.get('highlightColor') as string
     });
@@ -114,6 +116,16 @@ export const createOrUpdateFile = async (formData: FormData) => {
             id: result.data.id || '',
         },
     });
+
+    const aliasExists = await prisma.file.findUnique({
+        where: {
+            alias: result.data.alias || '',
+        },
+    });
+
+    if (aliasExists && aliasExists.id !== result.data.id) {
+        return {errors: [{message: "Alias must be unique"}]};
+    }
 
     const inputFile = formData.get('file') as File | null;
     let fileKey = fileExists?.key || '';
@@ -136,6 +148,7 @@ export const createOrUpdateFile = async (formData: FormData) => {
         where: {id: result.data.id || ''},
         update: {
             name: result.data.name,
+            alias: result.data.alias || null,
             description: result.data.description,
             key: fileKey,
             updatedAt: new Date(),
@@ -143,6 +156,7 @@ export const createOrUpdateFile = async (formData: FormData) => {
         },
         create: {
             name: result.data.name,
+            alias: result.data.alias || null,
             description: result.data.description,
             key: fileKey,
             category: {

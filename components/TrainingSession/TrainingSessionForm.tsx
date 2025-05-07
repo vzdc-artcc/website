@@ -22,6 +22,11 @@ import {
     CardContent,
     Chip,
     CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     FormControlLabel,
     Grid2,
     IconButton,
@@ -59,6 +64,7 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
     const router = useRouter();
     const theme = useTheme();
     const searchParams = useSearchParams();
+    const [releaseDialogOpen, setReleaseDialogOpen] = useState<TrainingSession | null>();
     const [allLessons, setAllLessons] = useState<Lesson[]>([]);
     const [allCommonMistakes, setAllCommonMistakes] = useState<CommonMistake[]>([]);
     const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -102,6 +108,7 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
 
         const {
             session,
+            release,
             errors
         } = await createOrUpdateTrainingSession(
             student,
@@ -119,15 +126,29 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
             return;
         }
 
+        if (release) {
+            setReleaseDialogOpen(session);
+        } else {
+            redirect(session);
+        }
+
+        toast("Training session saved successfully!", {type: 'success'});
+
+    }
+
+    const redirect = (session?: TrainingSession) => {
         if (!trainingSession?.id) {
             if (session){
-            router.replace(`/training/sessions/${session.id}`);
+                router.replace(`/training/sessions/${session.id}`);
             }
 
-        router.replace(`/training/sessions`);
-
+            router.replace(`/training/sessions`);
         }
-        toast("Training session saved successfully!", {type: 'success'});
+    }
+
+    const closeReleaseDialog = () => {
+        redirect(releaseDialogOpen || undefined);
+        setReleaseDialogOpen(null);
     }
 
     useEffect(() => {
@@ -142,6 +163,18 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
 
     return (
         (<LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Dialog open={!!releaseDialogOpen} onClose={() => closeReleaseDialog()}>
+                <DialogTitle>Trainer Release Request Processed</DialogTitle>
+                <DialogContent>
+                    <DialogContentText sx={{mb: 2,}}>One or more lessons in this session are configured to automatically
+                        submit a trainer release request upon passing.</DialogContentText>
+                    <DialogContentText><b>Inform the student that a trainer release request has been
+                        submitted.</b></DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeReleaseDialog} variant="contained" size="small">OK</Button>
+                </DialogActions>
+            </Dialog>
             <form action={handleSubmit}>
                 <Grid2 container columns={2} spacing={2}>
                     <Grid2 size={2}>

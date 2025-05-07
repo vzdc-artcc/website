@@ -1,8 +1,8 @@
-import { renderReactToMjml } from "@/actions/mjml";
-import { User } from "next-auth";
-import { Event } from "@prisma/client";
+import {renderReactToMjml} from "@/actions/mjml";
+import {User} from "next-auth";
+import {Event} from "@prisma/client";
 import SingleRecipientEmailWrapper from "../Wrapper/SingleRecipientEmailWrapper";
-import { formatZuluDate } from "@/lib/date";
+import {formatZuluDate} from "@/lib/date";
 
 export const newEventPosted = (controller: User, event: Event) => {
     return renderReactToMjml(
@@ -20,7 +20,8 @@ export const newEventPosted = (controller: User, event: Event) => {
             <p>The vZDC Events Team</p>
             <p>ec@vzdc.org</p>
             <br />
-            <p>To stop recieving these emails, turn off the 'Receive NEW event notifications' switch in <a href="https://vzdc.org/profile/edit">your profile settings</a></p>
+            <p>To stop receiving these emails, turn off the 'Receive NEW event notifications' switch in <a
+                href="https://vzdc.org/profile/edit">your profile settings</a></p>
         </SingleRecipientEmailWrapper>
     )
 }

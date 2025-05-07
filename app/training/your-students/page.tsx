@@ -25,6 +25,7 @@ import {formatEasternDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/da
 import TrainingAppointmentFormDialog from "@/components/TrainingAppointment/TrainingAppointmentFormDialog";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 import {format} from "date-fns";
+import TrainerSideRequestButton from "@/components/TrainerReleaseRequest/TrainerSideRequestButton";
 
 const createCalendarLink = (
     startDate: Date,
@@ -100,6 +101,9 @@ export default async function Page() {
             identifier: true,
             name: true,
             duration: true,
+        },
+        orderBy: {
+            identifier: 'asc',
         },
     });
 
@@ -388,7 +392,7 @@ const getTable = (students: Student[]) => (
                     <TableCell>
                         {student.trainingAppointmentStudent.length > 0 ? (
                             <Tooltip
-                                title={`${formatZuluDate(student.trainingAppointmentStudent[0].start)} with ${student.trainingAppointmentStudent[0].trainer.fullName}: ${student.trainingAppointmentStudent[0].lessons.map((l) => l.identifier).join(', ')}`}>
+                                title={`${formatEasternDate(student.trainingAppointmentStudent[0].start)} with ${student.trainingAppointmentStudent[0].trainer.fullName}: ${student.trainingAppointmentStudent[0].lessons.map((l) => l.identifier).join(', ')}`}>
                                 <Link
                                     href={`/training/appointments?sortField=start&sortDirection=asc&filterField=student&filterValue=${student.user.cid}&filterOperator=equals`}>
                                     <Chip
@@ -424,6 +428,7 @@ const getTable = (students: Student[]) => (
                                 </IconButton>
                             </Link>
                         </Tooltip>
+                        <TrainerSideRequestButton student={student.user}/>
                     </TableCell>
                 </TableRow>))}
             </TableBody>

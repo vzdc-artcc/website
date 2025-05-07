@@ -9,7 +9,7 @@ import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-gr
 import {Prisma} from "@prisma/client";
 import {sendReleaseRequestApprovedEmail} from "@/actions/mail/training";
 
-export const releaseTrainingAssignment = async () => {
+export const releaseTrainingAssignment = async (student?: User) => {
 
     const session = await getServerSession(authOptions);
 
@@ -17,14 +17,28 @@ export const releaseTrainingAssignment = async () => {
         throw new Error('You must be logged in to release your training assignment.');
     }
 
+    const releaseRequest = await prisma.trainerReleaseRequest.findFirst({
+        where: {
+            studentId: student?.id || session.user.id,
+        }
+    });
+
+    if (releaseRequest) {
+        return 'There is already a release request active.';
+    }
+
     const release = await prisma.trainerReleaseRequest.create({
         data: {
-            studentId: session.user.id,
+            studentId: student?.id || session.user.id,
             submittedAt: new Date(),
         }
     });
 
-    await log("CREATE", "TRAINER_RELEASE_REQUEST", 'Requested to release trainers');
+    if (!student) {
+        await log("CREATE", "TRAINER_RELEASE_REQUEST", 'Requested to release trainers');
+    } else {
+        await log("CREATE", "TRAINER_RELEASE_REQUEST", `Requested to release student ${student.fullName} (${student.cid})`);
+    }
 
     revalidatePath('/training/releases');
 
@@ -131,7 +145,7 @@ export const approveReleaseRequest = async (studentId: string) => {
 
     await log("DELETE", "TRAINING_ASSIGNMENT", `Released trainers for student ${release.student.fullName} (${release.student.cid})`);
 
-    await sendReleaseRequestApprovedEmail(release.student as User, [assignment.primaryTrainer as User, ...assignment.otherTrainers as User[]]);
+    sendReleaseRequestApprovedEmail(release.student as User, [assignment.primaryTrainer as User, ...assignment.otherTrainers as User[]]).then();
     revalidatePath('/training/releases');
 }
 

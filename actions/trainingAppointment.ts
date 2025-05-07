@@ -164,12 +164,13 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
             },
             include: {
                 student: true,
+                lessons: true,
             },
         });
 
         await log("UPDATE", "TRAINING_APPOINTMENT", `Updated training appointment with ${ta.student.fullName} on ${formatZuluDate(ta.start)}`);
 
-        sendTrainingAppointmentUpdatedEmail(ta, ta.student as User, trainer.user).then();
+        sendTrainingAppointmentUpdatedEmail(ta, ta.student as User, trainer.user, ta.lessons.map(l => l.duration).reduce((a, c) => a + c, 0)).then();
     } else {
         const ta = await prisma.trainingAppointment.create({
             data: {
@@ -182,12 +183,13 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
             },
             include: {
                 student: true,
+                lessons: true,
             },
         });
 
         await log("CREATE", "TRAINING_APPOINTMENT", `Created training appointment with ${ta.student.fullName} on ${formatZuluDate(ta.start)}`);
 
-        sendTrainingAppointmentScheduledEmail(ta, ta.student as User, trainer.user).then();
+        sendTrainingAppointmentScheduledEmail(ta, ta.student as User, trainer.user, ta.lessons.map(l => l.duration).reduce((a, c) => a + c, 0)).then();
     }
 
     revalidatePath('/training/your-students');
