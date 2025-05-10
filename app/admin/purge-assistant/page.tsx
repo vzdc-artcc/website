@@ -36,6 +36,7 @@ export default async function Page(
             controllerStatus: {
                 not: "NONE",
             },
+            trainingAssignmentRequestStudent: null,
             ...(includeLoas === 'false' && {
                 OR: [
                     {
