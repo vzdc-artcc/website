@@ -42,7 +42,8 @@ export default async function Layout({children}: { children: React.ReactNode }) 
                 <Stack direction="column" spacing={2}>
                     {numDoubleBookedAppointments > 0 &&
                         <Alert severity="error" variant="outlined">There are one or more double booked training
-                            appointments scheduled. Check the calendar for appointments prefixed with '(DB)' and
+                            appointments scheduled. Check the calendar for appointments prefixed
+                            with &apos;(DB)&apos; and
                             consider rescheduling.</Alert>}
                     {children}
                 </Stack>
