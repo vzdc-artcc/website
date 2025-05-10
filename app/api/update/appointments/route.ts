@@ -1,12 +1,19 @@
 import prisma from "@/lib/db";
 import {updateSyncTime} from "@/actions/lib/sync";
+import {sendTrainingAppointmentWarningEmail} from "@/actions/mail/trainingAppointment";
+import {User} from "next-auth";
 
-const TRAINING_ENVIRONMENTS = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["CHECK CONFIG"];
-const BUFFER_TIME = 15; // in minutes
+const TRAINING_ENVIRONMENTS = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["ERR-CONFIG"];
+const BUFFER_TIME = Number(process.env.BUFFER_TIME) || 15; // in minutes
 
 export async function GET() {
 
     const appointments = await prisma.trainingAppointment.findMany({
+        where: {
+            start: {
+                gte: new Date(),
+            },
+        },
         include: {
             lessons: true,
         },
@@ -21,6 +28,7 @@ export async function GET() {
         duration: number,
         environment?: string,
         liveTraining: boolean,
+        classroomTraining: boolean,
     }[] = appointments.map((appointment) => {
         const duration = appointment.lessons.map(l => l.duration).reduce((a, b) => a + b, 0);
         return {
@@ -29,6 +37,7 @@ export async function GET() {
             duration,
             environment: appointment.environment || undefined,
             liveTraining: appointment.lessons.every(lesson => lesson.location === 1),
+            classroomTraining: appointment.lessons.every(lesson => lesson.location === 0),
         };
     });
 
@@ -46,6 +55,14 @@ export async function GET() {
             appointmentUpdateDetails.push({
                 id: appointment.id,
                 environment: "LIVE",
+                doubleBooking: false,
+            });
+
+            continue;
+        } else if (appointment.classroomTraining) {
+            appointmentUpdateDetails.push({
+                id: appointment.id,
+                environment: "CLASSROOM",
                 doubleBooking: false,
             });
 
@@ -93,7 +110,71 @@ export async function GET() {
         });
     }
 
+    await deleteOldTrainingAppointments();
+
+    await sendTrainingAppointmentWarningEmails();
+
     await updateSyncTime({appointments: new Date()});
 
     return Response.json({ok: true,});
 }
+
+const sendTrainingAppointmentWarningEmails = async () => {
+    const now = new Date();
+    now.setTime(now.getTime() + (1000 * 60 * 60 * 12)); // 12 hours from now
+    const trainingAppointments = await prisma.trainingAppointment.findMany({
+        where: {
+            start: {
+                gte: new Date(),
+                lte: now,
+            },
+            warningEmailSent: false,
+        },
+        include: {
+            student: true,
+            trainer: true,
+        },
+    });
+
+    await Promise.all(trainingAppointments.map(async (trainingAppointment) => {
+        try {
+            await sendTrainingAppointmentWarningEmail(trainingAppointment, trainingAppointment.student as User, trainingAppointment.trainer as User);
+            await prisma.trainingAppointment.update({
+                where: {
+                    id: trainingAppointment.id,
+                },
+                data: {
+                    warningEmailSent: true,
+                },
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    }));
+}
+
+const deleteOldTrainingAppointments = async () => {
+    const now = new Date();
+
+    const trainingAppointments = await prisma.trainingAppointment.findMany({
+        include: {
+            lessons: true,
+        },
+    });
+
+    for (const appointment of trainingAppointments) {
+        const totalLessonDurationInMs = appointment.lessons
+            .map((lesson) => lesson.duration * 60 * 1000) // Convert minutes to milliseconds
+            .reduce((acc, curr) => acc + curr, 0);
+
+        const endTime = new Date(appointment.start.getTime() + totalLessonDurationInMs + BUFFER_TIME * 60 * 1000);
+
+        if (endTime <= now) {
+            await prisma.trainingAppointment.delete({
+                where: {
+                    id: appointment.id,
+                },
+            });
+        }
+    }
+};

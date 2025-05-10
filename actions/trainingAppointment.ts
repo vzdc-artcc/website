@@ -84,6 +84,13 @@ const getWhere = (filter?: GridFilterItem): Prisma.TrainingAppointmentWhereInput
                     ],
                 },
             };
+        case 'environment':
+            return {
+                environment: {
+                    [filter.operator]: filter.value,
+                    mode: 'insensitive',
+                }
+            };
         case 'lessons':
             return {
                 lessons: {

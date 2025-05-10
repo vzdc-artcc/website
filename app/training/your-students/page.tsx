@@ -19,7 +19,7 @@ import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
-import {Check, Close, Event, LocalActivity, MilitaryTech, People} from "@mui/icons-material";
+import {Check, Close, Event, Info, LocalActivity, MilitaryTech, PendingOutlined, People} from "@mui/icons-material";
 import {Lesson} from "@prisma/client";
 import {formatEasternDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
 import TrainingAppointmentFormDialog from "@/components/TrainingAppointment/TrainingAppointmentFormDialog";
@@ -266,6 +266,7 @@ export default async function Page() {
                                     <TableCell>Duration (min)</TableCell>
                                     <TableCell>Student</TableCell>
                                     <TableCell>Preparation Completed</TableCell>
+                                    <TableCell>Environment</TableCell>
                                     <TableCell>Lesson(s)</TableCell>
                                     <TableCell>Actions</TableCell>
                                 </TableRow>
@@ -280,6 +281,14 @@ export default async function Page() {
                                         <TableCell>{`${ta.student.fullName} - ${getRating(ta.student.rating)}`}</TableCell>
                                         <TableCell>{ta.preparationCompleted ? <Check color="success"/> :
                                             <Close color="error"/>}</TableCell>
+                                        <TableCell>{ta.doubleBooking ?
+                                            <Tooltip
+                                                title="Double Booking.  Check calendar for specifics and consider rescheduling.">
+                                                <Info color="error"/>
+                                            </Tooltip>
+                                            : ta.environment ||
+                                            <PendingOutlined color="warning"/>}
+                                        </TableCell>
                                         <TableCell>{ta.lessons.map((l) => (
                                             <Chip size="small"
                                                   key={l.id}

@@ -93,12 +93,6 @@ export default function TrainingAppointmentFormDialog({
                             groupBy={(option) =>
                                 assignedStudents.some((s) => s.user.id === option.id) ? 'Your Students' : 'All Students'
                             }
-                            // renderGroup={(params) => (
-                            //     <Box key={params.key}>
-                            //         <Typography variant="subtitle2" sx={{ml: 1, py: 0.5,}}>{params.group}</Typography>
-                            //         {params.children}
-                            //     </Box>
-                            // )}
                             getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.cid})`}
                             value={allStudents.find((u) => u.id === student) || null}
                             onChange={(event, newValue) => {
@@ -107,7 +101,7 @@ export default function TrainingAppointmentFormDialog({
                             renderInput={(params) => <TextField {...params} required label="Student"/>}
                         />
                         <DateTimePicker sx={{width: '100%',}} name="start" label="Start (Eastern Time)" value={start}
-                                        disablePast ampm={false} onChange={setStart}/>
+                                        disablePast onChange={setStart}/>
                         <Autocomplete
                             options={allLessons}
                             multiple

@@ -38,6 +38,9 @@ export default async function Page() {
         where: {
             studentId: user?.id || "",
         },
+        orderBy: {
+            start: "asc",
+        },
         include: {
             trainer: true,
             lessons: true,

@@ -10,6 +10,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    Tooltip,
     Typography
 } from "@mui/material";
 import {getChipColor, getMinutesAgo, getMonth, getTimeAgo, getTimeIn} from "@/lib/date";
@@ -17,6 +18,8 @@ import prisma from "@/lib/db";
 import {TRAINING_ONLY_LOG_MODELS} from "@/lib/log";
 import {Lesson} from "@prisma/client";
 import {Info, PendingOutlined} from "@mui/icons-material";
+
+const TRAINING_ENVIRONMENTS = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["ERR-CONFIG"];
 
 export default async function Page() {
 
@@ -77,6 +80,25 @@ export default async function Page() {
 
     const syncTimes = await prisma.syncTimes.findFirst();
 
+    const nextAppointmentForEnvironments: {
+        name: string,
+        start?: Date,
+    }[] = await Promise.all(TRAINING_ENVIRONMENTS.map(async (env) => {
+        const nextSession = await prisma.trainingAppointment.findFirst({
+            where: {
+                environment: env,
+            },
+            orderBy: {
+                start: 'asc'
+            }
+        });
+
+        return {
+            name: env,
+            start: nextSession?.start,
+        };
+    }));
+
     return (
         (<Grid2 container columns={4} spacing={2}>
             <Grid2
@@ -131,8 +153,8 @@ export default async function Page() {
                     </CardContent>
                 </Card>
             </Grid2>
-            <Grid2 size={{xs: 4,}}>
-                <Card>
+            <Grid2 size={{xs: 4, md: 2,}}>
+                <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography sx={{mb: 1,}}>Appointments Sync</Typography>
                         <Chip
@@ -141,7 +163,23 @@ export default async function Page() {
                     </CardContent>
                 </Card>
             </Grid2>
-
+            <Grid2 size={{xs: 4, md: 2,}}>
+                <Card sx={{height: '100%',}}>
+                    <CardContent>
+                        <Typography sx={{mb: 1,}}>Environment Status</Typography>
+                        {nextAppointmentForEnvironments.map((env, idx) => {
+                            return (
+                                <Typography key={idx} variant="subtitle2" gutterBottom>
+                                    <Chip
+                                        size="small"
+                                        label={env.name}
+                                    /> {env?.start && env.start <= new Date() ? 'In Use'.toUpperCase() : 'Available'} {env.start && env.start > new Date() ? getTimeIn(env.start).toLowerCase().replace('in', 'for') : ''}
+                                </Typography>
+                            )
+                        })}
+                    </CardContent>
+                </Card>
+            </Grid2>
             <Grid2
                 size={{
                     xs: 4,
@@ -183,8 +221,11 @@ export default async function Page() {
                                                 <TableCell>{appointment.lessons.map((l: Lesson) => l.duration)
                                                     .reduce((acc: number, curr: number) => acc + curr, 0)}</TableCell>
                                                 <TableCell>{appointment.doubleBooking ?
-                                                    <Info color="error"/> : appointment.environment ||
-                                                    <PendingOutlined/>}</TableCell>
+                                                    <Tooltip title="Double Booking.  Check calendar for specifics.">
+                                                        <Info color="error"/>
+                                                    </Tooltip>
+                                                    : appointment.environment ||
+                                                    <PendingOutlined color="warning"/>}</TableCell>
                                                 <TableCell>
                                                     {appointment.lessons.map((lesson: Lesson) => {
                                                         return (

@@ -49,6 +49,9 @@ export default function TrainingAppointmentInformationDialog({
                     <DialogContentText>Trainer: {trainingAppointment.trainer.fullName}</DialogContentText>
                     <DialogContentText>Student: {trainingAppointment.student.fullName}</DialogContentText>
                     <br/>
+                    <DialogContentText
+                        color={trainingAppointment.doubleBooking ? 'error' : 'textSecondary'}>Environment: {trainingAppointment.doubleBooking ? 'DOUBLE BOOKED' : trainingAppointment.environment || 'PENDING ASSIGNMENT'}</DialogContentText>
+                    <br/>
                     <DialogContentText>Start (Eastern
                         Time): {formatEasternDate(trainingAppointment.start)}</DialogContentText>
                     <DialogContentText>Duration: {trainingAppointment.lessons.map((l) => l.duration).reduce((acc, c) => acc + c, 0)} minutes</DialogContentText>
