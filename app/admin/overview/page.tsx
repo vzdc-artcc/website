@@ -13,7 +13,7 @@ import {
     Typography
 } from "@mui/material";
 import prisma from "@/lib/db";
-import {getMonth, getTimeAgo} from "@/lib/date";
+import {getChipColor, getMinutesAgo, getMonth, getTimeAgo} from "@/lib/date";
 import {getMonthHours} from "@/lib/hours";
 
 export default async function Page() {
@@ -212,22 +212,4 @@ export default async function Page() {
             </Grid2>
         </Grid2>)
     );
-}
-
-const getMinutesAgo = (date: Date): number => {
-    const now = new Date();
-    const diffInMilliseconds = now.getTime() - date.getTime();
-    return Math.floor(diffInMilliseconds / 1000 / 60);
-}
-
-const getChipColor = (date?: Date | null): 'success' | 'warning' | 'error' => {
-    if (!date) return 'error';
-    const minutesAgo = getMinutesAgo(date);
-    if (minutesAgo <= 30) {
-        return 'success'; // green
-    } else if (minutesAgo <= 60) {
-        return 'warning'; // yellow
-    } else {
-        return 'error'; // red
-    }
 }

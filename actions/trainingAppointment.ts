@@ -158,6 +158,8 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
                     connect: result.data.lessonIds.map((lessonId) => ({id: lessonId})),
                 },
                 preparationCompleted: (!oldTA.lessons.every((lesson) => result.data.lessonIds.includes(lesson.id)) || result.data.lessonIds.length !== oldTA.lessons.length) ? false : oldTA.preparationCompleted,
+                environment: null,
+                doubleBooking: false,
             },
             where: {
                 id: result.data.id,

@@ -12,10 +12,11 @@ import {
     TableRow,
     Typography
 } from "@mui/material";
-import {getMonth, getTimeAgo, getTimeIn} from "@/lib/date";
+import {getChipColor, getMinutesAgo, getMonth, getTimeAgo, getTimeIn} from "@/lib/date";
 import prisma from "@/lib/db";
 import {TRAINING_ONLY_LOG_MODELS} from "@/lib/log";
 import {Lesson} from "@prisma/client";
+import {Info, PendingOutlined} from "@mui/icons-material";
 
 export default async function Page() {
 
@@ -74,6 +75,8 @@ export default async function Page() {
         },
     });
 
+    const syncTimes = await prisma.syncTimes.findFirst();
+
     return (
         (<Grid2 container columns={4} spacing={2}>
             <Grid2
@@ -128,6 +131,17 @@ export default async function Page() {
                     </CardContent>
                 </Card>
             </Grid2>
+            <Grid2 size={{xs: 4,}}>
+                <Card>
+                    <CardContent>
+                        <Typography sx={{mb: 1,}}>Appointments Sync</Typography>
+                        <Chip
+                            label={syncTimes?.appointments ? `${getMinutesAgo(syncTimes.appointments)}m ago` : 'NEVER'}
+                            color={getChipColor(syncTimes?.appointments)}/>
+                    </CardContent>
+                </Card>
+            </Grid2>
+
             <Grid2
                 size={{
                     xs: 4,
@@ -146,6 +160,7 @@ export default async function Page() {
                                             <TableCell>Student</TableCell>
                                             <TableCell>Start</TableCell>
                                             <TableCell>Duration</TableCell>
+                                            <TableCell>Environment</TableCell>
                                             <TableCell>Lesson(s)</TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -167,6 +182,9 @@ export default async function Page() {
                                                 <TableCell>{getTimeIn(appointment.start)}</TableCell>
                                                 <TableCell>{appointment.lessons.map((l: Lesson) => l.duration)
                                                     .reduce((acc: number, curr: number) => acc + curr, 0)}</TableCell>
+                                                <TableCell>{appointment.doubleBooking ?
+                                                    <Info color="error"/> : appointment.environment ||
+                                                    <PendingOutlined/>}</TableCell>
                                                 <TableCell>
                                                     {appointment.lessons.map((lesson: Lesson) => {
                                                         return (

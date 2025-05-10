@@ -589,12 +589,13 @@ model IncidentReport {
 }
 
 model SyncTimes {
-  id       String    @id @default(cuid())
-  roster   DateTime?
-  stats    DateTime?
-  loas     DateTime?
-  events   DateTime?
-  soloCert DateTime?
+  id           String    @id @default(cuid())
+  roster       DateTime?
+  stats        DateTime?
+  loas         DateTime?
+  events       DateTime?
+  soloCert     DateTime?
+  appointments DateTime?
 }
 
 model StatisticsPrefixes {
@@ -814,6 +815,9 @@ model TrainingAppointment {
   trainerId String
 
   start DateTime
+
+  environment   String?
+  doubleBooking Boolean @default(false)
 
   preparationCompleted Boolean @default(false)
   warningEmailSent     Boolean @default(false)
