@@ -255,6 +255,7 @@ model CertificationType {
   certificationOptions CertificationOption[]
   soloCertifications   SoloCertification[]
   certifications       Certification[]
+  lessonRosterChanges LessonRosterChange[]
 }
 
 model SoloCertification {
@@ -324,6 +325,7 @@ enum LogModel {
   PERFORMANCE_INDICATOR_CRITERIA_CATEGORY
   PERFORMANCE_INDICATOR_CRITERIA
   LESSON_PERFORMANCE_INDICATOR
+  LESSON_ROSTER_CHANGE
 
   TRAINING_APPOINTMENT
 }
@@ -479,7 +481,8 @@ model Lesson {
   duration           Int     @default(60)
   traineePreparation String?
 
-  appointments TrainingAppointment[]
+  appointments  TrainingAppointment[]
+  rosterChanges LessonRosterChange[]
 }
 
 model LessonRubric {
@@ -831,4 +834,18 @@ enum PerformanceIndicatorMarker {
   SATISFACTORY
   NEEDS_IMPROVEMENT
   UNSATISFACTORY
+}
+
+model LessonRosterChange {
+  id String @id @default(cuid())
+
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  certificationType   CertificationType @relation(fields: [certificationTypeId], references: [id], onDelete: Cascade)
+  certificationTypeId String
+
+  certificationOption CertificationOption
+
+  dossierText String
 }

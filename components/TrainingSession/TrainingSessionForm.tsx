@@ -1,8 +1,10 @@
 'use client';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
+    CertificationType,
     CommonMistake,
     Lesson,
+    LessonRosterChange,
     RubricCriteraScore,
     TrainingSession,
     TrainingSessionPerformanceIndicator,
@@ -42,7 +44,7 @@ import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import TrainingTicketForm from "@/components/TrainingSession/TrainingTicketForm";
-import {Delete, ExpandMore} from "@mui/icons-material";
+import {ArrowForward, Delete, ExpandMore} from "@mui/icons-material";
 import {toast} from "react-toastify";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import FormSaveButton from "@/components/Form/FormSaveButton";
@@ -59,12 +61,17 @@ export type TrainingSessionIndicatorWithAll = TrainingSessionPerformanceIndicato
     categories: TrainingSessionIndicatorCategoryWithAll[],
 }
 
+export type RosterChangeWithAll = LessonRosterChange & {
+    certificationType: CertificationType,
+}
+
 export default function TrainingSessionForm({trainingSession,}: { trainingSession?: TrainingSession, }) {
 
     const router = useRouter();
     const theme = useTheme();
     const searchParams = useSearchParams();
     const [releaseDialogOpen, setReleaseDialogOpen] = useState<TrainingSession | null>();
+    const [rosterUpdates, setRosterUpdates] = useState<RosterChangeWithAll[]>([]);
     const [allLessons, setAllLessons] = useState<Lesson[]>([]);
     const [allCommonMistakes, setAllCommonMistakes] = useState<CommonMistake[]>([]);
     const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -109,6 +116,7 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
         const {
             session,
             release,
+            rosterUpdates,
             errors
         } = await createOrUpdateTrainingSession(
             student,
@@ -126,8 +134,9 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
             return;
         }
 
-        if (release) {
-            setReleaseDialogOpen(session);
+        if (release || rosterUpdates) {
+            setReleaseDialogOpen(session || null);
+            setRosterUpdates(rosterUpdates || []);
         } else {
             redirect(session);
         }
@@ -164,7 +173,7 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
     return (
         (<LocalizationProvider dateAdapter={AdapterDayjs}>
             <Dialog open={!!releaseDialogOpen} onClose={() => closeReleaseDialog()}>
-                <DialogTitle>Trainer Release Request Processed</DialogTitle>
+                <DialogTitle>Trainer Release Request Submitted</DialogTitle>
                 <DialogContent>
                     <DialogContentText sx={{mb: 2,}}>One or more lessons in this session are configured to automatically
                         submit a trainer release request upon passing.</DialogContentText>
@@ -173,6 +182,30 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={closeReleaseDialog} variant="contained" size="small">OK</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={rosterUpdates.length > 0} onClose={() => setRosterUpdates([])}>
+                <DialogTitle>Roster Updates Processed</DialogTitle>
+                <DialogContent>
+                    <DialogContentText sx={{mb: 2,}}>The following roster updates were made for this student as a result
+                        of passing one or more lessons during this session:</DialogContentText>
+                    <ul>
+                        {rosterUpdates.map((update) => (
+                            <li key={update.id}>
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    <DialogContentText
+                                        color="textPrimary">{update.certificationType.name}</DialogContentText>
+                                    <ArrowForward/>
+                                    <DialogContentText
+                                        color="textPrimary">{update.certificationOption}</DialogContentText>
+                                </Stack>
+                            </li>
+                        ))}
+                    </ul>
+                    <DialogContentText sx={{mt: 2,}}>Please inform the student of these changes.</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setRosterUpdates([])} variant="contained" size="small">OK</Button>
                 </DialogActions>
             </Dialog>
             <form action={handleSubmit}>

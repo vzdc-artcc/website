@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, {useState} from 'react';
 import {CertificationOption, CertificationType} from "@prisma/client";
 import {useRouter} from "next/navigation";
 import {toast} from "react-toastify";
@@ -9,7 +9,7 @@ import FormSaveButton from "@/components/Form/FormSaveButton";
 
 export default function CertificationTypeForm({certificationType}: { certificationType?: CertificationType }) {
 
-    const [availableOptions, setAvailableOptions] = React.useState<CertificationOption[]>(certificationType?.certificationOptions.filter((co) => !['NONE', 'SOLO'].includes(co)) || []);
+    const [availableOptions, setAvailableOptions] = useState<CertificationOption[]>(certificationType?.certificationOptions.filter((co) => !['NONE', 'SOLO'].includes(co)) || []);
     const router = useRouter();
 
     const handleSubmit = async (formData: FormData) => {
