@@ -15,7 +15,7 @@ export const sendTrainingAppointmentScheduledEmail = async (trainingAppointment:
 
     const event = {
         start: trainingAppointment.start.toUTCString(),
-        duration: {hours: duration, minutes: 0},
+        duration: {minutes: duration},
         title: `Training Appointment with ${trainer.fullName}`,
     };
 
@@ -54,7 +54,7 @@ export const sendTrainingAppointmentUpdatedEmail = async (trainingAppointment: T
 
     const event = {
         start: trainingAppointment.start.toUTCString(),
-        duration: {hours: duration, minutes: 0},
+        duration: {minutes: duration},
         title: `Training Appointment with ${trainer.fullName}`,
     };
 
