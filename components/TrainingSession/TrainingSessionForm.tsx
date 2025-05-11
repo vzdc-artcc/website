@@ -1,8 +1,10 @@
 'use client';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
+    CertificationType,
     CommonMistake,
     Lesson,
+    LessonRosterChange,
     RubricCriteraScore,
     TrainingSession,
     TrainingSessionPerformanceIndicator,
@@ -22,6 +24,11 @@ import {
     CardContent,
     Chip,
     CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     FormControlLabel,
     Grid2,
     IconButton,
@@ -37,7 +44,7 @@ import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import TrainingTicketForm from "@/components/TrainingSession/TrainingTicketForm";
-import {Delete, ExpandMore} from "@mui/icons-material";
+import {ArrowForward, Delete, ExpandMore} from "@mui/icons-material";
 import {toast} from "react-toastify";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import FormSaveButton from "@/components/Form/FormSaveButton";
@@ -54,11 +61,17 @@ export type TrainingSessionIndicatorWithAll = TrainingSessionPerformanceIndicato
     categories: TrainingSessionIndicatorCategoryWithAll[],
 }
 
+export type RosterChangeWithAll = LessonRosterChange & {
+    certificationType: CertificationType,
+}
+
 export default function TrainingSessionForm({trainingSession,}: { trainingSession?: TrainingSession, }) {
 
     const router = useRouter();
     const theme = useTheme();
     const searchParams = useSearchParams();
+    const [releaseDialogOpen, setReleaseDialogOpen] = useState<TrainingSession | null>();
+    const [rosterUpdates, setRosterUpdates] = useState<RosterChangeWithAll[]>([]);
     const [allLessons, setAllLessons] = useState<Lesson[]>([]);
     const [allCommonMistakes, setAllCommonMistakes] = useState<CommonMistake[]>([]);
     const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -102,6 +115,8 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
 
         const {
             session,
+            release,
+            rosterUpdates,
             errors
         } = await createOrUpdateTrainingSession(
             student,
@@ -119,15 +134,33 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
             return;
         }
 
-        if (!trainingSession?.id) {
-            if (session){
-            router.replace(`/training/sessions/${session.id}`);
-            }
+        if (release || rosterUpdates) {
+            release && setReleaseDialogOpen(session);
+            rosterUpdates && setRosterUpdates(rosterUpdates);
+        } else {
+            redirect();
+        }
+
+        toast("Training session saved successfully!", {type: 'success'});
+
+    }
+
+    const redirect = () => {
+        if (trainingSession) {
+            router.replace(`/training/sessions/${trainingSession.id}`);
+        }
 
         router.replace(`/training/sessions`);
+    }
 
-        }
-        toast("Training session saved successfully!", {type: 'success'});
+    const closeReleaseDialog = (redirectFlag: boolean) => {
+        redirectFlag && redirect();
+        setReleaseDialogOpen(null);
+    }
+
+    const closeRosterDialog = (redirectFlag: boolean) => {
+        redirectFlag && redirect();
+        setRosterUpdates([]);
     }
 
     useEffect(() => {
@@ -142,6 +175,44 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
 
     return (
         (<LocalizationProvider dateAdapter={AdapterDayjs}>
+            <Dialog open={!!releaseDialogOpen} onClose={() => closeReleaseDialog(rosterUpdates.length === 0)}>
+                <DialogTitle>Trainer Release Request Submitted</DialogTitle>
+                <DialogContent>
+                    <DialogContentText sx={{mb: 2,}}>One or more lessons in this session are configured to automatically
+                        submit a trainer release request upon passing.</DialogContentText>
+                    <DialogContentText><b>Inform the student that a trainer release request has been
+                        submitted.</b></DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => closeReleaseDialog(rosterUpdates.length === 0)} variant="contained"
+                            size="small">OK</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={rosterUpdates.length > 0} onClose={() => closeRosterDialog(!releaseDialogOpen)}>
+                <DialogTitle>Roster Updates Processed</DialogTitle>
+                <DialogContent>
+                    <DialogContentText sx={{mb: 2,}}>The following roster updates were made for this student as a result
+                        of passing one or more lessons during this session:</DialogContentText>
+                    <ul>
+                        {rosterUpdates.map((update) => (
+                            <li key={update.id}>
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    <DialogContentText
+                                        color="textPrimary">{update.certificationType.name}</DialogContentText>
+                                    <ArrowForward/>
+                                    <DialogContentText
+                                        color="textPrimary">{update.certificationOption}</DialogContentText>
+                                </Stack>
+                            </li>
+                        ))}
+                    </ul>
+                    <DialogContentText sx={{mt: 2,}}>Please inform the student of these changes.</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => closeRosterDialog(!releaseDialogOpen)} variant="contained"
+                            size="small">OK</Button>
+                </DialogActions>
+            </Dialog>
             <form action={handleSubmit}>
                 <Grid2 container columns={2} spacing={2}>
                     <Grid2 size={2}>

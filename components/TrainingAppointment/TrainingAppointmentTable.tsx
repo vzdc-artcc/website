@@ -69,6 +69,18 @@ export default function TrainingAppointmentTable({sessionUser}: { sessionUser: U
             filterable: false,
         },
         {
+            field: 'environment',
+
+            flex: 1,
+            headerName: 'Environment',
+            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+            renderCell: (params) => {
+                return (
+                    <span style={{color: params.row.doubleBooking ? 'red' : 'inherit',}}>{params.row.environment}</span>
+                )
+            }
+        },
+        {
             field: 'lessons',
             flex: 1,
             headerName: 'Lesson(s)',

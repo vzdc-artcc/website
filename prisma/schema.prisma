@@ -255,6 +255,7 @@ model CertificationType {
   certificationOptions CertificationOption[]
   soloCertifications   SoloCertification[]
   certifications       Certification[]
+  lessonRosterChanges LessonRosterChange[]
 }
 
 model SoloCertification {
@@ -324,6 +325,7 @@ enum LogModel {
   PERFORMANCE_INDICATOR_CRITERIA_CATEGORY
   PERFORMANCE_INDICATOR_CRITERIA
   LESSON_PERFORMANCE_INDICATOR
+  LESSON_ROSTER_CHANGE
 
   TRAINING_APPOINTMENT
 }
@@ -427,7 +429,10 @@ model FileCategory {
 }
 
 model File {
-  id             String             @id @default(cuid())
+  id String @id @default(cuid())
+
+  alias String? @unique
+
   name           String
   order          Int                @default(0)
   description    String
@@ -463,9 +468,9 @@ model Lesson {
   rubricId    String?       @unique
   updatedAt   DateTime
 
-  instructorOnly                 Boolean
-  notifyInstructorOnPass         Boolean
-  deleteTrainingAssignmentOnPass Boolean @default(false)
+  instructorOnly         Boolean
+  notifyInstructorOnPass Boolean
+  releaseRequestOnPass   Boolean @default(false)
 
   trainingTickets TrainingTicket[]
   progressions    TrainingProgressionStep[]
@@ -476,7 +481,8 @@ model Lesson {
   duration           Int     @default(60)
   traineePreparation String?
 
-  appointments TrainingAppointment[]
+  appointments  TrainingAppointment[]
+  rosterChanges LessonRosterChange[]
 }
 
 model LessonRubric {
@@ -586,12 +592,13 @@ model IncidentReport {
 }
 
 model SyncTimes {
-  id       String    @id @default(cuid())
-  roster   DateTime?
-  stats    DateTime?
-  loas     DateTime?
-  events   DateTime?
-  soloCert DateTime?
+  id           String    @id @default(cuid())
+  roster       DateTime?
+  stats        DateTime?
+  loas         DateTime?
+  events       DateTime?
+  soloCert     DateTime?
+  appointments DateTime?
 }
 
 model StatisticsPrefixes {
@@ -812,6 +819,9 @@ model TrainingAppointment {
 
   start DateTime
 
+  environment   String?
+  doubleBooking Boolean @default(false)
+
   preparationCompleted Boolean @default(false)
   warningEmailSent     Boolean @default(false)
 
@@ -824,4 +834,18 @@ enum PerformanceIndicatorMarker {
   SATISFACTORY
   NEEDS_IMPROVEMENT
   UNSATISFACTORY
+}
+
+model LessonRosterChange {
+  id String @id @default(cuid())
+
+  lessonId String
+  lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  certificationType   CertificationType @relation(fields: [certificationTypeId], references: [id], onDelete: Cascade)
+  certificationTypeId String
+
+  certificationOption CertificationOption
+
+  dossierText String
 }

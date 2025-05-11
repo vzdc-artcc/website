@@ -19,12 +19,13 @@ import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
-import {Check, Close, Event, LocalActivity, MilitaryTech, People} from "@mui/icons-material";
+import {Check, Close, Event, Info, LocalActivity, MilitaryTech, PendingOutlined, People} from "@mui/icons-material";
 import {Lesson} from "@prisma/client";
 import {formatEasternDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
 import TrainingAppointmentFormDialog from "@/components/TrainingAppointment/TrainingAppointmentFormDialog";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 import {format} from "date-fns";
+import TrainerSideRequestButton from "@/components/TrainerReleaseRequest/TrainerSideRequestButton";
 
 const createCalendarLink = (
     startDate: Date,
@@ -100,6 +101,9 @@ export default async function Page() {
             identifier: true,
             name: true,
             duration: true,
+        },
+        orderBy: {
+            identifier: 'asc',
         },
     });
 
@@ -262,6 +266,7 @@ export default async function Page() {
                                     <TableCell>Duration (min)</TableCell>
                                     <TableCell>Student</TableCell>
                                     <TableCell>Preparation Completed</TableCell>
+                                    <TableCell>Environment</TableCell>
                                     <TableCell>Lesson(s)</TableCell>
                                     <TableCell>Actions</TableCell>
                                 </TableRow>
@@ -276,6 +281,14 @@ export default async function Page() {
                                         <TableCell>{`${ta.student.fullName} - ${getRating(ta.student.rating)}`}</TableCell>
                                         <TableCell>{ta.preparationCompleted ? <Check color="success"/> :
                                             <Close color="error"/>}</TableCell>
+                                        <TableCell>{ta.doubleBooking ?
+                                            <Tooltip
+                                                title="Double Booking.  Check calendar for specifics and consider rescheduling.">
+                                                <Info color="error"/>
+                                            </Tooltip>
+                                            : ta.environment ||
+                                            <PendingOutlined color="warning"/>}
+                                        </TableCell>
                                         <TableCell>{ta.lessons.map((l) => (
                                             <Chip size="small"
                                                   key={l.id}
@@ -388,7 +401,7 @@ const getTable = (students: Student[]) => (
                     <TableCell>
                         {student.trainingAppointmentStudent.length > 0 ? (
                             <Tooltip
-                                title={`${formatZuluDate(student.trainingAppointmentStudent[0].start)} with ${student.trainingAppointmentStudent[0].trainer.fullName}: ${student.trainingAppointmentStudent[0].lessons.map((l) => l.identifier).join(', ')}`}>
+                                title={`${formatEasternDate(student.trainingAppointmentStudent[0].start)} with ${student.trainingAppointmentStudent[0].trainer.fullName}: ${student.trainingAppointmentStudent[0].lessons.map((l) => l.identifier).join(', ')}`}>
                                 <Link
                                     href={`/training/appointments?sortField=start&sortDirection=asc&filterField=student&filterValue=${student.user.cid}&filterOperator=equals`}>
                                     <Chip
@@ -424,6 +437,7 @@ const getTable = (students: Student[]) => (
                                 </IconButton>
                             </Link>
                         </Tooltip>
+                        <TrainerSideRequestButton student={student.user}/>
                     </TableCell>
                 </TableRow>))}
             </TableBody>

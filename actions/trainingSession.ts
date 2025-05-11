@@ -6,7 +6,7 @@ import prisma from "@/lib/db";
 import {log} from "@/actions/log";
 import {revalidatePath} from "next/cache";
 import {z} from "zod";
-import {CommonMistake, Lesson, Prisma, RubricCriteraScore} from "@prisma/client";
+import {CertificationType, CommonMistake, Lesson, LessonRosterChange, Prisma, RubricCriteraScore} from "@prisma/client";
 import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {
@@ -19,6 +19,7 @@ import {sendInstructorsTrainingSessionCreatedEmail, sendTrainingSessionCreatedEm
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
 import {TrainingSessionIndicatorWithAll} from "@/components/TrainingSession/TrainingSessionForm";
 import {after} from "next/server";
+import {writeDossier} from "@/actions/dossier";
 
 
 export async function deleteTrainingSession(id: string) {
@@ -105,7 +106,7 @@ export async function createOrUpdateTrainingSession(
         },
     });
 
-    if (!fetchedPi && (!performanceIndicator || !performanceIndicator.categories.every((category) => category.criteria.every((criteria) => !!criteria.marker)))) {
+    if (fetchedPi && (!performanceIndicator || !performanceIndicator.categories.every((category) => category.criteria.every((criteria) => !!criteria.marker)))) {
         return {
             errors: [{
                 message: "You must fill out ALL the performance indicators to submit this ticket."
@@ -114,6 +115,7 @@ export async function createOrUpdateTrainingSession(
     }
 
     const session = await getServerSession(authOptions);
+    type LessonRosterChangeWithType = LessonRosterChange & { certificationType: CertificationType, };
 
     if (id && session) {
 
@@ -223,6 +225,49 @@ export async function createOrUpdateTrainingSession(
             return {};
         }
 
+        let release = null;
+
+        const rosterUpdates: LessonRosterChangeWithType[] = [];
+
+        const passedLessons = trainingSession.tickets.filter((t) => t.passed);
+
+        if (passedLessons.some((t => t.lesson.releaseRequestOnPass))) {
+            const assignment = await prisma.trainingAssignment.findUnique({
+                where: {
+                    studentId: trainingSession.student.id,
+                },
+            });
+            const releaseRequest = await prisma.trainerReleaseRequest.findFirst({
+                where: {
+                    studentId: trainingSession.student.id,
+                },
+            });
+
+            if (assignment && !releaseRequest) {
+                release = await prisma.trainerReleaseRequest.create({
+                    data: {
+                        studentId: trainingSession.student.id,
+                        submittedAt: new Date(),
+                    }
+                });
+            }
+        }
+
+        await Promise.all(passedLessons.map(async (l) => {
+            const lessonRosterUpdates = await prisma.lessonRosterChange.findMany({
+                where: {
+                    lessonId: l.lesson.id,
+                },
+                include: {
+                    certificationType: true,
+                },
+            });
+
+            lessonRosterUpdates.forEach((lessonRosterUpdate) => {
+                rosterUpdates.push(lessonRosterUpdate);
+            });
+        }));
+
         revalidatePath('/training/sessions', "layout");
 
         for (const newTicket of trainingSession.tickets) {
@@ -233,7 +278,29 @@ export async function createOrUpdateTrainingSession(
             }
         }
 
-        return {session: trainingSession};
+        for (const update of rosterUpdates) {
+            await prisma.certification.upsert({
+                where: {
+                    certificationTypeId_userId: {
+                        userId: trainingSession.student.id,
+                        certificationTypeId: update.certificationType.id,
+                    },
+                },
+                create: {
+                    userId: trainingSession.student.id,
+                    certificationTypeId: update.certificationType.id,
+                    certificationOption: update.certificationOption,
+
+                },
+                update: {
+                    certificationOption: update.certificationOption,
+                }
+            });
+
+            await writeDossier(update.dossierText, trainingSession.student.cid);
+        }
+
+        return {session: trainingSession, release, rosterUpdates};
 
     } else if (session) {
 
@@ -314,6 +381,50 @@ export async function createOrUpdateTrainingSession(
 
         const vatusaId = await createVatusaTrainingSession(trainingSession.tickets[0].lesson.location, trainingSession.student.cid, session.user.cid, start, trainingSession.tickets[0].lesson.position, getDuration(trainingSession.start, trainingSession.end), `${ticketComment}\n\nRefer to your training ticket in the vZDC website to see the scoring rubric.`, getOtsStatus(trainingSession.tickets));
 
+        let release = null;
+
+        const rosterUpdates: LessonRosterChangeWithType[] = [];
+
+        const passedLessons = trainingSession.tickets.filter((t) => t.passed);
+
+        if (trainingSession.tickets.some((t) => t.lesson.releaseRequestOnPass && t.passed)) {
+            const assignment = await prisma.trainingAssignment.findUnique({
+                where: {
+                    studentId: trainingSession.student.id,
+                },
+            });
+
+            const releaseRequest = await prisma.trainerReleaseRequest.findFirst({
+                where: {
+                    studentId: trainingSession.student.id,
+                },
+            });
+
+            if (assignment && !releaseRequest) {
+                release = await prisma.trainerReleaseRequest.create({
+                    data: {
+                        studentId: trainingSession.student.id,
+                        submittedAt: new Date(),
+                    }
+                });
+            }
+        }
+
+        await Promise.all(passedLessons.map(async (l) => {
+            const lessonRosterUpdates = await prisma.lessonRosterChange.findMany({
+                where: {
+                    lessonId: l.lesson.id,
+                },
+                include: {
+                    certificationType: true,
+                },
+            });
+
+            lessonRosterUpdates.forEach((lessonRosterUpdate) => {
+                rosterUpdates.push(lessonRosterUpdate);
+            });
+        }));
+
         await prisma.trainingSession.update({
             where: {id: trainingSession.id},
             data: {
@@ -333,8 +444,29 @@ export async function createOrUpdateTrainingSession(
             }
         }
 
+        for (const update of rosterUpdates) {
+            await prisma.certification.upsert({
+                where: {
+                    certificationTypeId_userId: {
+                        userId: trainingSession.student.id,
+                        certificationTypeId: update.certificationType.id,
+                    },
+                },
+                create: {
+                    userId: trainingSession.student.id,
+                    certificationTypeId: update.certificationType.id,
+                    certificationOption: update.certificationOption,
 
-        return {session: trainingSession};
+                },
+                update: {
+                    certificationOption: update.certificationOption,
+                }
+            });
+
+            await writeDossier(update.dossierText, trainingSession.student.cid);
+        }
+
+        return {session: trainingSession, release, rosterUpdates};
     } else {
         return {
             errors: [{

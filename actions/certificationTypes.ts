@@ -28,6 +28,22 @@ export const createOrUpdateCertificationType = async (formData: FormData) => {
         return {errors: result.error.errors};
     }
 
+    const oldLessonRosterChanges = await prisma.lessonRosterChange.findMany({
+        where: {
+            certificationTypeId: result.data.id || '',
+            certificationOption: {
+                notIn: result.data.certificationOptions,
+            },
+        },
+        include: {
+            lesson: true,
+        },
+    });
+
+    if (oldLessonRosterChanges.length > 0) {
+        return {errors: [{message: `Cannot update certification type because there are invalid certification options on the following lessons: ${oldLessonRosterChanges.map((change) => change.lesson.identifier).join(', ')}.  Fix these conflicts and then submit your update.`}]};
+    }
+
     const certificationType = await prisma.certificationType.upsert({
         create: {
             name: result.data.name,

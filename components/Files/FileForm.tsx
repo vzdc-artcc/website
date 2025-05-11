@@ -1,11 +1,11 @@
 'use client';
 import React from 'react';
-import { File as DBFile, FileCategory, HighlightColorType } from '@prisma/client';
-import { Box, MenuItem, Stack, TextField } from "@mui/material";
+import {File as DBFile, FileCategory, HighlightColorType} from '@prisma/client';
+import {Box, MenuItem, Stack, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import { toast } from "react-toastify";
-import { createOrUpdateFile } from "@/actions/files";
-import { useRouter } from "next/navigation";
+import {toast} from "react-toastify";
+import {createOrUpdateFile} from "@/actions/files";
+import {useRouter} from "next/navigation";
 
 export default function FileForm({ file, category }: { file?: DBFile, category: FileCategory }) {
 
@@ -35,6 +35,9 @@ export default function FileForm({ file, category }: { file?: DBFile, category: 
             <Stack direction="column" spacing={2}>
                 <TextField variant="filled" fullWidth name="name" label="Name" required
                     defaultValue={file?.name || ''} />
+                <TextField variant="filled" fullWidth name="alias" label="Alias"
+                           defaultValue={file?.alias || ''}
+                           helperText="Must be unique or else an error will be thrown."/>
                 <TextField variant="filled" fullWidth name="description" label="Description"
                     defaultValue={file?.description || ''} multiline rows={4} />
                 <TextField variant="filled" fullWidth name="highlightColor" label="Highlight Color" select defaultValue={file?.highlightColor || ''}>

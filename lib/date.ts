@@ -97,3 +97,21 @@ export const eventGetDuration = (start: Date, end: Date, days?: boolean) => {
 export const formatEasternDate = (date: Date) => {
     return dayjs.utc(date).tz("America/New_York").format("MM/DD/YY HH:mm");
 };
+
+export const getMinutesAgo = (date: Date): number => {
+    const now = new Date();
+    const diffInMilliseconds = now.getTime() - date.getTime();
+    return Math.floor(diffInMilliseconds / 1000 / 60);
+}
+
+export const getChipColor = (date?: Date | null): 'success' | 'warning' | 'error' => {
+    if (!date) return 'error';
+    const minutesAgo = getMinutesAgo(date);
+    if (minutesAgo <= 30) {
+        return 'success'; // green
+    } else if (minutesAgo <= 60) {
+        return 'warning'; // yellow
+    } else {
+        return 'error'; // red
+    }
+}

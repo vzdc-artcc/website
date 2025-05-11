@@ -13,6 +13,7 @@ export default async function FileTable({files, admin}: { files: File[], admin?:
                 <TableHead>
                     <TableRow>
                         <TableCell>Name</TableCell>
+                        {admin && <TableCell>Alias</TableCell>}
                         <TableCell>Description</TableCell>
                         <TableCell>Updated At (UTC)</TableCell>
                         {admin && <TableCell>Actions</TableCell>}
@@ -29,6 +30,7 @@ export default async function FileTable({files, admin}: { files: File[], admin?:
                                     </Stack>
                                 </Link>
                             </TableCell>
+                            {admin && <TableCell>{file.alias}</TableCell>}
                             <TableCell>{file.description}</TableCell>
                             <TableCell>{file.updatedAt.toUTCString()}</TableCell>
                             {admin && <TableCell>

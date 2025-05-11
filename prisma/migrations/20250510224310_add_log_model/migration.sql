@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "LogModel" ADD VALUE 'LESSON_ROSTER_CHANGE';

@@ -10,7 +10,7 @@ export default async function Page() {
 
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user.roles.includes("INSTRUCTOR") || !session.user.roles.includes("STAFF")) {
+    if (!session || !session.user.staffPositions.includes("TA") || !session.user.staffPositions.includes("ATA")) {
         permanentRedirect('/training/assignments');
     }
 

@@ -21,6 +21,7 @@ export const updateSyncTime = async (data: SyncTimesUncheckedUpdateInput) => {
                 loas: data.loas as Date,
                 events: data.events as Date,
                 soloCert: data.soloCert as Date,
+                appointments: data.appointments as Date,
             },
         });
     }

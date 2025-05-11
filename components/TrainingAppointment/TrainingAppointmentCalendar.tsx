@@ -32,7 +32,7 @@ export default function TrainingAppointmentCalendar({appointments, isTrainingSta
                 editable={false}
                 events={appointments.map((a) => ({
                     id: a.id,
-                    title: a.student.fullName,
+                    title: `${a.doubleBooking ? '(DB)' : ''} ${a.student.fullName}`,
                     start: a.start,
                     end: getEndTime(a.start, a.lessons.map(l => l.duration).reduce((a, b) => a + b, 0)),
                     color: getRatingColor(a.student.rating),
