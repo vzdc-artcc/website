@@ -60,7 +60,7 @@ export default function RosterChangeForm({lesson, rosterChange, allCertification
                         labelId="certification-options-label"
                         id="certification-options"
                         value={certificationOption || ''}
-                        label="Certification Options"
+                        label="Certification Option"
                         onChange={(event) => setCertificationOption(event.target.value as CertificationOption)}
                         disabled={!certificationType}
                         variant="filled"
