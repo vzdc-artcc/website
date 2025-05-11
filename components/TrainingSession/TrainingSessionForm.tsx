@@ -135,29 +135,32 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
         }
 
         if (release || rosterUpdates) {
-            setReleaseDialogOpen(session || null);
-            setRosterUpdates(rosterUpdates || []);
+            release && setReleaseDialogOpen(session);
+            rosterUpdates && setRosterUpdates(rosterUpdates);
         } else {
-            redirect(session);
+            redirect();
         }
 
         toast("Training session saved successfully!", {type: 'success'});
 
     }
 
-    const redirect = (session?: TrainingSession) => {
-        if (!trainingSession?.id) {
-            if (session){
-                router.replace(`/training/sessions/${session.id}`);
-            }
-
-            router.replace(`/training/sessions`);
+    const redirect = () => {
+        if (trainingSession) {
+            router.replace(`/training/sessions/${trainingSession.id}`);
         }
+
+        router.replace(`/training/sessions`);
     }
 
-    const closeReleaseDialog = () => {
-        redirect(releaseDialogOpen || undefined);
+    const closeReleaseDialog = (redirectFlag: boolean) => {
+        redirectFlag && redirect();
         setReleaseDialogOpen(null);
+    }
+
+    const closeRosterDialog = (redirectFlag: boolean) => {
+        redirectFlag && redirect();
+        setRosterUpdates([]);
     }
 
     useEffect(() => {
@@ -172,7 +175,7 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
 
     return (
         (<LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Dialog open={!!releaseDialogOpen} onClose={() => closeReleaseDialog()}>
+            <Dialog open={!!releaseDialogOpen} onClose={() => closeReleaseDialog(rosterUpdates.length === 0)}>
                 <DialogTitle>Trainer Release Request Submitted</DialogTitle>
                 <DialogContent>
                     <DialogContentText sx={{mb: 2,}}>One or more lessons in this session are configured to automatically
@@ -181,10 +184,11 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
                         submitted.</b></DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={closeReleaseDialog} variant="contained" size="small">OK</Button>
+                    <Button onClick={() => closeReleaseDialog(rosterUpdates.length === 0)} variant="contained"
+                            size="small">OK</Button>
                 </DialogActions>
             </Dialog>
-            <Dialog open={rosterUpdates.length > 0} onClose={() => setRosterUpdates([])}>
+            <Dialog open={rosterUpdates.length > 0} onClose={() => closeRosterDialog(!releaseDialogOpen)}>
                 <DialogTitle>Roster Updates Processed</DialogTitle>
                 <DialogContent>
                     <DialogContentText sx={{mb: 2,}}>The following roster updates were made for this student as a result
@@ -205,7 +209,8 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
                     <DialogContentText sx={{mt: 2,}}>Please inform the student of these changes.</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setRosterUpdates([])} variant="contained" size="small">OK</Button>
+                    <Button onClick={() => closeRosterDialog(!releaseDialogOpen)} variant="contained"
+                            size="small">OK</Button>
                 </DialogActions>
             </Dialog>
             <form action={handleSubmit}>

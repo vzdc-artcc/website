@@ -101,7 +101,7 @@ export default function TrainingAppointmentFormDialog({
                             renderInput={(params) => <TextField {...params} required label="Student"/>}
                         />
                         <DateTimePicker sx={{width: '100%',}} name="start" label="Start (Eastern Time)" value={start}
-                                        disablePast onChange={setStart}/>
+                                        disablePast ampm={false} onChange={setStart}/>
                         <Autocomplete
                             options={allLessons}
                             multiple
