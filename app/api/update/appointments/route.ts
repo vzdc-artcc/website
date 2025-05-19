@@ -4,7 +4,8 @@ import {sendTrainingAppointmentWarningEmail} from "@/actions/mail/trainingAppoin
 import {User} from "next-auth";
 
 const TRAINING_ENVIRONMENTS = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["ERR-CONFIG"];
-const oneWeekInMS = 7 * 24 * 60 * 60 * 1000
+const BUFFER_TIME = Number(process.env.BUFFER_TIME) || 15; // in minutes
+const oneWeekInMS = 7 * 24 * 60 * 60 * 1000;
 
 export async function GET() {
 
