@@ -5,6 +5,7 @@ import {User} from "next-auth";
 
 const TRAINING_ENVIRONMENTS = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["ERR-CONFIG"];
 const BUFFER_TIME = Number(process.env.BUFFER_TIME) || 15; // in minutes
+const oneWeekInMS = 7 * 24 * 60 * 60 * 1000;
 
 export async function GET() {
 
@@ -167,7 +168,7 @@ const deleteOldTrainingAppointments = async () => {
             .map((lesson) => lesson.duration * 60 * 1000) // Convert minutes to milliseconds
             .reduce((acc, curr) => acc + curr, 0);
 
-        const endTime = new Date(appointment.start.getTime() + totalLessonDurationInMs + BUFFER_TIME * 60 * 1000);
+        const endTime = new Date(appointment.start.getTime() + totalLessonDurationInMs + oneWeekInMS);
 
         if (endTime <= now) {
             await prisma.trainingAppointment.delete({
