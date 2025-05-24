@@ -84,6 +84,7 @@ export const addVisitor = async (application: VisitorApplication, user: User) =>
         },
         data: {
             controllerStatus: "VISITOR",
+            showWelcomeMessage: true,
             trainingProgressionId: visitorProgression?.id,
         },
     });

@@ -21,7 +21,7 @@ import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
 import {Check, Close, Event, Info, LocalActivity, MilitaryTech, PendingOutlined, People} from "@mui/icons-material";
 import {Lesson} from "@prisma/client";
-import {formatEasternDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
+import {formatEasternDate, formatTimezoneDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
 import TrainingAppointmentFormDialog from "@/components/TrainingAppointment/TrainingAppointmentFormDialog";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 import {format} from "date-fns";
@@ -35,7 +35,7 @@ const createCalendarLink = (
     sessionDetails: string
 ): string => {
     // Convert startDate to GMT
-    const startDateGMT = new Date(startDate.toLocaleString("en-US", {timeZone: "GMT"}));
+    const startDateGMT = new Date(startDate.toLocaleString("en-US", {timeZone: timezone}));
     const endDateGMT = new Date(startDateGMT.getTime() + durationMinutes * 60 * 1000);
 
     // Format dates in Google Calendar format
@@ -230,9 +230,14 @@ export default async function Page() {
         trainingAppointmentStudent: student.trainingAppointmentStudent,
     }));
 
+    const nowMinus30Minutes = new Date(Date.now() - 30 * 60 * 1000);
+
     const trainingAppointments = await prisma.trainingAppointment.findMany({
         where: {
             trainerId: session.user.id,
+            start: {
+                gte: nowMinus30Minutes,
+            },
         },
         include: {
             student: true,
@@ -249,7 +254,8 @@ export default async function Page() {
                 <CardContent>
                     <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center" sx={{mb: 1,}}>
                         <Typography variant="h5">Your Upcoming Sessions</Typography>
-                        <TrainingAppointmentFormDialog assignedStudents={[...primaryStudents, ...otherStudents]}
+                        <TrainingAppointmentFormDialog timeZone={session.user.timezone}
+                                                       assignedStudents={[...primaryStudents, ...otherStudents]}
                                                        allStudents={allUsers as User[]}
                                                        allLessons={allLessons as Lesson[]}/>
                     </Stack>
@@ -262,7 +268,7 @@ export default async function Page() {
                         <Table size="small">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Start (Eastern Time)</TableCell>
+                                    <TableCell>Start</TableCell>
                                     <TableCell>Duration (min)</TableCell>
                                     <TableCell>Student</TableCell>
                                     <TableCell>Preparation Completed</TableCell>
@@ -274,7 +280,7 @@ export default async function Page() {
                             <TableBody>
                                 {trainingAppointments.map((ta) => (
                                     <TableRow key={ta.id}>
-                                        <TableCell>{formatEasternDate(ta.start)}</TableCell>
+                                        <TableCell>{formatTimezoneDate(ta.start, session.user.timezone)}</TableCell>
                                         <TableCell>{ta.lessons.map((l) => l.duration).reduce((p, c) => {
                                             return p + c;
                                         }, 0)}</TableCell>
@@ -302,7 +308,7 @@ export default async function Page() {
                                                 href={createCalendarLink(
                                                     ta.start,
                                                     ta.lessons.map((l) => l.duration).reduce((p, c) => p + c, 0),
-                                                    'GMT',
+                                                    session.user.timezone,
                                                     ta.student.fullName || '',
                                                     `Session with ${ta.student.fullName} covering lessons: ${ta.lessons.map((l) => l.identifier).join(', ')}`
                                                 )}
@@ -313,7 +319,8 @@ export default async function Page() {
                                                     </IconButton>
                                                 </Tooltip>
                                             </Link>
-                                            <TrainingAppointmentFormDialog trainingAppointment={{
+                                            <TrainingAppointmentFormDialog timeZone={session.user.timezone}
+                                                                           trainingAppointment={{
                                                 id: ta.id,
                                                 studentId: ta.studentId,
                                                 start: ta.start,

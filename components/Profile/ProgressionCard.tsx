@@ -1,6 +1,6 @@
 import React from 'react';
 import {User} from "next-auth";
-import {Button, Card, CardContent, Chip, Grid2, Stack, Typography} from "@mui/material";
+import {Card, CardContent, Chip, Grid2, Stack, Typography} from "@mui/material";
 import {getProgressionStatus} from "@/actions/progressionAssignment";
 import {East, South} from "@mui/icons-material";
 import {formatZuluDate} from "@/lib/date";
@@ -18,9 +18,8 @@ export default async function ProgressionCard({user}: { user: User }) {
             <Card sx={{height: '100%',}}>
                 <CardContent>
                     <Typography variant="h6" gutterBottom>Training Progression</Typography>
-                    <Typography gutterBottom>There are no training progressions assigned to you at this
+                    <Typography>There are no training progressions assigned to you at this
                         time. </Typography>
-                    <Typography>Contact the training staff if you believe this is in error.</Typography>
                 </CardContent>
             </Card>
         );
@@ -69,10 +68,6 @@ export default async function ProgressionCard({user}: { user: User }) {
                                         {step.trainingSession ? <Typography
                                                 variant="subtitle2">Attempted {formatZuluDate(step.trainingSession.start)}</Typography> :
                                             <Typography variant="subtitle2">Never Attempted</Typography>}
-                                        {!step.trainingSession &&
-                                            <Button variant="outlined" size="small" color="inherit"
-                                                    sx={{mt: 2, width: '100%',}}
-                                                    disabled>Schedule {step.lesson.identifier}</Button>}
                                     </CardContent>
                                 </Card>
 

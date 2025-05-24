@@ -10,11 +10,6 @@ const oneWeekInMS = 7 * 24 * 60 * 60 * 1000;
 export async function GET() {
 
     const appointments = await prisma.trainingAppointment.findMany({
-        where: {
-            start: {
-                gte: new Date(),
-            },
-        },
         include: {
             lessons: true,
         },
@@ -51,6 +46,10 @@ export async function GET() {
     }[] = []
 
     for (const appointment of appointmentDetails) {
+
+        if (appointment.start < new Date()) {
+            continue;
+        }
 
         if (appointment.liveTraining) {
             appointmentUpdateDetails.push({

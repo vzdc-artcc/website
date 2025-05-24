@@ -15,7 +15,7 @@ import {Edit} from "@mui/icons-material";
 import {LOAStatus} from "@prisma/client";
 import AssignedMentorsCard from "@/components/Profile/AssignedMentorsCard";
 import ProgressionCard from "@/components/Profile/ProgressionCard";
-import {formatEasternDate, getTimeIn} from "@/lib/date";
+import {formatTimezoneDate, getTimeIn} from "@/lib/date";
 import CompletePreparationButton from "@/components/TrainingAppointment/CompletePreparationButton";
 import SessionJoinInstructionsButton from "@/components/TrainingAppointment/SessionJoinInstructionsButton";
 
@@ -34,9 +34,14 @@ export default async function Page() {
         },
     });
 
+    const nowMinus15Minutes = new Date(Date.now() - 15 * 60 * 1000);
+
     const trainingAppointment = await prisma.trainingAppointment.findFirst({
         where: {
             studentId: user?.id || "",
+            start: {
+                gte: nowMinus15Minutes,
+            },
         },
         orderBy: {
             start: "asc",
@@ -71,7 +76,7 @@ export default async function Page() {
                         <Typography variant="h6">Training
                             Appointment: {trainingAppointment.trainer.fullName}</Typography>
                         <Typography
-                            variant="subtitle2">{formatEasternDate(trainingAppointment.start)} (ET)
+                            variant="subtitle2">{formatTimezoneDate(trainingAppointment.start, user.timezone)}
                             - {trainingAppointment.start.getTime() < (new Date()).getTime() ? 'NOW' : getTimeIn(trainingAppointment.start)}</Typography>
                         <Typography variant="subtitle2" gutterBottom>{trainingAppointment.lessons.map(l => l.duration)
                             .reduce((acc: number, curr: number) => acc + curr, 0)} minutes</Typography>

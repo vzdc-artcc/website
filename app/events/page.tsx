@@ -1,12 +1,25 @@
 import React from 'react';
 import Image from 'next/image';
-import {Accordion, AccordionDetails, AccordionSummary, Box, Card, CardContent, Container, Link, Stack, Typography} from "@mui/material";
+import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Box,
+    Card,
+    CardContent,
+    Container,
+    Link,
+    Stack,
+    Typography
+} from "@mui/material";
 import {Metadata} from "next";
 import EventCalendar from '@/components/Events/EventCalendar';
 import prisma from '@/lib/db';
-import { formatZuluDate } from '@/lib/date';
+import {formatZuluDate} from '@/lib/date';
 import Placeholder from '@/public/img/logo_large.png';
-import { ExpandMore } from '@mui/icons-material';
+import {ExpandMore} from '@mui/icons-material';
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/auth/auth";
 
 export const metadata: Metadata = {
     title: 'Events | vZDC',
@@ -23,8 +36,10 @@ export default async function Page() {
             start: 'asc',
         },
     });
-    
-    return (
+
+    const session = await getServerSession(authOptions);
+
+    return session?.user && (
         <Container maxWidth="lg">
             <Accordion sx={{ mb: 2, }}>
                 <AccordionSummary expandIcon={<ExpandMore />}>
@@ -48,7 +63,7 @@ export default async function Page() {
             </Accordion>
             <Card>
                 <CardContent>
-                    <EventCalendar events={events}/>
+                    <EventCalendar events={events} timeZone={session.user.timezone}/>
                 </CardContent>
             </Card>
             {events.length > 0 && <Typography variant="h6" sx={{my: 2,}}>List View</Typography>}

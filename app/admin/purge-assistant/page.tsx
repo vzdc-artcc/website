@@ -31,12 +31,11 @@ export default async function Page(
         return <ErrorCard heading="Roster Purge Assistant" message="Invalid bounds."/>
     }
 
-    const controllers = await prisma.user.findMany({
+    let controllers = await prisma.user.findMany({
         where: {
             controllerStatus: {
                 not: "NONE",
             },
-            trainingAssignmentRequestStudent: null,
             ...(includeLoas === 'false' && {
                 OR: [
                     {
@@ -52,6 +51,9 @@ export default async function Page(
             }),
         },
         include: {
+            changesUnseen: true,
+            changesSeen: true,
+            trainingAssignmentRequestStudent: true,
             log: {
                 include: {
                     months: true,
@@ -66,6 +68,10 @@ export default async function Page(
                 },
             },
         },
+    });
+
+    controllers = controllers.filter(controller => {
+        return !(controller.rating === 1 && controller.trainingAssignmentRequestStudent);
     });
 
     let condensedControllers = controllers.map((controller) => {

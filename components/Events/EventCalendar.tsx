@@ -3,16 +3,16 @@ import React from 'react';
 import dayGridPlugin from "@fullcalendar/daygrid";
 import FullCalendar from "@fullcalendar/react";
 import {useRouter} from "next/navigation";
-import { EventType } from '@prisma/client';
+import {EventType} from '@prisma/client';
 
-export default function EventCalendar({events}: { events: any[], }) {
+export default function EventCalendar({events, timeZone}: { events: any[], timeZone: string, }) {
 
     const router = useRouter();
 
     return (
         <FullCalendar
             plugins={[dayGridPlugin]}
-            timeZone="UTC"
+            timeZone={timeZone}
             editable={false}
             events={events.map((event) => ({
                 id: event.id,

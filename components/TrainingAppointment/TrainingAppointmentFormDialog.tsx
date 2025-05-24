@@ -26,11 +26,13 @@ import {toast} from "react-toastify";
 import {formatZuluDate} from "@/lib/date";
 
 export default function TrainingAppointmentFormDialog({
+                                                          timeZone,
                                                           trainingAppointment,
                                                           assignedStudents,
                                                           allStudents,
                                                           allLessons
                                                       }: {
+    timeZone: string,
     trainingAppointment?: { id: string, studentId: string, start: Date, lessonIds: string[], },
     assignedStudents: Student[],
     allStudents: User[],
@@ -42,7 +44,7 @@ export default function TrainingAppointmentFormDialog({
 
     const [open, setOpen] = useState(false);
     const [student, setStudent] = useState(trainingAppointment?.studentId || '');
-    const [start, setStart] = useState<Dayjs | null>(dayjs.utc(trainingAppointment?.start || new Date()).tz("America/New_York"));
+    const [start, setStart] = useState<Dayjs | null>(dayjs.utc(trainingAppointment?.start || new Date()).tz(timeZone));
     const [lessons, setLessons] = useState<Lesson[]>(trainingAppointment?.lessonIds.map((id) => allLessons.find((l) => l.id === id)).filter((l) => l !== undefined) as Lesson[] || []);
     const [loading, setLoading] = useState(false);
 
@@ -60,7 +62,7 @@ export default function TrainingAppointmentFormDialog({
         setOpen(false);
         if (!trainingAppointment) {
             setStudent('');
-            setStart(dayjs.utc(new Date()).tz("America/New_York"));
+            setStart(dayjs.utc(new Date()).tz(timeZone));
             setLessons([]);
         }
         setLoading(false);
@@ -100,7 +102,7 @@ export default function TrainingAppointmentFormDialog({
                             }}
                             renderInput={(params) => <TextField {...params} required label="Student"/>}
                         />
-                        <DateTimePicker sx={{width: '100%',}} name="start" label="Start (Eastern Time)" value={start}
+                        <DateTimePicker sx={{width: '100%',}} name="start" label="Start" value={start}
                                         disablePast ampm={false} onChange={setStart}/>
                         <Autocomplete
                             options={allLessons}

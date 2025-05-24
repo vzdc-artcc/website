@@ -9,6 +9,7 @@ import {
     BarChart,
     CellTower,
     DeleteSweep,
+    EmojiPeople,
     Feedback,
     Folder,
     Home,
@@ -203,6 +204,14 @@ export default async function AdminMenu() {
                         <CellTower/>
                     </ListItemIcon>
                     <ListItemText primary="Broadcasts"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/admin/welcome-messages" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <EmojiPeople/>
+                    </ListItemIcon>
+                    <ListItemText primary="Welcome Messages"/>
                 </ListItemButton>
             </Link>
             <Link href="/admin/logs" style={{textDecoration: 'none', color: 'inherit',}}>

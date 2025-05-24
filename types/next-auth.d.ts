@@ -69,6 +69,12 @@ declare module "next-auth" {
         newEventNotifications: boolean,
         flagAutoAssignSinglePass: boolean,
 
+        showWelcomeMessage: boolean,
+
+        timezone: string,
+        joinDate: Date,
+        discordUid?: string,
+
         teamspeakUid?: string,
     }
 

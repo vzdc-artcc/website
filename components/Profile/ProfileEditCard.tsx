@@ -2,7 +2,7 @@
 import React from 'react';
 import {User} from "next-auth";
 import {Filter} from 'bad-words';
-import {Alert, Card, CardContent, Divider, Stack, Switch, TextField, Tooltip} from "@mui/material";
+import {Alert, Autocomplete, Card, CardContent, Divider, Stack, Switch, TextField, Tooltip} from "@mui/material";
 import {getRating} from "@/lib/vatsim";
 import {z} from "zod";
 import {toast} from "react-toastify";
@@ -27,6 +27,7 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
             operatingInitials: z.string().length(2, "Operating Initials must be 2 characters").toUpperCase(),
             receiveEmail: z.boolean(),
             newEventNotifications: z.boolean(),
+            timezone: z.string(),
         });
 
         const result = User.safeParse({
@@ -35,6 +36,7 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
             operatingInitials: formData.get('operatingInitials') as string || user.operatingInitials,
             receiveEmail: true,
             newEventNotifications: formData.get('newEventNotifications') === 'on',
+            timezone: formData.get('timezone') as string,
         });
 
         if (!result.success) {
@@ -69,6 +71,8 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
         toast('Profile updated successfully!', {type: 'success'});
     }
 
+    const timezones = Intl.supportedValuesOf("timeZone");
+
     return (
         <Card>
             <CardContent>
@@ -77,6 +81,13 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
                         <TextField fullWidth disabled variant="filled" label="Name" value={user.fullName}/>
                         <TextField fullWidth disabled variant="filled" label="VATSIM CID" value={user.cid}/>
                         <TextField fullWidth disabled variant="filled" label="Rating" value={getRating(user.rating)}/>
+                        <Autocomplete
+                            options={timezones}
+                            defaultValue={user.timezone || ""}
+                            renderInput={(params) => (
+                                <TextField {...params} label="Timezone" variant="filled" name="timezone"/>
+                            )}
+                        />
                         <Divider/>
                         {!admin && <>
                             <Alert severity="info">The Teamspeak UID form has been moved to the profile dropdown
