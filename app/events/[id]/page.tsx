@@ -19,7 +19,7 @@ import {
 import Image from "next/image";
 import Markdown from "react-markdown";
 import Placeholder from "@/public/img/logo_large.png";
-import {formatZuluDate} from '@/lib/date';
+import {formatTimezoneDate, formatZuluDate} from '@/lib/date';
 import {getServerSession} from 'next-auth';
 import {authOptions} from '@/auth/auth';
 import EventPositionRequestForm from '@/components/EventPosition/EventPositionRequestForm';
@@ -104,10 +104,14 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             <Grid2 size={2}>
                                 <Stack direction="column" spacing={1} sx={{mb: 4,}}>
                                     <Typography variant="h5">{event.name}</Typography>
-                                    <Typography variant="subtitle1">
+                                    {session?.user && <Typography variant="subtitle1">
+                                        {formatTimezoneDate(event.start, session?.user.timezone)}
+                                        - {formatTimezoneDate(event.end, session?.user.timezone)}
+                                    </Typography>}
+                                    {!session?.user && <Typography variant="subtitle1">
                                         {formatZuluDate(event.start)}
                                         - {formatZuluDate(event.end)}
-                                    </Typography>
+                                    </Typography>}
                                     <Typography
                                         variant="subtitle2">{event.featuredFields.join(" • ") || 'No fields'}</Typography>
                                 </Stack>
@@ -126,7 +130,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                     <CardContent>
                         <Typography variant="h6" gutterBottom>Your Position Assignment</Typography>
                         <Typography variant="h5" textAlign="center">{eventPosition.finalPosition}</Typography>
-                        <Typography variant="subtitle2" textAlign="center" gutterBottom>{formatZuluDate(eventPosition.finalStartTime || event.start)} - {formatZuluDate(eventPosition.finalEndTime || event.end)}</Typography>
+                        <Typography variant="subtitle2" textAlign="center"
+                                    gutterBottom>{formatTimezoneDate(eventPosition.finalStartTime || event.start, session.user.timezone)} - {formatTimezoneDate(eventPosition.finalEndTime || event.end, session.user.timezone)}</Typography>
                         <Typography textAlign="center" sx={{ mb: 4 }}>{eventPosition.finalNotes}</Typography>
                         <Typography variant="caption">Contact the events team if you have any questions.</Typography>
                     </CardContent>
@@ -152,8 +157,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                                                 {position?.user?.firstName} {position?.user?.lastName}
                                             </TableCell>
                                             <TableCell>{position?.finalPosition}</TableCell>
-                                            <TableCell>{position?.finalStartTime?.getTime() === event.start.getTime() ? 'EVENT' : formatZuluDate(position?.finalStartTime || event.start)}</TableCell>
-                                            <TableCell>{position?.finalEndTime?.getTime() === event.end.getTime() ? 'EVENT' : formatZuluDate(position?.finalEndTime || event.end)}</TableCell>
+                                            <TableCell>{position?.finalStartTime?.getTime() === event.start.getTime() ? 'EVENT' : formatTimezoneDate(position?.finalStartTime || event.start, session.user.timezone)}</TableCell>
+                                            <TableCell>{position?.finalEndTime?.getTime() === event.end.getTime() ? 'EVENT' : formatTimezoneDate(position?.finalEndTime || event.end, session.user.timezone)}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

@@ -27,7 +27,7 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
             operatingInitials: z.string().length(2, "Operating Initials must be 2 characters").toUpperCase(),
             receiveEmail: z.boolean(),
             newEventNotifications: z.boolean(),
-            timezone: z.string(),
+            timezone: z.string().min(1, "Timezone is required"),
         });
 
         const result = User.safeParse({

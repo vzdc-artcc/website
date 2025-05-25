@@ -261,9 +261,6 @@ export default async function Page() {
                     </Stack>
                     {trainingAppointments.length === 0 &&
                         <Typography>You have no upcoming training appointments.</Typography>}
-                    {trainingAppointments.length > 0 &&
-                        <Typography sx={{mb: 2,}}>Appointments are automatically deleted 15 minutes after the start
-                            time.</Typography>}
                     {trainingAppointments.length > 0 && <TableContainer>
                         <Table size="small">
                             <TableHead>

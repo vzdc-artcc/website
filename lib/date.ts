@@ -117,19 +117,5 @@ export const getChipColor = (date?: Date | null): 'success' | 'warning' | 'error
 }
 
 export const formatTimezoneDate = (date: Date, timeZone: string): string => {
-    const formatter = new Intl.DateTimeFormat("en-US", {
-        timeZone,
-        year: "2-digit",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-    });
-
-    const parts = formatter.formatToParts(date);
-    const formattedDate = `${parts.find(p => p.type === "month")?.value}/${parts.find(p => p.type === "day")?.value}/${parts.find(p => p.type === "year")?.value}`;
-    const formattedTime = `${parts.find(p => p.type === "hour")?.value}:${parts.find(p => p.type === "minute")?.value}`;
-
-    return `${formattedDate} ${formattedTime}`;
+    return dayjs.utc(date).tz(timeZone).format("MM/DD/YY HH:mm");
 };

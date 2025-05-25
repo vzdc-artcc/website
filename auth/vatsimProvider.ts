@@ -83,7 +83,7 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
                 "ATM"
             ],
             joinDate: new Date(),
-            discordUid: "123456789012345678",
+            discordUid: undefined,
             operatingInitials,
         };
     }

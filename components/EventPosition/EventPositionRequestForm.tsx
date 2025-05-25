@@ -1,28 +1,30 @@
 'use client';
-import { Autocomplete, Button, Grid2, TextField, Typography } from "@mui/material";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { Event, EventPosition, User } from "@prisma/client";
-import dayjs, { Dayjs } from "dayjs";
+import {Autocomplete, Button, Grid2, TextField, Typography} from "@mui/material";
+import {LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
+import {Event, EventPosition, User} from "@prisma/client";
+import dayjs, {Dayjs} from "dayjs";
 import utc from "dayjs/plugin/utc";
 import Form from "next/form";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import FormSaveButton from "../Form/FormSaveButton";
-import { Add, Delete } from "@mui/icons-material";
-import { deleteEventPosition, fetchAllUsers, saveEventPosition } from "@/actions/eventPosition";
-import { toast } from "react-toastify";
-import { getRating } from "@/lib/vatsim";
+import {Add, Delete} from "@mui/icons-material";
+import {deleteEventPosition, fetchAllUsers, saveEventPosition} from "@/actions/eventPosition";
+import {toast} from "react-toastify";
+import {getRating} from "@/lib/vatsim";
+import timezone from "dayjs/plugin/timezone";
 
 export default function EventPositionRequestForm({ admin, currentUser, event, eventPosition }: { admin?: boolean, currentUser: User, event: Event, eventPosition?: EventPosition | null, }) {
 
     dayjs.extend(utc);
+    dayjs.extend(timezone);
 
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [user, setUser] = useState<string>(currentUser.id || '');
     const [position, setPosition] = useState(eventPosition?.requestedPosition || '');
-    const [start, setStart] = useState<Dayjs | null>(dayjs.utc(eventPosition?.requestedStartTime || event.start));
-    const [end, setEnd] = useState<Dayjs | null>(dayjs.utc(eventPosition?.requestedEndTime || event.end));
+    const [start, setStart] = useState<Dayjs | null>(dayjs.utc(eventPosition?.requestedStartTime || event.start).tz(currentUser.timezone));
+    const [end, setEnd] = useState<Dayjs | null>(dayjs.utc(eventPosition?.requestedEndTime || event.end).tz(currentUser.timezone));
     const [notes, setNotes] = useState(eventPosition?.notes || '');
 
     const handleSubmit = async (formData: FormData) => {
@@ -82,7 +84,12 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
                         />
                     </Grid2>
                     <Grid2 size={{ xs: 6, sm: 3, md: 2, }}>
-                        <DateTimePicker sx={{ width: '100%', }} disabled={!admin && (!!eventPosition || event.positionsLocked)} disablePast ampm={false} minDateTime={dayjs.utc(event.start)} maxDateTime={dayjs.utc(event.end)} name="start" label={admin ? 'FINAL Start' : 'Requested Start'} value={start} onChange={setStart} />
+                        <DateTimePicker sx={{width: '100%',}}
+                                        disabled={!admin && (!!eventPosition || event.positionsLocked)} disablePast
+                                        ampm={false} minDateTime={dayjs.utc(event.start).tz(currentUser.timezone)}
+                                        maxDateTime={dayjs.utc(event.end).tz(currentUser.timezone)} name="start"
+                                        label={admin ? 'FINAL Start' : 'Requested Start'} value={start}
+                                        onChange={setStart}/>
                     </Grid2>
                     <Grid2 size={{ xs: 6, sm: 3, md: 2, }}>
                         <DateTimePicker sx={{ width: '100%', }} disabled={!admin && (!!eventPosition || event.positionsLocked)} disablePast ampm={false} minDateTime={dayjs.utc(event.start)} maxDateTime={dayjs.utc(event.end)} name="end" label={admin ? 'FINAL End' : 'Requested End'} value={end} onChange={setEnd} />

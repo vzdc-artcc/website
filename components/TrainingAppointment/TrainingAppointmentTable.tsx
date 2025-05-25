@@ -53,7 +53,7 @@ export default function TrainingAppointmentTable({sessionUser}: { sessionUser: U
         {
             field: 'start',
             flex: 1,
-            headerName: 'Start (Eastern Time)',
+            headerName: 'Start',
             renderCell: (params) => formatEasternDate(params.row.start),
             type: 'dateTime',
             filterable: false,
@@ -103,7 +103,8 @@ export default function TrainingAppointmentTable({sessionUser}: { sessionUser: U
             type: 'actions',
             headerName: 'Actions',
             getActions: (params) => [
-                <TrainingAppointmentInformationDialog trainingAppointment={params.row} key={params.id}
+                <TrainingAppointmentInformationDialog timeZone={sessionUser.timezone} trainingAppointment={params.row}
+                                                      key={params.id}
                                                       isTrainingStaff={["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as StaffPosition))}/>,
                 ["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as StaffPosition)) || sessionUser.cid == `${params.row.trainer.cid}` ?
                     <TrainingAppointmentDeleteButton trainingAppointment={params.row} fromAdmin/>
