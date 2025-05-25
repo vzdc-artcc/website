@@ -15,6 +15,10 @@ export default function WelcomeMessageDialog({user, welcomeMessages}: {
 
     const [open, setOpen] = useState(user.showWelcomeMessage);
 
+    if (user.controllerStatus !== 'HOME' && user.controllerStatus !== 'VISITOR') {
+        return <></>; // Do not show dialog if user is not HOME or VISITOR
+    }
+
     const onClose = async () => {
         setOpen(false);
         await acknowledgeWelcomeMessage(user.id);
