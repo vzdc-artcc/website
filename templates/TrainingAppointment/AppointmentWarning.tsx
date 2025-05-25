@@ -1,7 +1,7 @@
 import {TrainingAppointment} from "@prisma/client";
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
-import {formatEasternDate} from "@/lib/date";
+import {formatTimezoneDate} from "@/lib/date";
 import {getRating} from "@/lib/vatsim";
 import {User} from "next-auth";
 
@@ -9,7 +9,7 @@ export const appointmentWarning = async (trainingAppointment: TrainingAppointmen
     return renderReactToMjml(
         <SingleRecipientEmailWrapper recipient={student} headerText="Training Appointment Soon">
             <p>This is a reminder about your training appointment scheduled
-                on <b>{formatEasternDate(trainingAppointment.start)}</b> (ET).</p>
+                on <b>{formatTimezoneDate(trainingAppointment.start, student.timezone)}</b> ({student.timezone}).</p>
             <p>You are required to attend this appointment unless you contact your trainer prior to the start time.</p>
             <br/>
             {!trainingAppointment.preparationCompleted && <>

@@ -21,7 +21,7 @@ import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
 import {Check, Close, Event, Info, LocalActivity, MilitaryTech, PendingOutlined, People} from "@mui/icons-material";
 import {Lesson} from "@prisma/client";
-import {formatEasternDate, formatTimezoneDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
+import {formatTimezoneDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
 import TrainingAppointmentFormDialog from "@/components/TrainingAppointment/TrainingAppointmentFormDialog";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 import {format} from "date-fns";
@@ -338,14 +338,14 @@ export default async function Page() {
                 <CardContent>
                     <Typography variant="h5" sx={{mb: 1,}}>Primary Students</Typography>
                     {primaryStudents.length === 0 && <Typography>You have no primary students.</Typography>}
-                    {primaryStudents.length > 0 && getTable(primaryStudents)}
+                    {primaryStudents.length > 0 && getTable(primaryStudents, session.user.timezone)}
                 </CardContent>
             </Card>
             <Card>
                 <CardContent>
                     <Typography variant="h5" sx={{mb: 1,}}>Other Students</Typography>
                     {otherStudents.length === 0 && <Typography>You have no other students.</Typography>}
-                    {otherStudents.length > 0 && getTable(otherStudents)}
+                    {otherStudents.length > 0 && getTable(otherStudents, session.user.timezone)}
                 </CardContent>
             </Card>
         </Stack>
@@ -353,7 +353,7 @@ export default async function Page() {
     );
 }
 
-const getTable = (students: Student[]) => (
+const getTable = (students: Student[], timezone: string) => (
     <TableContainer>
         <Table size="small">
             <TableHead>
@@ -405,7 +405,7 @@ const getTable = (students: Student[]) => (
                     <TableCell>
                         {student.trainingAppointmentStudent.length > 0 ? (
                             <Tooltip
-                                title={`${formatEasternDate(student.trainingAppointmentStudent[0].start)} with ${student.trainingAppointmentStudent[0].trainer.fullName}: ${student.trainingAppointmentStudent[0].lessons.map((l) => l.identifier).join(', ')}`}>
+                                title={`${formatTimezoneDate(student.trainingAppointmentStudent[0].start, timezone)} with ${student.trainingAppointmentStudent[0].trainer.fullName}: ${student.trainingAppointmentStudent[0].lessons.map((l) => l.identifier).join(', ')}`}>
                                 <Link
                                     href={`/training/appointments?sortField=start&sortDirection=asc&filterField=student&filterValue=${student.user.cid}&filterOperator=equals`}>
                                     <Chip

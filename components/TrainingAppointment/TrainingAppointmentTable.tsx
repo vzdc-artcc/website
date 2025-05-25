@@ -4,7 +4,7 @@ import {GridColDef} from "@mui/x-data-grid";
 import Link from "next/link";
 import {Chip} from "@mui/material";
 import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
-import {formatEasternDate} from "@/lib/date";
+import {formatTimezoneDate} from "@/lib/date";
 import {Lesson, StaffPosition} from "@prisma/client";
 import {fetchTrainingAppointments} from "@/actions/trainingAppointment";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
@@ -54,7 +54,7 @@ export default function TrainingAppointmentTable({sessionUser}: { sessionUser: U
             field: 'start',
             flex: 1,
             headerName: 'Start',
-            renderCell: (params) => formatEasternDate(params.row.start),
+            renderCell: (params) => formatTimezoneDate(params.row.start, sessionUser.timezone),
             type: 'dateTime',
             filterable: false,
         },

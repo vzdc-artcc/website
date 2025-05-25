@@ -2,13 +2,15 @@ import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
 import {TrainingAppointment} from "@prisma/client";
 import {User} from "next-auth";
-import {formatEasternDate} from "@/lib/date";
+import {formatTimezoneDate} from "@/lib/date";
 import {getRating} from "@/lib/vatsim";
 
 export const appointmentUpdated = async (trainingAppointment: TrainingAppointment, student: User, trainer: User) => {
     return renderReactToMjml(
         <SingleRecipientEmailWrapper recipient={student} headerText="Training Appointment Updated">
-            <p>Your training appointment on <b>{formatEasternDate(trainingAppointment.start)}</b> (ET) has been updated.
+            <p>Your training appointment
+                on <b>{formatTimezoneDate(trainingAppointment.start, student.timezone)}</b> ({student.timezone}) has
+                been updated.
             </p>
             <p>Make sure you are familiar with the updates prior to the start time.</p>
             <br/>

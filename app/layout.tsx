@@ -55,7 +55,7 @@ export default async function RootLayout({
             <InitColorSchemeScript attribute="class" defaultMode="system"/>
             <div>
                 {session?.user && <BroadcastViewer user={session.user}/>}
-                {session?.user && welcomeMessages &&
+                {session?.user && session.user.controllerStatus !== 'NONE' && welcomeMessages &&
                     <WelcomeMessageDialog user={session.user} welcomeMessages={welcomeMessages}/>}
                 <Navbar/>
                 <Container maxWidth="xl" sx={{marginTop: 2,}}>
