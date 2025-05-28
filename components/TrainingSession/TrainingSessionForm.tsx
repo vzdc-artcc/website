@@ -1,11 +1,10 @@
 'use client';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
-    CertificationType,
     CommonMistake,
     Lesson,
-    LessonRosterChange,
     RubricCriteraScore,
+    TrainerReleaseRequest,
     TrainingSession,
     TrainingSessionPerformanceIndicator,
     TrainingSessionPerformanceIndicatorCategory,
@@ -24,11 +23,6 @@ import {
     CardContent,
     Chip,
     CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
     FormControlLabel,
     Grid2,
     IconButton,
@@ -44,7 +38,7 @@ import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import TrainingTicketForm from "@/components/TrainingSession/TrainingTicketForm";
-import {ArrowForward, Delete, ExpandMore} from "@mui/icons-material";
+import {Delete, ExpandMore} from "@mui/icons-material";
 import {toast} from "react-toastify";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import FormSaveButton from "@/components/Form/FormSaveButton";
@@ -52,6 +46,10 @@ import {createOrUpdateTrainingSession} from "@/actions/trainingSession"
 import utc from "dayjs/plugin/utc";
 import TrainingSessionPerformanceIndicatorForm
     from "@/components/TrainingSession/TrainingSessionPerformanceIndicatorForm";
+import timezone from "dayjs/plugin/timezone";
+import TrainingSessionAfterSubmitDialogs, {
+    RosterChangeWithAll
+} from "@/components/TrainingSession/TrainingSessionAfterSubmitDialogs";
 
 export type TrainingSessionIndicatorCategoryWithAll = TrainingSessionPerformanceIndicatorCategory & {
     criteria: TrainingSessionPerformanceIndicatorCriteria[],
@@ -61,21 +59,24 @@ export type TrainingSessionIndicatorWithAll = TrainingSessionPerformanceIndicato
     categories: TrainingSessionIndicatorCategoryWithAll[],
 }
 
-export type RosterChangeWithAll = LessonRosterChange & {
-    certificationType: CertificationType,
-}
-
-export default function TrainingSessionForm({trainingSession,}: { trainingSession?: TrainingSession, }) {
+export default function TrainingSessionForm({timeZone, trainingSession,}: {
+    timeZone: string,
+    trainingSession?: TrainingSession,
+}) {
 
     const router = useRouter();
     const theme = useTheme();
     const searchParams = useSearchParams();
-    const [releaseDialogOpen, setReleaseDialogOpen] = useState<TrainingSession | null>();
-    const [rosterUpdates, setRosterUpdates] = useState<RosterChangeWithAll[]>([]);
+
+    const [afterRelease, setAfterRelease] = useState<TrainerReleaseRequest>();
+    const [afterRosterUpdates, setAfterRosterUpdates] = useState<RosterChangeWithAll[]>();
+    const renderAfterDialogs = !!afterRelease || !!afterRosterUpdates;
+
     const [allLessons, setAllLessons] = useState<Lesson[]>([]);
     const [allCommonMistakes, setAllCommonMistakes] = useState<CommonMistake[]>([]);
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [allLoading, setAllLoading] = useState<boolean>(true);
+
     const [student, setStudent] = useState<string>(trainingSession?.studentId || searchParams.get('student') || '');
     const [start, setStart] = useState<Date | string>(trainingSession?.start || new Date());
     const [end, setEnd] = useState<Date | string>(trainingSession?.end || new Date());
@@ -89,6 +90,7 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
     }[]>([]);
     const [additionalNotes, setAdditionalNotes] = useState<string>(trainingSession?.additionalComments || '');
     const [trainerNotes, setTrainerNotes] = useState<string>(trainingSession?.trainerComments || '');
+
     const [enableMarkdown, setEnableMarkdown] = useState<boolean>(false);
 
     const getInitialData = useCallback(async () => {
@@ -114,7 +116,6 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
     const handleSubmit = async () => {
 
         const {
-            session,
             release,
             rosterUpdates,
             errors
@@ -134,33 +135,22 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
             return;
         }
 
+        toast("Training session saved successfully!", {type: 'success'});
+
         if (release || rosterUpdates) {
-            release && setReleaseDialogOpen(session);
-            rosterUpdates && setRosterUpdates(rosterUpdates);
+            setAfterRelease(release || undefined);
+            setAfterRosterUpdates(rosterUpdates);
         } else {
             redirect();
         }
-
-        toast("Training session saved successfully!", {type: 'success'});
-
     }
 
     const redirect = () => {
         if (trainingSession) {
             router.replace(`/training/sessions/${trainingSession.id}`);
+        } else {
+            router.replace(`/training/sessions`);
         }
-
-        router.replace(`/training/sessions`);
-    }
-
-    const closeReleaseDialog = (redirectFlag: boolean) => {
-        redirectFlag && redirect();
-        setReleaseDialogOpen(null);
-    }
-
-    const closeRosterDialog = (redirectFlag: boolean) => {
-        redirectFlag && redirect();
-        setRosterUpdates([]);
     }
 
     useEffect(() => {
@@ -172,47 +162,12 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
     }
 
     dayjs.extend(utc);
+    dayjs.extend(timezone);
 
     return (
         (<LocalizationProvider dateAdapter={AdapterDayjs}>
-            <Dialog open={!!releaseDialogOpen} onClose={() => closeReleaseDialog(rosterUpdates.length === 0)}>
-                <DialogTitle>Trainer Release Request Submitted</DialogTitle>
-                <DialogContent>
-                    <DialogContentText sx={{mb: 2,}}>One or more lessons in this session are configured to automatically
-                        submit a trainer release request upon passing.</DialogContentText>
-                    <DialogContentText><b>Inform the student that a trainer release request has been
-                        submitted.</b></DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => closeReleaseDialog(rosterUpdates.length === 0)} variant="contained"
-                            size="small">OK</Button>
-                </DialogActions>
-            </Dialog>
-            <Dialog open={rosterUpdates.length > 0} onClose={() => closeRosterDialog(!releaseDialogOpen)}>
-                <DialogTitle>Roster Updates Processed</DialogTitle>
-                <DialogContent>
-                    <DialogContentText sx={{mb: 2,}}>The following roster updates were made for this student as a result
-                        of passing one or more lessons during this session:</DialogContentText>
-                    <ul>
-                        {rosterUpdates.map((update) => (
-                            <li key={update.id}>
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                    <DialogContentText
-                                        color="textPrimary">{update.certificationType.name}</DialogContentText>
-                                    <ArrowForward/>
-                                    <DialogContentText
-                                        color="textPrimary">{update.certificationOption}</DialogContentText>
-                                </Stack>
-                            </li>
-                        ))}
-                    </ul>
-                    <DialogContentText sx={{mt: 2,}}>Please inform the student of these changes.</DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => closeRosterDialog(!releaseDialogOpen)} variant="contained"
-                            size="small">OK</Button>
-                </DialogActions>
-            </Dialog>
+            {renderAfterDialogs && <TrainingSessionAfterSubmitDialogs onAllClose={redirect} release={afterRelease}
+                                                                      rosterChanges={afterRosterUpdates}/>}
             <form action={handleSubmit}>
                 <Grid2 container columns={2} spacing={2}>
                     <Grid2 size={2}>
@@ -232,7 +187,7 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
                             xs: 2,
                             md: 1
                         }}>
-                        <DateTimePicker ampm={false} label="Start" value={dayjs.utc(start)}
+                        <DateTimePicker ampm={false} label="Start" value={dayjs.utc(start).tz(timeZone)}
                                         onChange={(d) => setStart(d?.toDate() || new Date())}/>
                     </Grid2>
                     <Grid2
@@ -240,7 +195,7 @@ export default function TrainingSessionForm({trainingSession,}: { trainingSessio
                             xs: 2,
                             md: 1
                         }}>
-                        <DateTimePicker ampm={false} label="End" value={dayjs.utc(end)}
+                        <DateTimePicker ampm={false} label="End" value={dayjs.utc(end).tz(timeZone)}
                                         onChange={(d) => setEnd(d?.toDate() || new Date())}/>
                     </Grid2>
                     <Grid2 size={2}>

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Card, CardContent, List, ListItemButton, ListItemIcon, ListItemText, Typography} from "@mui/material";
-import {AccessTime, Badge, BugReport, Feedback, Route, School, Shield} from "@mui/icons-material";
+import {AccessTime, Badge, Feedback, Route, Shield} from "@mui/icons-material";
 import Link from "next/link";
 /*
 
@@ -41,17 +41,8 @@ export default function LinksCard() {
                             <ListItemText primary="Web Systems Feedback"/>
                         </ListItemButton>
                     </Link>
-                    <Link href="https://training.vzdc.org" target="_blank"
-                          style={{color: 'inherit', textDecoration: 'none',}}>
-                        <ListItemButton sx={{borderRadius: 8}}>
-                            <ListItemIcon>
-                                <School/>
-                            </ListItemIcon>
-                            <ListItemText primary="Schedule Training Session"/>
-                        </ListItemButton>
-                    </Link>
                     <Link href="/prd" target="_blank" style={{color: 'inherit', textDecoration: 'none',}}>
-                        <ListItemButton sx={{borderRadius: 8}}>
+                        <ListItemButton>
                             <ListItemIcon>
                                 <Route/>
                             </ListItemIcon>
@@ -59,7 +50,7 @@ export default function LinksCard() {
                         </ListItemButton>
                     </Link>
                     <Link href="/profile/loa/request" style={{color: 'inherit', textDecoration: 'none',}}>
-                        <ListItemButton sx={{borderRadius: 8}}>
+                        <ListItemButton>
                             <ListItemIcon>
                                 <AccessTime/>
                             </ListItemIcon>
@@ -67,7 +58,7 @@ export default function LinksCard() {
                         </ListItemButton>
                     </Link>
                     <Link href="/incident/new" style={{color: 'inherit', textDecoration: 'none',}}>
-                        <ListItemButton sx={{borderRadius: 8}}>
+                        <ListItemButton>
                             <ListItemIcon>
                                 <Shield/>
                             </ListItemIcon>
@@ -75,20 +66,11 @@ export default function LinksCard() {
                         </ListItemButton>
                     </Link>
                     <Link href="/controllers/staff" style={{color: 'inherit', textDecoration: 'none',}}>
-                        <ListItemButton sx={{borderRadius: 8}}>
+                        <ListItemButton>
                             <ListItemIcon>
                                 <Badge/>
                             </ListItemIcon>
                             <ListItemText primary="ARTCC Staff"/>
-                        </ListItemButton>
-                    </Link>
-                    <Link href="https://github.com/vZDC-ARTCC/website/issues"
-                          style={{color: 'inherit', textDecoration: 'none',}}>
-                        <ListItemButton sx={{borderRadius: 8}}>
-                            <ListItemIcon>
-                                <BugReport/>
-                            </ListItemIcon>
-                            <ListItemText primary="Report a Bug"/>
                         </ListItemButton>
                     </Link>
                 </List>

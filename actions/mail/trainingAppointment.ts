@@ -24,8 +24,8 @@ export const sendTrainingAppointmentScheduledEmail = async (trainingAppointment:
 
     await mailTransport.sendMail({
         from: FROM_EMAIL,
-        to: student.email,
-        bcc: trainer.email,
+        to: FROM_EMAIL,
+        bcc: [student.email, trainer.email].join(','),
         subject: "Training Appointment Scheduled",
         html,
         attachments: [
@@ -63,8 +63,8 @@ export const sendTrainingAppointmentUpdatedEmail = async (trainingAppointment: T
 
     await mailTransport.sendMail({
         from: FROM_EMAIL,
-        to: student.email,
-        bcc: trainer.email,
+        to: FROM_EMAIL,
+        bcc: [student.email, trainer.email].join(','),
         subject: "Training Appointment Updated",
         html,
         attachments: [
