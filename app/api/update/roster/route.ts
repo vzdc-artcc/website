@@ -21,6 +21,7 @@ async function rosterUpdate() {
     const users = await prisma.user.findMany();
 
     let controllerCount = 0;
+    console.log(`ROSTER SYNC: Starting with ${users.length} users.`);
 
     for (const user of users) {
 
