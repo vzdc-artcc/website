@@ -11,9 +11,12 @@ import {assignNextProgressionOrRemove, getProgressionStatus} from "@/actions/pro
 export const dynamic = 'force-dynamic';
 
 const DEV_MODE = process.env['DEV_MODE'] === 'true';
-
-
 export async function GET() {
+    rosterUpdate().then();
+    return Response.json({ok: true, message: 'Roster update started.'});
+}
+
+export async function rosterUpdate() {
 
     const users = await prisma.user.findMany();
 
@@ -100,7 +103,7 @@ export async function GET() {
                         },
                     });
 
-                    if (existingCertification?.certificationOption === 'UNRESTRICTED') {
+                    if (existingCertification?.certificationOption !== 'NONE') {
                         continue;
                     }
 
