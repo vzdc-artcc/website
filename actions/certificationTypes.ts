@@ -13,6 +13,7 @@ export const createOrUpdateCertificationType = async (formData: FormData) => {
         name: z.string().min(1, "Name is required").max(20, "Name cannot be longer than 20 characters"),
         // order: z.number().int("Order must be a whole number"),
         canSoloCert: z.boolean(),
+        autoAssignUnrestricted: z.boolean(),
         certificationOptions: z.array(z.nativeEnum(CertificationOption)),
     });
 
@@ -21,6 +22,7 @@ export const createOrUpdateCertificationType = async (formData: FormData) => {
         name: formData.get('name'),
         // order: parseInt(formData.get('order') as string),
         canSoloCert: formData.get('canSoloCert') === 'on',
+        autoAssignUnrestricted: formData.get('autoAssignUnrestricted') === 'on',
         certificationOptions: (formData.get('certificationOptions') as unknown as string).split(',') as CertificationOption[],
     });
 
@@ -49,11 +51,13 @@ export const createOrUpdateCertificationType = async (formData: FormData) => {
             name: result.data.name,
             order: 0,
             canSoloCert: result.data.canSoloCert,
+            autoAssignUnrestricted: result.data.autoAssignUnrestricted,
             certificationOptions: result.data.certificationOptions,
         },
         update: {
             name: result.data.name,
             canSoloCert: result.data.canSoloCert,
+            autoAssignUnrestricted: result.data.autoAssignUnrestricted,
             certificationOptions: result.data.certificationOptions,
         },
         where: {

@@ -2,13 +2,14 @@ import {TrainingAppointment} from "@prisma/client";
 import {User} from "next-auth";
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
-import {formatEasternDate} from "@/lib/date";
+import {formatTimezoneDate} from "@/lib/date";
 
 export const appointmentCanceledTrainer = async (trainingAppointment: TrainingAppointment, student: User, trainer: User) => {
     return renderReactToMjml(
         <SingleRecipientEmailWrapper recipient={trainer} headerText="Training Appointment Canceled">
             <p>Your training appointment
-                with <b>{student.fullName}</b> on <b>{formatEasternDate(trainingAppointment.start)}</b> (ET) has been
+                with <b>{student.fullName}</b> on <b>{formatTimezoneDate(trainingAppointment.start, trainer.timezone)}</b> ({trainer.timezone})
+                has been
                 cancelled
                 by staff.</p>
             <p>You are no longer required to attend this appointment.</p>

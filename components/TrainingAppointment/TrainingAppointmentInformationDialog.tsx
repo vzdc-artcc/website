@@ -5,7 +5,7 @@ import {User} from "next-auth";
 import {Visibility} from "@mui/icons-material";
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
-import {formatEasternDate} from "@/lib/date";
+import {formatTimezoneDate} from "@/lib/date";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 
 type TrainingAppointmentWithAll = TrainingAppointment & {
@@ -18,12 +18,14 @@ export default function TrainingAppointmentInformationDialog({
                                                                  trainingAppointment,
                                                                  manualOpen,
                                                                  onClose,
-                                                                 isTrainingStaff
+                                                                 isTrainingStaff,
+                                                                 timeZone,
                                                              }: {
     trainingAppointment: TrainingAppointmentWithAll,
     manualOpen?: boolean,
     onClose?: () => void,
     isTrainingStaff: boolean,
+    timeZone: string,
 }) {
 
     const [open, setOpen] = useState(manualOpen || false);
@@ -52,11 +54,10 @@ export default function TrainingAppointmentInformationDialog({
                     <DialogContentText
                         color={trainingAppointment.doubleBooking ? 'error' : 'textSecondary'}>Environment: {trainingAppointment.doubleBooking ? 'DOUBLE BOOKED' : trainingAppointment.environment || 'PENDING ASSIGNMENT'}</DialogContentText>
                     <br/>
-                    <DialogContentText>Start (Eastern
-                        Time): {formatEasternDate(trainingAppointment.start)}</DialogContentText>
+                    <DialogContentText>Start: {formatTimezoneDate(trainingAppointment.start, timeZone)}</DialogContentText>
                     <DialogContentText>Duration: {trainingAppointment.lessons.map((l) => l.duration).reduce((acc, c) => acc + c, 0)} minutes</DialogContentText>
                     <DialogContentText>Estimated
-                        End: {formatEasternDate(new Date(trainingAppointment.start.getTime() + trainingAppointment.lessons.map(l => l.duration).reduce((a, b) => a + b, 0) * 60000))}</DialogContentText>
+                        End: {formatTimezoneDate(new Date(trainingAppointment.start.getTime() + trainingAppointment.lessons.map(l => l.duration).reduce((a, b) => a + b, 0) * 60000), timeZone)}</DialogContentText>
                     <br/>
                     <DialogContentText>Preparation
                         Complete: {trainingAppointment.preparationCompleted ? 'YES' : 'NO'}</DialogContentText>

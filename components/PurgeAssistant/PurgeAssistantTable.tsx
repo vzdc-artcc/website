@@ -1,11 +1,12 @@
 'use client';
 import React from 'react';
 import {User} from "next-auth";
-import {Box, Button, Stack, Typography, Tab, Tabs} from "@mui/material";
+import {Box, Button, Stack, Tab, Tabs, Typography} from "@mui/material";
 import {DataGrid, GridColDef, GridToolbar} from '@mui/x-data-grid';
 import {getRating} from "@/lib/vatsim";
 import {toast} from "react-toastify";
 import {purgeControllers} from "@/actions/controller";
+import {formatZuluDate} from "@/lib/date";
 
 export default function PurgeAssistantTable({controllers, user}: {
     controllers: { controller: User, totalHours: number, totalTrainingHours: string, homeController: boolean }[],
@@ -52,6 +53,8 @@ export default function PurgeAssistantTable({controllers, user}: {
         {field: 'rating', headerName: 'Rating', flex: 1},
         {field: 'totalHours', headerName: 'Total Hours', flex: 1},
         {field: 'totalTrainingHours', headerName: 'Total Training Hours', flex: 1},
+        {field: 'joinDate', headerName: 'Join Facility Date', flex: 1,},
+        {field: 'reviewBroadcasts', headerName: 'Open Broadcasts', flex: 1,},
     ];
 
     const rows = controllers.map(({controller, totalHours, totalTrainingHours}) => ({
@@ -62,6 +65,8 @@ export default function PurgeAssistantTable({controllers, user}: {
         rating: getRating(controller.rating),
         totalHours: totalHours.toPrecision(3),
         totalTrainingHours: totalTrainingHours,
+        joinDate: formatZuluDate(controller.joinDate),
+        reviewBroadcasts: `${(controller as any).changesUnseen.length + (controller as any).changesSeen.length}`,
     }));
 
     return (
@@ -72,7 +77,6 @@ export default function PurgeAssistantTable({controllers, user}: {
             </Tabs>
             <Box hidden={selectedRoster !== "home"}>
                 <DataGrid
-                    autoHeight
                     initialState={{sorting: {sortModel: [{field: 'totalHours', sort: 'desc',}]}}}
                     rows={rows.filter(row => controllers.find(c => c.controller.id === row.id)?.homeController)}
                     columns={columns}
@@ -90,7 +94,6 @@ export default function PurgeAssistantTable({controllers, user}: {
             </Box>
             <Box hidden={selectedRoster !== "visit"}>
                 <DataGrid
-                    autoHeight
                     initialState={{sorting: {sortModel: [{field: 'totalHours', sort: 'desc',}]}}}
                     rows={rows.filter(row => !controllers.find(c => c.controller.id === row.id)?.homeController)}
                     columns={columns}

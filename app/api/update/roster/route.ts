@@ -22,6 +22,7 @@ export async function GET() {
         if (!user.excludedFromVatusaRosterUpdate) {
             const vatusaData = await getVatusaData(user as User, users as User[]);
             let newOperatingInitials = user.operatingInitials;
+            let showWelcomeMessage = user.showWelcomeMessage;
             if (vatusaData.controllerStatus === "NONE") {
                 newOperatingInitials = null;
                 await prisma.trainingAssignmentRequest.deleteMany({
@@ -40,6 +41,7 @@ export async function GET() {
                     },
                 });
             } else if (user.controllerStatus === "NONE") {
+                showWelcomeMessage = true;
                 newOperatingInitials = await getOperatingInitials(user.firstName || '', user.lastName || '', users.map(user => user.operatingInitials).filter(initial => initial !== null) as string[]);
             }
 
@@ -50,6 +52,7 @@ export async function GET() {
                     },
                     data: {
                         controllerStatus: "HOME",
+                        showWelcomeMessage: true,
                         operatingInitials: newOperatingInitials,
                         roles: {
                             set: ['CONTROLLER', 'MENTOR', 'INSTRUCTOR', 'STAFF', 'EVENT_STAFF'],
@@ -68,6 +71,9 @@ export async function GET() {
                 },
                 data: {
                     controllerStatus: vatusaData.controllerStatus,
+                    discordUid: vatusaData.discordUid,
+                    showWelcomeMessage: showWelcomeMessage,
+                    joinDate: vatusaData.joinDate,
                     operatingInitials: newOperatingInitials,
                     roles: {
                         set: vatusaData.roles,
@@ -77,6 +83,45 @@ export async function GET() {
                     },
                 },
             });
+
+            if (user.rating > 1) {
+                const autoAssignCerts = await prisma.certificationType.findMany({
+                    where: {
+                        autoAssignUnrestricted: true,
+                    },
+                });
+
+                for (const certificationType of autoAssignCerts) {
+
+                    const existingCertification = await prisma.certification.findFirst({
+                        where: {
+                            userId: user.id,
+                            certificationTypeId: certificationType.id,
+                        },
+                    });
+
+                    if (existingCertification?.certificationOption === 'UNRESTRICTED') {
+                        continue;
+                    }
+
+                    await prisma.certification.upsert({
+                        where: {
+                            certificationTypeId_userId: {
+                                userId: user.id,
+                                certificationTypeId: certificationType.id,
+                            },
+                        },
+                        create: {
+                            userId: user.id,
+                            certificationTypeId: certificationType.id,
+                            certificationOption: 'UNRESTRICTED',
+                        },
+                        update: {
+                            certificationOption: 'UNRESTRICTED',
+                        },
+                    });
+                }
+            }
         }
 
         await updateProgressionAssignments(user as User);

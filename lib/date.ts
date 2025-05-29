@@ -94,10 +94,6 @@ export const eventGetDuration = (start: Date, end: Date, days?: boolean) => {
     return hours + minutes / 60;
 }
 
-export const formatEasternDate = (date: Date) => {
-    return dayjs.utc(date).tz("America/New_York").format("MM/DD/YY HH:mm");
-};
-
 export const getMinutesAgo = (date: Date): number => {
     const now = new Date();
     const diffInMilliseconds = now.getTime() - date.getTime();
@@ -115,3 +111,7 @@ export const getChipColor = (date?: Date | null): 'success' | 'warning' | 'error
         return 'error'; // red
     }
 }
+
+export const formatTimezoneDate = (date: Date, timeZone: string): string => {
+    return dayjs.utc(date).tz(timeZone).format("MM/DD/YY HH:mm");
+};

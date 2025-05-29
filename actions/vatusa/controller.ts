@@ -73,9 +73,10 @@ export const getController = async (cid: string): Promise<{
     email: string,
     rating: number,
 } | undefined> => {
-    const res = await fetch(`${VATUSA_API}/user/${cid}?apikey=${VATUSA_API_KEY}`);
+    const res = await fetch(`${VATUSA_API}/user/${cid}`);
     const data = await res.json();
     if (data.data.status === 'error') {
+        console.log(data);
         return undefined;
     }
 

@@ -138,7 +138,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                         setOpenTeamspeakUidDialog(true);
                     }}/>}
                     <NavSidebarButton icon={<Refresh/>} text="Refresh VATUSA Account Information"
-                                      onClick={handleClick}/>
+                                      onClick={handleRefresh}/>
                     <NavSidebarButton icon={<Logout/>} text="Logout" onClick={logout}/>
                 </Box>
             </NavSidebar>}

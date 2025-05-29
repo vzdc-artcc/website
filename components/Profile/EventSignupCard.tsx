@@ -13,7 +13,7 @@ import {
     Typography
 } from "@mui/material";
 import prisma from '@/lib/db';
-import {formatZuluDate} from '@/lib/date';
+import {formatTimezoneDate} from '@/lib/date';
 import Link from 'next/link';
 import {Check, Close, Edit, Visibility} from '@mui/icons-material';
 
@@ -59,7 +59,7 @@ export default async function EventSignupCard({user}: { user: User, }) {
                                     <TableCell>{position.event.name}</TableCell>
                                     <TableCell>{position.published ? position.finalPosition : position.requestedPosition}</TableCell>
                                     <TableCell>{position.published ? <Check /> : <Close />}</TableCell>
-                                    <TableCell>{formatZuluDate(position.finalStartTime || position.event.start)}</TableCell>
+                                    <TableCell>{formatTimezoneDate(position.finalStartTime || position.event.start, user.timezone)}</TableCell>
                                     <TableCell>
                                         <Link href={`/events/${position.eventId}`}>
                                             <IconButton>

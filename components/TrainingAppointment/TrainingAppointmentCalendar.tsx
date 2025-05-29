@@ -6,6 +6,11 @@ import FullCalendar from "@fullcalendar/react";
 import {User} from "next-auth";
 import TrainingAppointmentInformationDialog
     from "@/components/TrainingAppointment/TrainingAppointmentInformationDialog";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {LocalizationProvider} from "@mui/x-date-pickers";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 export type TrainingAppointmentWithAll = TrainingAppointment & {
     student: User,
@@ -13,30 +18,45 @@ export type TrainingAppointmentWithAll = TrainingAppointment & {
     lessons: Lesson[],
 }
 
-export default function TrainingAppointmentCalendar({appointments, isTrainingStaff}: {
+export default function TrainingAppointmentCalendar({appointments, isTrainingStaff, timeZone}: {
     appointments: TrainingAppointmentWithAll[],
-    isTrainingStaff: boolean
+    isTrainingStaff: boolean,
+    timeZone: string,
 }) {
+
+    dayjs.extend(utc);
+    dayjs.extend(timezone);
 
     const [openId, setOpenId] = React.useState<string | null>(null);
 
     return (
-        <>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
             {openId && <TrainingAppointmentInformationDialog
+                timeZone={timeZone}
                 isTrainingStaff={isTrainingStaff}
                 trainingAppointment={appointments.find(a => a.id === openId) as TrainingAppointmentWithAll} manualOpen
                 onClose={() => setOpenId(null)}/>}
             <FullCalendar
                 plugins={[dayGridPlugin]}
-                timeZone="local"
+                timeZone="UTC"
                 editable={false}
-                events={appointments.map((a) => ({
-                    id: a.id,
-                    title: `${a.doubleBooking ? '(DB)' : ''} ${a.student.fullName}`,
-                    start: a.start,
-                    end: getEndTime(a.start, a.lessons.map(l => l.duration).reduce((a, b) => a + b, 0)),
-                    color: getRatingColor(a.student.rating),
-                }))}
+                events={appointments.map((a) => {
+
+                    // convert start time to utc, but offset it to the user's timezone in UTC timezone, so just subtract the offset
+                    const startOffset = dayjs.utc(a.start).tz(timeZone).utcOffset();
+                    let newStart = dayjs.utc(a.start).subtract(Math.abs(startOffset), 'minute').toDate();
+                    if (startOffset > 0) {
+                        newStart = dayjs.utc(a.start).add(Math.abs(startOffset), 'minute').toDate();
+                    }
+
+                    return {
+                        id: a.id,
+                        title: `${a.doubleBooking ? '(DB)' : ''} ${a.student.fullName}`,
+                        start: newStart,
+                        end: getEndTime(newStart, a.lessons.map(l => l.duration).reduce((a, b) => a + b, 0)),
+                        color: getRatingColor(a.student.rating),
+                    };
+                })}
                 eventClick={(info) => {
                     if (openId === info.event.id) {
                         setOpenId(null);
@@ -48,7 +68,7 @@ export default function TrainingAppointmentCalendar({appointments, isTrainingSta
                     today: "Today"
                 }}
             />
-        </>
+        </LocalizationProvider>
 
     );
 

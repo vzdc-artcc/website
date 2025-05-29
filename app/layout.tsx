@@ -18,6 +18,8 @@ import InitColorSchemeScript from "@mui/system/InitColorSchemeScript";
 import BroadcastViewer from "@/components/BroadcastViewer/BroadcastViewer";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
+import WelcomeMessageDialog from "@/components/WelcomeMessages/WelcomeMessageDialog";
+import prisma from "@/lib/db";
 
 export const metadata: Metadata = {
     title: "Virtual Washington ARTCC",
@@ -41,6 +43,8 @@ export default async function RootLayout({
 
     const session = await getServerSession(authOptions);
 
+    const welcomeMessages = await prisma.welcomeMessages.findFirst();
+
   return (
       <html lang="en" suppressHydrationWarning>
       <body className={roboto.variable}>
@@ -51,6 +55,8 @@ export default async function RootLayout({
             <InitColorSchemeScript attribute="class" defaultMode="system"/>
             <div>
                 {session?.user && <BroadcastViewer user={session.user}/>}
+                {session?.user && session.user.controllerStatus !== 'NONE' && welcomeMessages &&
+                    <WelcomeMessageDialog user={session.user} welcomeMessages={welcomeMessages}/>}
                 <Navbar/>
                 <Container maxWidth="xl" sx={{marginTop: 2,}}>
                     {children}

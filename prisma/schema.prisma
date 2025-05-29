@@ -74,6 +74,13 @@ model User {
   staffingRequests   StaffingRequest[]
   loas               LOA[]
 
+  joinDate   DateTime @default(now())
+  discordUid String?  @unique
+
+  timezone String @default("America/New_York")
+
+  showWelcomeMessage Boolean @default(true)
+
   teamspeakUid String?
 
   newEventNotifications Boolean? @default(false)
@@ -248,14 +255,15 @@ enum CertificationOption {
 }
 
 model CertificationType {
-  id                   String                @id @default(cuid())
-  name                 String
-  order                Int                   @default(0)
-  canSoloCert          Boolean
-  certificationOptions CertificationOption[]
-  soloCertifications   SoloCertification[]
-  certifications       Certification[]
-  lessonRosterChanges LessonRosterChange[]
+  id                     String                @id @default(cuid())
+  name                   String
+  order                  Int                   @default(0)
+  canSoloCert            Boolean
+  autoAssignUnrestricted Boolean               @default(false)
+  certificationOptions   CertificationOption[]
+  soloCertifications     SoloCertification[]
+  certifications         Certification[]
+  lessonRosterChanges    LessonRosterChange[]
 }
 
 model SoloCertification {
@@ -328,6 +336,8 @@ enum LogModel {
   LESSON_ROSTER_CHANGE
 
   TRAINING_APPOINTMENT
+
+  WELCOME_MESSAGES
 }
 
 model Log {
@@ -848,4 +858,11 @@ model LessonRosterChange {
   certificationOption CertificationOption
 
   dossierText String
+}
+
+model WelcomeMessages {
+  id String @id @default(cuid())
+
+  homeText    String
+  visitorText String
 }

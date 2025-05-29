@@ -21,7 +21,7 @@ export default async function Page() {
                         <Button variant="contained" startIcon={<Add/>}>Manual Training Assignment</Button>
                     </Link>}
                 </Stack>
-                <TrainingAssignmentTable manageMode={!!isTaOrAta}/>
+                <TrainingAssignmentTable manageMode={!!isTaOrAta} timezone={session?.user.timezone || ''}/>
             </CardContent>
         </Card>
     );

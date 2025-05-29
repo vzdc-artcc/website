@@ -1,7 +1,6 @@
 import React from 'react';
 import {User} from "next-auth";
-import {Box, Card, CardActions, CardContent, Chip, Stack, Tooltip, Typography} from "@mui/material";
-import {InfoOutlined} from "@mui/icons-material";
+import {Box, Card, CardActions, CardContent, Chip, Stack, Typography} from "@mui/material";
 import prisma from "@/lib/db";
 import {getRating} from "@/lib/vatsim";
 import AssignedTrainerRequestButton from "@/components/Profile/AssignedTrainerRequestButton";
@@ -9,7 +8,7 @@ import AssignedTrainerRequestCancelButton from "@/components/Profile/AssignedTra
 import AssignedTrainerReleaseButton from "@/components/Profile/AssignedTrainerReleaseButton";
 import AssignedTrainerReleaseCancelButton from "@/components/Profile/AssignedTrainerReleaseCancelButton";
 
-export default async function AssignedMentorsCard({user}: { user: User, }) {
+export default async function AssignedTrainersCard({user}: { user: User, }) {
 
     const trainingAssignment = await prisma.trainingAssignment.findUnique({
         where: {
@@ -40,11 +39,7 @@ export default async function AssignedMentorsCard({user}: { user: User, }) {
         <Card sx={{height: '100%',}}>
             <CardContent>
                 <Stack direction="row" spacing={1} alignItems="center" sx={{mb: 1,}}>
-                    <Typography variant="h6">Assigned Trainer(s)</Typography>
-                    <Tooltip
-                        title="Some students prefer training with the same individual(s) throughout their rating.  This section will show what trainer(s) are assigned to you.  If you don't have a preference, feel free to leave this section alone.">
-                        <InfoOutlined/>
-                    </Tooltip>
+                    <Typography variant="h6">Assigned Trainers</Typography>
                 </Stack>
                 {!trainingAssignment && trainingAssignmentRequest &&
                     <>

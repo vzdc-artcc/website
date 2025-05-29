@@ -12,6 +12,7 @@ export const updateCurrentProfile = async (user: User) => {
         operatingInitials: z.string().length(2, "Operating Initials must be 2 characters").toUpperCase(),
         receiveEmail: z.boolean(),
         newEventNotifications: z.boolean(),
+        timezone: z.string().min(1, "Timezone is required"),
     });
 
     const result = User.parse(user);
@@ -61,8 +62,6 @@ export const updateTeamspeakUid = async (user: User, teamspeakUid: string) => {
             id: user.id
         },
     });
-
-    console.log('updated');
 
     revalidatePath('/profile/overview');
 }

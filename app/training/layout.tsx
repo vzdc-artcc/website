@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     description: 'vZDC training admin page',
 };
 
+const {BUFFER_TIME} = process.env;
+
 export default async function Layout({children}: { children: React.ReactNode }) {
     const session = await getServerSession(authOptions);
 
@@ -41,10 +43,10 @@ export default async function Layout({children}: { children: React.ReactNode }) 
             <Grid2 size="grow">
                 <Stack direction="column" spacing={2}>
                     {numDoubleBookedAppointments > 0 &&
-                        <Alert severity="error" variant="outlined">There are one or more double booked training
+                        <Alert severity="warning">There are one or more double booked training
                             appointments scheduled. Check the calendar for appointments prefixed
                             with &apos;(DB)&apos; and
-                            consider rescheduling.</Alert>}
+                            consider rescheduling.<br/>Appointment Buffer Time: {BUFFER_TIME} minutes</Alert>}
                     {children}
                 </Stack>
             </Grid2>

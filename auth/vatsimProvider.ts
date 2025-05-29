@@ -61,6 +61,8 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
     controllerStatus: ControllerStatus,
     roles: Role[],
     staffPositions: StaffPosition[],
+    joinDate: Date,
+    discordUid?: string,
     operatingInitials?: string,
 }> => {
 
@@ -80,6 +82,8 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
             staffPositions: [
                 "ATM"
             ],
+            joinDate: new Date(),
+            discordUid: undefined,
             operatingInitials,
         };
     }
@@ -92,24 +96,35 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
     const controller = userData.data as {
         cid: number,
         facility: string,
+        facility_join: Date,
+        discord_id?: string,
         roles: {
             facility: string,
             role: string,
         }[],
         visiting_facilities: {
             facility: string,
+            created_at: Date,
         }[],
     };
 
-    if (!res.ok) return {controllerStatus: "NONE", roles: [], staffPositions: [],};
+    if (!res.ok) return {controllerStatus: "NONE", roles: [], staffPositions: [], joinDate: new Date(),};
     const controllerRoles = controller.roles.filter(r => r.facility === VATUSA_FACILITY).map(r => r.role);
-    const controllerStatus: ControllerStatus = controller.facility === VATUSA_FACILITY ? "HOME" : controller.visiting_facilities.map((vf) => vf.facility).includes(VATUSA_FACILITY || '') ? "VISITOR" : "NONE";
-    
+
+    const visitingFacilityEntry = controller.visiting_facilities.find(vf => vf.facility === VATUSA_FACILITY);
+
+    const controllerStatus: ControllerStatus = controller.facility === VATUSA_FACILITY ? "HOME" : visitingFacilityEntry ? "VISITOR" : "NONE";
+
     if (controllerStatus === "NONE") {
         operatingInitials = undefined;
     }
 
-    return {controllerStatus, operatingInitials, ...getRolesAndStaffPositions(controllerRoles)};
+    return {
+        controllerStatus,
+        joinDate: controllerStatus === "HOME" ? controller.facility_join : visitingFacilityEntry ? visitingFacilityEntry?.created_at : new Date(),
+        discordUid: controller.discord_id,
+        operatingInitials, ...getRolesAndStaffPositions(controllerRoles)
+    };
 }
 
 export const getRolesAndStaffPositions = (controllerRoles: string[]) => {

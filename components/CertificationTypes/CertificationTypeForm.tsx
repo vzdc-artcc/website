@@ -57,6 +57,9 @@ export default function CertificationTypeForm({certificationType}: { certificati
                 <FormControlLabel name="canSoloCert"
                                   control={<Switch defaultChecked={certificationType?.canSoloCert}/>}
                                   label="Can get solo certified?"/>
+                <FormControlLabel name="autoAssignUnrestricted"
+                                  control={<Switch defaultChecked={certificationType?.autoAssignUnrestricted}/>}
+                                  label="Auto certify for rating?"/>
                 <FormSaveButton />
             </Stack>
         </form>

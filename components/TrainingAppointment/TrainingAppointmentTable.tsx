@@ -4,7 +4,7 @@ import {GridColDef} from "@mui/x-data-grid";
 import Link from "next/link";
 import {Chip} from "@mui/material";
 import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
-import {formatEasternDate} from "@/lib/date";
+import {formatTimezoneDate} from "@/lib/date";
 import {Lesson, StaffPosition} from "@prisma/client";
 import {fetchTrainingAppointments} from "@/actions/trainingAppointment";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
@@ -35,7 +35,7 @@ export default function TrainingAppointmentTable({sessionUser}: { sessionUser: U
             filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
         {
-            field: 'instructor',
+            field: 'trainer',
             flex: 1,
             headerName: 'Trainer',
             renderCell: (params) => {
@@ -53,8 +53,8 @@ export default function TrainingAppointmentTable({sessionUser}: { sessionUser: U
         {
             field: 'start',
             flex: 1,
-            headerName: 'Start (Eastern Time)',
-            renderCell: (params) => formatEasternDate(params.row.start),
+            headerName: 'Start',
+            renderCell: (params) => formatTimezoneDate(params.row.start, sessionUser.timezone),
             type: 'dateTime',
             filterable: false,
         },
@@ -103,7 +103,8 @@ export default function TrainingAppointmentTable({sessionUser}: { sessionUser: U
             type: 'actions',
             headerName: 'Actions',
             getActions: (params) => [
-                <TrainingAppointmentInformationDialog trainingAppointment={params.row} key={params.id}
+                <TrainingAppointmentInformationDialog timeZone={sessionUser.timezone} trainingAppointment={params.row}
+                                                      key={params.id}
                                                       isTrainingStaff={["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as StaffPosition))}/>,
                 ["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as StaffPosition)) || sessionUser.cid == `${params.row.trainer.cid}` ?
                     <TrainingAppointmentDeleteButton trainingAppointment={params.row} fromAdmin/>

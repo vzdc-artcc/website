@@ -28,10 +28,10 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         permanentRedirect(`/training/sessions/${params.id}`);
     }
 
-    return (
+    return session?.user && (
         <>
             <Typography variant="h5" sx={{mb: 2,}}>Edit Training Session</Typography>
-            <TrainingSessionForm trainingSession={trainingSession}/>
+            <TrainingSessionForm trainingSession={trainingSession} timeZone={session.user.timezone}/>
         </>
     );
 }

@@ -84,13 +84,21 @@ export default async function Page() {
         name: string,
         start?: Date,
     }[] = await Promise.all(TRAINING_ENVIRONMENTS.map(async (env) => {
-        const nextSession = await prisma.trainingAppointment.findFirst({
+        const nextSessions = await prisma.trainingAppointment.findMany({
             where: {
                 environment: env,
             },
             orderBy: {
                 start: 'asc'
-            }
+            },
+            include: {
+                lessons: true,
+            },
+        });
+
+        const nextSession = nextSessions.find(session => {
+            const end = new Date(session.start.getTime() + session.lessons.reduce((acc, lesson) => acc + lesson.duration * 60 * 1000, 0));
+            return session.start > now || end > now;
         });
 
         return {

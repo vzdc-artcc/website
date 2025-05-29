@@ -13,7 +13,7 @@ import {
     TableHead,
     TableRow
 } from "@mui/material";
-import {formatZuluDate, getDuration} from "@/lib/date";
+import {formatTimezoneDate, getDuration} from "@/lib/date";
 import Link from "next/link";
 import {Visibility} from "@mui/icons-material";
 
@@ -58,8 +58,8 @@ export default async function TrainingSessionStudentTable({user, take}: { user: 
                     {trainingSessions.map((trainingSession) => (
                         <TableRow key={trainingSession.id}>
                             <TableCell>{trainingSession.student.firstName} {trainingSession.student.lastName} ({trainingSession.student.cid})</TableCell>
-                            <TableCell>{formatZuluDate(trainingSession.start)}</TableCell>
-                            <TableCell>{formatZuluDate(trainingSession.end).substring(9)}</TableCell>
+                            <TableCell>{formatTimezoneDate(trainingSession.start, user.timezone)}</TableCell>
+                            <TableCell>{formatTimezoneDate(trainingSession.end, user.timezone)}</TableCell>
                             <TableCell>{getDuration(trainingSession.start, trainingSession.end)}</TableCell>
                             <TableCell>
                                 <Stack direction="column" spacing={1}>

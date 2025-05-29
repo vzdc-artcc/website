@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {TrainingAssignment, TrainingAssignmentRequest} from "@prisma/client";
 import {User} from "next-auth";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {Autocomplete, Box, Chip, Stack, TextField} from "@mui/material";
+import {Autocomplete, Box, Chip, CircularProgress, Stack, TextField} from "@mui/material";
 import {getRating} from "@/lib/vatsim";
 import {toast} from "react-toastify";
 import {getPrimaryAndSecondaryStudentNumbers, saveTrainingAssignment} from "@/actions/trainingAssignment";
@@ -82,45 +82,47 @@ export default function TrainingAssignmentForm({
                     }}
                     renderInput={(params) => <TextField {...params} required label="Student"/>}
                 />
-                <Autocomplete
-                    options={allTrainers}
-                    disabled={disabled}
-                    getOptionLabel={(option) => `${getRating(option.rating)} - ${option.primary}P ${option.secondary}S - ${option.firstName} ${option.lastName} (${option.cid})`}
-                    value={allTrainers.find((u) => u.id === primaryTrainer) || null}
-                    onChange={(event, newValue) => {
-                        setPrimaryTrainer(newValue ? newValue.id : '');
-                        if (otherTrainers.includes(newValue?.id || '')) {
-                            setOtherTrainers((prev) => prev.filter((id) => id !== newValue?.id));
+                {allTrainers.length > 0 ? <>
+                    <Autocomplete
+                        options={allTrainers}
+                        disabled={disabled}
+                        getOptionLabel={(option) => `${getRating(option.rating)} - ${option.primary}P ${option.secondary}S - ${option.firstName} ${option.lastName} (${option.cid})`}
+                        value={allTrainers.find((u) => u.id === primaryTrainer) || null}
+                        onChange={(event, newValue) => {
+                            setPrimaryTrainer(newValue ? newValue.id : '');
+                            if (otherTrainers.includes(newValue?.id || '')) {
+                                setOtherTrainers((prev) => prev.filter((id) => id !== newValue?.id));
+                            }
+                        }}
+                        renderInput={(params) => <TextField {...params} required label="Primary Trainer"
+                                                            helperText="Key: <RATING> - <# PRIMARY STUDENTS>P <# SECONDARY STUDENTS>S - <NAME + CID>"/>}
+                    />
+                    <Autocomplete
+                        multiple
+                        disabled={disabled}
+                        options={allTrainers}
+                        getOptionLabel={(option) => `${getRating(option.rating)} - ${option.primary}P ${option.secondary}S - ${option.firstName} ${option.lastName} (${option.cid})`}
+                        value={allTrainers.filter((u) => otherTrainers.includes(u.id))}
+                        onChange={(event, newValue) => {
+                            if (newValue.filter((trainer) => trainer.id === primaryTrainer).length > 0) {
+                                toast('Primary trainer cannot be selected as an additional trainer.', {type: 'error'});
+                            } else {
+                                setOtherTrainers(newValue.map((trainer) => trainer.id));
+                            }
+                        }}
+                        renderTags={(value, getTagProps) =>
+                            value.map((option, index) => (
+                                <Chip {...getTagProps({index})} key={index}
+                                      label={`${option.firstName} ${option.lastName}`}/>
+                            ))
                         }
-                    }}
-                    renderInput={(params) => <TextField {...params} required label="Primary Trainer"
-                                                        helperText="Key: <RATING> - <# PRIMARY STUDENTS>P <# SECONDARY STUDENTS>S - <NAME + CID>"/>}
-                />
-                <Autocomplete
-                    multiple
-                    disabled={disabled}
-                    options={allTrainers}
-                    getOptionLabel={(option) => `${getRating(option.rating)} - ${option.primary}P ${option.secondary}S - ${option.firstName} ${option.lastName} (${option.cid})`}
-                    value={allTrainers.filter((u) => otherTrainers.includes(u.id))}
-                    onChange={(event, newValue) => {
-                        if (newValue.filter((trainer) => trainer.id === primaryTrainer).length > 0) {
-                            toast('Primary trainer cannot be selected as an additional trainer.', {type: 'error'});
-                        } else {
-                            setOtherTrainers(newValue.map((trainer) => trainer.id));
-                        }
-                    }}
-                    renderTags={(value, getTagProps) =>
-                        value.map((option, index) => (
-                            <Chip {...getTagProps({index})} key={index}
-                                  label={`${option.firstName} ${option.lastName}`}/>
-                        ))
-                    }
-                    renderInput={(params) => <TextField {...params} label="Other Trainers"
-                                                        helperText="Key: <RATING> - <# PRIMARY STUDENTS>P <# SECONDARY STUDENTS>S - <NAME + CID>"/>}
-                />
-                {!disabled && <Box>
-                    <FormSaveButton/>
-                </Box>}
+                        renderInput={(params) => <TextField {...params} label="Other Trainers"
+                                                            helperText="Key: <RATING> - <# PRIMARY STUDENTS>P <# SECONDARY STUDENTS>S - <NAME + CID>"/>}
+                    />
+                    {!disabled && <Box>
+                        <FormSaveButton/>
+                    </Box>}
+                </> : <CircularProgress/>}
             </Stack>
         </form>
     );

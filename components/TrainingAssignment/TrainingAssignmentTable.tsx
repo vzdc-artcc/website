@@ -11,9 +11,9 @@ import {useRouter} from "next/navigation";
 import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
 import {Lesson} from "@prisma/client";
-import {formatEasternDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
+import {formatTimezoneDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
 
-export default function TrainingAssignmentTable({manageMode}: { manageMode: boolean }) {
+export default function TrainingAssignmentTable({manageMode, timezone}: { manageMode: boolean, timezone: string }) {
 
     const router = useRouter();
 
@@ -126,7 +126,7 @@ export default function TrainingAssignmentTable({manageMode}: { manageMode: bool
 
                 return (
                     <Tooltip
-                        title={`${formatEasternDate(startDate)} with ${appointment.trainer.fullName}: ${appointment.lessons.map((l: Lesson) => l.identifier).join(', ')}`}>
+                        title={`${formatTimezoneDate(startDate, timezone)} with ${appointment.trainer.fullName}: ${appointment.lessons.map((l: Lesson) => l.identifier).join(', ')}`}>
                         <Link
                             href={`/training/appointments?sortField=start&sortDirection=asc&filterField=student&filterValue=${params.row.student.cid}&filterOperator=equals`}>
                             <Chip

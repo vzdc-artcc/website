@@ -35,7 +35,8 @@ export default async function Page({searchParams}: { searchParams: Promise<{ you
                         <FormControlLabel control={<Switch checked={!!filterBy}/>} label="Only show my appointments"/>
                     </Link>
                 </Box>
-                <TrainingAppointmentCalendar appointments={appointments as TrainingAppointmentWithAll[]}
+                <TrainingAppointmentCalendar timeZone={session.user.timezone}
+                                             appointments={appointments as TrainingAppointmentWithAll[]}
                                              isTrainingStaff={["TA", "ATA"].some((sp) => session.user.staffPositions.includes(sp as StaffPosition))}/>
             </CardContent>
         </Card>
