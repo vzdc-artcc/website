@@ -30,6 +30,7 @@ import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-gr
 import {TrainingSessionIndicatorWithAll} from "@/components/TrainingSession/TrainingSessionForm";
 import {after} from "next/server";
 import {writeDossier} from "@/actions/dossier";
+import {RosterChangeWithAll} from "@/components/TrainingSession/TrainingSessionAfterSubmitDialogs";
 
 type LessonRosterChangeWithType = LessonRosterChange & { certificationType: CertificationType, };
 type TrainingTicketWithLesson = TrainingTicket & {
@@ -52,6 +53,12 @@ export async function deleteTrainingSession(id: string) {
     return trainingSession;
 }
 
+type CreateOrUpdateTrainingSessionResult = {
+    release?: TrainerReleaseRequest;
+    rosterUpdates?: RosterChangeWithAll[];
+    errors?: { message: string }[];
+};
+
 export async function createOrUpdateTrainingSession(
     student: string,
     start: any,
@@ -67,7 +74,7 @@ export async function createOrUpdateTrainingSession(
     enableMarkdown: boolean,
     performanceIndicator?: TrainingSessionIndicatorWithAll,
     id?: string,
-) {
+): Promise<CreateOrUpdateTrainingSessionResult> {
 
     const trainingSessionZ = z.object({
         id: z.string().optional(),
