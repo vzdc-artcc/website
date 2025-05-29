@@ -103,9 +103,9 @@ export const getMinutesAgo = (date: Date): number => {
 export const getChipColor = (date?: Date | null): 'success' | 'warning' | 'error' => {
     if (!date) return 'error';
     const minutesAgo = getMinutesAgo(date);
-    if (minutesAgo <= 30) {
+    if (minutesAgo <= 60) {
         return 'success'; // green
-    } else if (minutesAgo <= 60) {
+    } else if (minutesAgo <= 120) {
         return 'warning'; // yellow
     } else {
         return 'error'; // red
