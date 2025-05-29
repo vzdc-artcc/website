@@ -16,7 +16,7 @@ export async function GET() {
     return Response.json({ok: true, message: 'Roster update started.'});
 }
 
-export async function rosterUpdate() {
+async function rosterUpdate() {
 
     const users = await prisma.user.findMany();
 
