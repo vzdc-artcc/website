@@ -75,7 +75,7 @@ model User {
   loas               LOA[]
 
   joinDate   DateTime @default(now())
-  discordUid String?  @unique
+  discordUid String?
 
   timezone String @default("America/New_York")
 
