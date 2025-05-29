@@ -20,6 +20,8 @@ async function rosterUpdate() {
 
     const users = await prisma.user.findMany();
 
+    let controllerCount = 0;
+
     for (const user of users) {
 
         if (!user.excludedFromVatusaRosterUpdate) {
@@ -132,6 +134,9 @@ async function rosterUpdate() {
         await updateProgressionCompletions(user as User);
 
         await refreshAccountData(user as User, true);
+
+        controllerCount++;
+        console.log(`ROSTER SYNC: ${controllerCount}/${users.length}`);
     }
 
     await updateSyncTime({roster: new Date()});
