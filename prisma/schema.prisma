@@ -79,7 +79,7 @@ model User {
 
   timezone String @default("America/New_York")
 
-  showWelcomeMessage Boolean @default(true)
+  showWelcomeMessage Boolean @default(false)
 
   teamspeakUid String?
 
