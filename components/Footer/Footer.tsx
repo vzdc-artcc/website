@@ -6,20 +6,24 @@ import vatsim from "@/public/img/vatsim.png";
 import Image from "next/image";
 import Link from "next/link";
 import getConfig from "next/config";
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/auth/auth";
 
 const DEV_MODE = process.env['DEV_MODE'] === 'true';
 
-export default function Footer() {
+export default async function Footer() {
 
     const { publicRuntimeConfig } = getConfig();
+    const session = await getServerSession(authOptions);
 
     return (
         <AppBar position="static" sx={{marginTop: 20}}>
             <Toolbar>
                 <Container maxWidth="md" sx={{padding: 5,}}>
-                    <Typography textAlign="center">&copy; 2025 Virtual Washington Air Route Traffic Control Center, All
+                    <Typography textAlign="center" gutterBottom>&copy; 2025 Virtual Washington Air Route Traffic Control
+                        Center, All
                         Rights Reserved.</Typography>
-                    <Typography textAlign="center" sx={{marginTop: 1,}}>A sub-division of VATUSA, a division of the
+                    <Typography textAlign="center" gutterBottom>A sub-division of VATUSA, a division of the
                         VATSIM network.</Typography>
                     <Link href="/misc/AvDr/" style={{color: 'inherit',textDecoration: 'none'}}>
                         <Typography textAlign="center" fontWeight={700} sx={{marginTop: 2,}}>NOT FOR REAL WORLD
@@ -45,7 +49,7 @@ export default function Footer() {
                             </Link>
                         </Box>
                     </Tooltip>
-                    <Stack direction="row" spacing={1} sx={{mt: 2,}} justifyContent="center">
+                    <Stack direction="row" spacing={1} sx={{my: 2,}} justifyContent="center">
                         <Tooltip title={'vZDC Privicy Policy'}>
                             <Link href="/privacy" style={{color: 'inherit',}}>
                                 <Typography textAlign="center">Privacy</Typography>
@@ -70,6 +74,10 @@ export default function Footer() {
                             </Link>
                         </Tooltip>
                     </Stack>
+                    {session?.user &&
+                        <Typography variant="subtitle1" fontSize={12} textAlign="center">All non-zulu times are
+                            displayed in <b>{session.user.timezone}</b>. You can change this in &apos;Your
+                            Profile&apos;.</Typography>}
                 </Container>
             </Toolbar>
         </AppBar>

@@ -35,7 +35,7 @@ export default function TrainingAppointmentTable({sessionUser}: { sessionUser: U
             filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
         {
-            field: 'instructor',
+            field: 'trainer',
             flex: 1,
             headerName: 'Trainer',
             renderCell: (params) => {

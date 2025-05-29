@@ -310,7 +310,7 @@ export default async function Page() {
                                                     `Session with ${ta.student.fullName} covering lessons: ${ta.lessons.map((l) => l.identifier).join(', ')}`
                                                 )}
                                             >
-                                                <Tooltip title="Add to Calendar">
+                                                <Tooltip title="Add to Google Calendar">
                                                     <IconButton>
                                                         <Event/>
                                                     </IconButton>

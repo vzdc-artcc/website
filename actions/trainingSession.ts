@@ -59,7 +59,7 @@ type CreateOrUpdateTrainingSessionResult = {
     errors?: { message: string }[];
 };
 
-export async function createOrUpdateTrainingSession(
+export const createOrUpdateTrainingSession = async (
     student: string,
     start: any,
     end: any,
@@ -74,7 +74,7 @@ export async function createOrUpdateTrainingSession(
     enableMarkdown: boolean,
     performanceIndicator?: TrainingSessionIndicatorWithAll,
     id?: string,
-): Promise<CreateOrUpdateTrainingSessionResult> {
+): Promise<CreateOrUpdateTrainingSessionResult> => {
 
     const trainingSessionZ = z.object({
         id: z.string().optional(),
@@ -250,7 +250,7 @@ export async function createOrUpdateTrainingSession(
         await prisma.trainingSession.update({
             where: {id: trainingSession.id},
             data: {
-                vatusaId: vatusaId,
+                vatusaId,
             }
         });
 

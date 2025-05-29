@@ -54,8 +54,7 @@ export default function TrainingAppointmentInformationDialog({
                     <DialogContentText
                         color={trainingAppointment.doubleBooking ? 'error' : 'textSecondary'}>Environment: {trainingAppointment.doubleBooking ? 'DOUBLE BOOKED' : trainingAppointment.environment || 'PENDING ASSIGNMENT'}</DialogContentText>
                     <br/>
-                    <DialogContentText>Start (Eastern
-                        Time): {formatTimezoneDate(trainingAppointment.start, timeZone)}</DialogContentText>
+                    <DialogContentText>Start: {formatTimezoneDate(trainingAppointment.start, timeZone)}</DialogContentText>
                     <DialogContentText>Duration: {trainingAppointment.lessons.map((l) => l.duration).reduce((acc, c) => acc + c, 0)} minutes</DialogContentText>
                     <DialogContentText>Estimated
                         End: {formatTimezoneDate(new Date(trainingAppointment.start.getTime() + trainingAppointment.lessons.map(l => l.duration).reduce((a, b) => a + b, 0) * 60000), timeZone)}</DialogContentText>

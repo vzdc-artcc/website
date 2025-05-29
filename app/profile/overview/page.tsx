@@ -13,7 +13,7 @@ import LoaDeleteButton from "@/components/LOA/LoaDeleteButton";
 import Link from "next/link";
 import {Edit} from "@mui/icons-material";
 import {LOAStatus} from "@prisma/client";
-import AssignedMentorsCard from "@/components/Profile/AssignedMentorsCard";
+import AssignedTrainersCard from "@/components/Profile/AssignedTrainersCard";
 import ProgressionCard from "@/components/Profile/ProgressionCard";
 import {formatTimezoneDate, getTimeIn} from "@/lib/date";
 import CompletePreparationButton from "@/components/TrainingAppointment/CompletePreparationButton";
@@ -128,7 +128,7 @@ export default async function Page() {
                     xs: 6,
                     md: 2
                 }}>
-                <AssignedMentorsCard user={user}/>
+                <AssignedTrainersCard user={user}/>
             </Grid2>
             <Grid2
                 size={{
