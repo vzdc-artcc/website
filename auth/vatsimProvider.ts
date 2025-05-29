@@ -122,7 +122,7 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
     return {
         controllerStatus,
         joinDate: controllerStatus === "HOME" ? controller.facility_join : visitingFacilityEntry ? visitingFacilityEntry?.created_at : new Date(),
-        discordUid: controller.discord_id,
+        discordUid: `${controller.discord_id}`,
         operatingInitials, ...getRolesAndStaffPositions(controllerRoles)
     };
 }
