@@ -79,6 +79,5 @@ export const getController = async (cid: string): Promise<{
         return undefined;
     }
 
-    console.log(data);
     return data.data;
 }
