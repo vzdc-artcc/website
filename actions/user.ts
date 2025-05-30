@@ -102,7 +102,6 @@ export const refreshAccountData = async (user: User, silent?: boolean,) => {
     }
 
     const controller = await getController(user.cid);
-    console.log(controller);
     if (!controller) return;
     await prisma.user.update({
         data: {
