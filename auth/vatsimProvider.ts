@@ -89,7 +89,7 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
     }
     const res = await fetch(`https://api.vatusa.net/v2/user/${data.cid}`, {
         next: {
-            revalidate: 900,
+            revalidate: 0,
         }
     });
     const userData = await res.json();

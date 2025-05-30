@@ -8,7 +8,7 @@ import {z} from "zod";
 import {writeDossier} from "@/actions/dossier";
 import {log} from "@/actions/log";
 import {getController} from "@/actions/vatusa/controller";
-import { after } from "next/server";
+import {after} from "next/server";
 
 export const updateOperatingInitials = async (user: User, initials: string,) => {
 

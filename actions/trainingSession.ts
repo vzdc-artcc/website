@@ -563,6 +563,11 @@ const fetchAndUpdateReleaseRequest = async (student: User, passedLessons: Lesson
 
 const sendInstructorEmails = async (student: User, trainingSession: TrainingSession, oldTickets: TrainingTicketWithLesson[], newTickets: TrainingTicketWithLesson[]) => {
     for (const newTicket of newTickets) {
+
+        if (!newTicket.lesson.notifyInstructorOnPass) {
+            continue;
+        }
+
         const oldTicket = oldTickets.find((ticket) => ticket.lesson.id === newTicket.lesson.id);
 
         if (!oldTicket || (!oldTicket.passed && newTicket.passed && newTicket.lesson.notifyInstructorOnPass)) {
