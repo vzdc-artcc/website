@@ -162,6 +162,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
             data: {
                 start: result.data.start,
                 lessons: {
+                    disconnect: oldTA.lessons.map((lesson) => ({id: lesson.id})),
                     connect: result.data.lessonIds.map((lessonId) => ({id: lessonId})),
                 },
                 preparationCompleted: (!oldTA.lessons.every((lesson) => result.data.lessonIds.includes(lesson.id)) || result.data.lessonIds.length !== oldTA.lessons.length) ? false : oldTA.preparationCompleted,
