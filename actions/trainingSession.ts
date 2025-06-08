@@ -570,7 +570,7 @@ const sendInstructorEmails = async (student: User, trainingSession: TrainingSess
 
         const oldTicket = oldTickets.find((ticket) => ticket.lesson.id === newTicket.lesson.id);
 
-        if (!oldTicket || (!oldTicket.passed && newTicket.passed && newTicket.lesson.notifyInstructorOnPass)) {
+        if ((!oldTicket && newTicket.passed) || (!oldTicket?.passed && newTicket.passed)) {
             sendInstructorsTrainingSessionCreatedEmail(student, trainingSession, newTicket.lesson).then();
         }
     }

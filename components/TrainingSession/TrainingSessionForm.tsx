@@ -75,6 +75,7 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
     const [allLessons, setAllLessons] = useState<Lesson[]>([]);
     const [allCommonMistakes, setAllCommonMistakes] = useState<CommonMistake[]>([]);
     const [allUsers, setAllUsers] = useState<User[]>([]);
+    const [yourStudentIds, setYourStudentIds] = useState<string[]>([]);
     const [allLoading, setAllLoading] = useState<boolean>(true);
 
     const [student, setStudent] = useState<string>(trainingSession?.studentId || searchParams.get('student') || '');
@@ -95,10 +96,11 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
 
     const getInitialData = useCallback(async () => {
         setAllLoading(true);
-        const {lessons, commonMistakes, users} = await getAllData();
+        const {lessons, commonMistakes, users, yourStudentIds} = await getAllData();
         setAllLessons(lessons.sort(({identifier:a},{identifier:b})=>a.localeCompare(b)));
         setAllCommonMistakes(commonMistakes);
         setAllUsers(users as User[]);
+        setYourStudentIds(yourStudentIds);
         setAllLoading(false);
         if (trainingSession) {
             const tickets = await getTicketsForSession(trainingSession.id);
@@ -173,7 +175,19 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                     <Grid2 size={2}>
                         <Autocomplete
                             disabled={!!trainingSession}
-                            options={allUsers}
+                            options={allUsers.sort((a, b) => {
+                                if (yourStudentIds.includes(a.id) && yourStudentIds.includes(b.id)) {
+                                    return a.lastName.localeCompare(b.lastName);
+                                } else if (yourStudentIds.includes(a.id)) {
+                                    return -1;
+                                } else if (yourStudentIds.includes(b.id)) {
+                                    return 1;
+                                }
+                                return 0;
+                            })}
+                            groupBy={(option) =>
+                                yourStudentIds.includes(option.id) ? 'Your Students' : 'All Students'
+                            }
                             getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.cid})`}
                             value={allUsers.find((u) => u.id === student) || null}
                             onChange={(event, newValue) => {
