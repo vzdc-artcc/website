@@ -1,7 +1,7 @@
 'use client';
 import React, {useState} from 'react';
 import {IconButton, Menu, MenuItem, Tooltip} from "@mui/material";
-import {Apps, DeveloperBoard, Public, Radar} from "@mui/icons-material";
+import {Apps, DeveloperBoard, Public, Radar, Map} from "@mui/icons-material";
 import Link from "next/link";
 
 export default function AppPickerMenu() {
@@ -37,6 +37,9 @@ export default function AppPickerMenu() {
                 </Link>
                 <Link href="https://asx.vzdc.org" passHref style={{color: 'inherit', textDecoration: 'none',}}>
                     <MenuItem onClick={close}><Radar sx={{mr: 1,}}/>A.S.X</MenuItem>
+                </Link>
+                <Link href="https://rvm.vzdc.org" passHref style={{color: 'inherit', textDecoration: 'none',}}>
+                    <MenuItem onClick={close}><Map sx={{mr: 1,}}/>R.V.M</MenuItem>
                 </Link>
             </Menu>
         </>
