@@ -55,7 +55,7 @@ export default async function Page({searchParams}: { searchParams: Promise<{ mis
                         and availability. The information contained on this page will be shared with vZDC
                         controllers. <b>You must mention your mission number when contacting ATC for clearance to
                         utilize this mission. </b>If your mission number contains a letter, it indicates that you booked
-                        your mission less than 24 hours in advance. Honoring of your mission is at the controller's
+                        your mission less than 24 hours in advance. Honoring of your mission is at the controller&apos;s
                         discretion, and you may be asked to adjust or cancel your mission if necessary. This mission
                         will be deleted after the end time. If you have any questions or concerns, please contact the
                         vZDC staff.
