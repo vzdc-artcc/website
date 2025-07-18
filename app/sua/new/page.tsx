@@ -5,7 +5,7 @@ import {authOptions} from "@/auth/auth";
 import ErrorCard from "@/components/Error/ErrorCard";
 import SuaRequestForm from "@/components/SuaRequest/SuaRequestForm";
 
-const allSuas = (process.env['SUAS'] as string).split(',');
+const allSuas = (process.env['SUAS'] as string || '').split(',');
 
 export default async function Page() {
 
