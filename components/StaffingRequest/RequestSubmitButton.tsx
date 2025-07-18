@@ -3,7 +3,7 @@ import React from 'react';
 import {Button} from "@mui/material";
 import {useFormStatus} from 'react-dom'
 
-export default function StaffingRequestSubmitButton() {
+export default function RequestSubmitButton() {
 
     const {pending} = useFormStatus();
 

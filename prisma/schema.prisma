@@ -129,6 +129,7 @@ model User {
 
   trainingAppointmentStudent TrainingAppointment[] @relation("TrainingAppointmentStudent")
   trainingAppointmentTrainer TrainingAppointment[] @relation("TrainingAppointmentTrainer")
+  suaBlocks                  SuaBlock[]
 }
 
 model TrainingAssignment {
@@ -865,4 +866,33 @@ model WelcomeMessages {
 
   homeText    String
   visitorText String
+}
+
+model SuaBlock {
+  id String @id @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  start DateTime
+  end   DateTime
+
+  afiliation String
+  details    String
+
+  missionNumber String @unique
+
+  airspace SuaBlockAirspace[]
+}
+
+model SuaBlockAirspace {
+  id String @id @default(cuid())
+
+  suaBlock   SuaBlock @relation(fields: [suaBlockId], references: [id], onDelete: Cascade)
+  suaBlockId String
+
+  identifier String
+
+  bottomAltitude String
+  topAltitude    String
 }

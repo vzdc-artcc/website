@@ -14,7 +14,8 @@ import {
     PersonAdd,
     Radar,
     Radio,
-    Route
+    Route,
+    Workspaces
 } from "@mui/icons-material";
 
 export type NavigationButton = {
@@ -100,6 +101,11 @@ export const NAVIGATION: NavigationButton[] = [
                     label: 'Request Staffing',
                     link: '/staffing/new',
                     icon: <Add/>,
+                },
+                {
+                    label: 'SUA Request',
+                    link: '/sua/new',
+                    icon: <Workspaces/>,
                 },
                 {
                     label: 'Upcoming Events',
