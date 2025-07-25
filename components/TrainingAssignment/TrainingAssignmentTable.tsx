@@ -181,12 +181,12 @@ export default function TrainingAssignmentTable({manageMode, timezone}: { manage
                     label="View/Edit Assignment"
                     onClick={() => router.push(`/training/assignments/${params.row.id}`)}
                 />,
-                <GridActionsCellItem
+                manageMode ? <GridActionsCellItem
                     key={params.row.id}
                     icon={<Chat/>}
                     label="Create Discord Channel"
                     onClick={() => createDiscordChannel(params.row.student, params.row.primaryTrainer, params.row.otherTrainers)}
-                />,
+                /> : <></>,
                 manageMode ? <TrainingAssignmentDeleteButton key={params.row.id} assignment={params.row}/> : <></>,
             ],
             flex: 1
