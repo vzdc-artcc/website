@@ -104,6 +104,10 @@ export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: s
                                    helperText="Include any information that might be helpful to the controller.  You can block airspace below."/>
                     </Grid2>
                     <Grid2 size={2}>
+                        <Typography variant="subtitle1" gutterBottom>
+                            <b>Instructions:</b> Enter the three digit altitude in FL for the bottom and top of each SUA
+                            you wish to block. If you do not wish to use a certain SUA, leave the field blank.
+                        </Typography>
                         <TableContainer>
                             <Table>
                                 <TableHead>

@@ -4,12 +4,26 @@ import {z} from "zod";
 import prisma from "@/lib/db";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
+import {sendMissionCreatedEmail} from "@/actions/mail/sua";
 
 export const createSuaRequest = async (formData: FormData) => {
 
     const session = await getServerSession(authOptions);
 
     if (!session) return {};
+
+    const existingMissions = await prisma.suaBlock.count({
+        where: {
+            userId: session.user.id,
+            start: {
+                gte: new Date(),
+            },
+        },
+    });
+
+    if (existingMissions >= 2) {
+        return {errors: [{message: "You can only have 2 active SUA requests at a time."}]};
+    }
 
     const staffingRequestZ = z.object({
         userId: z.string(),
@@ -58,10 +72,9 @@ export const createSuaRequest = async (formData: FormData) => {
         if (key.startsWith('airspace.')) {
             const airspaceDetails = key.replace('airspace.', '').split('.');
             const existing = requestedAirspace[airspaceDetails[0]] || {};
-            console.log(value);
             if (!Number.isInteger(Number(value))) {
                 return {errors: [{message: `Invalid value for airspace ${airspaceDetails[0]}`}]};
-            } else if (`${value}`.length != 3) {
+            } else if (value && `${value}`.length != 3) {
                 return {errors: [{message: `Airspace ${airspaceDetails[0]} must be a 3-digit altitude in FL.`}]};
             }
 
@@ -111,5 +124,32 @@ export const createSuaRequest = async (formData: FormData) => {
         }
     });
 
+    sendMissionCreatedEmail(session.user, mission).then();
+
     return {mission};
+}
+
+export const deleteSuaRequest = async (missionId: string) => {
+    const session = await getServerSession(authOptions);
+
+    if (!session) return {};
+
+    const mission = await prisma.suaBlock.findUnique({
+        where: {
+            id: missionId,
+        },
+        include: {
+            airspace: true,
+        }
+    });
+
+    if (!mission || mission.userId !== session.user.id) {
+        return {errors: [{message: "Mission not found or you do not have permission to delete it."}]};
+    }
+
+    await prisma.suaBlock.delete({
+        where: {
+            id: missionId,
+        }
+    });
 }
