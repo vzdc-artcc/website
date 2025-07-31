@@ -60,18 +60,22 @@ export default async function Page({searchParams}: { searchParams: Promise<{ mis
                         <Divider sx={{my: 2,}}/>
                         <Typography variant="h6" gutterBottom>Disclaimer</Typography>
                         <Typography variant="body2" gutterBottom>
-                            <b>This mission is not a guarantee of ATC coverage, nor can it be modified after
-                                submitting. </b>Please
-                            check the vZDC website for current staffing
-                            and availability. The information contained on this page will be shared with vZDC
-                            controllers. You must mention your mission number when contacting ATC for clearance to
-                            utilize this mission. If your mission number contains a letter, it indicates that you booked
-                            your mission less than 24 hours in advance. Honoring of your mission is at the
-                            controller&apos;s
-                            discretion, and you may be asked to adjust or cancel your mission if necessary. This mission
-                            will be deleted after the end time. If you have any questions or concerns, please contact
-                            the
-                            vZDC staff.
+                            This mission does <b>not</b> guarantee ATC coverage and cannot be modified once submitted.
+                            Please check the vZDC website for current staffing and availability before your mission
+                            begins.
+                            <br/>
+                            <br/>
+                            The details provided here will be shared with vZDC controllers. When contacting ATC for
+                            clearance, you must reference your mission number. If your mission number includes a letter,
+                            it means the booking was made less than 24 hours in advance, and might not be honored.
+                            <br/>
+                            <br/>
+                            Mission accommodation is at the discretion of the controller on duty. You may be asked to
+                            adjust or cancel your mission if required for operational reasons.
+                            <br/>
+                            <br/>
+                            All missions are automatically deleted after their scheduled end time. For questions or
+                            concerns, please contact vZDC staff directly.
                         </Typography>
                     </CardContent>
                     <CardActions>

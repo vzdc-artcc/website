@@ -97,16 +97,19 @@ export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: s
                         }}>
                         <DateTimePicker ampm={false} label="End" value={dayjs.utc(end)}
                                         onChange={(d) => setEnd(d?.toDate() || new Date())}/>
+                        <Typography variant="caption" sx={{display: 'block',}}>Must be longer than 30
+                            minutes.</Typography>
                     </Grid2>
                     <Grid2 size={2}>
                         <TextField fullWidth required multiline rows={5} variant="filled" name="details"
                                    label="Details"
-                                   helperText="Include any information that might be helpful to the controller.  You can block airspace below."/>
+                                   helperText="Include any information that might be helpful to the controller.  You can block airspace below.  Please be conscise so our controllers can read it in a timely matter."/>
                     </Grid2>
                     <Grid2 size={2}>
                         <Typography variant="subtitle1" gutterBottom>
                             <b>Instructions:</b> Enter the three digit altitude in FL for the bottom and top of each SUA
-                            you wish to block. If you do not wish to use a certain SUA, leave the field blank.
+                            you wish to block. If you do not wish to use a certain SUA, leave the field blank. Enter 000
+                            for surface.
                         </Typography>
                         <TableContainer>
                             <Table>

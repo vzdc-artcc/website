@@ -13,6 +13,11 @@ export async function GET() {
     const suas = await prisma.suaBlock.findMany({
         include: {
             airspace: true,
+            user: {
+                select: {
+                    cid: true,
+                },
+            },
         },
         omit: {
             userId: true,
@@ -20,6 +25,7 @@ export async function GET() {
         orderBy: {
             start: 'asc',
         },
+        take: 10,
     });
 
     return Response.json(suas);
