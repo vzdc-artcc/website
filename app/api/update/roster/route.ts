@@ -46,7 +46,7 @@ async function rosterUpdate() {
                         userId: user.id,
                     },
                 });
-            } else if (user.controllerStatus === "NONE") {
+            } else if (user.controllerStatus === "NONE" || !user.operatingInitials) {
                 showWelcomeMessage = true;
                 newOperatingInitials = await getOperatingInitials(user.firstName || '', user.lastName || '', users.map(user => user.operatingInitials).filter(initial => initial !== null) as string[]);
             }
