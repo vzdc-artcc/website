@@ -16,10 +16,6 @@ import {User} from "next-auth";
 const DISCORD_TRAINING_CHANNEL_CREATE_URL = process.env['DISCORD_TRAINING_CHANNEL_CREATE_URL'] || '';
 
 export const createDiscordTrainingChannel = async (student: User, primaryTrainer: User, otherTrainers: User[]) => {
-    console.log(student);
-    console.log(primaryTrainer);
-    console.log(otherTrainers);
-
     try {
         const res = await fetch(DISCORD_TRAINING_CHANNEL_CREATE_URL, {
             method: 'POST',
