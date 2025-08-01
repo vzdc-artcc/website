@@ -4,14 +4,15 @@ import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@
 import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import {Chip, Stack, Tooltip} from "@mui/material";
 import {User} from "next-auth";
-import {fetchTrainingAssignments} from "@/actions/trainingAssignment";
-import {Visibility} from "@mui/icons-material";
+import {createDiscordTrainingChannel, fetchTrainingAssignments} from "@/actions/trainingAssignment";
+import {Chat, Visibility} from "@mui/icons-material";
 import TrainingAssignmentDeleteButton from "@/components/TrainingAssignment/TrainingAssignmentDeleteButton";
 import {useRouter} from "next/navigation";
 import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
 import {Lesson} from "@prisma/client";
 import {formatTimezoneDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
+import {toast} from "react-toastify";
 
 export default function TrainingAssignmentTable({manageMode, timezone}: { manageMode: boolean, timezone: string }) {
 
@@ -180,11 +181,30 @@ export default function TrainingAssignmentTable({manageMode, timezone}: { manage
                     label="View/Edit Assignment"
                     onClick={() => router.push(`/training/assignments/${params.row.id}`)}
                 />,
+                manageMode ? <GridActionsCellItem
+                    key={params.row.id}
+                    disabled
+                    icon={<Chat/>}
+                    label="Create Discord Channel"
+                    onClick={() => createDiscordChannel(params.row.student, params.row.primaryTrainer, params.row.otherTrainers)}
+                /> : <></>,
                 manageMode ? <TrainingAssignmentDeleteButton key={params.row.id} assignment={params.row}/> : <></>,
             ],
             flex: 1
         },
     ];
+
+    const createDiscordChannel = (student: User, primaryTrainer: User, otherTrainers: User[]) => {
+        toast.warning("Creating Discord channel. This may take a few seconds. Do not spam the button!");
+
+        createDiscordTrainingChannel(student, primaryTrainer, otherTrainers).then((ok) => {
+            if (ok) {
+                toast.success('Discord channel created successfully!');
+            } else {
+                toast.error('Failed to create Discord channel. Please try again later or contact the WM.');
+            }
+        });
+    }
 
     return (
         <DataTable

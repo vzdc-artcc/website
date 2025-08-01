@@ -3,7 +3,7 @@ import React from 'react';
 import {User} from "next-auth";
 import {useGoogleReCaptcha} from "react-google-recaptcha-v3";
 import {Grid2, TextField} from "@mui/material";
-import StaffingRequestSubmitButton from "@/components/StaffingRequest/StaffingRequestSubmitButton";
+import RequestSubmitButton from "@/components/StaffingRequest/RequestSubmitButton";
 import {toast} from "react-toastify";
 import {createStaffingRequest} from "@/actions/staffingRequest";
 import {useRouter} from "next/navigation";
@@ -68,7 +68,7 @@ export default function StaffingRequestForm({user}: { user: User, }) {
                                helperText="Include airports, times, routes, and any other staffing requirements needed."/>
                 </Grid2>
                 <Grid2 size={2}>
-                    <StaffingRequestSubmitButton/>
+                    <RequestSubmitButton/>
                 </Grid2>
             </Grid2>
         </form>)

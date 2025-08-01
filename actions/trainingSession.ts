@@ -480,7 +480,7 @@ const upsertVatusaTrainingSession = async (instructorCid: string, cid: string, t
     }
 
     if (status !== 'OK' && trainingSession.vatusaId) {
-        await log("UPDATE", "TRAINING_SESSION", `A VATUSA error occurred when trying to POST training session.`)
+        await log("UPDATE", "TRAINING_SESSION", `As usual, a VATUSA error occurred when trying to POST training session.`)
         return;
     }
 
@@ -564,13 +564,13 @@ const fetchAndUpdateReleaseRequest = async (student: User, passedLessons: Lesson
 const sendInstructorEmails = async (student: User, trainingSession: TrainingSession, oldTickets: TrainingTicketWithLesson[], newTickets: TrainingTicketWithLesson[]) => {
     for (const newTicket of newTickets) {
 
-        if (!newTicket.lesson.notifyInstructorOnPass) {
+        if (!newTicket.lesson.notifyInstructorOnPass || !newTicket.passed) {
             continue;
         }
 
         const oldTicket = oldTickets.find((ticket) => ticket.lesson.id === newTicket.lesson.id);
 
-        if (!oldTicket || (!oldTicket.passed && newTicket.passed && newTicket.lesson.notifyInstructorOnPass)) {
+        if (!oldTicket || !oldTicket.passed) {
             sendInstructorsTrainingSessionCreatedEmail(student, trainingSession, newTicket.lesson).then();
         }
     }

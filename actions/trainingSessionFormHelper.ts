@@ -1,14 +1,31 @@
 'use server';
 
 import prisma from "@/lib/db";
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/auth/auth";
 
 export const getAllData = async () => {
+
+    const session = await getServerSession(authOptions);
 
     const lessons = await prisma.lesson.findMany();
     const commonMistakes = await prisma.commonMistake.findMany();
     const users = await prisma.user.findMany();
+    const yourStudentIds = await prisma.user.findMany({
+        where: {
+            trainingAssignmentStudent: {
+                OR: [
+                    {primaryTrainerId: session?.user.id},
+                    {otherTrainers: {some: {id: session?.user.id}}}
+                ],
+            },
+        },
+        select: {
+            id: true,
+        },
+    });
 
-    return {lessons, commonMistakes, users};
+    return {lessons, commonMistakes, users, yourStudentIds: yourStudentIds.map(u => u.id)};
 }
 
 export const getCriteriaForLesson = async (lessonId: string) => {

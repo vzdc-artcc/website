@@ -13,6 +13,29 @@ import {
 } from "@/actions/mail/training";
 import {User} from "next-auth";
 
+const DISCORD_TRAINING_CHANNEL_CREATE_URL = process.env['DISCORD_TRAINING_CHANNEL_CREATE_URL'] || '';
+
+export const createDiscordTrainingChannel = async (student: User, primaryTrainer: User, otherTrainers: User[]) => {
+    try {
+        const res = await fetch(DISCORD_TRAINING_CHANNEL_CREATE_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                student,
+                primaryTrainer,
+                otherTrainers,
+            }),
+        });
+
+        return res.ok;
+    } catch (error) {
+        console.error("Error creating Discord training channel:", error);
+        return false;
+    }
+}
+
 export const expressInterest = async (requestId: string, userId: string) => {
     const request = await prisma.trainingAssignmentRequest.update({
         where: {
@@ -71,7 +94,7 @@ export const deleteTrainingAssignment = async (id: string) => {
 
     await log("DELETE", "TRAINING_ASSIGNMENT", `Deleted training request for ${request.student.fullName} (${request.student.cid})`);
 
-    sendTrainingAssignmentDeletedEmail(request.student as User, [request.primaryTrainer as User, ...request.otherTrainers as User[]]);
+    sendTrainingAssignmentDeletedEmail(request.student as User, [request.primaryTrainer as User, ...request.otherTrainers as User[]]).then();
     revalidatePath('/training/requests');
 }
 
