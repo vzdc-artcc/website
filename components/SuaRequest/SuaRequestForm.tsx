@@ -80,7 +80,7 @@ export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: s
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="afiliation" label="Affiliation" required
-                                   helperText="Which organziation you are asssociated with."/>
+                                   helperText="Which organization you are associated with."/>
                     </Grid2>
                     <Grid2
                         size={{
