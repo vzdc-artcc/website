@@ -9,8 +9,8 @@ import {authOptions} from "@/auth/auth";
 import SuaRequestDeleteButton from "@/components/SuaRequest/SuaRequestDeleteButton";
 
 export const metadata: Metadata = {
-    title: 'Special Use Airspace | vZDC',
-    description: 'vZDC special use airspace details page',
+    title: 'vSOA Scheduling | vZDC',
+    description: 'vZDC mission details page',
 };
 
 export default async function Page({searchParams}: { searchParams: Promise<{ missionId?: string }> }) {

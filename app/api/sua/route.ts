@@ -5,10 +5,10 @@ export async function GET() {
     await prisma.suaBlock.deleteMany({
         where: {
             end: {
-                lt: new Date(),
+                lt: new Date(Date.now() - 60 * 60 * 1000), // 1 hour ago
             },
         },
-    });
+    })
 
     const suas = await prisma.suaBlock.findMany({
         include: {

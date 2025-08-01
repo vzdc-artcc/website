@@ -103,7 +103,7 @@ export const NAVIGATION: NavigationButton[] = [
                     icon: <Add/>,
                 },
                 {
-                    label: 'SUA Request',
+                    label: 'vSOA Scheduling',
                     link: '/sua/new',
                     icon: <Workspaces/>,
                 },

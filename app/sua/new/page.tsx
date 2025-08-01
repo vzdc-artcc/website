@@ -4,22 +4,29 @@ import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import ErrorCard from "@/components/Error/ErrorCard";
 import SuaRequestForm from "@/components/SuaRequest/SuaRequestForm";
+import {Metadata} from "next";
 
 const allSuas = (process.env['SUAS'] as string || '').split(',');
+
+export const metadata: Metadata = {
+    title: 'Mission Details | vZDC',
+    description: 'vZDC mission details page',
+};
+
 
 export default async function Page() {
 
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
-        return <ErrorCard heading="Special Use Airspace Request" message="You must be logged in to view this page."/>
+        return <ErrorCard heading="vSOA Scheduling" message="You must be logged in to view this page."/>
     }
 
     return (
         <Container maxWidth="md">
             <Card>
                 <CardContent>
-                    <Typography variant="h5" sx={{mb: 2,}}>Special Use Airspace Request</Typography>
+                    <Typography variant="h5" sx={{mb: 2,}}>vSOA Scheduling Request</Typography>
                     <SuaRequestForm user={session.user} allSuas={allSuas.sort((a, b) => a.localeCompare(b))}/>
                 </CardContent>
             </Card>
