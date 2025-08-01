@@ -103,7 +103,7 @@ export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: s
                     <Grid2 size={2}>
                         <TextField fullWidth required multiline rows={5} variant="filled" name="details"
                                    label="Details"
-                                   helperText="Include any information that might be helpful to the controller.  You can block airspace below.  Please be conscise so our controllers can read it in a timely matter."/>
+                                   helperText="Include any information that might be helpful to the controller.  You can block airspace below.  Please be concise so our controllers can read it in a timely manner."/>
                     </Grid2>
                     <Grid2 size={2}>
                         <Typography variant="subtitle1" gutterBottom>
