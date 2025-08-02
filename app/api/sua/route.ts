@@ -21,7 +21,8 @@ export async function GET() {
         },
         where: {
             start: {
-                lte: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+                gte: new Date(),
+                lte: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours ago
             },
         },
         omit: {
