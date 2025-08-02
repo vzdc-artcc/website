@@ -51,6 +51,11 @@ export const NAVIGATION: NavigationButton[] = [
                     link: '/airports',
                     icon: <AirplanemodeActive/>,
                 },
+                {
+                    label: 'vSOA Scheduling',
+                    link: '/sua/new',
+                    icon: <Workspaces/>,
+                },
             ],
         },
     },
@@ -101,11 +106,6 @@ export const NAVIGATION: NavigationButton[] = [
                     label: 'Request Staffing',
                     link: '/staffing/new',
                     icon: <Add/>,
-                },
-                {
-                    label: 'vSOA Scheduling',
-                    link: '/sua/new',
-                    icon: <Workspaces/>,
                 },
                 {
                     label: 'Upcoming Events',
