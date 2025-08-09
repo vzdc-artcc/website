@@ -72,8 +72,8 @@ jobs:
       - name: Update Kubernetes Deployment (MASTER)
         if: ${{ steps.extract_branch.outputs.branch == 'master' }}
         env:
-          KUBECONFIG_DATA: ${{ secrets.SA_KUBECONFIG_BASE64 }}  # your base64 kubeconfig secret
+          KUBECONFIG_DATA: ${{ secrets.DO_KUBECONFIG_BASE64 }}  # your base64 kubeconfig secret
           IMAGE_TAG: ghcr.io/${{ github.repository }}:master-${{ env.COMMIT_HASH }}
         run: |
           echo "$KUBECONFIG_DATA" | base64 --decode > kubeconfig.yaml
-          kubectl --kubeconfig=kubeconfig.yaml set image deployment/website my-container=$IMAGE_TAG -n default
+          kubectl --kubeconfig=kubeconfig.yaml set image deployment/website website=$IMAGE_TAG run-migrations=$IMAGE_TAG -n default
