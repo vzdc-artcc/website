@@ -339,6 +339,8 @@ enum LogModel {
   TRAINING_APPOINTMENT
 
   WELCOME_MESSAGES
+
+  DISCORD_MESSAGE
 }
 
 model Log {

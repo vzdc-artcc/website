@@ -18,7 +18,8 @@ import {
     Report,
     Send,
     Task,
-    ViewCompact
+    ViewCompact,
+    Chat
 } from "@mui/icons-material";
 import prisma from "@/lib/db";
 import MenuWrapper from './MenuWrapper';
@@ -150,6 +151,14 @@ export default async function AdminMenu() {
                         <Send/>
                     </ListItemIcon>
                     <ListItemText primary="Send Email"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/admin/discord/announcments" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <Chat/>
+                    </ListItemIcon>
+                    <ListItemText primary="Discord Announcments"/>
                 </ListItemButton>
             </Link>
             <Link href="/admin/visitor-applications" style={{textDecoration: 'none', color: 'inherit',}}>
