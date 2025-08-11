@@ -1,8 +1,9 @@
 'use server';
-import { PrismaClient } from '@prisma/client';
+import {Event, PrismaClient} from '@prisma/client';
 import { getServerSession } from 'next-auth';
 import {authOptions} from "@/auth/auth";
 import {log} from "@/actions/log";
+import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
 
 
 const prisma = new PrismaClient();
@@ -112,4 +113,26 @@ export async function sendAnnouncement(
         };
     }
 }
+
+export const sendDiscordEventPositionData = async (event: Event, positions: EventPositionWithSolo[]) => {
+
+    const publishedPositions = positions.filter((position) => position.published);
+
+    const res = await fetch(`${BOT_API_BASE_URL}/events/create_event_post`, {
+        method: 'POST',
+        headers: {
+            'X-API-Key': BOT_API_SECRET_KEY,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            event,
+            eventPositions: publishedPositions,
+        }),
+    });
+
+    if (!res.ok) {
+        return 'Unable to send Discord event position data';
+    }
+}
+
 

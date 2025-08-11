@@ -2,9 +2,9 @@
 import React from 'react';
 import {Event} from "@prisma/client";
 import {Button} from "@mui/material";
-import {sendDiscordEventPositionData} from "@/actions/eventPosition";
 import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
 import {toast} from "react-toastify";
+import {sendDiscordEventPositionData} from "@/actions/discord";
 
 export default function SendDiscordEventDataButton({positions, event}: {
     positions: EventPositionWithSolo[],

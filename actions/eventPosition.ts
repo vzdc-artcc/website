@@ -14,9 +14,6 @@ import {
     sendEventPositionRequestDeletedEmail
 } from "./mail/event";
 import {ZodErrorSlimResponse} from "@/types";
-import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
-
-const {DISCORD_EVENT_POSITION_POST_URL} = process.env;
 
 export const toggleManualPositionOpen = async (event: Event) => {
 
@@ -344,24 +341,4 @@ export const fetchAllUsers = async () => {
             },
         },
     });
-}
-
-export const sendDiscordEventPositionData = async (event: Event, positions: EventPositionWithSolo[]) => {
-
-    const publishedPositions = positions.filter((position) => position.published);
-
-    const res = await fetch(DISCORD_EVENT_POSITION_POST_URL as string, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            event,
-            eventPositions: publishedPositions,
-        }),
-    });
-
-    if (!res.ok) {
-        return 'Unable to send Discord event position data';
-    }
 }
