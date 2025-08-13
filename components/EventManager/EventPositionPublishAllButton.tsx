@@ -90,6 +90,11 @@ const getErrors = async (event: Event, positions: EventPositionWithSolo[]): Prom
 
         if (position.finalPosition !== duplicate?.finalPosition) {
             continue;
+        if (!duplicate) {
+            continue;
+        }
+        if (position.finalPosition !== duplicate.finalPosition) {
+            continue;
         }
 
         if (duplicate && position.user) {
