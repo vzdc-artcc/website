@@ -6,6 +6,7 @@ import {IconButton, Tooltip} from "@mui/material";
 import {Download} from "@mui/icons-material";
 import {formatZuluDate} from "@/lib/date";
 import {toast} from "react-toastify";
+import csv from "csv-stringify";
 
 export default function EventPositionCsvButton({event, positions}: {
     event: Event,
@@ -13,8 +14,6 @@ export default function EventPositionCsvButton({event, positions}: {
 }) {
 
     const onClick = async () => {
-        // Create a CSV string from the positions
-        // create a csv with firstName, lastName, rating, cid, soloPosition, requestedPosition, reqStartTime, reqEndTime, notes, finalPosition, finalStartTime, finalEndTime, finalNotes
         const csvRows = [
             ['First Name', 'Last Name', 'Rating', 'CID', 'Solo Position', 'Requested Position', 'Requested Start Time', 'Requested End Time', 'Notes', 'Final Position', 'Final Start Time', 'Final End Time', 'Final Notes'],
             ...positions.map(position => [
@@ -34,7 +33,18 @@ export default function EventPositionCsvButton({event, positions}: {
             ])
         ];
 
-        const csvContent = csvRows.map(e => e.join(',')).join('\n');
+        const csvContent = await new Promise<string>((resolve, reject) => {
+            csv.stringify(csvRows, {
+                columns: [
+                    'First Name', 'Last Name', 'Rating', 'CID', 'Solo Position', 'Requested Position',
+                    'Requested Start Time', 'Requested End Time', 'Notes', 'Final Position',
+                    'Final Start Time', 'Final End Time', 'Final Notes',
+                ],
+            }, (err, output) => {
+                if (err) reject(err);
+                else resolve(output);
+            });
+        });
         const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
