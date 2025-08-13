@@ -1,19 +1,33 @@
-import { EventPositionWithSolo } from "@/app/events/admin/events/[id]/manager/page";;
-import { Box, Chip, Stack } from "@mui/material";
-import { ButtonGroup } from "@mui/material";
-import { formatZuluDate } from "@/lib/date";
-import { getRating } from "@/lib/vatsim";
-import { TableBody, Tooltip } from "@mui/material";
-import { CardContent, Table, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { Card } from "@mui/material";
+import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
+import {
+    Box,
+    ButtonGroup,
+    Card,
+    CardContent,
+    Chip,
+    Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Tooltip,
+    Typography
+} from "@mui/material";
+import {formatZuluDate} from "@/lib/date";
+import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
-import { Event, EventPosition } from "@prisma/client";
+import {Event, EventPosition} from "@prisma/client";
 import TogglePositionsLockButton from "./TogglePositionsLockButton";
 import ForcePositionsToggleSwitch from "./ForcePositionsToggleSwitch";
 import EventPositionDeleteButton from "./EventPositionDeleteButton";
 import EventPositionEditButton from "./EventPositionEditButton";
 import EventPositionPublishButton from "./EventPositionPublishButton";
 import EventPositionPublishAllButton from "./EventPositionPublishAllButton";
+import EventPositionCsvButton from "@/components/EventManager/EventPositionCsvButton";
+
+
 
 export default async function EventPositionsTable({ event, positions }: { event: Event, positions: EventPositionWithSolo[] }) {
 
@@ -52,9 +66,15 @@ export default async function EventPositionsTable({ event, positions }: { event:
                     <Box sx={{ display: { xs: 'none', sm: 'inherit', }}}>
                        <ForcePositionsToggleSwitch event={event} /> 
                     </Box>
+                    <Box sx={{display: {xs: 'none', sm: 'inherit',}}}>
+                        <EventPositionCsvButton event={event} positions={positions}/>
+                    </Box>
                 </Stack>
                 <Box sx={{ display: { sm: 'none', }}}>
                        <ForcePositionsToggleSwitch event={event} /> 
+                </Box>
+                <Box sx={{display: {sm: 'none',}}}>
+                    <EventPositionCsvButton event={event} positions={positions}/>
                 </Box>
                 <TableContainer>
                     <Table>
