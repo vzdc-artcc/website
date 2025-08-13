@@ -1,13 +1,12 @@
 'use client';
-import { publishEventPosition, unpublishEventPosition, validateFinalEventPosition } from "@/actions/eventPosition";
-import { EventPositionWithSolo } from "@/app/events/admin/events/[id]/manager/page";
-import { ZodErrorSlimResponse } from "@/types";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-import { Event, } from "@prisma/client";
-import { User } from "next-auth";
-import { useState } from "react";
-import { toast } from "react-toastify";
-import { ZodIssue } from "zod";
+import {publishEventPosition, unpublishEventPosition, validateFinalEventPosition} from "@/actions/eventPosition";
+import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
+import {ZodErrorSlimResponse} from "@/types";
+import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
+import {Event,} from "@prisma/client";
+import {User} from "next-auth";
+import {useState} from "react";
+import {toast} from "react-toastify";
 
 export default function EventPositionPublishAllButton({ event, positions, }: { event: Event, positions: EventPositionWithSolo[], }) {
 
@@ -88,6 +87,14 @@ const getErrors = async (event: Event, positions: EventPositionWithSolo[]): Prom
 
         // check for duplicate positions
         const duplicate = positions.find((p) => p !== position && p.requestedPosition === position.requestedPosition);
+
+        if (!duplicate) {
+            continue;
+        }
+        if (position.finalPosition !== duplicate.finalPosition) {
+            continue;
+        }
+
         if (duplicate && position.user) {
             if (errors.find((error) => error.user === position.user)) {
                 errors.find((error) => error.user === position.user)?.errors.push(`Duplicate position ${position.requestedPosition}`);

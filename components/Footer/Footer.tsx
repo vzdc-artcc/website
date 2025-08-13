@@ -8,6 +8,7 @@ import Link from "next/link";
 import getConfig from "next/config";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
+import DonationButton from "@/components/Donation/DonationButton";
 
 const DEV_MODE = process.env['DEV_MODE'] === 'true';
 
@@ -49,8 +50,11 @@ export default async function Footer() {
                             </Link>
                         </Box>
                     </Tooltip>
+                    <Box sx={{textAlign: 'center', my: 2,}}>
+                        <DonationButton/>
+                    </Box>
                     <Stack direction="row" spacing={1} sx={{my: 2,}} justifyContent="center">
-                        <Tooltip title={'vZDC Privicy Policy'}>
+                        <Tooltip title={'vZDC Privacy Policy'}>
                             <Link href="/privacy" style={{color: 'inherit',}}>
                                 <Typography textAlign="center">Privacy</Typography>
                             </Link>
