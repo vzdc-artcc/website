@@ -4,7 +4,7 @@ import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogT
 import {Favorite} from "@mui/icons-material";
 import Link from "next/link";
 
-const {NEXT_PUBLIC_DONATION_URL = ''} = process.env;
+const donationUrl = process.env.NEXT_PUBLIC_DONATION_URL || '';
 
 export default function DonationButton() {
 
@@ -42,7 +42,7 @@ export default function DonationButton() {
                     <Button variant="contained" color="inherit" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Link href={NEXT_PUBLIC_DONATION_URL} target="_blank">
+                    <Link href={donationUrl} target="_blank">
                         <Button variant="contained" onClick={handleClose} startIcon={<Favorite/>} autoFocus>
                             Donate
                         </Button>
