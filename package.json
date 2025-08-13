@@ -36,7 +36,7 @@
     "@types/mjml": "^4.7.4",
     "@uiw/react-markdown-editor": "^6.1.2",
     "bad-words": "^4.0.0",
-    "csv": "^6.4.1",
+    "csv-stringify": "^6.6.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "ics": "^3.8.1",

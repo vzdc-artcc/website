@@ -6,7 +6,7 @@ import {IconButton, Tooltip} from "@mui/material";
 import {Download} from "@mui/icons-material";
 import {formatZuluDate} from "@/lib/date";
 import {toast} from "react-toastify";
-import csv from "csv-stringify";
+import {stringify} from "csv-stringify";
 
 export default function EventPositionCsvButton({event, positions}: {
     event: Event,
@@ -34,7 +34,7 @@ export default function EventPositionCsvButton({event, positions}: {
         ];
 
         const csvContent = await new Promise<string>((resolve, reject) => {
-            csv.stringify(csvRows, {
+            stringify(csvRows, {
                 columns: [
                     'First Name', 'Last Name', 'Rating', 'CID', 'Solo Position', 'Requested Position',
                     'Requested Start Time', 'Requested End Time', 'Notes', 'Final Position',
