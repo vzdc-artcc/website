@@ -88,8 +88,6 @@ const getErrors = async (event: Event, positions: EventPositionWithSolo[]): Prom
         // check for duplicate positions
         const duplicate = positions.find((p) => p !== position && p.requestedPosition === position.requestedPosition);
 
-        if (position.finalPosition !== duplicate?.finalPosition) {
-            continue;
         if (!duplicate) {
             continue;
         }
