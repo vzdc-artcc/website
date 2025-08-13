@@ -29,7 +29,7 @@ export async function GET() {
             userId: true,
         },
         orderBy: {
-            start: 'asc',
+            start: 'desc',
         },
         take: 10,
     });
