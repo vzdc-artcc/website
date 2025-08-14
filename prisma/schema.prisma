@@ -341,6 +341,7 @@ enum LogModel {
   WELCOME_MESSAGES
 
   DISCORD_MESSAGE
+  DISCORD_CHANNEL_UPDATE
 }
 
 model Log {

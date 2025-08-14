@@ -1,6 +1,6 @@
 'use server';
 import {Event, PrismaClient} from '@prisma/client';
-import { getServerSession } from 'next-auth';
+import {getServerSession} from 'next-auth';
 import {authOptions} from "@/auth/auth";
 import {log} from "@/actions/log";
 import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
@@ -133,6 +133,8 @@ export const sendDiscordEventPositionData = async (event: Event, positions: Even
     if (!res.ok) {
         return 'Unable to send Discord event position data';
     }
+
+    await log("CREATE", "DISCORD_MESSAGE", `Sent Discord event position data for event ${event.name}`);
 }
 
 

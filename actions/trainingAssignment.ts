@@ -31,7 +31,12 @@ export const createDiscordTrainingChannel = async (student: User, primaryTrainer
             }),
         });
 
-        return res.ok;
+        if (res.ok) {
+            await log("CREATE", "DISCORD_CHANNEL_UPDATE", `Created Discord training channel for ${student.fullName} (${student.cid}) with primary trainer ${primaryTrainer.fullName} (${primaryTrainer.cid}) and other trainers ${otherTrainers.map(t => `${t.fullName} (${t.cid})`).join(', ')}`);
+            return true;
+        }
+
+        return false;
     } catch (error) {
         console.error("Error creating Discord training channel:", error);
         return false;
