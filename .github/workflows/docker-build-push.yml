@@ -68,3 +68,24 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}:${{ steps.extract_branch.outputs.branch }}-latest
             ghcr.io/${{ github.repository }}:${{ steps.extract_branch.outputs.branch }}-${{ env.COMMIT_HASH }}
+
+      - name: Install doctl
+        run: |
+          curl -sL https://github.com/digitalocean/doctl/releases/download/v1.113.0/doctl-1.113.0-linux-amd64.tar.gz \
+          | tar -xzv
+          sudo mv doctl /usr/local/bin
+
+      - name: Authenticate with DigitalOcean
+        run: doctl auth init -t ${{ secrets.DO_PAT }}
+
+      - name: Fetch kubeconfig for cluster
+        env:
+          CLUSTER_ID: ${{ secrets.DO_CLUSTER_ID }}
+        run: doctl kubernetes cluster kubeconfig save "$CLUSTER_ID" --set-current-context
+          
+      - name: Update Kubernetes Deployment (MASTER)
+        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
+        env:
+          IMAGE_TAG: ghcr.io/${{ github.repository }}:master-${{ env.COMMIT_HASH }}
+        run: |
+          kubectl set image deployment/website website=$IMAGE_TAG run-migrations=$IMAGE_TAG -n default

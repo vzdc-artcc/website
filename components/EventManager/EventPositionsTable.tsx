@@ -26,6 +26,7 @@ import EventPositionEditButton from "./EventPositionEditButton";
 import EventPositionPublishButton from "./EventPositionPublishButton";
 import EventPositionPublishAllButton from "./EventPositionPublishAllButton";
 import SendDiscordEventDataButton from "@/components/EventManager/SendDiscordEventDataButton";
+import EventPositionCsvButton from "@/components/EventManager/EventPositionCsvButton";
 
 
 
@@ -69,9 +70,15 @@ export default async function EventPositionsTable({ event, positions }: { event:
                     <Box sx={{ display: { xs: 'none', sm: 'inherit', }}}>
                        <ForcePositionsToggleSwitch event={event} /> 
                     </Box>
+                    <Box sx={{display: {xs: 'none', sm: 'inherit',}}}>
+                        <EventPositionCsvButton event={event} positions={positions}/>
+                    </Box>
                 </Stack>
                 <Box sx={{ display: { sm: 'none', }}}>
                        <ForcePositionsToggleSwitch event={event} /> 
+                </Box>
+                <Box sx={{display: {sm: 'none',}}}>
+                    <EventPositionCsvButton event={event} positions={positions}/>
                 </Box>
                 <TableContainer>
                     <Table>
