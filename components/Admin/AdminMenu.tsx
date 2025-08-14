@@ -8,6 +8,7 @@ import {
     Badge as BadgeIcon,
     BarChart,
     CellTower,
+    Chat,
     DeleteSweep,
     EmojiPeople,
     Feedback,
@@ -18,8 +19,7 @@ import {
     Report,
     Send,
     Task,
-    ViewCompact,
-    Chat
+    ViewCompact
 } from "@mui/icons-material";
 import prisma from "@/lib/db";
 import MenuWrapper from './MenuWrapper';
@@ -158,7 +158,7 @@ export default async function AdminMenu() {
                     <ListItemIcon>
                         <Chat/>
                     </ListItemIcon>
-                    <ListItemText primary="Discord Announcments"/>
+                    <ListItemText primary="Discord Announcements"/>
                 </ListItemButton>
             </Link>
             <Link href="/admin/visitor-applications" style={{textDecoration: 'none', color: 'inherit',}}>

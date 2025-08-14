@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { TextField, Button, Box, Grid2, Autocomplete } from '@mui/material';
-import { useFormStatus } from 'react-dom';
-import { toast } from 'react-toastify';
+import React, {useState} from 'react';
+import {Autocomplete, Box, Button, Grid2, TextField} from '@mui/material';
+import {useFormStatus} from 'react-dom';
+import {toast} from 'react-toastify';
 import dynamic from 'next/dynamic';
-import { sendAnnouncement } from '@/actions/discord';
+import {sendAnnouncement} from '@/actions/discord';
 
 const ANNOUNCEMENT_TYPES_OPTIONS_FLAT = [
     // Announcements
