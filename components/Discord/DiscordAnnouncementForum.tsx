@@ -5,8 +5,6 @@ import { TextField, Button, Box, Grid2, Autocomplete } from '@mui/material';
 import { useFormStatus } from 'react-dom';
 import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
-
-
 import { sendAnnouncement } from '@/actions/discord';
 
 const ANNOUNCEMENT_TYPES_OPTIONS_FLAT = [
@@ -101,6 +99,7 @@ export default function DiscordAnnouncementForm() {
                                     disabled={pending}
                                 />
                             )}
+                            // Ensure single selection
                             disableClearable={false}
                             disabled={pending}
                         />
@@ -117,37 +116,18 @@ export default function DiscordAnnouncementForm() {
                             disabled={pending}
                         />
                     </Grid2>
-
                     <Grid2 size={12}>
-                        <Box sx={{
-                            border: '1px solid rgba(0, 0, 0, 0.23)',
-                            borderRadius: '4px',
-                            overflow: 'hidden',
-                            '& .w-md-editor': {
-                                height: '300px',
-                                minHeight: '200px',
-                                fontSize: '1rem',
-                            },
-                            ...(pending && {
-                                backgroundColor: 'rgba(0, 0, 0, 0.06)',
-                                cursor: 'not-allowed',
-                                pointerEvents: 'none',
-                            })
-                        }}>
-                            <Box sx={{ p: 1, fontSize: '0.75rem', color: 'rgba(0, 0, 0, 0.6)' }}>Body *</Box>
-                            <DynamicMarkdownEditor
-                                value={body}
-                                onChange={(value: string) => {
-                                    setBody(value);
-                                }}
-                                height="250px"
-                                enableScroll={false}
-                                toolbarBottom={true}
-                                readOnly={pending}
-                            />
-                        </Box>
+                        <DynamicMarkdownEditor
+                            value={body}
+                            onChange={(value: string) => {
+                                setBody(value);
+                            }}
+                            height="250px"
+                            enableScroll={false}
+                            toolbarBottom={true}
+                            readOnly={pending}
+                        />
                     </Grid2>
-
                 </Grid2>
                 <Button
                     type="submit"

@@ -14,6 +14,7 @@ import {Lesson} from "@prisma/client";
 import {formatTimezoneDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
 import {toast} from "react-toastify";
 
+
 export default function TrainingAssignmentTable({manageMode, timezone}: { manageMode: boolean, timezone: string }) {
 
     const router = useRouter();
@@ -183,7 +184,6 @@ export default function TrainingAssignmentTable({manageMode, timezone}: { manage
                 />,
                 manageMode ? <GridActionsCellItem
                     key={params.row.id}
-                    disabled
                     icon={<Chat/>}
                     label="Create Discord Channel"
                     onClick={() => createDiscordChannel(params.row.student, params.row.primaryTrainer, params.row.otherTrainers)}

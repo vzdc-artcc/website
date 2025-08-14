@@ -25,6 +25,7 @@ import EventPositionDeleteButton from "./EventPositionDeleteButton";
 import EventPositionEditButton from "./EventPositionEditButton";
 import EventPositionPublishButton from "./EventPositionPublishButton";
 import EventPositionPublishAllButton from "./EventPositionPublishAllButton";
+import SendDiscordEventDataButton from "@/components/EventManager/SendDiscordEventDataButton";
 import EventPositionCsvButton from "@/components/EventManager/EventPositionCsvButton";
 
 
@@ -62,6 +63,9 @@ export default async function EventPositionsTable({ event, positions }: { event:
                     </Box>
                     <Box>
                         <TogglePositionsLockButton event={event} />
+                    </Box>
+                    <Box>
+                        <SendDiscordEventDataButton event={event} positions={positions}/>
                     </Box>
                     <Box sx={{ display: { xs: 'none', sm: 'inherit', }}}>
                        <ForcePositionsToggleSwitch event={event} /> 
