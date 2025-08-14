@@ -1,5 +1,5 @@
 import {Card, CardContent, Typography} from "@mui/material";
-import DiscordAnnouncementForm from "@/components/Discord/DiscordAnnouncementForum";
+import DiscordAnnouncementForm from "@/components/Discord/DiscordAnnouncementForm";
 
 export default function AdminAnnouncementsPage() {
     return (

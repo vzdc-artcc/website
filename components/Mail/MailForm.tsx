@@ -1,164 +1,95 @@
 'use client';
+import React, {useState} from 'react';
+import {MailGroup} from "@/app/admin/mail/page";
+import {User} from "next-auth";
+import {Autocomplete, Grid2, TextField} from "@mui/material";
+import FormSaveButton from "@/components/Form/FormSaveButton";
+import {sendMail} from "@/actions/mail/general";
+import {toast} from "react-toastify";
 
-import React, { useState } from 'react';
-import { TextField, Button, Box, Grid2, Autocomplete } from '@mui/material';
-import { useFormStatus } from 'react-dom';
-import { toast } from 'react-toastify';
-import dynamic from 'next/dynamic';
+export default function MailForm({allUsers, groups}: { allUsers: User[], groups: MailGroup[], }) {
 
+    const [selectedOptions, setSelectedOptions] = useState<({ group: string; name: string; ids: string[]; } | {
+        name: string;
+        id: string;
+        group: string;
+    })[]>([]);
 
-import { sendAnnouncement } from '@/actions/discord';
+    const options = [
+        ...groups.map(group => ({...group, group: 'Groups'})),
+        ...allUsers.map(user => ({
+            name: `${user.firstName} ${user.lastName} (${user.cid})`,
+            id: user.id,
+            group: 'Controllers'
+        })),
+    ];
 
-const ANNOUNCEMENT_TYPES_OPTIONS_FLAT = [
-    // Announcements
-    { value: 'general', label: 'General Announcement', group: 'Announcements' },
-    { value: 'event', label: 'Event Announcement', group: 'Announcements' },
-    { value: 'training', label: 'Training Announcement', group: 'Announcements' },
-    { value: 'websystem', label: 'Web System Announcement', group: 'Announcements' },
-    { value: 'facility', label: 'Facility Announcement', group: 'Announcements' },
-    // Updates
-    { value: 'general-update', label: 'General Update', group: 'Updates' },
-    { value: 'event-update', label: 'Event Update', group: 'Updates' },
-    { value: 'training-update', label: 'Training Update', group: 'Updates' },
-    { value: 'websystem-update', label: 'Web System Update', group: 'Updates' },
-    { value: 'facility-update', label: 'Facility Update', group: 'Updates' },
-    // Event Specifics
-    { value: 'event-reminder', label: 'Event Reminder', group: 'Event Specifics' },
-    { value: 'event-posting', label: 'Event Posting', group: 'Event Specifics' },
-];
-
-const DynamicMarkdownEditor = dynamic(
-    () => import('@uiw/react-markdown-editor'),
-    { ssr: false }
-);
-
-
-export default function DiscordAnnouncementForm() {
-    const { pending } = useFormStatus();
-
-    const [messageTypeOption, setMessageTypeOption] = useState<{ value: string; label: string; group: string } | null>(null);
-    const [title, setTitle] = useState('');
-    const [body, setBody] = useState('');
+    const selectedIds = selectedOptions.flatMap(option => 'ids' in option ? option.ids : [option.id]);
+    const uniqueSelectedIds = Array.from(new Set(selectedIds));
 
     const handleSubmit = async (formData: FormData) => {
-        toast('Sending announcement...', { type: 'info', autoClose: false, closeButton: false, toastId: 'announcement-toast' });
 
-        formData.set('messageType', messageTypeOption?.value || '');
+        toast('Sending mail...  This could take a while.  Do not close this page.', {type: 'info'})
 
-        formData.set('body', body);
+        const {ok, errors} = await sendMail(
+            allUsers.filter(user => uniqueSelectedIds.includes(user.id)).map(user => user.email),
+            formData.get('subject') as string,
+            formData.get('replyTo') as string,
+            formData.get('body') as string);
 
-        const result = await sendAnnouncement(
-            formData.get('messageType') as string,
-            formData.get('title') as string,
-            formData.get('body') as string,
-        );
-
-        if (result.errors) {
-            toast.update('announcement-toast', {
-                render: result.errors.map(e => e.message).join('. '),
-                type: 'error',
-                autoClose: 5000,
-                closeButton: true
-            });
-        } else if (result.ok) {
-            toast.update('announcement-toast', {
-                render: 'Announcement sent successfully!',
-                type: 'success',
-                autoClose: 5000,
-                closeButton: true
-            });
-            setMessageTypeOption(null);
-            setTitle('');
-            setBody('');
-            const formElement = document.getElementById('announcement-form') as HTMLFormElement;
-            if (formElement) formElement.reset();
+        if (errors) {
+            toast(errors.map(e => e.message).join('. '), {type: 'error'});
+            return;
         }
-    };
 
-    const isFormValid = messageTypeOption?.value && title.trim() !== '' && body.trim() !== '';
+        if (ok) {
+            toast('Mail sent!', {type: 'success'});
+            setSelectedOptions([]);
+        }
+
+    }
 
     return (
-        <Box sx={{ p: 3, border: '1px solid #ccc', borderRadius: '8px' }}>
-            <form id="announcement-form" action={handleSubmit}>
-                <Grid2 container spacing={2} sx={{ mb: 2 }}>
-                    <Grid2 size={{ xs: 12, md: 6 }}>
-                        <Autocomplete
-                            id="announcement-type-autocomplete"
-                            options={ANNOUNCEMENT_TYPES_OPTIONS_FLAT}
-                            groupBy={(option) => option.group}
-                            getOptionLabel={(option) => option.label}
-                            onChange={(event, newValue) => {
-                                setMessageTypeOption(newValue);
-                            }}
-                            value={messageTypeOption}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Announcement Type"
-                                    variant="filled"
-                                    required
-                                    name="messageType"
-                                    disabled={pending}
-                                />
-                            )}
-                            disableClearable={false}
-                            disabled={pending}
-                        />
-                    </Grid2>
-                    <Grid2 size={{ xs: 12, md: 6 }}>
-                        <TextField
-                            required
-                            fullWidth
-                            variant="filled"
-                            name="title"
-                            label="Title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            disabled={pending}
-                        />
-                    </Grid2>
-
-                    <Grid2 size={12}>
-                        <Box sx={{
-                            border: '1px solid rgba(0, 0, 0, 0.23)',
-                            borderRadius: '4px',
-                            overflow: 'hidden',
-                            '& .w-md-editor': {
-                                height: '300px',
-                                minHeight: '200px',
-                                fontSize: '1rem',
-                            },
-                            ...(pending && {
-                                backgroundColor: 'rgba(0, 0, 0, 0.06)',
-                                cursor: 'not-allowed',
-                                pointerEvents: 'none',
-                            })
-                        }}>
-                            <Box sx={{ p: 1, fontSize: '0.75rem', color: 'rgba(0, 0, 0, 0.6)' }}>Body *</Box>
-                            <DynamicMarkdownEditor
-                                value={body}
-                                onChange={(value: string) => {
-                                    setBody(value);
-                                }}
-                                height="250px"
-                                enableScroll={false}
-                                toolbarBottom={true}
-                                readOnly={pending}
-                            />
-                        </Box>
-                    </Grid2>
-
+        (<form action={handleSubmit}>
+            <input type="hidden" name="to" value={uniqueSelectedIds}/>
+            <Grid2 container columns={2} spacing={2}>
+                <Grid2
+                    size={{
+                        xs: 2,
+                        md: 1
+                    }}>
+                    <Autocomplete
+                        id="group-user-autocomplete"
+                        options={options}
+                        groupBy={(option) => option.group}
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, newValue) => {
+                            setSelectedOptions(newValue);
+                        }}
+                        value={selectedOptions}
+                        renderInput={(params) => <TextField {...params} label="Recipients" variant="outlined"/>}
+                        multiple
+                        disableCloseOnSelect
+                    />
                 </Grid2>
-                <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                    disabled={pending || !isFormValid}
-                >
-                    {pending ? 'Sending...' : 'Send Announcement'}
-                </Button>
-            </form>
-        </Box>
+                <Grid2
+                    size={{
+                        xs: 2,
+                        md: 1
+                    }}>
+                    <TextField required fullWidth variant="filled" name="subject" label="Subject"/>
+                </Grid2>
+                <Grid2 size={2}>
+                    <TextField required fullWidth variant="filled" name="replyTo" label="Reply To"/>
+                </Grid2>
+                <Grid2 size={2}>
+                    <TextField required fullWidth multiline rows={5} variant="filled" name="body"
+                               label="Body"/>
+                </Grid2>
+                <Grid2 size={2}>
+                    <FormSaveButton/>
+                </Grid2>
+            </Grid2>
+        </form>)
     );
 }
