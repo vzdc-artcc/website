@@ -77,6 +77,12 @@ export default async function Footer() {
                                 <Typography textAlign="center">Credits</Typography>
                             </Link>
                         </Tooltip>
+                        <Typography>|</Typography>
+                        <Tooltip title={'Status'}>
+                            <Link href="https://status.vzdc.org/status/vzdc" style={{color: 'inherit',}}>
+                                <Typography textAlign="center">Status</Typography>
+                            </Link>
+                        </Tooltip>
                     </Stack>
                     {session?.user &&
                         <Typography variant="subtitle1" fontSize={12} textAlign="center">All non-zulu times are
