@@ -153,7 +153,7 @@ export default async function AdminMenu() {
                     <ListItemText primary="Send Email"/>
                 </ListItemButton>
             </Link>
-            <Link href="/admin/discord/announcments" style={{textDecoration: 'none', color: 'inherit',}}>
+            <Link href="/admin/discord/announcements" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
                         <Chat/>
