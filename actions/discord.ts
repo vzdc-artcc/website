@@ -131,7 +131,7 @@ export const sendDiscordEventPositionData = async (event: Event, positions: Even
     });
 
     if (!res.ok) {
-        return 'Unable to send Discord event position data';
+        return res.status;
     }
 
     await log("CREATE", "DISCORD_MESSAGE", `Sent Discord event position data for event ${event.name}`);
