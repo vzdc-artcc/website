@@ -21,7 +21,7 @@ export default async function Footer() {
         <AppBar position="static" sx={{marginTop: 20}}>
             <Toolbar>
                 <Container maxWidth="md" sx={{padding: 5,}}>
-                    <Typography textAlign="center" gutterBottom>&copy; 2025 Virtual Washington Air Route Traffic Control
+                    <Typography textAlign="center" gutterBottom>&copy; {(new Date()).getFullYear()} Virtual Washington Air Route Traffic Control
                         Center, All
                         Rights Reserved.</Typography>
                     <Typography textAlign="center" gutterBottom>A sub-division of VATUSA, a division of the
