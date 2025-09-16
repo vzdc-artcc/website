@@ -10,18 +10,18 @@ export default async function Page() {
 
     const session = await getServerSession(authOptions);
 
-    const isTaOrAta = session?.user?.staffPositions.includes('TA') || session?.user?.staffPositions.includes('ATA');
+    const isTaOrAtaOrWm = session?.user?.staffPositions.includes('TA') || session?.user?.staffPositions.includes('ATA') || session?.user?.staffPositions.includes('WM');
 
     return (
         <Card>
             <CardContent>
                 <Stack direction="row" justifyContent="space-between" spacing={1}>
                     <Typography variant="h5">Trainer Assignments</Typography>
-                    {isTaOrAta && <Link href="/training/assignments/new" passHref>
+                    {isTaOrAtaOrWm && <Link href="/training/assignments/new" passHref>
                         <Button variant="contained" startIcon={<Add/>}>Manual Training Assignment</Button>
                     </Link>}
                 </Stack>
-                <TrainingAssignmentTable manageMode={!!isTaOrAta} timezone={session?.user.timezone || ''}/>
+                <TrainingAssignmentTable manageMode={!!isTaOrAtaOrWm} timezone={session?.user.timezone || ''}/>
             </CardContent>
         </Card>
     );

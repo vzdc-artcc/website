@@ -33,7 +33,7 @@ export default async function Page(props: { params: Promise<{ id: string, }> }) 
 
     const session = await getServerSession(authOptions);
 
-    const isTaOrAta = session?.user.staffPositions.includes('TA') || session?.user.staffPositions.includes('ATA');
+    const isTaOrAtaOrWm = session?.user.staffPositions.includes('TA') || session?.user.staffPositions.includes('ATA') || session?.user.staffPositions.includes('WM');
 
     const allUsers = await prisma.user.findMany({
         where: {
@@ -49,7 +49,7 @@ export default async function Page(props: { params: Promise<{ id: string, }> }) 
                 <CardContent>
                     <Stack direction="row" justifyContent="space-between" spacing={1}>
                         <Typography variant="h5">Training Request - {request.student.fullName}</Typography>
-                        {isTaOrAta && <TrainerAssignmentRequestDeleteButton request={request} noTable/>}
+                        {isTaOrAtaOrWm && <TrainerAssignmentRequestDeleteButton request={request} noTable/>}
                     </Stack>
                     <Typography
                         variant="subtitle2">Student: {request.student.fullName} ({request.student.cid})</Typography>
@@ -73,7 +73,7 @@ export default async function Page(props: { params: Promise<{ id: string, }> }) 
                                                                    hasAlreadyExpressedInterest={request.interestedTrainers.map(it => it.id).includes(session.user.id)}/>
                 </CardActions>
             </Card>
-            {isTaOrAta && <Card>
+            {isTaOrAtaOrWm && <Card>
                 <CardContent>
                     <Typography variant="h6" sx={{mb: 2,}}>Training Assignment</Typography>
                     <TrainingAssignmentForm allUsers={allUsers as User[]} trainingRequest={request}
