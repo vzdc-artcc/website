@@ -118,7 +118,7 @@ export const sendDiscordEventPositionData = async (event: Event, positions: Even
 
     const publishedPositions = positions.filter((position) => position.published);
 
-    const res = await fetch(`${BOT_API_BASE_URL}/events/create_event_post`, {
+    const res = await fetch(`${BOT_API_BASE_URL}/create_event_post`, {
         method: 'POST',
         headers: {
             'X-API-Key': BOT_API_SECRET_KEY,
