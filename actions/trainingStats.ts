@@ -46,6 +46,7 @@ export async function getPerMonthData(): Promise<
     }));
 
     return perMonthData;
+
 }
 
 export async function getLessonDistributionData(): Promise<

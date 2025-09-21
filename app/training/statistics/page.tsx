@@ -1,23 +1,9 @@
-import { Card, CardContent, Typography } from '@mui/material';
-import TrainingSessionsPerMonthGraph from '@/components/TrainingStatistics/TrainingSessionsPerMonthGraph';
-import {getLessonDistributionData, getPerMonthData} from "@/actions/trainingStats";
-import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph"; // Corrected component import
+import {permanentRedirect, RedirectType} from "next/navigation";
 
 export default async function Page() {
-    const perMonthData = await getPerMonthData();
-    const lessonDistributionData = await getLessonDistributionData();
 
-    return (
-        <Card>
-            <CardContent>
-                <Typography variant="h5" sx={{ mb: 2 }}>
-                    Training Stats
-                </Typography>
-                <TrainingSessionsPerMonthGraph data={perMonthData} />
-            </CardContent>
-            <CardContent>
-                <LessonDistributionGraph data={lessonDistributionData} /> {/* Corrected component name */}
-            </CardContent>
-        </Card>
-    );
+    const year = new Date().getFullYear().toString();
+    const month = new Date().getMonth().toString();
+
+    permanentRedirect(`/training/statistics/${year}/${month}`, RedirectType.replace);
 }
