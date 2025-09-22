@@ -42,7 +42,7 @@ export const NAVIGATION: NavigationButton[] = [
         dropdown: {
             buttons: [
                 {
-                    label: 'Charts',
+                    label: 'Charts Database',
                     link: '/charts',
                     icon: <Description/>,
                 },
