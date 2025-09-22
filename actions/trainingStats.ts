@@ -81,69 +81,6 @@ export async function getAllTrainingHours() {
     return totalHours;
 }
 
-{/*
-export const getTop3TrainingStaff = async (month: number, year: number) => {
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 1);
-
-    const trainingSessions = await prisma.trainingSession.findMany({
-        where: {
-            start: {
-                gte: startDate,
-            },
-            end: {
-                lt: endDate,
-            },
-        },
-        include: {
-            instructor: {
-                select: {
-                    id: true,
-                    preferredName: true,
-                    firstName: true,
-                    lastName: true,
-                    cid: true,
-                },
-            },
-        },
-    });
-
-    const staffHours: {
-        [key: string]: {
-            user: {
-                id: string;
-                preferredName: string | null;
-                firstName: string | null;
-                lastName: string | null;
-                cid: string;
-            };
-            hours: number;
-        };
-    } = {};
-
-    trainingSessions.forEach((session) => {
-        const instructorId = session.instructor.id;
-        const duration =
-            (session.end.getTime() - session.start.getTime()) / (1000 * 60 * 60);
-
-        if (!staffHours[instructorId]) {
-            staffHours[instructorId] = {
-                user: session.instructor,
-                hours: 0,
-            };
-        }
-        staffHours[instructorId].hours += duration;
-    });
-
-    const sortedStaff = Object.values(staffHours).sort(
-        (a, b) => b.hours - a.hours,
-    );
-
-    return sortedStaff.slice(0, 3);
-};
-*/}
-
-
 export const getTopTrainingStaffByHours = async (limit: number, startDate: Date, endDate: Date) => {
     const trainingSessions = await prisma.trainingSession.findMany({
         where: {
