@@ -127,7 +127,7 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>Session Failed</Typography>
+                        <Typography>Sessions Failed</Typography>
                         <Typography variant="h4">{trainerFailedSessions}</Typography>
                     </CardContent>
                 </Card>
