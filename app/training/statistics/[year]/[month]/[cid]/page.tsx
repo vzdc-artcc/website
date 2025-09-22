@@ -1,19 +1,26 @@
 import React from 'react';
 import prisma from "@/lib/db";
 import {getMonth} from "@/lib/date";
-import {Card, CardContent, Grid2, Typography} from "@mui/material";
+import {Card, CardContent, Grid2, Typography, Chip} from "@mui/material";
 import {getRating} from "@/lib/vatsim";
-import StatisticsTable from "@/components/Statistics/StatisticsTable";
-import {getMonthLog, getTotalHours} from "@/lib/hours";
 import {notFound} from "next/navigation";
-import ControllingSessionsTable from "@/components/Statistics/ControllingSessionsTable";
+import {
+    getTrainerSessionsInMonth,
+    getTrainerPassedSessionsCountInMonth,
+    getTrainerFailedSessionsCountInMonth,
+    calculatePassRate, getMostRunLesson, endOfMonthUTC, startOfMonthUTC, getLessonDistributionData
+} from "@/actions/trainingStats";
+import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
 
-export default async function Page(props: { params: Promise<{ year: string, month: string, cid: string, }> }) {
+export default async function Page(props: { params: Promise<{ year: string, month: string, cid: string }> }) {
     const params = await props.params;
 
     const {year, month, cid} = params;
 
-    if (!Number(year) || Number(year) < 2000 || Number(year) > new Date().getFullYear() || Number(month) < 0 || Number(month) > 11) {
+    const numYear = parseInt(year);
+    const numMonth = parseInt(month);
+
+    if (isNaN(numYear) || numYear < 2000 || numYear > new Date().getFullYear() || isNaN(numMonth) || numMonth < 0 || numMonth > 11) {
         return (
             <Card>
                 <CardContent>
@@ -25,69 +32,50 @@ export default async function Page(props: { params: Promise<{ year: string, mont
         );
     }
 
-    const user = await prisma.user.findUnique({
-        where: {
-            cid: cid,
-            controllerStatus: {
-                not: 'NONE',
-            },
+    const trainer = await prisma.user.findUnique({
+        where: { cid: cid },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            preferredName: true,
+            cid: true,
+            rating: true,
         },
     });
 
-    if (!user) {
+    if (!trainer) {
         notFound();
     }
 
-    const logs = await prisma.controllerLogMonth.findMany({
-        where: {
-            year: parseInt(year),
-            month: !isNaN(parseInt(month)) ? parseInt(month) : undefined,
-            log: {
-                user: {
-                    cid,
-                },
-            },
-        },
-        include: {
-            log: {
-                include: {
-                    user: true
-                }
-            }
-        }
-    });
+    const sessions = await getTrainerSessionsInMonth(year, month, cid);
 
-    const positionsWorked = await prisma.controllerPosition.findMany({
-        where: {
-            log: {
-                user: {
-                    cid,
-                },
-            },
-            start: {
-                gte: new Date(parseInt(year), isNaN(parseInt(month)) ? 0 : parseInt(month), 1),
-                lt: new Date(parseInt(year), isNaN(parseInt(month)) ? 11 : parseInt(month) + 1, 1),
-            },
-        },
-        orderBy: {
-            start: 'desc',
-        },
-    });
+    const totalHours = sessions.reduce((sum, session) => {
+        const duration = (session.end.getTime() - session.start.getTime()) / (1000 * 60 * 60);
+        return sum + duration;
+    }, 0).toFixed(3);
 
-    const totalHours = getTotalHours(logs);
+    const trainerPassedSessions = await getTrainerPassedSessionsCountInMonth(numYear, numMonth, cid);
+    const trainerFailedSessions = await getTrainerFailedSessionsCountInMonth(numYear, numMonth, cid);
 
-    const monthLog = getMonthLog(logs);
+    const trainerMonthPassRate = calculatePassRate(trainerPassedSessions, trainerFailedSessions);
+
+    const trainerMonthStart = startOfMonthUTC(numYear, numMonth);
+    const trainerMonthEnd = endOfMonthUTC(numYear, numMonth);
+    const mostRunLessonTrainerMonthly = await getMostRunLesson(trainerMonthStart, trainerMonthEnd, trainer.id);
+
+    const lessonDistributionTrainerMonthly = await getLessonDistributionData(trainerMonthStart, trainerMonthEnd, trainer.id);
 
     return (
-        (<Grid2 container columns={30} spacing={2}>
+        <Grid2 container columns={30} spacing={2}>
             <Grid2 size={30}>
                 <Card>
                     <CardContent>
                         <Typography
-                            variant="h5">{user.preferredName || `${user.firstName} ${user.lastName}`}</Typography>
+                            variant="h5">{trainer.preferredName || `${trainer.firstName} ${trainer.lastName}`}</Typography>
                         <Typography
-                            variant="body2">{user.preferredName && `${user.firstName} ${user.lastName}`}</Typography>
-                        <Typography>{getRating(user.rating)} • {user.cid}</Typography>
+                            variant="body2">{trainer.preferredName && `${trainer.firstName} ${trainer.lastName}`}</Typography>
+                        <Typography>{getRating(trainer.rating)} • {trainer.cid}</Typography>
                         <Typography>{parseInt(month) >= 0 && `${getMonth(parseInt(month))}, `}{year} Statistics</Typography>
                     </CardContent>
                 </Card>
@@ -100,8 +88,8 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>Delivery Hours</Typography>
-                        <Typography variant="h6">{totalHours.deliveryHours.toPrecision(3)} hours</Typography>
+                        <Typography>Sessions</Typography>
+                        <Typography variant="h4">{sessions.length}</Typography>
                     </CardContent>
                 </Card>
             </Grid2>
@@ -113,8 +101,8 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>Ground Hours</Typography>
-                        <Typography variant="h6">{totalHours.groundHours.toPrecision(3)} hours</Typography>
+                        <Typography>Training Hours</Typography>
+                        <Typography variant="h4">{totalHours}</Typography>
                     </CardContent>
                 </Card>
             </Grid2>
@@ -126,8 +114,8 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>Tower Hours</Typography>
-                        <Typography variant="h6">{totalHours.towerHours.toPrecision(3)} hours</Typography>
+                        <Typography>Sessions Passed</Typography>
+                        <Typography variant="h4">{trainerPassedSessions}</Typography>
                     </CardContent>
                 </Card>
             </Grid2>
@@ -139,8 +127,8 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>TRACON Hours</Typography>
-                        <Typography variant="h6">{totalHours.approachHours.toPrecision(3)} hours</Typography>
+                        <Typography>Session Failed</Typography>
+                        <Typography variant="h4">{trainerFailedSessions}</Typography>
                     </CardContent>
                 </Card>
             </Grid2>
@@ -152,8 +140,13 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>Center Hours</Typography>
-                        <Typography variant="h6">{totalHours.centerHours.toPrecision(3)} hours</Typography>
+                        <Typography gutterBottom>Pass Rate</Typography>
+                        <Chip
+                            label={`${trainerMonthPassRate.percentage}%`}
+                            color={trainerMonthPassRate.color}
+                            variant="filled"
+                            size="medium"
+                        />
                     </CardContent>
                 </Card>
             </Grid2>
@@ -165,28 +158,31 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>Total Hours</Typography>
-                        <Typography
-                            variant="h6">{(totalHours.deliveryHours + totalHours.groundHours + totalHours.towerHours + totalHours.approachHours + totalHours.centerHours).toPrecision(3)} hours</Typography>
+                        <Typography gutterBottom>Most Run Session</Typography>
+                        {mostRunLessonTrainerMonthly.lessonIdentifier ? (
+                            <Chip
+                                label={`${mostRunLessonTrainerMonthly.lessonIdentifier} (${mostRunLessonTrainerMonthly.count} times)`}
+                                color="info"
+                                variant="filled"
+                                size="medium"
+                            />
+                        ) : (
+                            <Typography variant="body2">N/A</Typography>
+                        )}
                     </CardContent>
                 </Card>
             </Grid2>
             <Grid2 size={30}>
                 <Card>
                     <CardContent>
-                        <Typography variant="h6">Controlling Sessions</Typography>
-                        <ControllingSessionsTable positions={positionsWorked}/>
+                        {lessonDistributionTrainerMonthly.length > 0 ? (
+                            <LessonDistributionGraph data={lessonDistributionTrainerMonthly} />
+                        ) : (
+                            <Typography variant="body2" sx={{ mt: 2 }}>No lesson data available for this instructor in this month.</Typography>
+                        )}
                     </CardContent>
                 </Card>
             </Grid2>
-            {isNaN(parseInt(month)) && <Grid2 size={30}>
-                <Card>
-                    <CardContent>
-                        <Typography variant="h6">Monthly Totals</Typography>
-                        <StatisticsTable heading="Month" logs={monthLog.filter((log) => !!log)}/>
-                    </CardContent>
-                </Card>
-            </Grid2>}
-        </Grid2>)
-    );
+        </Grid2>
+    )
 }

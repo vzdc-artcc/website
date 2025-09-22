@@ -4,6 +4,7 @@ import {Metadata} from "next";
 import prisma from "@/lib/db";
 import {User} from "next-auth";
 import TrainingStatsTimeSelector from "@/components/TrainingStatistics/TrainingStatsTimeSelector";
+import {getAllTrainingHours} from "@/actions/trainingStats";
 
 export const metadata: Metadata = {
     title: 'Training Statistics | vZDC',
@@ -29,24 +30,7 @@ export default async function Layout({children}: { children: React.ReactNode }) 
         },
     });
 
-    const now = new Date();
-
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const sessions = await prisma.trainingSession.findMany({
-        where: {
-            start: {
-                gte: startOfMonth,
-                lte: endOfMonth
-            }
-        }
-    });
-
-    const totalHours = sessions.reduce((sum, session) => {
-        const duration = (session.end.getTime() - session.start.getTime()) / (1000 * 60 * 60); // convert milliseconds to hours
-        return sum + duration;
-    }, 0).toFixed(3);
+    const totalHours = await getAllTrainingHours()
 
     return (
         (<Container maxWidth="lg">
@@ -69,7 +53,7 @@ export default async function Layout({children}: { children: React.ReactNode }) 
                         <Card>
                             <CardContent>
                                 <Typography>All-Time Hours</Typography>
-                                <Typography variant="h6">{totalHours} hours</Typography>
+                                <Typography variant="h6">{totalHours.toFixed(2)} hours</Typography>
                             </CardContent>
                         </Card>
                     </Grid2>

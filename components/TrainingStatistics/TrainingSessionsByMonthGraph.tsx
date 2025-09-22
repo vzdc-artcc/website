@@ -13,10 +13,10 @@ interface ChartProps {
     data: TrainingSessionChartData[];
 }
 
-const TrainingSessionsPerMonthGraph = ({ data }: ChartProps) => {
+const TrainingSessionsByMonthGraph = ({ data }: ChartProps) => {
     const { colorScheme } = useColorScheme();
     const [chartOptions, setChartOptions] = useState<AgCartesianChartOptions>({
-        data: data, // Initialize with passed data
+        data: data,
         series: [{ type: 'bar', xKey: 'month', yKey: 'sessions' }],
         theme: colorScheme === 'dark' ? 'ag-polychroma-dark' : 'ag-polychroma',
         title: {
@@ -40,8 +40,6 @@ const TrainingSessionsPerMonthGraph = ({ data }: ChartProps) => {
         ],
     });
 
-    // Update chart options when data prop changes (though for this scenario, it's a one-time load)
-    // or when the color scheme changes
     useEffect(() => {
         setChartOptions((prevOptions) => ({
             ...prevOptions,
@@ -53,4 +51,4 @@ const TrainingSessionsPerMonthGraph = ({ data }: ChartProps) => {
     return <AgCharts options={chartOptions} />;
 };
 
-export default TrainingSessionsPerMonthGraph;
+export default TrainingSessionsByMonthGraph;

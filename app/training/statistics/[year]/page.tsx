@@ -1,18 +1,28 @@
 import React from 'react';
-import prisma from "@/lib/db";
-import {Box, Card, CardContent, Grid2, IconButton, Stack, Tooltip, Typography} from "@mui/material";
+import {Box, Card, CardContent, Chip, Grid2, IconButton, Stack, Tooltip, Typography} from "@mui/material";
+import {
+    getAllSessionsInYear,
+    getPassedSessionsCountInYear,
+    getFailedSessionsCountInYear,
+    getTopTrainingStaffByHours,
+    endOfYearUTC,
+    startOfYearUTC, calculatePassRate, getMostRunLesson, getMonthlySessionCountsForYear, getLessonDistributionData,
+
+} from "@/actions/trainingStats";
 import Link from "next/link";
 import {StackedLineChart} from "@mui/icons-material";
-import {getRating} from "@/lib/vatsim";
-import StatisticsTable from "@/components/Statistics/StatisticsTable";
-import {getControllerLog, getMonthLog, getTop3Controllers} from "@/lib/hours";
+import TrainingSessionsByMonthGraph from "@/components/TrainingStatistics/TrainingSessionsByMonthGraph";
+import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
+
 
 export default async function Page(props: { params: Promise<{ year: string }> }) {
     const params = await props.params;
 
     const {year} = params;
 
-    if (!Number(year) || Number(year) < 2000 || Number(year) > new Date().getFullYear()) {
+    const numYear = parseInt(year);
+
+    if (isNaN(numYear) || numYear < 2000 || numYear > new Date().getFullYear()) {
         return (
             <Card>
                 <CardContent>
@@ -23,49 +33,32 @@ export default async function Page(props: { params: Promise<{ year: string }> })
         );
     }
 
-    const logs = await prisma.controllerLogMonth.findMany({
-        where: {
-            year: parseInt(year),
-        },
-        include: {
-            log: {
-                include: {
-                    user: true
-                }
-            }
-        }
-    });
+    const sessionsInYear = await getAllSessionsInYear(numYear);
+    const totalHoursInYear = sessionsInYear.reduce((sum, session) => {
+        const duration = (session.end.getTime() - session.start.getTime()) / (1000 * 60 * 60);
+        return sum + duration;
+    }, 0).toFixed(3);
+    const passedSessionsInYear = await getPassedSessionsCountInYear(numYear);
+    const failedSessionsInYear = await getFailedSessionsCountInYear(numYear);
 
-    const totalHours = logs.reduce((acc, log) => {
+    const yearPassRate = calculatePassRate(passedSessionsInYear, failedSessionsInYear);
 
-        acc.deliveryHours += log.deliveryHours;
-        acc.groundHours += log.groundHours;
-        acc.towerHours += log.towerHours;
-        acc.approachHours += log.approachHours;
-        acc.centerHours += log.centerHours;
+    const yearStart = startOfYearUTC(numYear);
+    const yearEnd = endOfYearUTC(numYear);
+    const top3TrainersYearly = await getTopTrainingStaffByHours(3, yearStart, yearEnd);
 
-        return acc;
-    }, {
-        deliveryHours: 0,
-        groundHours: 0,
-        towerHours: 0,
-        approachHours: 0,
-        centerHours: 0
+    const mostRunLessonYearly = await getMostRunLesson(yearStart, yearEnd);
 
-    });
+    const monthlyGraphData = await getMonthlySessionCountsForYear(numYear);
 
-    const monthLog = getMonthLog(logs);
-
-    const top3Controllers = getTop3Controllers(logs);
-
-    const controllerLog = getControllerLog(logs);
+    const lessonDistributionYearly = await getLessonDistributionData(yearStart, yearEnd);
 
     return (
-        (<Grid2 container columns={30} spacing={2}>
+        <Grid2 container columns={30} spacing={2}>
             <Grid2 size={30}>
                 <Card>
                     <CardContent>
-                        <Typography variant="h4">{year} Statistics</Typography>
+                        <Typography variant="h4">Training Statistics</Typography>
                     </CardContent>
                 </Card>
             </Grid2>
@@ -77,8 +70,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>Delivery Hours</Typography>
-                        <Typography variant="h6">{totalHours.deliveryHours.toPrecision(3)} hours</Typography>
+                        <Typography>Sessions</Typography>
+                        <Typography variant="h4">{sessionsInYear.length}</Typography>
                     </CardContent>
                 </Card>
             </Grid2>
@@ -90,8 +83,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>Ground Hours</Typography>
-                        <Typography variant="h6">{totalHours.groundHours.toPrecision(3)} hours</Typography>
+                        <Typography>Training Hours</Typography>
+                        <Typography variant="h4">{totalHoursInYear}</Typography>
                     </CardContent>
                 </Card>
             </Grid2>
@@ -103,8 +96,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>Tower Hours</Typography>
-                        <Typography variant="h6">{totalHours.towerHours.toPrecision(3)} hours</Typography>
+                        <Typography>Sessions Passed</Typography>
+                        <Typography variant="h4">{passedSessionsInYear}</Typography>
                     </CardContent>
                 </Card>
             </Grid2>
@@ -116,8 +109,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>TRACON Hours</Typography>
-                        <Typography variant="h6">{totalHours.approachHours.toPrecision(3)} hours</Typography>
+                        <Typography>Sessions Failed</Typography>
+                        <Typography variant="h4">{failedSessionsInYear}</Typography>
                     </CardContent>
                 </Card>
             </Grid2>
@@ -129,8 +122,13 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>Center Hours</Typography>
-                        <Typography variant="h6">{totalHours.centerHours.toPrecision(3)} hours</Typography>
+                        <Typography gutterBottom>Pass Rate</Typography>
+                        <Chip
+                            label={`${yearPassRate.percentage}%`}
+                            color={yearPassRate.color}
+                            variant="filled"
+                            size="medium"
+                        />
                     </CardContent>
                 </Card>
             </Grid2>
@@ -142,39 +140,44 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography>Total Hours</Typography>
-                        <Typography
-                            variant="h6">{(totalHours.deliveryHours + totalHours.groundHours + totalHours.towerHours + totalHours.approachHours + totalHours.centerHours).toPrecision(3)} hours</Typography>
+                        <Typography gutterBottom>Most Run Session</Typography>
+                        {mostRunLessonYearly.lessonIdentifier ? (
+                            <Chip
+                                label={`${mostRunLessonYearly.lessonIdentifier} (${mostRunLessonYearly.count} times)`}
+                                color="info"
+                                variant="filled"
+                                size="medium"
+                            />
+                        ) : (
+                            <Typography variant="body2">N/A</Typography>
+                        )}
                     </CardContent>
                 </Card>
             </Grid2>
-            {top3Controllers.map((controller, idx) => (
+            {top3TrainersYearly.map((trainer, idx) => (
                 <Grid2
-                    key={controller.user.cid}
+                    key={trainer.user.id}
                     size={{
                         xs: 30,
                         md: 10
                     }}>
                     <Card>
                         <CardContent>
-                            <Box sx={{mb: 2,}}>
+                            <Box sx={{ mb: 2 }}>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <Typography
-                                        variant="h5">{idx + 1} - {controller.user.preferredName || `${controller.user.firstName} ${controller.user.lastName}`}</Typography>
-                                    <Tooltip title="View Statistics for this controller">
-                                        <Link href={`/controllers/statistics/${year}/-/${controller.user.cid}`}>
+                                        variant="h5">{idx + 1} - {trainer.user.preferredName || `${trainer.user.firstName} ${trainer.user.lastName}`}</Typography>
+                                    <Tooltip title="View Training Statistics for this instructor">
+                                        <Link href={`/training/staff/${trainer.user.cid}`}>
                                             <IconButton size="large">
-                                                <StackedLineChart fontSize="large"/>
+                                                <StackedLineChart fontSize="large" />
                                             </IconButton>
                                         </Link>
                                     </Tooltip>
                                 </Stack>
-                                <Typography
-                                    variant="subtitle2">{controller.user.preferredName && `${controller.user.firstName} ${controller.user.lastName}`}</Typography>
-                                <Typography
-                                    variant="body1">{getRating(controller.user.rating)} • {controller.user.cid}</Typography>
+                                <Typography variant="body1">{trainer.user.cid}</Typography>
                             </Box>
-                            <Typography variant="h6">{controller.hours.toPrecision(3)} hours</Typography>
+                            <Typography variant="h6">{trainer.hours.toPrecision(3)} hours</Typography>
                         </CardContent>
                     </Card>
                 </Grid2>
@@ -182,19 +185,21 @@ export default async function Page(props: { params: Promise<{ year: string }> })
             <Grid2 size={30}>
                 <Card>
                     <CardContent>
-                        <Typography variant="h6">Monthly Totals</Typography>
-                        <StatisticsTable heading="Month" logs={monthLog.filter((log) => !!log)}/>
+                        <TrainingSessionsByMonthGraph data={monthlyGraphData} />
                     </CardContent>
                 </Card>
             </Grid2>
             <Grid2 size={30}>
                 <Card>
                     <CardContent>
-                        <Typography variant="h6">Controller Totals</Typography>
-                        <StatisticsTable heading="Controller" logs={controllerLog.filter((log) => !!log)}/>
+                        {lessonDistributionYearly.length > 0 ? (
+                            <LessonDistributionGraph data={lessonDistributionYearly} />
+                        ) : (
+                            <Typography variant="body2" sx={{ mt: 2 }}>No lesson data available for this year.</Typography>
+                        )}
                     </CardContent>
                 </Card>
             </Grid2>
-        </Grid2>)
-    );
+        </Grid2>
+    )
 }
