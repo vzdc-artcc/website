@@ -62,7 +62,7 @@ export default async function Page(props: { params: Promise<{ year: string, mont
             <Card>
                 <CardContent>
                     <Typography variant="h4">Invalid Month</Typography>
-                    <Typography sx={{mt: 1,}}>Month must be within 0-11 range or '-' for all months.</Typography>
+                    <Typography sx={{mt: 1,}}>Month must be within 0-11 range or &apos-&apos for all months.</Typography>
                 </CardContent>
             </Card>
         );
