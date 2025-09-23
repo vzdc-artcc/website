@@ -376,7 +376,6 @@ export async function getTrainerMonthlySessionCountsForYear(year: number, instru
             },
         });
 
-        // Use getMonth helper or directly format as string, adjust as needed
         const monthName = new Date(year, i).toLocaleString('default', { month: 'short' }); // e.g., 'Jan', 'Feb'
         data.push({
             month: monthName,
