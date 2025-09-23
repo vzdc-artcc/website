@@ -458,7 +458,7 @@ export async function getTrainerSessionsInYear(year: number, instructorId: strin
             instructorId: instructorId,
             start: {
                 gte: start,
-                lte: end
+                lt: end
             }
         },
         include: {
