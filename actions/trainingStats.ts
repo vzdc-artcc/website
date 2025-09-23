@@ -460,7 +460,7 @@ export async function getTrainerSessionsInYear(year: number, instructorId: strin
             instructorId: instructorId, // Filter by trainer's ID
             start: {
                 gte: start,
-                lte: end
+                lt: end
             }
         },
         include: {
