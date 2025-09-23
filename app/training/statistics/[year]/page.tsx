@@ -1,16 +1,18 @@
 import React from 'react';
-import {Box, Card, CardContent, Chip, Grid2, IconButton, Stack, Tooltip, Typography} from "@mui/material";
+import {Box, Card, CardContent, Chip, Grid2, Typography} from "@mui/material";
 import {
     getAllSessionsInYear,
     getPassedSessionsCountInYear,
     getFailedSessionsCountInYear,
     getTopTrainingStaffByHours,
     endOfYearUTC,
-    startOfYearUTC, calculatePassRate, getMostRunLesson, getMonthlySessionCountsForYear, getLessonDistributionData,
+    startOfYearUTC,
+    calculatePassRate,
+    getMostRunLesson,
+    getMonthlySessionCountsForYear,
+    getLessonDistributionData,
 
 } from "@/actions/trainingStats";
-import Link from "next/link";
-import {StackedLineChart} from "@mui/icons-material";
 import TrainingSessionsByMonthGraph from "@/components/TrainingStatistics/TrainingSessionsByMonthGraph";
 import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
 
@@ -164,17 +166,9 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                     <Card>
                         <CardContent>
                             <Box sx={{ mb: 2 }}>
-                                <Stack direction="row" spacing={1} alignItems="center">
                                     <Typography
-                                        variant="h5">{idx + 1} - {trainer.user.preferredName || `${trainer.user.firstName} ${trainer.user.lastName}`}</Typography>
-                                    <Tooltip title="View Training Statistics for this instructor">
-                                        <Link href={`/training/staff/${trainer.user.cid}`}>
-                                            <IconButton size="large">
-                                                <StackedLineChart fontSize="large" />
-                                            </IconButton>
-                                        </Link>
-                                    </Tooltip>
-                                </Stack>
+                                        variant="h5">{idx + 1} - {trainer.user.preferredName || `${trainer.user.firstName} ${trainer.user.lastName}`}
+                                    </Typography>
                                 <Typography variant="body1">{trainer.user.cid}</Typography>
                             </Box>
                             <Typography variant="h6">{trainer.hours.toPrecision(3)} hours</Typography>

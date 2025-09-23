@@ -1,4 +1,4 @@
-import {Box, Card, CardContent, Grid2, IconButton, Stack, Tooltip, Typography, Chip} from "@mui/material";
+import {Box, Card, CardContent, Grid2, Typography, Chip} from "@mui/material";
 import {getMonth} from "@/lib/date";
 import React from "react";
 import {
@@ -10,8 +10,6 @@ import {
     endOfMonthUTC,
     calculatePassRate, getMostRunLesson, getLessonDistributionData
 } from "@/actions/trainingStats";
-import Link from "next/link";
-import {StackedLineChart} from "@mui/icons-material";
 import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
 
 
@@ -166,17 +164,9 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                     <Card>
                         <CardContent>
                             <Box sx={{ mb: 2 }}>
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                    <Typography
-                                        variant="h5">{idx + 1} - {trainer.user.preferredName || `${trainer.user.firstName} ${trainer.user.lastName}`}</Typography>
-                                    <Tooltip title="View Training Statistics for this instructor">
-                                        <Link href={`/training/staff/${trainer.user.cid}`}>
-                                            <IconButton size="large">
-                                                <StackedLineChart fontSize="large" />
-                                            </IconButton>
-                                        </Link>
-                                    </Tooltip>
-                                </Stack>
+                                <Typography
+                                    variant="h5">{idx + 1} - {trainer.user.preferredName || `${trainer.user.firstName} ${trainer.user.lastName}`}
+                                </Typography>
                                 <Typography variant="body1">{trainer.user.cid}</Typography>
                             </Box>
                             <Typography variant="h6">{trainer.hours.toPrecision(3)} hours</Typography>
