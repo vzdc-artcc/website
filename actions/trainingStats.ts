@@ -362,7 +362,7 @@ export async function getMostRunLesson(
     return { lessonIdentifier: mostRunLessonIdentifier, count: maxCount };
 }
 
-export async function getTrainerMonthlySessionCountsForYear(year: number, instructorId: string): Promise<{ month: string; sessions: number }[]> {
+export async function getMonthlySessionCountsForYear(year: number): Promise<{ month: string; sessions: number }[]> {
     const data = [];
     for (let i = 0; i < 12; i++) {
         const start = startOfMonthUTC(year, i);
@@ -370,13 +370,12 @@ export async function getTrainerMonthlySessionCountsForYear(year: number, instru
 
         const sessionCount = await prisma.trainingSession.count({
             where: {
-                instructorId: instructorId,
                 start: { gte: start },
                 end: { lt: end },
             },
         });
 
-        const monthName = new Date(year, i).toLocaleString('default', { month: 'short' }); // e.g., 'Jan', 'Feb'
+        const monthName = new Date(year, i).toLocaleString('default', { month: 'short' });
         data.push({
             month: monthName,
             sessions: sessionCount,
@@ -456,7 +455,7 @@ export async function getTrainerSessionsInYear(year: number, instructorId: strin
 
     const sessions = await prisma.trainingSession.findMany({
         where: {
-            instructorId: instructorId, // Filter by trainer's ID
+            instructorId: instructorId,
             start: {
                 gte: start,
                 lt: end
@@ -477,7 +476,7 @@ export async function getTrainerPassedSessionsCountInYear(year: number, instruct
 
     return prisma.trainingSession.count({
         where: {
-            instructorId: instructorId, // Filter by trainer's ID
+            instructorId: instructorId,
             start: { gte: start },
             end: { lt: end },
             tickets: { every: { passed: true } },
@@ -491,10 +490,33 @@ export async function getTrainerFailedSessionsCountInYear(year: number, instruct
 
     return prisma.trainingSession.count({
         where: {
-            instructorId: instructorId, // Filter by trainer's ID
+            instructorId: instructorId,
             start: { gte: start },
             end: { lt: end },
             tickets: { some: { passed: false } },
         },
     });
+}
+
+export async function getTrainerMonthlySessionCountsForYear(year: number, instructorId: string): Promise<{ month: string; sessions: number }[]> {
+    const data = [];
+    for (let i = 0; i < 12; i++) {
+        const start = startOfMonthUTC(year, i);
+        const end = endOfMonthUTC(year, i);
+
+        const sessionCount = await prisma.trainingSession.count({
+            where: {
+                instructorId: instructorId,
+                start: { gte: start },
+                end: { lt: end },
+            },
+        });
+
+        const monthName = new Date(year, i).toLocaleString('default', { month: 'short' });
+        data.push({
+            month: monthName,
+            sessions: sessionCount,
+        });
+    }
+    return data;
 }
