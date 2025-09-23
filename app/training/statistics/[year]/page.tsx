@@ -9,8 +9,8 @@ import {
     startOfYearUTC,
     calculatePassRate,
     getMostRunLesson,
-    getLessonDistributionData, getMonthlySessionCountsForYear,
-
+    getLessonDistributionData,
+    getMonthlySessionCountsForYear,
 } from "@/actions/trainingStats";
 import TrainingSessionsByMonthGraph from "@/components/TrainingStatistics/TrainingSessionsByMonthGraph";
 import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
