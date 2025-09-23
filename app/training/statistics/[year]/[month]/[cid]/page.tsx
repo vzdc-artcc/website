@@ -8,8 +8,15 @@ import {
     getTrainerSessionsInMonth,
     getTrainerPassedSessionsCountInMonth,
     getTrainerFailedSessionsCountInMonth,
-    calculatePassRate, getMostRunLesson, endOfMonthUTC, startOfMonthUTC, getLessonDistributionData, startOfYearUTC,
-    endOfYearUTC, getTrainerSessionsInYear, getTrainerPassedSessionsCountInYear, getTrainerFailedSessionsCountInYear,
+    calculatePassRate, getMostRunLesson,
+    endOfMonthUTC,
+    startOfMonthUTC,
+    getLessonDistributionData,
+    startOfYearUTC,
+    endOfYearUTC,
+    getTrainerSessionsInYear,
+    getTrainerPassedSessionsCountInYear,
+    getTrainerFailedSessionsCountInYear,
     getTrainerMonthlySessionCountsForYear
 } from "@/actions/trainingStats";
 import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
