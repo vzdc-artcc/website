@@ -58,7 +58,7 @@ export default async function Page() {
                             <TableRow>
                                 <TableCell>Name</TableCell>
                                 <TableCell>Controllers Certified</TableCell>
-                                <TableCell>Active Solo Certifications</TableCell>
+                                <TableCell>Active Solo Endorsements</TableCell>
                                 <TableCell>Actions</TableCell>
                             </TableRow>
                         </TableHead>

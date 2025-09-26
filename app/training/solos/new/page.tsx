@@ -15,7 +15,7 @@ export default async function Page() {
     });
     const session = await getServerSession(authOptions);
 
-    if (!session || !session?.user.roles.includes("INSTRUCTOR")) {
+    if (!session || (!session.user.roles.includes("INSTRUCTOR") && !session.user.staffPositions.includes("WM"))) {
         return (
             <Card>
                 <CardContent>
@@ -32,14 +32,14 @@ export default async function Page() {
     });
 
     if (certificationTypes.length === 0) {
-        return <ErrorCard heading="Unable to grant solo certification"
-                          message="There are no certification types that are allowed to be solo certified.  Create or modify the certification types to continue."/>
+        return <ErrorCard heading="Unable to grant solo endorsement"
+                          message="There are no certification types that are allowed to be solo endorsed.  Create or modify the certification types to continue."/>
     }
 
     return (
         <Card>
             <CardContent>
-                <Typography variant="h5" sx={{mb: 2,}}>New Solo Certification</Typography>
+                <Typography variant="h5" sx={{mb: 2,}}>New Solo Endorsement</Typography>
                 <SoloForm controllers={controllers as User[]} certificationTypes={certificationTypes}/>
             </CardContent>
         </Card>

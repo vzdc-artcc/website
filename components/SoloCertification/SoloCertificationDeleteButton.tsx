@@ -22,10 +22,10 @@ export default function SoloCertificationDeleteButton({soloCertification,}: { so
     }
 
     return (
-        <Tooltip title="Delete Solo Certification">
+        <Tooltip title="Delete Solo Endorsement">
             <GridActionsCellItem
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
-                label="Delete Solo Certification"
+                label="Delete Solo Endorsement"
                 onClick={handleClick}
             />
         </Tooltip>

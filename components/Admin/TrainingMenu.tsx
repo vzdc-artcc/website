@@ -134,7 +134,7 @@ export default async function TrainingMenu() {
                             <WorkspacePremium/>
                         </Badge>
                     </ListItemIcon>
-                    <ListItemText primary="Solo Certifications"/>
+                    <ListItemText primary="Solo Endorsements"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/lessons" style={{textDecoration: 'none', color: 'inherit',}}>

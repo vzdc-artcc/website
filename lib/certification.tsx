@@ -26,7 +26,7 @@ export const getIconForCertificationOption = (certificationOption: Certification
             return <Tooltip title="Center Certified"><Check fontSize="large" color="success"/></Tooltip>;
         case "SOLO":
             return <Tooltip
-                title={soloCertification ? `${soloCertification?.position} - ${getDaysLeft(soloCertification?.expires || new Date())}` : 'Solo Certified'}><Timer
+                title={soloCertification ? `${soloCertification?.position} - ${getDaysLeft(soloCertification?.expires || new Date())}` : 'Solo Endorsed'}><Timer
                 fontSize="large" color="info"/></Tooltip>;
         default:
             return <Clear fontSize="large" color="error"/>;

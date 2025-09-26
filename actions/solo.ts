@@ -69,7 +69,7 @@ export const addSolo = async (formData: FormData) => {
 
     await sendSoloAddedEmail(data.controller as User, data);
 
-    await log('CREATE', 'SOLO_CERTIFICATION', `Created solo certification ${data.position} for ${data.controller.firstName} ${data.controller.lastName}`);
+    await log('CREATE', 'SOLO_CERTIFICATION', `Created solo endorsement ${data.position} for ${data.controller.firstName} ${data.controller.lastName}`);
 
     await addVatusaSolo(data.controller.cid, data.position, data.expires);
 
@@ -90,7 +90,7 @@ export const deleteSolo = async (id: string) => {
 
     await sendSoloDeletedEmail(ss.controller as User, ss);
 
-    await log('DELETE', 'SOLO_CERTIFICATION', `Deleted solo certification ${ss.position} for ${ss.controller.firstName} ${ss.controller.lastName}`);
+    await log('DELETE', 'SOLO_CERTIFICATION', `Deleted solo endorsement ${ss.position} for ${ss.controller.firstName} ${ss.controller.lastName}`);
 
     await deleteVatusaSolo(ss.controller.cid, ss.position);
 
@@ -131,7 +131,7 @@ export const deleteExpiredSolos = async () => {
 
         await sendSoloExpiredEmail(solo.controller as User, solo);
 
-        await log('DELETE', 'SOLO_CERTIFICATION', `Deleted expired solo certification ${solo.position} for ${solo.controller.firstName} ${solo.controller.lastName}`);
+        await log('DELETE', 'SOLO_CERTIFICATION', `Deleted expired solo endorsement ${solo.position} for ${solo.controller.firstName} ${solo.controller.lastName}`);
 
         await deleteVatusaSolo(solo.controller.cid, solo.position);
     }

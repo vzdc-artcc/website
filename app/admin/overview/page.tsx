@@ -143,7 +143,7 @@ export default async function Page() {
                 }}>
                 <Card>
                     <CardContent>
-                        <Typography sx={{mb: 1,}}>Solo Certification Sync</Typography>
+                        <Typography sx={{mb: 1,}}>Solo Endorsement Sync</Typography>
                         <Chip label={syncTimes?.soloCert ? `${getMinutesAgo(syncTimes?.soloCert)}m ago` : 'NEVER'}
                               color={getChipColor(syncTimes?.soloCert)}/>
                     </CardContent>

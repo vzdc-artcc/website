@@ -176,7 +176,7 @@ export default async function Home() {
                 }}>
                 <Card sx={{height: 600, overflowY: 'auto',}}>
                     <CardContent>
-                        <Typography {...headingFont.style} variant="h5" sx={{mb: 1,}}>Solo Certifications</Typography>
+                        <Typography {...headingFont.style} variant="h5" sx={{mb: 1,}}>Solo Endorsements</Typography>
                         <Stack direction="column" spacing={1}>
                             {soloCertifications.length > 0 ? soloCertifications.map(solo => (
                                 <Card elevation={0} key={solo.id}>
@@ -190,7 +190,7 @@ export default async function Home() {
                                         </Link>
                                     </CardContent>
                                 </Card>
-                            )) : <Typography>No active solo certifications</Typography>}
+                            )) : <Typography>No active solo endorsements</Typography>}
                         </Stack>
                     </CardContent>
                 </Card>

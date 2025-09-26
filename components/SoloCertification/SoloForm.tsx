@@ -27,7 +27,7 @@ export default function SoloForm({controllers, certificationTypes,}: {
             toast(error.errors.map((e) => e.message).join(".  "), {type: 'error'})
         }
 
-        toast('Solo certification added', {type: 'success'});
+        toast('Solo endorsement added', {type: 'success'});
         router.push('/training/solos');
     };
 

@@ -15,7 +15,7 @@ export default function CertificationTypeDeleteButton({certificationType}: { cer
             await deleteCertificationType(certificationType.id);
             toast(`Certification type '${certificationType.name}' deleted successfully!`, {type: 'success'});
         } else {
-            toast(`Deleting '${certificationType.name}' will remove this certification from ALL controllers and remove all solo certifications.  Click again to confirm.`, {type: 'warning'});
+            toast(`Deleting '${certificationType.name}' will remove this certification from ALL controllers and remove all solo endorsements.  Click again to confirm.`, {type: 'warning'});
             setClicked(true);
         }
 
