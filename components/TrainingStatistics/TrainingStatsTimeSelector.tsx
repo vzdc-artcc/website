@@ -138,7 +138,7 @@ export default function TrainingStatsTimeSelector({trainingStaff}: { trainingSta
                             onChange={(event, newValue) => {
                                 setController(newValue ? newValue.cid : '');
                             }}
-                            renderInput={(params) => <TextField {...params} label="Controller"/>}
+                            renderInput={(params) => <TextField {...params} label="Trainer"/>}
                         />
                         <Box>
                             <Button type="submit" variant="contained" size="large">Search</Button>
