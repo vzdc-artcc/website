@@ -15,7 +15,8 @@ import {
     Radar,
     Radio,
     Route,
-    Workspaces
+    Workspaces,
+    TurnSharpRight,
 } from "@mui/icons-material";
 
 export type NavigationButton = {
@@ -88,6 +89,11 @@ export const NAVIGATION: NavigationButton[] = [
                     label: 'Preferred Routes Database',
                     link: '/prd',
                     icon: <Route/>,
+                },
+                {
+                    label: 'Flight Plan Practice',
+                    link: '/routepractice',
+                    icon: <TurnSharpRight/>,
                 }
             ],
         },
