@@ -11,7 +11,7 @@ import {
   FormControlLabel,
   Checkbox,
   Button,
-  useTheme
+  useTheme,
 } from "@mui/material";
 import { toast } from "react-toastify";
 import generateRandomFlightPlan from "@/components/RoutePractice/RandomFlightPlan";
@@ -22,9 +22,9 @@ export default function RoutePracticeForm({
   initialPlan: any;
 }) {
   const [flightPlan, setFlightPlan] = React.useState<any>(initialPlan);
+  const [repeatedError, setRepeatedError] = React.useState<number>(0);
 
   const theme = useTheme();
-  
 
   React.useEffect(() => {
     setFlightPlan(generateRandomFlightPlan());
@@ -39,6 +39,22 @@ export default function RoutePracticeForm({
   const [correct, setCorrect] = React.useState(0);
   const [incorrect, setIncorrect] = React.useState(0);
 
+  React.useEffect(() => {
+    if (repeatedError > 2) {
+      const infoMessage = [
+        flightPlan.iafdof && "Altitude",
+        flightPlan.wrongRoute && "Route",
+        flightPlan.missingTransition && "SID",
+        flightPlan.wrongEq && "Equipment Suffix",
+      ]
+        .filter(Boolean)
+        .join(" / ");
+  
+      const finalMessage = infoMessage ? "Double check: " + infoMessage : "";
+      toast.info(finalMessage, { autoClose: 2000, pauseOnFocusLoss: false });
+    }
+  }, [repeatedError, flightPlan]);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCheckboxes({
       ...checkboxes,
@@ -52,14 +68,17 @@ export default function RoutePracticeForm({
         autoClose: 2000,
         pauseOnFocusLoss: false,
       });
-      setIncorrect(incorrect + 1);
+      setIncorrect(prev => prev + 1);
+
+      setRepeatedError(prev => prev + 1);
     } else {
       setFlightPlan(generateRandomFlightPlan());
       toast.success("The flight plan was correct!", {
         autoClose: 2000,
         pauseOnFocusLoss: false,
       });
-      setCorrect(correct + 1);
+      setCorrect(prev => prev + 1);
+      setRepeatedError(0);
     }
   };
 
@@ -74,19 +93,23 @@ export default function RoutePracticeForm({
       setCheckboxes({ alt: false, eq: false, rte: false });
       toast.success("You caught all the errors!", {
         autoClose: 2000,
+        pauseOnFocusLoss: false,
       });
-      setCorrect(correct + 1);
+      setCorrect(prev => prev + 1);
+      setRepeatedError(0);
     } else {
-      toast.error("Sorry, this flight plan is incorrect", {
+      toast.error("Sorry, that's not the correct error(s)", {
         autoClose: 2000,
         pauseOnFocusLoss: false,
       });
-      setIncorrect(incorrect + 1);
+      setIncorrect(prev => prev + 1);
+
+      setRepeatedError(prev => prev + 1);
     }
   };
 
   const backgroundColor = theme.palette.mode === "dark" ? "black" : "none";
-  const textColor = theme.palette.mode === "dark" ? "skyblue" : "black"
+  const textColor = theme.palette.mode === "dark" ? "skyblue" : "black";
 
   return (
     <Box>
@@ -94,7 +117,11 @@ export default function RoutePracticeForm({
         container
         spacing={2}
         columns={8}
-        style={{ paddingBottom: 20, background: backgroundColor, paddingTop: 20 }}
+        style={{
+          paddingBottom: 20,
+          background: backgroundColor,
+          paddingTop: 20,
+        }}
       >
         <Grid2 size={1}>
           <Typography align="center">AID</Typography>
@@ -275,10 +302,19 @@ export default function RoutePracticeForm({
         </FormControl>
 
         <Box display="flex" gap={2} mt={2}>
-          <Button variant="contained" color="success" onClick={handleNoErrors} disabled={checkboxes.alt || checkboxes.eq || checkboxes.rte}>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={handleNoErrors}
+            disabled={checkboxes.alt || checkboxes.eq || checkboxes.rte}
+          >
             No Errors
           </Button>
-          <Button variant="contained" onClick={handleSubmit} disabled={!checkboxes.alt && !checkboxes.eq && !checkboxes.rte}>
+          <Button
+            variant="contained"
+            onClick={handleSubmit}
+            disabled={!checkboxes.alt && !checkboxes.eq && !checkboxes.rte}
+          >
             Submit
           </Button>
         </Box>
