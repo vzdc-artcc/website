@@ -85,12 +85,6 @@ export default function RoutePracticeForm({
     }
   };
 
-  const hasAnyError =
-    flightPlan.iafdof ||
-    flightPlan.wrongEq ||
-    flightPlan.wrongRoute ||
-    flightPlan.missingTransition;
-
   const backgroundColor = theme.palette.mode === "dark" ? "black" : "none";
   const textColor = theme.palette.mode === "dark" ? "skyblue" : "black"
 
@@ -281,10 +275,10 @@ export default function RoutePracticeForm({
         </FormControl>
 
         <Box display="flex" gap={2} mt={2}>
-          <Button variant="contained" color="success" onClick={handleNoErrors}>
+          <Button variant="contained" color="success" onClick={handleNoErrors} disabled={checkboxes.alt || checkboxes.eq || checkboxes.rte}>
             No Errors
           </Button>
-          <Button variant="contained" onClick={handleSubmit}>
+          <Button variant="contained" onClick={handleSubmit} disabled={!checkboxes.alt && !checkboxes.eq && !checkboxes.rte}>
             Submit
           </Button>
         </Box>
@@ -326,7 +320,7 @@ export default function RoutePracticeForm({
           <Typography variant="body2" sx={{ color: "success.main" }}>
             Correct: {correct}
           </Typography>
-          <Typography variant="body2" sx={{ color: "#5c0c0c" }}>
+          <Typography variant="body2" sx={{ color: "#9D2932" }}>
             Incorrect: {incorrect}
           </Typography>
         </Box>
