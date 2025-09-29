@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { toast } from "react-toastify";
 import generateRandomFlightPlan from "@/components/RoutePractice/RandomFlightPlan";
+import { BorderRight } from "@mui/icons-material";
 
 export default function RoutePracticeForm({
   initialPlan,
@@ -78,7 +79,7 @@ export default function RoutePracticeForm({
 
   return (
     <Box>
-      <Grid2 container spacing={2} columns={8} style={{ paddingBottom: "1%" }}>
+      <Grid2 container spacing={2} columns={8} style={{ paddingBottom: 20, background: "black", paddingTop: 20}}>
         <Grid2 size={1}>
           <Typography align="center">AID</Typography>
           <Typography align="center" style={{ color: "skyblue" }}>

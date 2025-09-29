@@ -19,7 +19,7 @@ export default async function Page() {
     return (
         <Card>
             <CardContent>
-                <Typography variant="h5" sx={{mb: 1,}}>Flight Plan Practice</Typography>
+                <Typography variant="h5" sx={{mb: 1, pb: 1}}>Flight Plan Practice</Typography>
                 <div style={{alignItems:"center"}}>
                     <RoutePracticeForm initialPlan={flightPlan}/>
                 </div>
