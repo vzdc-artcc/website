@@ -91,17 +91,6 @@ export default function RoutePracticeForm({
     flightPlan.wrongRoute ||
     flightPlan.missingTransition;
 
-  React.useEffect(() => {
-    if (
-      hasAnyError && // ✅ only if there is at least one error
-      checkboxes.alt === flightPlan.iafdof &&
-      checkboxes.eq === flightPlan.wrongEq &&
-      checkboxes.rte ===
-        (!!flightPlan.wrongRoute || flightPlan.missingTransition)
-    ) {
-    }
-  }, [checkboxes, flightPlan]);
-
   const backgroundColor = theme.palette.mode === "dark" ? "black" : "none";
   const textColor = theme.palette.mode === "dark" ? "skyblue" : "black"
 
