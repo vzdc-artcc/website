@@ -1,5 +1,5 @@
 import React from 'react';
-import {Alert, Card, CardContent, Stack, Typography} from "@mui/material";
+import {Alert, Stack} from "@mui/material";
 
 export default async function Layout({children}: { children: React.ReactNode }) {
     return (
