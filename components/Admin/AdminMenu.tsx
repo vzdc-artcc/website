@@ -15,7 +15,7 @@ import {
     Folder,
     Home,
     ListAlt,
-    MilitaryTech,
+    MilitaryTech, QueryStats,
     Report,
     Send,
     Task,
@@ -205,6 +205,14 @@ export default async function AdminMenu() {
                         <BarChart/>
                     </ListItemIcon>
                     <ListItemText primary="Statistics Prefixes"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/admin/statistics" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <QueryStats/>
+                    </ListItemIcon>
+                    <ListItemText primary="Facility Statistics"/>
                 </ListItemButton>
             </Link>
             <Link href="/admin/broadcasts" style={{textDecoration: 'none', color: 'inherit',}}>
