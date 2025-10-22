@@ -1,7 +1,7 @@
 'use client';
 import React, {useState} from 'react';
 import Form from "next/form";
-import {TextField, Grid2} from "@mui/material";
+import {Grid2, TextField} from "@mui/material";
 import {AtcBooking} from "@/lib/atcBooking";
 import dayjs, {Dayjs} from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -61,20 +61,30 @@ export default function AtcBookingForm({ booking, user }: { booking?: AtcBooking
                         <TextField fullWidth variant="filled" label="Position/Callsign" name="position" defaultValue={booking?.callsign} required />
                     </Grid2>
                     <Grid2 size={{ xs: 2, sm: 1}}>
-                        <DateTimePicker sx={{width: '100%',}}
-                                        disablePast
-                                        ampm={false}
-                                        name="start"
-                                        label="Start Time" value={start}
-                                        onChange={setStart}/>
+                        <DateTimePicker
+                            sx={{width: '100%'}}
+                            disablePast
+                            minDateTime={dayjs().tz(user.timezone).add(2, 'hour')}
+                            maxDateTime={dayjs().tz(user.timezone).add(72, 'hour')}
+                            ampm={false}
+                            name="start"
+                            label="Start Time"
+                            value={start}
+                            onChange={setStart}
+                        />
                     </Grid2>
                     <Grid2 size={{ xs: 2, sm: 1}}>
-                        <DateTimePicker sx={{width: '100%',}}
-                                        disablePast
-                                        ampm={false}
-                                        name="end"
-                                        label="End Time" value={end}
-                                        onChange={setEnd}/>
+                        <DateTimePicker
+                            sx={{width: '100%'}}
+                            disablePast
+                            minDateTime={start ? start.add(1, 'hour') : undefined}
+                            maxDateTime={start ? start.add(2, 'hour') : dayjs().tz(user.timezone).add(2, 'hour')}
+                            ampm={false}
+                            name="end"
+                            label="End Time"
+                            value={end}
+                            onChange={setEnd}
+                        />
                     </Grid2>
                     <Grid2 size={2}>
                         <FormSaveButton />

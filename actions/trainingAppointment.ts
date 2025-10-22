@@ -202,6 +202,27 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
         sendTrainingAppointmentScheduledEmail(ta, ta.student as User, trainer.user, ta.lessons.map(l => l.duration).reduce((a, c) => a + c, 0)).then();
     }
 
+    const liveLesson = ta.lessons.find((l => l.location === 1));
+    const booking = await fetchTrainingBooking(trainingSession.student.cid);
+    if (liveLesson) {
+        const bookingEnd = new Date(ta.start.getTime() + liveLesson.duration * 60000);
+        bookingEnd.setMinutes(bookingEnd.getMinutes() + liveLesson.duration);
+
+        if (booking) {
+            await deleteAtcBooking(booking.id);
+        }
+        await createOrUpdateAtcBooking({
+            id: booking?.id,
+            cid: Number(trainingSession.student.cid),
+            start: ta.start.toISOString().replace(/\.\d{3}Z$/, 'Z').replace('T', ' '),
+            end: bookingEnd.toISOString().replace(/\.\d{3}Z$/, 'Z').replace('T', ' '),
+            callsign: liveLesson.lesson.position,
+            type: 'mentoring',
+        })
+    } else if (booking) {
+        await deleteAtcBooking(booking.id);
+    }
+
     revalidatePath('/training/your-students');
     revalidatePath(`/training/appointments`);
     revalidatePath(`/training/calendar`);

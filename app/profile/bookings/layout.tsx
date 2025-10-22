@@ -11,24 +11,28 @@ export default async function Layout({children}: { children: React.ReactNode }) 
                         Controllers may hold a maximum of <b>two active bookings</b> with vZDC at any given time.
                     </Typography>
                     <Typography variant="caption">
-                        <b>vZDC does not directly manage ATC bookings.</b> Your booking data is submitted to the VATSIM
-                        ATC Bookings system, which relays it to third-party services such as VATSIM Radar. As a result,
-                        vZDC has no control over how your data is handled beyond the actions available through this
-                        website. Please do not contact vZDC staff for support regarding ATC bookings, as we cannot
-                        modify or intervene in those systems.
+                        Each booking may be made for a maximum duration of <b>two hours</b>.
+                    </Typography>
+                    <Typography variant="caption">
+                        Bookings <b>do not guarantee that you will be one staffing</b> the requested position. The
+                        VATSIM and VATUSA policies state that all positions are staffed on a first-come, first-served
+                        basis.
+                    </Typography>
+                    <Typography variant="caption">
+                        Bookings may be made up to <b>72 hours in advance</b>.
                     </Typography>
                     <Typography variant="caption">
                         <b>ATC bookings are separate from event signups.</b> Bookings are intended for non-event
                         staffing only. To participate in an event, please complete the signup form provided on that
-                        event’s page.
+                        event’s page. <b>Any event takes priority over booking.</b>
                     </Typography>
                     <Typography variant="caption">
-                        Controllers are strongly encouraged to staff their booked positions as scheduled. However, due
-                        to the informal nature of the ATC booking system, there are minimal consequences for missed
-                        bookings. Event signups, however, are still strictly enforced.
+                        Controllers are strongly encouraged to staff their booked positions as scheduled. Repeated
+                        no-shows may result in disciplinary actions.
                     </Typography>
-                    <Typography variant="caption" sx={{color: 'red'}}>
-                        <b>INSERT/MODIFY -- SSTF THOUGHTS HERE</b>
+                    <Typography variant="subtitle1">
+                        Read all administrative policies before booking a position to ensure that you understand all the
+                        rules.
                     </Typography>
                 </Stack>
             </Alert>
