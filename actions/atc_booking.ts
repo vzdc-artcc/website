@@ -32,7 +32,7 @@ export const fetchTrainingBooking = async (cid: string): Promise<AtcBooking | nu
         return json[0] || null;
     }
 
-    return null;
+    return undefined;
 }
 
 export const fetchAtcBookings = async (onlyCid?: string): Promise<AtcBooking[] | string> => {

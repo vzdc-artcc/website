@@ -77,7 +77,7 @@ export default function AtcBookingForm({ booking, user }: { booking?: AtcBooking
                         <DateTimePicker
                             sx={{width: '100%'}}
                             disablePast
-                            minDateTime={start ? start.add(1, 'hour') : undefined}
+                            minDateTime={start ? start.add(1, 'hour') : null}
                             maxDateTime={start ? start.add(2, 'hour') : dayjs().tz(user.timezone).add(2, 'hour')}
                             ampm={false}
                             name="end"
