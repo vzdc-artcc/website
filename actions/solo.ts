@@ -85,8 +85,35 @@ export const deleteSolo = async (id: string) => {
         },
         include: {
             controller: true,
+            certificationType: true,
         }
     });
+
+    if (ss.certificationType.autoAssignUnrestricted) {
+        await prisma.certification.update({
+            where: {
+                certificationTypeId_userId: {
+                    certificationTypeId: ss.certificationTypeId,
+                    userId: ss.controller.id,
+                },
+            },
+            data: {
+                certificationOption: 'CERTIFIED',
+            },
+        });
+    } else {
+        await prisma.certification.update({
+            where: {
+                certificationTypeId_userId: {
+                    certificationTypeId: ss.certificationTypeId,
+                    userId: ss.controller.id,
+                },
+            },
+            data: {
+                certificationOption: 'NONE',
+            },
+        });
+    }
 
     await sendSoloDeletedEmail(ss.controller as User, ss);
 
@@ -107,6 +134,7 @@ export const deleteExpiredSolos = async () => {
         },
         include: {
             controller: true,
+            certificationType: true,
         }
     });
 
@@ -117,17 +145,32 @@ export const deleteExpiredSolos = async () => {
             }
         });
 
-        await prisma.certification.update({
-            where: {
-                certificationTypeId_userId: {
-                    certificationTypeId: solo.certificationTypeId,
-                    userId: solo.controller.id,
+        if (solo.certificationType.autoAssignUnrestricted) {
+            await prisma.certification.update({
+                where: {
+                    certificationTypeId_userId: {
+                        certificationTypeId: solo.certificationTypeId,
+                        userId: solo.controller.id,
+                    },
                 },
-            },
-            data: {
-                certificationOption: 'CERTIFIED',
-            },
-        });
+                data: {
+                    certificationOption: 'CERTIFIED',
+                },
+            });
+        } else {
+            await prisma.certification.update({
+                where: {
+                    certificationTypeId_userId: {
+                        certificationTypeId: solo.certificationTypeId,
+                        userId: solo.controller.id,
+                    },
+                },
+                data: {
+                    certificationOption: 'NONE',
+                },
+            });
+        }
+
 
         await sendSoloExpiredEmail(solo.controller as User, solo);
 
