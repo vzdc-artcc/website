@@ -31,7 +31,6 @@ import {TrainingSessionIndicatorWithAll} from "@/components/TrainingSession/Trai
 import {after} from "next/server";
 import {writeDossier} from "@/actions/dossier";
 import {RosterChangeWithAll} from "@/components/TrainingSession/TrainingSessionAfterSubmitDialogs";
-import {createOrUpdateAtcBooking, deleteAtcBooking, fetchTrainingBooking} from "@/actions/atc_booking";
 
 type LessonRosterChangeWithType = LessonRosterChange & { certificationType: CertificationType, };
 type TrainingTicketWithLesson = TrainingTicket & {
@@ -181,24 +180,6 @@ export const createOrUpdateTrainingSession = async (
         });
 
         await upsertVatusaTrainingSession(session.user.cid, trainingSession.student.cid, trainingSession);
-
-        const liveLesson = trainingSession.tickets.find((tt) => tt.lesson.location === 1);
-        const booking = await fetchTrainingBooking(trainingSession.student.cid);
-        if (liveLesson) {
-            if (booking) {
-                await deleteAtcBooking(booking.id);
-            }
-            await createOrUpdateAtcBooking({
-                id: booking?.id,
-                cid: Number(trainingSession.student.cid),
-                start: trainingSession.start.toISOString().replace(/\.\d{3}Z$/, 'Z').replace('T', ' '),
-                end: trainingSession.end.toISOString().replace(/\.\d{3}Z$/, 'Z').replace('T', ' '),
-                callsign: liveLesson.lesson.position,
-                type: 'mentoring',
-            })
-        } else if (booking) {
-            await deleteAtcBooking(booking.id);
-        }
 
         const passedLessons = trainingSession.tickets.filter((t) => t.passed);
         const oldPassedLessons = oldTickets.filter((t) => t.passed).map((t) => t.lesson);

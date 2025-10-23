@@ -2,7 +2,7 @@ import React from 'react';
 import {Button, Card, CardContent, Stack, Typography} from "@mui/material";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
-import {fetchAtcBookings} from "@/actions/atc_booking";
+import {fetchAtcBookings} from "@/actions/atcBooking";
 import AtcBookingTable from "@/components/AtcBooking/AtcBookingTable";
 import {Add} from "@mui/icons-material";
 import Link from "next/link";

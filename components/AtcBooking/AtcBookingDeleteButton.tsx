@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {toast} from "react-toastify";
 import {IconButton} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-import {deleteAtcBooking} from "@/actions/atc_booking";
+import {deleteAtcBooking} from "@/actions/atcBooking";
 
 export default function AtcBookingDeleteButton({ bookingId }: { bookingId: string }) {
 

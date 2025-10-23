@@ -26,16 +26,18 @@ export default function AtcBookingTable({ bookings, timeZone }: { bookings: AtcB
                 {bookings.map((booking) => (
                     <TableRow key={booking.id}>
                         <TableCell>{booking.callsign}</TableCell>
-                        <TableCell>{formatTimezoneDate(booking.start, timeZone)}</TableCell>
-                        <TableCell>{formatTimezoneDate(booking.end, timeZone)}</TableCell>
-                        <TableCell>
+                        <TableCell>{formatTimezoneDate(booking.start as unknown as Date, timeZone)}</TableCell>
+                        <TableCell>{formatTimezoneDate(booking.end as unknown as Date, timeZone)}</TableCell>
+                        {booking.type !== 'training' ? <TableCell>
                             <Link href={`/profile/bookings/${booking.id}`} style={{ textDecoration: 'none', color: 'inherit', }}>
                                 <IconButton>
                                     <Edit />
                                 </IconButton>
                             </Link>
-                            <AtcBookingDeleteButton bookingId={booking.id} />
-                        </TableCell>
+                            <AtcBookingDeleteButton bookingId={booking.id + ""}/>
+                        </TableCell> : <TableCell>
+                            <Typography>DISABLED - TRAINING APPOINTMENT</Typography>
+                        </TableCell>}
                     </TableRow>
                 ))}
             </TableBody>

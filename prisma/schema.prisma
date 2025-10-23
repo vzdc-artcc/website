@@ -839,7 +839,8 @@ model TrainingAppointment {
   preparationCompleted Boolean @default(false)
   warningEmailSent     Boolean @default(false)
 
-  lessons Lesson[]
+  atcBookingId String?
+  lessons      Lesson[]
 }
 
 enum PerformanceIndicatorMarker {

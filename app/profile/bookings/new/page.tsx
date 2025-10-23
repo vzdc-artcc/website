@@ -4,7 +4,7 @@ import AtcBookingForm from "@/components/AtcBooking/AtcBookingForm";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import ErrorCard from "@/components/Error/ErrorCard";
-import {fetchAtcBookings} from "@/actions/atc_booking";
+import {fetchAtcBookings} from "@/actions/atcBooking";
 
 export default async function Page() {
 

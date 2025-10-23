@@ -1,5 +1,5 @@
 import React from 'react';
-import {fetchAtcBooking} from "@/actions/atc_booking";
+import {fetchAtcBooking} from "@/actions/atcBooking";
 import {notFound} from "next/navigation";
 import {Card, CardContent, Typography} from "@mui/material";
 import AtcBookingForm from "@/components/AtcBooking/AtcBookingForm";

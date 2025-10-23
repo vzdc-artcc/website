@@ -11,7 +11,7 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
 import {User} from "next-auth";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {createOrUpdateAtcBooking} from "@/actions/atc_booking";
+import {createOrUpdateAtcBooking} from "@/actions/atcBooking";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
 
@@ -65,7 +65,7 @@ export default function AtcBookingForm({ booking, user }: { booking?: AtcBooking
                             sx={{width: '100%'}}
                             disablePast
                             minDateTime={dayjs().tz(user.timezone).add(2, 'hour')}
-                            maxDateTime={dayjs().tz(user.timezone).add(72, 'hour')}
+                            maxDateTime={dayjs().tz(user.timezone).add(72, 'hour').add(1, 'minute')}
                             ampm={false}
                             name="start"
                             label="Start Time"
@@ -77,8 +77,8 @@ export default function AtcBookingForm({ booking, user }: { booking?: AtcBooking
                         <DateTimePicker
                             sx={{width: '100%'}}
                             disablePast
-                            minDateTime={start ? start.add(1, 'hour') : null}
-                            maxDateTime={start ? start.add(2, 'hour') : dayjs().tz(user.timezone).add(2, 'hour')}
+                            minDateTime={start ? start.add(1, 'hour') : undefined}
+                            maxDateTime={start ? start.add(2, 'hour') : dayjs().tz(user.timezone).add(2, 'hour').add(1, 'minute')}
                             ampm={false}
                             name="end"
                             label="End Time"
