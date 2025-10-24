@@ -5,7 +5,7 @@ import UpcomingEventsCarousel from "@/components/HomePage/UpcomingEventsCarousel
 import {formatZuluDate, getDuration, getTimeIn} from "@/lib/date";
 import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
-import {StackedLineChart,} from "@mui/icons-material";
+import {OpenInNew, StackedLineChart,} from "@mui/icons-material";
 import {getTop3Controllers} from "@/lib/hours";
 import HeaderText from "@/components/Hero/HeaderText";
 import BackgroundImage from "@/components/Hero/BackgroundImage";
@@ -168,7 +168,10 @@ export default async function Home() {
                     </Card>
                     <Card sx={{height: '50%', overflowY: 'auto',}}>
                         <CardContent>
-                            <Typography {...headingFont.style} variant="h5" sx={{mb: 1,}}>Upcoming ATC</Typography>
+                            <Typography {...headingFont.style} variant="h5" sx={{mb: 1,}}>Upcoming ATC
+                                <Link href="/bookings/calendar"
+                                      style={{color: 'inherit', textDecoration: 'none',}}><OpenInNew fontSize="small"
+                                                                                                     sx={{ml: 1,}}/></Link></Typography>
                             <Stack direction="column" spacing={1}>
                                 {typeof atcBookings !== 'string' && atcBookings.length > 0 ? atcBookings.slice(0, 10).map((booking, i) => (
                                     <Card elevation={0} key={booking.id}>
