@@ -87,7 +87,7 @@ export const createOrUpdateAtcBooking = async (
     if (booking.type !== 'training') {
         if (!isUpdate) {
             const bookings = await fetchAtcBookings(String(booking.cid));
-            if (Array.isArray(bookings) && bookings.length >= 3) {
+            if (Array.isArray(bookings) && bookings.length >= 2) {
                 return 'You have reached the maximum number of active bookings (2). Please delete an existing booking before creating a new one.';
             }
         }
