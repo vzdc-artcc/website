@@ -7,6 +7,7 @@ import {
     CalendarMonth,
     Chat,
     Description,
+    Event,
     FileOpen,
     Forum,
     Group,
@@ -15,8 +16,8 @@ import {
     Radar,
     Radio,
     Route,
-    Workspaces,
     TurnSharpRight,
+    Workspaces,
 } from "@mui/icons-material";
 
 export type NavigationButton = {
@@ -57,6 +58,11 @@ export const NAVIGATION: NavigationButton[] = [
                     link: '/sua/new',
                     icon: <Workspaces/>,
                 },
+                {
+                    label: 'ATC Bookings',
+                    link: '/bookings/calendar',
+                    icon: <Event/>,
+                },
             ],
         },
     },
@@ -94,7 +100,12 @@ export const NAVIGATION: NavigationButton[] = [
                     label: 'Flight Plan Practice',
                     link: '/routepractice',
                     icon: <TurnSharpRight/>,
-                }
+                },
+                {
+                    label: 'ATC Bookings',
+                    link: '/bookings/calendar',
+                    icon: <Event/>,
+                },
             ],
         },
     },

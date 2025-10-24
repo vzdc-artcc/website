@@ -113,7 +113,7 @@ export default async function Page() {
                     md: 10,
                     lg: 4
                 }}>
-                <Card>
+                <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography sx={{mb: 1,}}>Roster Sync</Typography>
                         <Chip label={syncTimes?.roster ? `${getMinutesAgo(syncTimes?.roster)}m ago` : 'NEVER'}
@@ -127,7 +127,7 @@ export default async function Page() {
                     md: 10,
                     lg: 4
                 }}>
-                <Card>
+                <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography sx={{mb: 1,}}>Statistics Sync</Typography>
                         <Chip label={syncTimes?.stats ? `${getMinutesAgo(syncTimes?.stats)}m ago` : 'NEVER'}
@@ -141,7 +141,7 @@ export default async function Page() {
                     md: 10,
                     lg: 4
                 }}>
-                <Card>
+                <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography sx={{mb: 1,}}>Solo Endorsement Sync</Typography>
                         <Chip label={syncTimes?.soloCert ? `${getMinutesAgo(syncTimes?.soloCert)}m ago` : 'NEVER'}
@@ -155,7 +155,7 @@ export default async function Page() {
                     md: 10,
                     lg: 4
                 }}>
-                <Card>
+                <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography sx={{mb: 1,}}>Events Sync</Typography>
                         <Chip label={syncTimes?.events ? `${getMinutesAgo(syncTimes?.events)}m ago` : 'NEVER'}
@@ -169,7 +169,7 @@ export default async function Page() {
                     md: 10,
                     lg: 4
                 }}>
-                <Card>
+                <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography sx={{mb: 1,}}>LOA Sync</Typography>
                         <Chip label={syncTimes?.loas ? `${getMinutesAgo(syncTimes?.loas)}m ago` : 'NEVER'}

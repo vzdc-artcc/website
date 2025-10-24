@@ -94,7 +94,7 @@ export default function LessonForm({lesson}: { lesson?: Lesson, }) {
                         label="Location"
                         name="location"
                         required
-                        defaultValue={2}
+                        defaultValue={lesson?.location || 2}
                         helperText="This is for VATUSA"
                     >
                         <MenuItem value={0}>

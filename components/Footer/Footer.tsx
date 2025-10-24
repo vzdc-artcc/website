@@ -18,7 +18,7 @@ export default async function Footer() {
     const session = await getServerSession(authOptions);
 
     return (
-        <AppBar position="static" sx={{marginTop: 20}}>
+        <AppBar position="static" sx={{backgroundColor: '#f5f5f5', color: 'black', marginTop: 20,}}>
             <Toolbar>
                 <Container maxWidth="md" sx={{padding: 5,}}>
                     <Typography textAlign="center" gutterBottom>&copy; {(new Date()).getFullYear()} Virtual Washington Air Route Traffic Control

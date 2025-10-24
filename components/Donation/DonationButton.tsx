@@ -16,7 +16,7 @@ export default function DonationButton() {
 
     return (
         <>
-            <Button variant="contained" color="inherit" startIcon={<Favorite/>} size="small"
+            <Button variant="contained" color="primary" startIcon={<Favorite/>} size="small"
                     sx={{textAlign: 'center', width: '100%', maxWidth: 200,}} onClick={() => setOpen(true)}>
                 Donate
             </Button>

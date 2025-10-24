@@ -1,12 +1,8 @@
 import React from 'react';
 import {Box, Card, CardContent, List, ListItemButton, ListItemIcon, ListItemText, Typography} from "@mui/material";
-import {AccessTime, Badge, Feedback, Route, Shield} from "@mui/icons-material";
+import {AccessTime, Badge, Event, Feedback, Route, Shield} from "@mui/icons-material";
 import Link from "next/link";
 import DonationButton from "@/components/Donation/DonationButton";
-/*
-
-<ListItemButton sx={{border: 1, borderRadius: 8}}>
- */
 
 export default function LinksCard() {
     return (
@@ -48,6 +44,14 @@ export default function LinksCard() {
                                 <Route/>
                             </ListItemIcon>
                             <ListItemText primary="Preferred Routes Database"/>
+                        </ListItemButton>
+                    </Link>
+                    <Link href="/profile/bookings" style={{color: 'inherit', textDecoration: 'none',}}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <Event />
+                            </ListItemIcon>
+                            <ListItemText primary="Your ATC Bookings"/>
                         </ListItemButton>
                     </Link>
                     <Link href="/profile/loa/request" style={{color: 'inherit', textDecoration: 'none',}}>

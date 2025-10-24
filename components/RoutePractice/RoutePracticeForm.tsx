@@ -1,19 +1,19 @@
 "use client";
 import React from "react";
 import {
-  TextField,
-  Grid2,
-  Box,
-  Typography,
-  FormControl,
-  FormLabel,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  Button,
-  useTheme,
+    Box,
+    Button,
+    Checkbox,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    FormLabel,
+    Grid2,
+    TextField,
+    Typography,
+    useTheme,
 } from "@mui/material";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 import generateRandomFlightPlan from "@/components/RoutePractice/RandomFlightPlan";
 
 export default function RoutePracticeForm({
@@ -327,7 +327,7 @@ export default function RoutePracticeForm({
             height: 20,
             borderRadius: 5,
             overflow: "hidden",
-            background: "#333",
+              background: theme.palette.mode === "dark" ? '#333' : 'lightgray',
           }}
         >
           <Box

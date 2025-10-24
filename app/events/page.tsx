@@ -23,7 +23,7 @@ import {authOptions} from "@/auth/auth";
 
 export const metadata: Metadata = {
     title: 'Events | vZDC',
-    description: 'vZDC charts page',
+    description: 'vZDC events page',
 };
 
 export default async function Page() {
@@ -39,7 +39,7 @@ export default async function Page() {
 
     const session = await getServerSession(authOptions);
 
-    return session?.user && (
+    return (
         <Container maxWidth="lg">
             <Accordion sx={{ mb: 2, }}>
                 <AccordionSummary expandIcon={<ExpandMore />}>
@@ -63,7 +63,7 @@ export default async function Page() {
             </Accordion>
             <Card>
                 <CardContent>
-                    <EventCalendar events={events} timeZone={session.user.timezone}/>
+                    <EventCalendar events={events} timeZone={session?.user.timezone || 'America/New_York'}/>
                 </CardContent>
             </Card>
             {events.length > 0 && <Typography variant="h6" sx={{my: 2,}}>List View</Typography>}
