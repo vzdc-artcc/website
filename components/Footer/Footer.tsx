@@ -18,10 +18,10 @@ export default async function Footer() {
     const session = await getServerSession(authOptions);
 
     return (
-        <AppBar position="static" sx={{marginTop: 20}}>
+        <AppBar position="static" sx={{backgroundColor: '#f5f5f5', color: 'black', marginTop: 20,}}>
             <Toolbar>
                 <Container maxWidth="md" sx={{padding: 5,}}>
-                    <Typography textAlign="center" gutterBottom>&copy; 2025 Virtual Washington Air Route Traffic Control
+                    <Typography textAlign="center" gutterBottom>&copy; {(new Date()).getFullYear()} Virtual Washington Air Route Traffic Control
                         Center, All
                         Rights Reserved.</Typography>
                     <Typography textAlign="center" gutterBottom>A sub-division of VATUSA, a division of the
@@ -75,6 +75,12 @@ export default async function Footer() {
                         <Tooltip title={'Credits'}>
                             <Link href="/credits" style={{color: 'inherit',}}>
                                 <Typography textAlign="center">Credits</Typography>
+                            </Link>
+                        </Tooltip>
+                        <Typography>|</Typography>
+                        <Tooltip title={'Status'}>
+                            <Link href="https://status.vzdc.org/status/vzdc" style={{color: 'inherit',}}>
+                                <Typography textAlign="center">Status</Typography>
                             </Link>
                         </Tooltip>
                     </Stack>

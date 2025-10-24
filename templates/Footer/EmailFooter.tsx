@@ -8,7 +8,7 @@ function EmailFooter({recipient}: { recipient?: User }) {
             <MjmlSection background-color="#500E0E" padding="20px">
                 <MjmlColumn>
                     <MjmlText color="white" align="center">
-                        &copy; 2024 Virtual Washington ARTCC. All rights reserved.
+                        &copy; {(new Date()).getFullYear()} Virtual Washington ARTCC. All rights reserved.
                     </MjmlText>
                     <MjmlImage href="https://vzdc.org" src="https://vzdc.org/img/logo.png"
                                alt="Virtual Washington ARTCC" width="150px"/>

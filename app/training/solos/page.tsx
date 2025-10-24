@@ -15,11 +15,11 @@ export default async function Page() {
             <CardContent>
                 <Stack direction="row" spacing={2} justifyContent="space-between">
                     <Stack direction="column" spacing={1}>
-                        <Typography variant="h5">Active Solo Certifications</Typography>
+                        <Typography variant="h5">Active Solo Endorsements</Typography>
                         <Typography>All times are in GMT</Typography>
                     </Stack>
-                    {session?.user.roles.includes("INSTRUCTOR") && <Link href="/training/solos/new">
-                        <Button variant="contained" size="large" startIcon={<Add/>}>Grant Solo Certification</Button>
+                    {(session?.user.roles.includes("INSTRUCTOR") || session?.user.staffPositions.includes("WM")) && <Link href="/training/solos/new">
+                        <Button variant="contained" size="large" startIcon={<Add/>}>Grant Solo Endorsement</Button>
                     </Link>}
                 </Stack>
                 <SoloCertificationTable/>

@@ -83,8 +83,8 @@ export const createOrUpdateTrainingSession = async (
         end: z.date({required_error: "You must select an end date."}).refine(end => {
             const dateStart = new Date(start);
             const diffInMinutes = (end.getTime() - dateStart.getTime()) / (1000 * 60);
-            return diffInMinutes >= 5;
-        }, {message: "End date must be at least 5 minutes after start date."}),
+            return diffInMinutes >= 5 && diffInMinutes <= 12 * 60;
+        }, {message: "Session must be between 5 minutes and 12 hours long."}),
         additionalComments: z.string().optional(),
         trainerComments: z.string().optional(),
         trainingTickets: z.array(z.object({

@@ -18,7 +18,7 @@ export default async function Page(props: { params: Promise<{ id: string, }> }) 
         permanentRedirect('/training/assignments');
     }
 
-    const allowedEdit = session.user.staffPositions.includes("TA") || session.user.staffPositions.includes("ATA");
+    const allowedEdit = session.user.staffPositions.includes("TA") || session.user.staffPositions.includes("ATA") || session.user.staffPositions.includes("WM");
 
     const assignment = await prisma.trainingAssignment.findUnique({
         where: {

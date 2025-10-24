@@ -14,7 +14,7 @@ export const sendSoloAddedEmail = async (controller: User, solo: SoloCertificati
     await mailTransport.sendMail({
         from: FROM_EMAIL,
         to: controller.email,
-        subject: 'Solo Certification Added',
+        subject: 'Solo Endorsement Added',
         html,
     });
 }
@@ -26,7 +26,7 @@ export const sendSoloDeletedEmail = async (controller: User, solo: SoloCertifica
     await mailTransport.sendMail({
         from: FROM_EMAIL,
         to: controller.email,
-        subject: 'Solo Certification Removed',
+        subject: 'Solo Endorsement Removed',
         html,
     });
 }
@@ -38,7 +38,7 @@ export const sendSoloExpiredEmail = async (controller: User, solo: SoloCertifica
     await mailTransport.sendMail({
         from: FROM_EMAIL,
         to: controller.email,
-        subject: 'Solo Certification Expired',
+        subject: 'Solo Endorsement Expired',
         html,
     });
 }

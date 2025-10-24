@@ -8,6 +8,7 @@ import {
     Badge as BadgeIcon,
     BarChart,
     CellTower,
+    Chat,
     DeleteSweep,
     EmojiPeople,
     Feedback,
@@ -150,6 +151,14 @@ export default async function AdminMenu() {
                         <Send/>
                     </ListItemIcon>
                     <ListItemText primary="Send Email"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/admin/discord/announcements" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <Chat/>
+                    </ListItemIcon>
+                    <ListItemText primary="Discord Announcements"/>
                 </ListItemButton>
             </Link>
             <Link href="/admin/visitor-applications" style={{textDecoration: 'none', color: 'inherit',}}>

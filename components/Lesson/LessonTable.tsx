@@ -38,8 +38,8 @@ export default function LessonTable({user}: { user: User }) {
             flex: 1,
             filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
-        {field: 'instructorOnly', headerName: 'Instructor Only', type: 'boolean', flex: 1},
-        {field: 'notifyInstructorOnPass', headerName: 'Notify Instructor On Pass', type: 'boolean', flex: 1},
+        {field: 'instructorOnly', headerName: 'OTS', type: 'boolean', flex: 1},
+        {field: 'notifyInstructorOnPass', headerName: 'Notify Instructors On Pass', type: 'boolean', flex: 1},
         {
             field: 'actions',
             headerName: 'Actions',

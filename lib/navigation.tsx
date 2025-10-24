@@ -7,6 +7,7 @@ import {
     CalendarMonth,
     Chat,
     Description,
+    Event,
     FileOpen,
     Forum,
     Group,
@@ -15,7 +16,8 @@ import {
     Radar,
     Radio,
     Route,
-    Workspaces
+    TurnSharpRight,
+    Workspaces,
 } from "@mui/icons-material";
 
 export type NavigationButton = {
@@ -42,7 +44,7 @@ export const NAVIGATION: NavigationButton[] = [
         dropdown: {
             buttons: [
                 {
-                    label: 'Chart Database',
+                    label: 'Charts Database',
                     link: '/charts',
                     icon: <Description/>,
                 },
@@ -55,6 +57,11 @@ export const NAVIGATION: NavigationButton[] = [
                     label: 'vSOA Scheduling',
                     link: '/sua/new',
                     icon: <Workspaces/>,
+                },
+                {
+                    label: 'ATC Bookings',
+                    link: '/bookings/calendar',
+                    icon: <Event/>,
                 },
             ],
         },
@@ -88,7 +95,17 @@ export const NAVIGATION: NavigationButton[] = [
                     label: 'Preferred Routes Database',
                     link: '/prd',
                     icon: <Route/>,
-                }
+                },
+                {
+                    label: 'Flight Plan Practice',
+                    link: '/routepractice',
+                    icon: <TurnSharpRight/>,
+                },
+                {
+                    label: 'ATC Bookings',
+                    link: '/bookings/calendar',
+                    icon: <Event/>,
+                },
             ],
         },
     },

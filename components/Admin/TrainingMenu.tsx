@@ -14,7 +14,7 @@ import {
     ManageSearch,
     MilitaryTech,
     People,
-    PersonAdd,
+    PersonAdd, QueryStats,
     Schedule,
     School,
     ViewWeek,
@@ -134,7 +134,7 @@ export default async function TrainingMenu() {
                             <WorkspacePremium/>
                         </Badge>
                     </ListItemIcon>
-                    <ListItemText primary="Solo Certifications"/>
+                    <ListItemText primary="Solo Endorsements"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/lessons" style={{textDecoration: 'none', color: 'inherit',}}>
@@ -177,6 +177,14 @@ export default async function TrainingMenu() {
                     <ListItemText primary="Mistakes"/>
                 </ListItemButton>
             </Link>
+            <Link href="/training/statistics" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <QueryStats/>
+                    </ListItemIcon>
+                    <ListItemText primary="Training Statistics"/>
+                </ListItemButton>
+            </Link>
             <Link href="/training/logs" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
@@ -188,16 +196,3 @@ export default async function TrainingMenu() {
         </MenuWrapper>
     );
 }
-
-/* this is for training stats
-
-<Link href="/training/statistics" style={{textDecoration: 'none', color: 'inherit',}}>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                <QueryStats/>
-                            </ListItemIcon>
-                            <ListItemText primary="Training Statistics"/>
-                        </ListItemButton>
-                    </Link>
-
- */

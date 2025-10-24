@@ -25,7 +25,7 @@ export default function SessionJoinInstructionsButton({trainingAppointment}: {
                     <DialogContentText gutterBottom>Once you are in the server, change your nickname to your <b>real
                         name</b> and set your TeamSpeak UID on this website. You will receive instructions in a DM from
                         our bot if you did not set your UID.</DialogContentText>
-                    <DialogContentText gutterBottom>Join the &apos;<b>Front Door - Waiting
+                    <DialogContentText gutterBottom>Join the &apos;<b>Training Waiting
                         Room</b>&apos; channel.</DialogContentText>
                     <DialogContentText gutterBottom>Wait for the trainer to move you into the designated training
                         channel.</DialogContentText>

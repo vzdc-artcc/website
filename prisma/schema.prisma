@@ -339,6 +339,9 @@ enum LogModel {
   TRAINING_APPOINTMENT
 
   WELCOME_MESSAGES
+
+  DISCORD_MESSAGE
+  DISCORD_CHANNEL_UPDATE
 }
 
 model Log {
@@ -836,7 +839,8 @@ model TrainingAppointment {
   preparationCompleted Boolean @default(false)
   warningEmailSent     Boolean @default(false)
 
-  lessons Lesson[]
+  atcBookingId String?
+  lessons      Lesson[]
 }
 
 enum PerformanceIndicatorMarker {

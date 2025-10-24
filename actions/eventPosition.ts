@@ -1,15 +1,19 @@
 'use server';
 
-import { authOptions } from "@/auth/auth";
+import {authOptions} from "@/auth/auth";
 import prisma from "@/lib/db";
-import { Event, EventPosition } from "@prisma/client";
-import { getServerSession, User } from "next-auth";
-import { after } from "next/server";
-import { SafeParseReturnType, z } from "zod";
-import { log } from "./log";
-import { revalidatePath } from "next/cache";
-import { sendEventPositionEmail, sendEventPositionRemovalEmail, sendEventPositionRequestDeletedEmail } from "./mail/event";
-import { ZodErrorSlimResponse } from "@/types";
+import {Event, EventPosition} from "@prisma/client";
+import {getServerSession, User} from "next-auth";
+import {after} from "next/server";
+import {SafeParseReturnType, z} from "zod";
+import {log} from "./log";
+import {revalidatePath} from "next/cache";
+import {
+    sendEventPositionEmail,
+    sendEventPositionRemovalEmail,
+    sendEventPositionRequestDeletedEmail
+} from "./mail/event";
+import {ZodErrorSlimResponse} from "@/types";
 
 export const toggleManualPositionOpen = async (event: Event) => {
 
@@ -338,4 +342,3 @@ export const fetchAllUsers = async () => {
         },
     });
 }
-

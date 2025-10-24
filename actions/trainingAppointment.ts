@@ -15,6 +15,7 @@ import {
     sendTrainingAppointmentScheduledEmail,
     sendTrainingAppointmentUpdatedEmail
 } from "@/actions/mail/trainingAppointment";
+import {createOrUpdateAtcBooking, deleteAtcBooking, fetchTrainingBooking} from "@/actions/atcBooking";
 
 export const fetchTrainingAppointments = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
     const orderBy: Prisma.TrainingAppointmentOrderByWithRelationInput = {};
@@ -140,6 +141,8 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
         return {errors: result.error.errors};
     }
 
+    let ta;
+
     if (result.data.id) {
         const oldTA = await prisma.trainingAppointment.findUnique({
             where: {
@@ -158,7 +161,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
             return {errors: [{message: 'Training appointment not found'}]};
         }
 
-        const ta = await prisma.trainingAppointment.update({
+        ta = await prisma.trainingAppointment.update({
             data: {
                 start: result.data.start,
                 lessons: {
@@ -174,6 +177,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
             },
             include: {
                 student: true,
+                trainer: true,
                 lessons: true,
             },
         });
@@ -182,7 +186,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
 
         sendTrainingAppointmentUpdatedEmail(ta, ta.student as User, trainer.user, ta.lessons.map(l => l.duration).reduce((a, c) => a + c, 0)).then();
     } else {
-        const ta = await prisma.trainingAppointment.create({
+        ta = await prisma.trainingAppointment.create({
             data: {
                 trainerId,
                 studentId: result.data.studentId,
@@ -193,6 +197,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
             },
             include: {
                 student: true,
+                trainer: true,
                 lessons: true,
             },
         });
@@ -200,6 +205,39 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
         await log("CREATE", "TRAINING_APPOINTMENT", `Created training appointment with ${ta.student.fullName} on ${formatZuluDate(ta.start)}`);
 
         sendTrainingAppointmentScheduledEmail(ta, ta.student as User, trainer.user, ta.lessons.map(l => l.duration).reduce((a, c) => a + c, 0)).then();
+    }
+
+    const liveLesson = ta.lessons.find((l => l.location === 1));
+    const booking = ta.atcBookingId && await fetchTrainingBooking(ta.atcBookingId);
+    if (liveLesson) {
+        const bookingEnd = new Date(ta.start.getTime() + liveLesson.duration * 60000);
+
+        if (booking) {
+            await deleteAtcBooking(booking.id);
+        }
+        const res = await createOrUpdateAtcBooking({
+            id: ta?.atcBookingId && Number(ta.atcBookingId) || undefined,
+            cid: Number(ta.trainer.cid),
+            start: ta.start.toISOString().replace(/\.\d{3}Z$/, '').replace('T', ' '),
+            end: bookingEnd.toISOString().replace(/\.\d{3}Z$/, '').replace('T', ' '),
+            callsign: liveLesson.position,
+            type: 'training',
+        })
+        if (typeof res === 'string') {
+            return {errors: [{message: `Training appointment was created, but encountered the following error when creating an ATC booking: ${res}`}]};
+        }
+
+        await prisma.trainingAppointment.update({
+            where: {
+                id: ta.id,
+            },
+            data: {
+                atcBookingId: res.id + "",
+            },
+        });
+
+    } else if (booking) {
+        await deleteAtcBooking(booking.id);
     }
 
     revalidatePath('/training/your-students');
@@ -218,8 +256,14 @@ export const deleteTrainingAppointment = async (id: string, fromAdmin?: boolean)
         include: {
             student: true,
             trainer: true,
+            lessons: true,
         },
     });
+
+    const liveLesson = ta.lessons.find((l => l.location === 1));
+    if (liveLesson) {
+        await deleteAtcBooking(Number(ta.atcBookingId));
+    }
 
     revalidatePath('/training/your-students');
     revalidatePath(`/training/appointments`);
