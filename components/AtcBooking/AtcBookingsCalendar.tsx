@@ -36,7 +36,7 @@ export default function AtcBookingsCalendar({bookings, timeZone}: { bookings: At
                     title: booking.callsign,
                     start: newStart,
                     end: newEnd,
-                    color: booking.type === 'booking' ? 'blue' : 'red',
+                    color: booking.type === 'booking' ? 'cyan' : 'red',
                 };
             })}
             buttonText={{

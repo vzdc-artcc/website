@@ -43,7 +43,7 @@ export default async function Page() {
         <Container maxWidth="lg">
             <Accordion sx={{ mb: 2, }}>
                 <AccordionSummary expandIcon={<ExpandMore />}>
-                    <Typography variant="h6">Legend</Typography>
+                    <Typography variant="h6">Upcoming Events - Legend</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     <Stack direction="column" spacing={2} sx={{mt: 1,}}>
