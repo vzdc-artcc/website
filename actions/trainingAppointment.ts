@@ -216,7 +216,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
             await deleteAtcBooking(booking.id + "");
         }
         const res = await createOrUpdateAtcBooking({
-            id: ta?.atcBookingId && Number(ta.atcBookingId) || undefined,
+            id: ta.atcBookingId ? Number(ta.atcBookingId) : undefined,
             cid: Number(ta.trainer.cid),
             start: ta.start.toISOString().replace(/\.\d{3}Z$/, '').replace('T', ' '),
             end: bookingEnd.toISOString().replace(/\.\d{3}Z$/, '').replace('T', ' '),
