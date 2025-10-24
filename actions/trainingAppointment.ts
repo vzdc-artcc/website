@@ -213,7 +213,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
         const bookingEnd = new Date(ta.start.getTime() + liveLesson.duration * 60000);
 
         if (booking) {
-            await deleteAtcBooking(booking.id);
+            await deleteAtcBooking(booking.id + "");
         }
         const res = await createOrUpdateAtcBooking({
             id: ta?.atcBookingId && Number(ta.atcBookingId) || undefined,
@@ -237,7 +237,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
         });
 
     } else if (booking) {
-        await deleteAtcBooking(booking.id);
+        await deleteAtcBooking(booking.id + "");
     }
 
     revalidatePath('/training/your-students');
@@ -262,7 +262,7 @@ export const deleteTrainingAppointment = async (id: string, fromAdmin?: boolean)
 
     const liveLesson = ta.lessons.find((l => l.location === 1));
     if (liveLesson) {
-        await deleteAtcBooking(Number(ta.atcBookingId));
+        await deleteAtcBooking(ta.atcBookingId + "");
     }
 
     revalidatePath('/training/your-students');
