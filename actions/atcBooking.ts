@@ -144,7 +144,7 @@ export const createOrUpdateAtcBooking = async (
     return json;
 }
 
-export const deleteAtcBooking = async (id: number): Promise<boolean> => {
+export const deleteAtcBooking = async (id: string): Promise<boolean> => {
     const res = await fetch(`https://atc-bookings.vatsim.net/api/booking/${id}`, {
         method: 'DELETE',
         headers: {
