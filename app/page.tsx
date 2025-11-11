@@ -173,7 +173,7 @@ export default async function Home() {
                                       style={{color: 'inherit', textDecoration: 'none',}}><OpenInNew fontSize="small"
                                                                                                      sx={{ml: 1,}}/></Link></Typography>
                             <Stack direction="column" spacing={1}>
-                                {typeof atcBookings !== 'string' && atcBookings.length > 0 ? atcBookings.slice(0, 10).map((booking, i) => (
+                                {typeof atcBookings !== 'string' && atcBookings.length > 0 ? atcBookings.filter(b => new Date(b.start.replace(" ", "T") + "Z") > new Date()).slice(0, 10).map((booking, i) => (
                                     <Card elevation={0} key={booking.id}>
                                         <CardContent>
                                             <Stack direction="row" spacing={1} justifyContent="space-between">
