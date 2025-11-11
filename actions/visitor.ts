@@ -10,6 +10,7 @@ import {addVatusaVisitor} from "@/actions/vatusa/roster";
 import {sendVisitorApplicationAcceptedEmail, sendVisitorApplicationRejectedEmail} from "@/actions/mail/visitor";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
 import {sendProgressionAssignedEmail} from "@/actions/mail/progression";
+import {formatZuluDate} from "@/lib/date";
 
 export const addVisitingApplication = async (formData: FormData) => {
 
@@ -47,10 +48,23 @@ export const addVisitingApplication = async (formData: FormData) => {
         return {errors: [{message: "You already have a pending visitor application"},]};
     }
 
+    const lastRejected = await prisma.visitorApplication.findFirst({
+        where: {
+            userId: result.data.userId,
+            status: "DENIED",
+        },
+    });
+
+    await prisma.visitorApplication.deleteMany({
+        where: {
+            userId: result.data.userId,
+        },
+    });
+
     const application = await prisma.visitorApplication.create({
         data: {
             homeFacility: result.data.homeFacility,
-            whyVisit: result.data.whyVisit,
+            whyVisit: result.data.whyVisit + (lastRejected ? `\n\nAUTOMATIC NOTE: This user previously had a visitor application rejected on ${formatZuluDate(lastRejected.decidedAt || new Date())}.\nREASON: ${lastRejected.reasonForDenial})\nThe previous application has been deleted to accommodate this one.` : ''),
             user: {
                 connect: {
                     id: result.data.userId,

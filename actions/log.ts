@@ -5,12 +5,15 @@ import prisma from "@/lib/db";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
+import {isDebug} from "@/lib/key";
+
+const {DEBUG_KEY} = process.env;
 
 export const log = async (type: LogType, model: LogModel, message: string) => {
 
     const session = await getServerSession(authOptions);
 
-    if (session) {
+    if (session && !isDebug(DEBUG_KEY || '', session.user)) {
         await prisma.log.create({
             data: {
                 user: {
