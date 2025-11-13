@@ -106,7 +106,7 @@ async function rosterUpdate() {
                         },
                     });
 
-                    if (existingCertification?.certificationOption !== 'NONE') {
+                    if (existingCertification && existingCertification?.certificationOption !== 'NONE') {
                         continue;
                     }
 

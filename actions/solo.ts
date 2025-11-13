@@ -98,7 +98,7 @@ export const deleteSolo = async (id: string) => {
                 },
             },
             data: {
-                certificationOption: 'CERTIFIED',
+                certificationOption: 'UNRESTRICTED',
             },
         });
     } else {
@@ -154,7 +154,7 @@ export const deleteExpiredSolos = async () => {
                     },
                 },
                 data: {
-                    certificationOption: 'CERTIFIED',
+                    certificationOption: 'UNRESTRICTED',
                 },
             });
         } else {

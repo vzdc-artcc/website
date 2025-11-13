@@ -31,6 +31,7 @@ import {TrainingSessionIndicatorWithAll} from "@/components/TrainingSession/Trai
 import {after} from "next/server";
 import {writeDossier} from "@/actions/dossier";
 import {RosterChangeWithAll} from "@/components/TrainingSession/TrainingSessionAfterSubmitDialogs";
+import {deleteSolo} from "@/actions/solo";
 
 type LessonRosterChangeWithType = LessonRosterChange & { certificationType: CertificationType, };
 type TrainingTicketWithLesson = TrainingTicket & {
@@ -510,6 +511,17 @@ const fetchAndUpdateRosterChanges = async (student: User, oldPassedLessons: Less
     });
 
     await Promise.all(rosterUpdates.map(async (update) => {
+        const soloCertification = await prisma.soloCertification.findFirst({
+            where: {
+                userId: student.id,
+                certificationTypeId: update.certificationTypeId,
+            },
+        });
+
+        if (soloCertification) {
+            await deleteSolo(soloCertification.id);
+        }
+
         await prisma.certification.upsert({
             where: {
                 certificationTypeId_userId: {
