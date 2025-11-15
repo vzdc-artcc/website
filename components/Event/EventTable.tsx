@@ -77,7 +77,7 @@ export default function EventTable({ archived }: { archived?: boolean, }) {
                         onClick={() => router.push(`/events/admin/events/${params.row.id}/manager`)}
                     />
                 </Tooltip>,
-                <EventPromotionalMessageSendButton event={params.row}/>,
+                <EventPromotionalMessageSendButton key={`${params.row.id}-promo`} event={params.row}/>,
                 <Tooltip title="Edit Event" key={`edit-${params.row.id}`}>
                     <GridActionsCellItem
                         icon={<Edit/>}

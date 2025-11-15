@@ -137,7 +137,7 @@ export default function EventForm({ event }: { event?: Event, }) {
             setHost('ZDC');
         }
         debouncedUpdateStatus();
-    }, [debouncedUpdateStatus, type]);
+    }, [debouncedUpdateStatus, type, host]);
 
     const handleOpen = (panel: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
         setOpen(isExpanded ? panel : -1);
