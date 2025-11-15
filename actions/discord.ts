@@ -118,15 +118,24 @@ export const sendDiscordEventPositionData = async (event: Event, positions: Even
 
     const publishedPositions = positions.filter((position) => position.published);
 
-    const res = await fetch(`${BOT_API_BASE_URL}/create_event_post`, {
+    const res = await fetch(`${BOT_API_BASE_URL}/event_position_posting`, {
         method: 'POST',
         headers: {
             'X-API-Key': BOT_API_SECRET_KEY,
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            event,
-            eventPositions: publishedPositions,
+            event_name: event.name,
+            event_id: event.id,
+            event_description: event.description,
+            event_banner_url: `https://utfs.io/f/${event.bannerKey}`,
+            event_start_time: event.start,
+            event_end_time: event.end,
+            controllers: publishedPositions.map((position) => ({
+                controller_name: position.user?.fullName,
+                controller_rating: position.user?.rating,
+                controller_final_position: position.finalPosition
+            }))
         }),
     });
 

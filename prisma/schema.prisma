@@ -663,6 +663,7 @@ model Event {
   id   String    @id @default(cuid())
   name String
   type EventType
+  host String @default("ERR - CTC EVENTS STAFF")
 
   featuredFields String[]
 

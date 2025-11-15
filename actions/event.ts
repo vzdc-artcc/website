@@ -1,18 +1,16 @@
 'use server';
 
 import prisma from "@/lib/db";
-import { log } from "./log";
-import { after } from "next/server";
-import { GridFilterItem } from "@mui/x-data-grid";
-import { GridPaginationModel } from "@mui/x-data-grid";
-import { GridSortModel } from "@mui/x-data-grid";
-import { EventType, Prisma } from "@prisma/client";
-import { SafeParseReturnType, z } from "zod";
-import { UTApi } from "uploadthing/server";
-import { revalidatePath } from "next/cache";
-import { sendEventPositionRemovalEmail } from "./mail/event";
-import { User } from "next-auth";
-import { ZodErrorSlimResponse } from "@/types";
+import {log} from "./log";
+import {after} from "next/server";
+import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
+import {EventType, Prisma} from "@prisma/client";
+import {SafeParseReturnType, z} from "zod";
+import {UTApi} from "uploadthing/server";
+import {revalidatePath} from "next/cache";
+import {sendEventPositionRemovalEmail} from "./mail/event";
+import {User} from "next-auth";
+import {ZodErrorSlimResponse} from "@/types";
 
 const MAX_FILE_SIZE = 1024 * 1024 * 4;
 const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
@@ -108,9 +106,11 @@ export const validateEvent = async (input: { [key: string]: any }, zodResponse?:
         return duration > 30;
     };
 
+
     const eventZ = z.object({
         id: z.string().optional(),
         name: z.string().min(3, { message: "Name must be between 3 and 255 characters" }).max(255, { message: "Name must be between 3 and 255 characters" }),
+        host: z.string().min(1, {message: "Host is required"}).max(100, {message: "Host must be less than 100 characters"}),
         start: z.date({ required_error: 'Start date is required' }).refine(isAfterToday, { message: "Start date must be after today" }),
         end: z.date({ required_error: 'End date is required' }),
         type: z.nativeEnum(EventType, { required_error: 'Type is required' }),
@@ -149,6 +149,7 @@ export const upsertEvent = async (formData: FormData) => {
     const result = await validateEvent({
         id: formData.get('id'),
         name: formData.get('name'),
+        host: formData.get('host'),
         start: new Date(formData.get('start') as string),
         end: new Date(formData.get('end') as string),
         type: formData.get('type'),

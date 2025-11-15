@@ -48,6 +48,7 @@ export default function EventForm({ event }: { event?: Event, }) {
     const [bannerUploadType, setBannerUploadType] = useState<'file' | 'url'>('file');
 
     const [name, setName] = useState<string>(event?.name || '');
+    const [host, setHost] = useState<string>(event?.host || '');
     const [start, setStart] = useState<Dayjs | null>(dayjs.utc(event?.start || new Date()));
     const [end, setEnd] = useState<Dayjs | null>(dayjs.utc(event?.end || new Date()));
     const [type, setType] = useState<EventType | undefined>(event?.type);
@@ -76,6 +77,7 @@ export default function EventForm({ event }: { event?: Event, }) {
             const res = await validateEvent({
                 id: event?.id,
                 name,
+                host,
                 start: start?.toDate(),
                 end: end?.toDate(),
                 type: type?.toString() || '',
@@ -90,19 +92,20 @@ export default function EventForm({ event }: { event?: Event, }) {
                 setStatus([<CheckCircle key={1} color="success" />, <CheckCircle key={2} color="success" />, <CheckCircle key={3} color="success" />, <CheckCircle key={4} color="success" />, <CheckCircle key={5} color="success" />]);
                 return;
             }
-            
-            const secondStep = await getStepStatus(res, { type: type?.toString() || '' });
+
+            const secondStep = await getStepStatus(res, {type: type?.toString() || '', host});
             const thirdStep = await getStepStatus(res, { description });
             const fourthStep = await getStepStatus(res, { bannerUrl });
             const fifthStep = await getStepStatus(res, { featuredFields });
             setStatus([firstStep, secondStep, thirdStep, fourthStep, fifthStep]);
         }, 500),
-        [event?.archived, event?.id, name, start, end, type, description, bannerUrl, featuredFields]
+        [event?.archived, event?.id, name, host, start, end, type, description, bannerUrl, featuredFields]
     );
 
     const handleSubmit = async (formData: FormData) => {
 
         formData.set('name', name);
+        formData.set('host', host);
         formData.set('start', start?.toISOString() || '');
         formData.set('end', end?.toISOString() || '');
         formData.set('type', type || EventType.HOME);
@@ -130,8 +133,11 @@ export default function EventForm({ event }: { event?: Event, }) {
     }
 
     useEffect(() => {
+        if (type === EventType.HOME && host !== 'ZDC') {
+            setHost('ZDC');
+        }
         debouncedUpdateStatus();
-    }, [debouncedUpdateStatus]);
+    }, [debouncedUpdateStatus, type]);
 
     const handleOpen = (panel: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
         setOpen(isExpanded ? panel : -1);
@@ -206,6 +212,9 @@ export default function EventForm({ event }: { event?: Event, }) {
                                     ))}
                                 </RadioGroup>
                             </FormControl>
+                            <TextField sx={{mb: 1,}} fullWidth variant="filled" name="host" label="Host(s)" value={host}
+                                       onChange={(e) => setHost(e.target.value)}
+                                       disabled={!!event?.archived || type === 'HOME'}/>
                             {NextButton}                        
                         </AccordionDetails>
                     </Accordion>
@@ -314,7 +323,8 @@ export default function EventForm({ event }: { event?: Event, }) {
                         <AccordionDetails>
                             <ul>
                                 <li>
-                                    <Typography gutterBottom>By default, when an event is created, it is hidden from the calendar or list view.</Typography>
+                                    <Typography gutterBottom>By default, when an event is created, it is shown to the
+                                        calendar or list view.</Typography>
                                 </li>
                                 <li>
                                     <Typography gutterBottom>This event will be archived, not deleted, <b>24 hours</b> after the published end date.  This can be reverted through the event manager.</Typography>

@@ -20,6 +20,7 @@ import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import WelcomeMessageDialog from "@/components/WelcomeMessages/WelcomeMessageDialog";
 import prisma from "@/lib/db";
+import StaffTasksAlert from "@/components/Admin/StaffTasksAlert";
 
 export const metadata: Metadata = {
     title: "Virtual Washington ARTCC",
@@ -59,6 +60,7 @@ export default async function RootLayout({
                     <WelcomeMessageDialog user={session.user} welcomeMessages={welcomeMessages}/>}
                 <Navbar/>
                 <Container maxWidth="xl" sx={{marginTop: 2,}}>
+                    <StaffTasksAlert/>
                     {children}
                 </Container>
                 <Footer/>
