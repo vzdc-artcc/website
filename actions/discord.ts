@@ -146,4 +146,41 @@ export const sendDiscordEventPositionData = async (event: Event, positions: Even
     await log("CREATE", "DISCORD_MESSAGE", `Sent Discord event position data for event ${event.name}`);
 }
 
+export const sendEventPromotionalMessage = async (title: string, body: string, bannerKey: string) => {
+
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user) {
+        throw new Error();
+    }
+
+    try {
+        const res = await fetch(`${BOT_API_BASE_URL}/announcements`, {
+            method: 'POST',
+            headers: {
+                'X-API-Key': BOT_API_SECRET_KEY,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message_type: 'event-posting',
+                author_name: session.user.fullName,
+                title,
+                body,
+                banner_url: `https://utfs.io/f/${bannerKey}`,
+            }),
+        });
+
+        if (!res.ok) {
+            return res.status;
+        }
+    } catch (e) {
+        console.log(e);
+        return;
+    }
+
+
+    await log("CREATE", "DISCORD_MESSAGE", `Sent event promotional message titled "${title}"`);
+    return true;
+}
+
 

@@ -1,15 +1,16 @@
 'use client';
 
-import { Checklist, Edit, OpenInNew } from "@mui/icons-material";
-import { getGridSingleSelectOperators, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
-import { EventType } from "@prisma/client";
+import {Checklist, Edit, OpenInNew} from "@mui/icons-material";
+import {getGridSingleSelectOperators, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
+import {EventType} from "@prisma/client";
 import Link from "next/link";
 import EventDeleteButton from "./EventDeleteButton";
-import { Tooltip } from "@mui/material";
-import { useRouter } from "next/navigation";
-import DataTable, { containsOnlyFilterOperator, equalsOnlyFilterOperator } from "../DataTable/DataTable";
-import { fetchEvents } from "@/actions/event";
-import { formatZuluDate } from "@/lib/date";
+import {Tooltip} from "@mui/material";
+import {useRouter} from "next/navigation";
+import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "../DataTable/DataTable";
+import {fetchEvents} from "@/actions/event";
+import {formatZuluDate} from "@/lib/date";
+import EventPromotionalMessageSendButton from "@/components/Event/EventPromotionalMessageSendButton";
 
 export default function EventTable({ archived }: { archived?: boolean, }) {
 
@@ -20,7 +21,7 @@ export default function EventTable({ archived }: { archived?: boolean, }) {
             field: 'name',
             headerName: 'Name',
             filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
-            flex: 1,
+            flex: 3,
         },
         {
             field: 'type',
@@ -36,7 +37,7 @@ export default function EventTable({ archived }: { archived?: boolean, }) {
             type: 'dateTime',
             headerName: 'Start (GMT)',
             valueFormatter: formatZuluDate,
-            flex: 1,
+            flex: 2,
             filterable: false,
         },
         {
@@ -44,7 +45,7 @@ export default function EventTable({ archived }: { archived?: boolean, }) {
             type: 'dateTime',
             headerName: 'End (GMT)',
             valueFormatter: formatZuluDate,
-            flex: 1,
+            flex: 2,
             filterable: false,
         },
         {
@@ -67,7 +68,7 @@ export default function EventTable({ archived }: { archived?: boolean, }) {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',
-            flex: 1,
+            flex: 2,
             getActions: (params) => [
                 <Tooltip title="Event Manager" key={`positions-${params.row.id}`}>
                     <GridActionsCellItem
@@ -76,6 +77,7 @@ export default function EventTable({ archived }: { archived?: boolean, }) {
                         onClick={() => router.push(`/events/admin/events/${params.row.id}/manager`)}
                     />
                 </Tooltip>,
+                <EventPromotionalMessageSendButton event={params.row}/>,
                 <Tooltip title="Edit Event" key={`edit-${params.row.id}`}>
                     <GridActionsCellItem
                         icon={<Edit/>}
