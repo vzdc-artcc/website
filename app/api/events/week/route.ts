@@ -44,5 +44,5 @@ export async function GET() {
         }),
     });
 
-    return res.ok;
+    return Response.json(res.ok);
 }
