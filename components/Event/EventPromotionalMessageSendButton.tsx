@@ -3,7 +3,16 @@ import React, {useState} from 'react';
 import {Event} from "@prisma/client";
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {Campaign, Send} from "@mui/icons-material";
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Tooltip} from "@mui/material";
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    TextField,
+    Tooltip
+} from "@mui/material";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import {toast} from "react-toastify";
 import {sendEventPromotionalMessage} from "@/actions/discord";
@@ -45,7 +54,8 @@ export default function EventPromotionalMessageSendButton({event}: { event: Even
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md" fullWidth>
                 <DialogTitle>Send Event Promotional Message</DialogTitle>
                 <DialogContent>
-                    <TextField sx={{mb: 2,}} fullWidth variant="filled" label="Title" value={title}
+                    <DialogContentText>{event.name}</DialogContentText>
+                    <TextField sx={{my: 2,}} fullWidth variant="filled" label="Title" value={title}
                                onChange={(e) => setTitle(e.target.value)} required/>
                     <MarkdownEditor
                         enableScroll={false}
