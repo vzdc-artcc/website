@@ -5,6 +5,8 @@ const {UPDATER_KEY} = process.env;
 
 export const verifyUpdaterKey = async (req: Request) => {
     const apiKey = req.headers.get('x-updater-key');
+    console.log(apiKey);
+    console.log(UPDATER_KEY);
 
     const session = await getServerSession(authOptions);
     const isWm = session?.user.staffPositions.includes('WM');
