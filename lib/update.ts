@@ -5,7 +5,12 @@ const {UPDATER_KEY} = process.env;
 
 export const verifyUpdaterKey = async (req: Request) => {
     const apiKey = req.headers.get('x-updater-key');
-    console.log(apiKey);
+    // print all headers
+    console.log('Request Headers:');
+    req.headers.forEach((value, key) => {
+        console.log(`${key}: ${value}`);
+    });
+    console.log(`Received Updater Key: ${apiKey}`);
     console.log(UPDATER_KEY);
 
     const session = await getServerSession(authOptions);
