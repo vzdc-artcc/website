@@ -1,9 +1,15 @@
 import prisma from "@/lib/db";
+import {verifyUpdaterOrigin} from "@/lib/update";
 
 const BOT_API_BASE_URL = process.env.BOT_API_BASE_URL || 'http://localhost:5500';
 const BOT_API_SECRET_KEY = process.env.BOT_API_SECRET_KEY || '1234';
 
-export async function GET() {
+export async function GET(req: Request) {
+
+    if (!(await verifyUpdaterOrigin(req))) {
+        return new Response('Unauthorized', {status: 401});
+    }
+
     const now = new Date();
     const weekFromNow = new Date();
     weekFromNow.setDate(now.getDate() + 7);
