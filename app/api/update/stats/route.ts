@@ -4,10 +4,11 @@ import {User} from "next-auth";
 import {ControllerLogMonth} from "@prisma/client";
 import {updateSyncTime} from "@/actions/lib/sync";
 import {verifyUpdaterKey} from "@/lib/update";
+import {NextRequest} from "next/server";
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
 
     if (!(await verifyUpdaterKey(req))) {
         return new Response('Unauthorized', {status: 401});

@@ -8,12 +8,13 @@ import {getRating} from "@/lib/vatsim";
 import {sendProgressionAssignedEmail} from "@/actions/mail/progression";
 import {assignNextProgressionOrRemove, getProgressionStatus} from "@/actions/progressionAssignment";
 import {verifyUpdaterKey} from "@/lib/update";
+import {NextRequest} from "next/server";
 
 export const dynamic = 'force-dynamic';
 
 const DEV_MODE = process.env['DEV_MODE'] === 'true';
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
 
     if (!(await verifyUpdaterKey(req))) {
         return new Response('Unauthorized', {status: 401});

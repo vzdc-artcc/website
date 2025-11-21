@@ -3,12 +3,13 @@ import {updateSyncTime} from "@/actions/lib/sync";
 import prisma from "@/lib/db";
 import {UTApi} from "uploadthing/server";
 import {verifyUpdaterKey} from "@/lib/update";
+import {NextRequest} from "next/server";
 
 export const dynamic = 'force-dynamic';
 
 const ut = new UTApi();
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
 
     if (!(await verifyUpdaterKey(req))) {
         return new Response('Unauthorized', {status: 401});
