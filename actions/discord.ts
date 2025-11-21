@@ -162,7 +162,7 @@ export const sendEventPromotionalMessage = async (title: string, body: string, b
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                message_type: 'event-posting',
+                message_type: 'event-announcement',
                 author_name: session.user.fullName,
                 title,
                 body,
