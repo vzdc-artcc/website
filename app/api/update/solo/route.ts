@@ -1,13 +1,13 @@
 import {deleteExpiredSolos} from "@/actions/solo";
 import {revalidatePath} from "next/cache";
 import {updateSyncTime} from "@/actions/lib/sync";
-import {verifyUpdaterOrigin} from "@/lib/update";
+import {verifyUpdaterKey} from "@/lib/update";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
 
-    if (!(await verifyUpdaterOrigin(req))) {
+    if (!(await verifyUpdaterKey(req))) {
         return new Response('Unauthorized', {status: 401});
     }
 

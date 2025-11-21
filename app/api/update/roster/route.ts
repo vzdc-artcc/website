@@ -7,7 +7,7 @@ import {getOperatingInitials} from "@/actions/lib/oi";
 import {getRating} from "@/lib/vatsim";
 import {sendProgressionAssignedEmail} from "@/actions/mail/progression";
 import {assignNextProgressionOrRemove, getProgressionStatus} from "@/actions/progressionAssignment";
-import {verifyUpdaterOrigin} from "@/lib/update";
+import {verifyUpdaterKey} from "@/lib/update";
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +15,7 @@ const DEV_MODE = process.env['DEV_MODE'] === 'true';
 
 export async function GET(req: Request) {
 
-    if (!(await verifyUpdaterOrigin(req))) {
+    if (!(await verifyUpdaterKey(req))) {
         return new Response('Unauthorized', {status: 401});
     }
 

@@ -2,7 +2,7 @@ import prisma from "@/lib/db";
 import {updateSyncTime} from "@/actions/lib/sync";
 import {sendTrainingAppointmentWarningEmail} from "@/actions/mail/trainingAppointment";
 import {User} from "next-auth";
-import {verifyUpdaterOrigin} from "@/lib/update";
+import {verifyUpdaterKey} from "@/lib/update";
 
 const TRAINING_ENVIRONMENTS = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["ERR-CONFIG"];
 const BUFFER_TIME = Number(process.env.BUFFER_TIME) || 15; // in minutes
@@ -10,7 +10,7 @@ const oneWeekInMS = 7 * 24 * 60 * 60 * 1000;
 
 export async function GET(req: Request) {
 
-    if (!(await verifyUpdaterOrigin(req))) {
+    if (!(await verifyUpdaterKey(req))) {
         return new Response('Unauthorized', {status: 401});
     }
 
