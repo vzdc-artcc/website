@@ -3,10 +3,15 @@ import {revalidatePath} from "next/cache";
 import {User} from "next-auth";
 import {ControllerLogMonth} from "@prisma/client";
 import {updateSyncTime} from "@/actions/lib/sync";
+import {verifyUpdaterOrigin} from "@/lib/update";
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
+
+    if (!(await verifyUpdaterOrigin(req))) {
+        return new Response('Unauthorized', {status: 401});
+    }
 
     const now = new Date();
     const syncTime = await prisma.syncTimes.findFirst();

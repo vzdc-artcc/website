@@ -1,13 +1,18 @@
 import {revalidatePath} from "next/cache";
 import {updateSyncTime} from "@/actions/lib/sync";
 import prisma from "@/lib/db";
-import { UTApi } from "uploadthing/server";
+import {UTApi} from "uploadthing/server";
+import {verifyUpdaterOrigin} from "@/lib/update";
 
 export const dynamic = 'force-dynamic';
 
 const ut = new UTApi();
 
-export async function GET() {
+export async function GET(req: Request) {
+
+    if (!(await verifyUpdaterOrigin(req))) {
+        return new Response('Unauthorized', {status: 401});
+    }
 
     const in24Hours = new Date();
     in24Hours.setHours(in24Hours.getHours() + 24);

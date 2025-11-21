@@ -7,16 +7,24 @@ import {getOperatingInitials} from "@/actions/lib/oi";
 import {getRating} from "@/lib/vatsim";
 import {sendProgressionAssignedEmail} from "@/actions/mail/progression";
 import {assignNextProgressionOrRemove, getProgressionStatus} from "@/actions/progressionAssignment";
+import {verifyUpdaterOrigin} from "@/lib/update";
 
 export const dynamic = 'force-dynamic';
 
 const DEV_MODE = process.env['DEV_MODE'] === 'true';
-export async function GET() {
+
+export async function GET(req: Request) {
+
+    if (!(await verifyUpdaterOrigin(req))) {
+        return new Response('Unauthorized', {status: 401});
+    }
+
     rosterUpdate().then();
     return Response.json({ok: true, message: 'Roster update started.'});
 }
 
 async function rosterUpdate() {
+
 
     const users = await prisma.user.findMany();
 

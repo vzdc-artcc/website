@@ -4,7 +4,7 @@ import {updateSyncTime} from "@/actions/lib/sync";
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
 
     await deleteExpiredLoas();
 
