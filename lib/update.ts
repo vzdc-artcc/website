@@ -13,6 +13,6 @@ export const verifyUpdaterKey = async (req: Request) => {
         return true;
     }
 
-    console.log(`Updater origin verification failed. Origin: ${origin}, Expected: API Key Present: ${apiKey ? 'Yes' : 'No'}`);
+    console.log(`Updater origin verification failed. Expected: API Key Present: ${apiKey ? 'Yes' : 'No'}`);
     return false;
 }
