@@ -1,10 +1,11 @@
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
+import {NextRequest} from "next/server";
 
 const {UPDATER_KEY} = process.env;
 
-export const verifyUpdaterKey = async (req: Request) => {
-    const apiKey = req.headers.get('x-updater-key');
+export const verifyUpdaterKey = async (req: NextRequest) => {
+    const apiKey = req.headers.get('API-Key');
     // print all headers
     console.log('Request Headers:');
     req.headers.forEach((value, key) => {
