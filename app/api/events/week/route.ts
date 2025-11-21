@@ -1,10 +1,11 @@
 import prisma from "@/lib/db";
 import {verifyUpdaterKey} from "@/lib/update";
+import {NextRequest} from "next/server";
 
 const BOT_API_BASE_URL = process.env.BOT_API_BASE_URL || 'http://localhost:5500';
 const BOT_API_SECRET_KEY = process.env.BOT_API_SECRET_KEY || '1234';
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
 
     if (!(await verifyUpdaterKey(req))) {
         return new Response('Unauthorized', {status: 401});
