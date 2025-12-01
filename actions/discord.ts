@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 
 const BOT_API_BASE_URL = process.env.BOT_API_BASE_URL || 'http://localhost:5500';
 const BOT_API_SECRET_KEY = process.env.BOT_API_SECRET_KEY || '1234';
-const GUILD_ID = '391802941486530561';
+export const GUILD_ID = '391802941486530561';
 
 interface SendAnnouncementResult {
     ok?: boolean;
