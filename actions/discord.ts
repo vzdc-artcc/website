@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 
 const BOT_API_BASE_URL = process.env.BOT_API_BASE_URL || 'http://localhost:5500';
 const BOT_API_SECRET_KEY = process.env.BOT_API_SECRET_KEY || '1234';
-export const GUILD_ID = '391802941486530561';
+const {DISCORD_GUILD_ID} = process.env;
 
 interface SendAnnouncementResult {
     ok?: boolean;
@@ -78,7 +78,7 @@ export async function sendAnnouncement(
         author: authorName,
         author_rating: authorRating,
         author_staff_position: authorStaffPosition,
-        guild_id: GUILD_ID,
+        guild_id: DISCORD_GUILD_ID,
     };
 
     try {
@@ -127,7 +127,7 @@ export const sendDiscordEventPositionData = async (event: Event, positions: Even
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            guild_id: GUILD_ID,
+            guild_id: DISCORD_GUILD_ID,
             event_name: event.name,
             event_id: event.id,
             event_description: event.description,
@@ -170,7 +170,7 @@ export const sendEventPromotionalMessage = async (title: string, body: string, b
                 title,
                 body,
                 banner_url: `https://utfs.io/f/${bannerKey}`,
-                guild_id: GUILD_ID
+                guild_id: DISCORD_GUILD_ID
             }),
         });
 
