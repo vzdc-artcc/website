@@ -17,8 +17,7 @@ export default function IncidentTable() {
             headerName: 'Reporter',
             flex: 1,
             sortable: false,
-            renderCell: (params) => params.row.closed ?
-                <VisibilityOff/> : `${params.row.reporter.firstName} ${params.row.reporter.lastName} (${params.row.reporter.cid})`,
+            renderCell: (params) => `${params.row.reporter.firstName} ${params.row.reporter.lastName} (${params.row.reporter.cid})`,
             filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator]
         },
         {

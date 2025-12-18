@@ -38,9 +38,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Reporter</Typography>
-                        {incident.closed && <Typography>REDACTED</Typography>}
-                        {!incident.closed &&
-                            <Typography>{incident.reporter.firstName} {incident.reporter.lastName} ({incident.reporter.cid})</Typography>}
+                        <Typography>{incident.reporter.firstName} {incident.reporter.lastName} ({incident.reporter.cid})</Typography>
                     </Grid2>
                     <Grid2
                         size={{
@@ -48,8 +46,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Reporter Email</Typography>
-                        {incident.closed && <Typography>REDACTED</Typography>}
-                        {!incident.closed && <Typography>{incident.reporter.email}</Typography>}
+                        <Typography>{incident.reporter.email}</Typography>
                     </Grid2>
                     <Grid2
                         size={{
@@ -57,8 +54,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Reporter CID</Typography>
-                        {incident.closed && <Typography>REDACTED</Typography>}
-                        {!incident.closed && <Typography>{incident.reporter.cid}</Typography>}
+                        <Typography>{incident.reporter.cid}</Typography>
                     </Grid2>
                     <Grid2
                         size={{
