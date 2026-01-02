@@ -37,12 +37,30 @@ export default async function StaffTasksAlert() {
         },
     });
 
-    const pendingTasks = pendingVisitorApplications + pendingFeedback + activeIncidentReports + pendingLoas;
+    const pendingAdminTasks = pendingVisitorApplications + pendingFeedback + activeIncidentReports + pendingLoas;
 
-    return pendingTasks > 0 && (
-        <Alert severity="warning" sx={{my: 1,}}>
-            There {pendingTasks == 1 ? 'is' : 'are'} currently <b>{pendingTasks} pending senior staff
-            task{pendingTasks == 1 ? '' : 's'}</b> under Facility Administration.
-        </Alert>
+    const trainingReleaseRequests = await prisma.trainerReleaseRequest.count();
+
+    const pendingOtsRecs = await prisma.otsRecommendation.count({
+        where: {
+            assignedInstructorId: null,
+        },
+    });
+
+    const pendingTrainingTasks = trainingReleaseRequests + pendingOtsRecs;
+
+    return (
+        <>
+            {pendingAdminTasks > 0 &&
+                <Alert severity="warning" sx={{my: 1,}}>
+                    There {pendingAdminTasks == 1 ? 'is' : 'are'} currently <b>{pendingAdminTasks} pending senior staff
+                    task{pendingAdminTasks == 1 ? '' : 's'}</b> under Facility Administration.
+                </Alert>}
+            {pendingTrainingTasks > 0 &&
+                <Alert severity="warning" sx={{my: 1,}}>
+                    There {pendingTrainingTasks == 1 ? 'is' : 'are'} currently <b>{pendingTrainingTasks} pending TA
+                    task{pendingTrainingTasks == 1 ? '' : 's'}</b> under Training Administration.
+                </Alert>}
+        </>
     );
 }

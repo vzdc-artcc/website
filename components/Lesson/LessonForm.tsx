@@ -115,7 +115,8 @@ export default function LessonForm({lesson}: { lesson?: Lesson, }) {
                         <FormControlLabel control={<Switch defaultChecked={lesson?.notifyInstructorOnPass}/>}
                                           name="notifyInstructorOnPass" label="Notify Instructors on PASS?"/>
                         <FormControlLabel control={<Switch defaultChecked={lesson?.releaseRequestOnPass}/>}
-                                          name="releaseRequestOnPass" label="Submit trainer release request on PASS?"/>
+                                          name="releaseRequestOnPass"
+                                          label="Submit trainer release request on home controller PASS?"/>
                     </FormGroup>
                 </Grid2>
                 <Grid2 size={2}>

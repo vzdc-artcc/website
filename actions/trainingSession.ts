@@ -8,9 +8,9 @@ import {revalidatePath} from "next/cache";
 import {z} from "zod";
 import {
     CertificationType,
-    CommonMistake,
     Lesson,
     LessonRosterChange,
+    OtsRecommendation,
     Prisma,
     RubricCriteraScore,
     TrainerReleaseRequest,
@@ -24,8 +24,12 @@ import {
     deleteVatusaTrainingSession,
     editVatusaTrainingSession
 } from "@/actions/vatusa/training";
-import {getDuration} from "@/lib/date";
-import {sendInstructorsTrainingSessionCreatedEmail, sendTrainingSessionCreatedEmail} from "@/actions/mail/training";
+import {formatZuluDate, getDuration} from "@/lib/date";
+import {
+    sendInstructorsTrainingSessionCreatedEmail,
+    sendStudentOtsRecNotificationEmail,
+    sendTrainingSessionCreatedEmail
+} from "@/actions/mail/training";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
 import {TrainingSessionIndicatorWithAll} from "@/components/TrainingSession/TrainingSessionForm";
 import {after} from "next/server";
@@ -57,6 +61,7 @@ export async function deleteTrainingSession(id: string) {
 type CreateOrUpdateTrainingSessionResult = {
     release?: TrainerReleaseRequest;
     rosterUpdates?: RosterChangeWithAll[];
+    otsRec?: OtsRecommendation;
     errors?: { message: string }[];
 };
 
@@ -66,7 +71,6 @@ export const createOrUpdateTrainingSession = async (
     end: any,
     trainingTickets: {
         lesson: Lesson,
-        mistakes: CommonMistake[],
         scores: RubricCriteraScore[],
         passed: boolean,
     }[],
@@ -92,9 +96,6 @@ export const createOrUpdateTrainingSession = async (
             lesson: z.object({
                 id: z.string(),
             }),
-            mistakes: z.array(z.object({
-                id: z.string(),
-            })),
             scores: z.array(z.object({
                 criteriaId: z.string(),
                 cellId: z.string(),
@@ -136,6 +137,7 @@ export const createOrUpdateTrainingSession = async (
         session?: TrainingSession & any;
         release?: TrainerReleaseRequest;
         rosterUpdates?: LessonRosterChangeWithType[];
+        otsRec?: OtsRecommendation,
     } = {};
 
     if (id && session) {
@@ -152,7 +154,6 @@ export const createOrUpdateTrainingSession = async (
                 tickets: {
                     create: result.data.trainingTickets.map((t) => ({
                         lesson: {connect: {id: t.lesson.id}},
-                        mistakes: {connect: t.mistakes.map((m) => ({id: m.id}))},
                         scores: {
                             create: t.scores.map((s) => (
                                 {
@@ -189,13 +190,15 @@ export const createOrUpdateTrainingSession = async (
 
         const release = await fetchAndUpdateReleaseRequest(trainingSession.student as User, passedLessons.map((t) => t.lesson));
 
-        await sendInstructorEmails(trainingSession.student as User, trainingSession, oldTickets, trainingSession.tickets);
+        await deleteOtsRecs(trainingSession.student as User, trainingSession.tickets.map((t) => t.lesson));
+
+        const rec = await sendInstructorEmails(trainingSession.student as User, trainingSession.instructor as User, trainingSession, oldTickets, trainingSession.tickets);
 
         revalidatePath('/training/sessions', "layout");
 
         await log("UPDATE", "TRAINING_SESSION", `Updated training session with student ${trainingSession.student.cid} - ${trainingSession.student.firstName} ${trainingSession.student.lastName}`);
 
-        res = {session: trainingSession, release: release || undefined, rosterUpdates};
+        res = {session: trainingSession, release: release || undefined, rosterUpdates, otsRec: rec};
 
     } else if (session) {
 
@@ -210,7 +213,6 @@ export const createOrUpdateTrainingSession = async (
                 tickets: {
                     create: result.data.trainingTickets.map((t) => ({
                         lesson: {connect: {id: t.lesson.id}},
-                        mistakes: {connect: t.mistakes.map((m) => ({id: m.id}))},
                         scores: {
                             create: t.scores.map((s) => (
                                 {
@@ -246,7 +248,9 @@ export const createOrUpdateTrainingSession = async (
 
         const release = await fetchAndUpdateReleaseRequest(trainingSession.student as User, passedLessons.map((t) => t.lesson));
 
-        await sendInstructorEmails(trainingSession.student as User, trainingSession, [], trainingSession.tickets);
+        await deleteOtsRecs(trainingSession.student as User, trainingSession.tickets.map((t) => t.lesson));
+
+        const rec = await sendInstructorEmails(trainingSession.student as User, trainingSession.instructor as User, trainingSession, [], trainingSession.tickets);
 
         await prisma.trainingSession.update({
             where: {id: trainingSession.id},
@@ -263,7 +267,7 @@ export const createOrUpdateTrainingSession = async (
 
         await log("CREATE", "TRAINING_SESSION", `Created training session with student ${trainingSession.student.cid} - ${trainingSession.student.firstName} ${trainingSession.student.lastName}`);
 
-        res = {session: trainingSession, release: release || undefined, rosterUpdates};
+        res = {session: trainingSession, release: release || undefined, rosterUpdates, otsRec: rec};
     } else {
         return {
             errors: [{
@@ -548,7 +552,7 @@ const fetchAndUpdateRosterChanges = async (student: User, oldPassedLessons: Less
 const fetchAndUpdateReleaseRequest = async (student: User, passedLessons: Lesson[]) => {
     let release = null;
 
-    if (passedLessons.some((l => l.releaseRequestOnPass))) {
+    if (student.controllerStatus === 'HOME' && passedLessons.some((l => l.releaseRequestOnPass))) {
         const assignment = await prisma.trainingAssignment.findUnique({
             where: {
                 studentId: student.id,
@@ -573,7 +577,7 @@ const fetchAndUpdateReleaseRequest = async (student: User, passedLessons: Lesson
     return release;
 }
 
-const sendInstructorEmails = async (student: User, trainingSession: TrainingSession, oldTickets: TrainingTicketWithLesson[], newTickets: TrainingTicketWithLesson[]) => {
+const sendInstructorEmails = async (student: User, trainer: User, trainingSession: TrainingSession, oldTickets: TrainingTicketWithLesson[], newTickets: TrainingTicketWithLesson[]) => {
     for (const newTicket of newTickets) {
 
         if (!newTicket.lesson.notifyInstructorOnPass || !newTicket.passed) {
@@ -583,7 +587,29 @@ const sendInstructorEmails = async (student: User, trainingSession: TrainingSess
         const oldTicket = oldTickets.find((ticket) => ticket.lesson.id === newTicket.lesson.id);
 
         if (!oldTicket || !oldTicket.passed) {
+            // create ots rec
+            const rec = await prisma.otsRecommendation.create({
+                data: {
+                    studentId: student.id,
+                    notes: `${newTicket.lesson.identifier} w/ ${trainer.fullName} ON ${formatZuluDate(trainingSession.start)}.`,
+                },
+            });
+            await log("CREATE", "OTS_RECOMMENDATION", `Created OTS recommendation for ${student.fullName} after passing lesson ${newTicket.lesson.identifier}.`);
+            sendStudentOtsRecNotificationEmail(student, rec).then();
             sendInstructorsTrainingSessionCreatedEmail(student, trainingSession, newTicket.lesson).then();
+            return rec;
         }
+    }
+}
+
+const deleteOtsRecs = async (student: User, lessons: Lesson[]) => {
+    if (lessons.some((l) => l.instructorOnly)) {
+        await prisma.otsRecommendation.deleteMany({
+            where: {
+                studentId: student.id,
+            }
+        });
+
+        await log("DELETE", "OTS_RECOMMENDATION", `Deleted OTS recommendations for ${student.fullName} due to running an OTS lesson.`);
     }
 }

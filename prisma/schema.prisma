@@ -130,6 +130,8 @@ model User {
   trainingAppointmentStudent TrainingAppointment[] @relation("TrainingAppointmentStudent")
   trainingAppointmentTrainer TrainingAppointment[] @relation("TrainingAppointmentTrainer")
   suaBlocks                  SuaBlock[]
+  studentOtsRec              OtsRecommendation[]   @relation("studentOtsRec")
+  instructorOtsRec           OtsRecommendation[]   @relation("instructorOtsRec")
 }
 
 model TrainingAssignment {
@@ -337,6 +339,7 @@ enum LogModel {
   LESSON_ROSTER_CHANGE
 
   TRAINING_APPOINTMENT
+  OTS_RECOMMENDATION
 
   WELCOME_MESSAGES
 
@@ -663,7 +666,7 @@ model Event {
   id   String    @id @default(cuid())
   name String
   type EventType
-  host String @default("ERR - CTC EVENTS STAFF")
+  host String    @default("ERR - CTC EVENTS STAFF")
 
   featuredFields String[]
 
@@ -716,6 +719,8 @@ model EventPosition {
   finalNotes    String?
 
   published Boolean @default(false)
+
+  submittedAt DateTime @default(now())
 
   @@unique([eventId, userId])
 }
@@ -900,4 +905,18 @@ model SuaBlockAirspace {
 
   bottomAltitude String
   topAltitude    String
+}
+
+model OtsRecommendation {
+  id String @id @default(cuid())
+
+  student   User   @relation("studentOtsRec", fields: [studentId], references: [id], onDelete: Cascade)
+  studentId String
+
+  assignedInstructor   User?   @relation("instructorOtsRec", fields: [assignedInstructorId], references: [id], onDelete: Cascade)
+  assignedInstructorId String?
+
+  notes String
+
+  createdAt DateTime @default(now())
 }

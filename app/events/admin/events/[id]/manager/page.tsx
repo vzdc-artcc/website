@@ -1,17 +1,16 @@
-import { authOptions } from "@/auth/auth";
+import {authOptions} from "@/auth/auth";
 import ArchivedAlert from "@/components/EventManager/ArchivedAlert";
 import EventControls from "@/components/EventManager/EventControls";
 import EventPositionsTable from "@/components/EventManager/EventPositionsTable";
 import EventPresetSelector from "@/components/EventManager/EventPresetSelector";
 import HiddenAlert from "@/components/EventManager/HiddenAlert";
-import ManualControllerAddForm from "@/components/EventManager/ManualControllerAddForm";
 import EventPositionRequestForm from "@/components/EventPosition/EventPositionRequestForm";
 import prisma from "@/lib/db";
-import { ExpandMore } from "@mui/icons-material";
-import { Accordion, AccordionDetails, AccordionSummary, Alert, Card, CardContent, Stack, Typography } from "@mui/material";
-import { EventPosition, SoloCertification, User } from "@prisma/client";
-import { getServerSession } from "next-auth";
-import { notFound } from "next/navigation";
+import {ExpandMore} from "@mui/icons-material";
+import {Accordion, AccordionDetails, AccordionSummary, Stack, Typography} from "@mui/material";
+import {EventPosition, SoloCertification, User} from "@prisma/client";
+import {getServerSession} from "next-auth";
+import {notFound} from "next/navigation";
 
 export type EventPositionWithSolo = EventPosition & { 
     soloCert: SoloCertification | null | undefined,
@@ -32,7 +31,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     user: true,
                 },
                 orderBy: {
-                    published: 'asc',
+                    submittedAt: 'asc',
                 }
             },
         },

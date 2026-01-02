@@ -1,6 +1,6 @@
 'use server';
 
-import {Lesson, TrainingSession} from "@prisma/client";
+import {Lesson, OtsRecommendation, TrainingSession} from "@prisma/client";
 import {User} from "next-auth";
 import {FROM_EMAIL, mailTransport} from "@/lib/email";
 import {trainingSessionCreated} from "@/templates/TrainingSession/TrainingSessionCreated";
@@ -12,6 +12,11 @@ import {releaseRequestApprovedStudent} from "@/templates/ReleaseRequest/ReleaseR
 import {assignmentTrainerRemoved} from "@/templates/TrainingAssignment/AssignmentTrainerRemoved";
 import {assignmentUpdatedStudent} from "@/templates/TrainingAssignment/AssignmentUpdatedStudent";
 import {requestDeleted} from "@/templates/AssignmentRequest/RequestDeleted";
+import {studentOtsRecNotification} from "@/templates/TrainingSession/StudentOtsRecNotification";
+import {studentOtsAssignedNotification} from "@/templates/TrainingSession/StudentOtsAssignedNotification";
+import {instructorOtsAssignedNotification} from "@/templates/TrainingSession/InstructorOtsAssignedNotification";
+import {instructorOtsUnassignedNotification} from "@/templates/TrainingSession/InstructorOtsUnassignedNotification";
+import {studentOtsUnassignedNotification} from "@/templates/TrainingSession/StudentOtsUnassignedNotification";
 
 export const sendTrainingSessionCreatedEmail = async (student: User, trainingSession: TrainingSession) => {
 
@@ -37,6 +42,63 @@ export const sendInstructorsTrainingSessionCreatedEmail = async (student: User, 
         html,
     })
 }
+
+export const sendStudentOtsRecNotificationEmail = async (student: User, rec: OtsRecommendation) => {
+    const {html} = await studentOtsRecNotification(student, rec);
+
+    await mailTransport.sendMail({
+        from: FROM_EMAIL,
+        to: student.email,
+        subject: "OTS Recommendation",
+        html,
+    })
+}
+
+export const sendStudentOtsAssignedNotificationEmail = async (student: User, instructor: User) => {
+    const {html} = await studentOtsAssignedNotification(student, instructor);
+
+    await mailTransport.sendMail({
+        from: FROM_EMAIL,
+        to: student.email,
+        subject: "OTS Assignment",
+        html,
+    })
+}
+
+export const sendStudentOtsUnassignedNotificationEmail = async (student: User) => {
+    const {html} = await studentOtsUnassignedNotification(student);
+
+    await mailTransport.sendMail({
+        from: FROM_EMAIL,
+        to: student.email,
+        subject: "OTS Assignment Removed",
+        html,
+    })
+}
+
+
+export const sendInstructorOtsAssignedNotificationEmail = async (student: User, instructor: User) => {
+    const {html} = await instructorOtsAssignedNotification(student, instructor);
+
+    await mailTransport.sendMail({
+        from: FROM_EMAIL,
+        to: instructor.email,
+        subject: "OTS Assignment",
+        html,
+    });
+}
+
+export const sendInstructorOtsUnassignedNotificationEmail = async (student: User, instructor: User) => {
+    const {html} = await instructorOtsUnassignedNotification(student, instructor);
+
+    await mailTransport.sendMail({
+        from: FROM_EMAIL,
+        to: instructor.email,
+        subject: "OTS Assignment Removed",
+        html,
+    });
+}
+
 
 export const sendTrainingAssignmentUpdatedEmail = async (student: User, primaryTrainer: User, removedTrainers: User[], addedTrainers: User[], primaryChanged: boolean) => {
 

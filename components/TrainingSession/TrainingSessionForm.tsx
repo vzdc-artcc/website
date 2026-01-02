@@ -1,8 +1,8 @@
 'use client';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
-    CommonMistake,
     Lesson,
+    OtsRecommendation,
     RubricCriteraScore,
     TrainerReleaseRequest,
     TrainingSession,
@@ -70,10 +70,10 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
 
     const [afterRelease, setAfterRelease] = useState<TrainerReleaseRequest>();
     const [afterRosterUpdates, setAfterRosterUpdates] = useState<RosterChangeWithAll[]>();
-    const renderAfterDialogs = !!afterRelease || !!afterRosterUpdates;
+    const [otsRec, setOtsRec] = useState<OtsRecommendation>();
+    const renderAfterDialogs = !!afterRelease || !!afterRosterUpdates || !!otsRec;
 
     const [allLessons, setAllLessons] = useState<Lesson[]>([]);
-    const [allCommonMistakes, setAllCommonMistakes] = useState<CommonMistake[]>([]);
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [yourStudentIds, setYourStudentIds] = useState<string[]>([]);
     const [allLoading, setAllLoading] = useState<boolean>(true);
@@ -86,7 +86,6 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
     const [trainingTickets, setTrainingTickets] = useState<{
         passed: boolean,
         lesson: Lesson,
-        mistakes: CommonMistake[],
         scores: RubricCriteraScore[],
     }[]>([]);
     const [additionalNotes, setAdditionalNotes] = useState<string>(trainingSession?.additionalComments || '');
@@ -96,9 +95,8 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
 
     const getInitialData = useCallback(async () => {
         setAllLoading(true);
-        const {lessons, commonMistakes, users, yourStudentIds} = await getAllData();
+        const {lessons, users, yourStudentIds} = await getAllData();
         setAllLessons(lessons.sort(({identifier:a},{identifier:b})=>a.localeCompare(b)));
-        setAllCommonMistakes(commonMistakes);
         setAllUsers(users as User[]);
         setYourStudentIds(yourStudentIds);
         setAllLoading(false);
@@ -108,7 +106,6 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                 return {
                     passed: ticket.scores.every((score) => score.passed),
                     lesson: ticket.lesson,
-                    mistakes: ticket.mistakes,
                     scores: ticket.scores,
                 }
             }));
@@ -120,6 +117,7 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
         const {
             release,
             rosterUpdates,
+            otsRec,
             errors
         } = await createOrUpdateTrainingSession(
             student,
@@ -139,9 +137,10 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
 
         toast("Training session saved successfully!", {type: 'success'});
 
-        if (release || rosterUpdates) {
+        if (release || rosterUpdates || otsRec) {
             setAfterRelease(release || undefined);
             setAfterRosterUpdates(rosterUpdates);
+            setOtsRec(otsRec)
         } else {
             redirect();
         }
@@ -168,8 +167,9 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
 
     return (
         (<LocalizationProvider dateAdapter={AdapterDayjs}>
-            {renderAfterDialogs && <TrainingSessionAfterSubmitDialogs onAllClose={redirect} release={afterRelease}
-                                                                      rosterChanges={afterRosterUpdates}/>}
+            {renderAfterDialogs &&
+                <TrainingSessionAfterSubmitDialogs onAllClose={redirect} release={afterRelease} otsRec={otsRec}
+                                                   rosterChanges={afterRosterUpdates}/>}
             <form action={handleSubmit}>
                 <Grid2 container columns={2} spacing={2}>
                     <Grid2 size={2}>
@@ -231,17 +231,15 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                         </AccordionSummary>
                                         <AccordionDetails>
                                             <TrainingTicketForm allLessons={allLessons}
-                                                                allCommonMistakes={allCommonMistakes}
-                                                                lesson={ticket.lesson} mistakes={ticket.mistakes}
+                                                                lesson={ticket.lesson}
                                                                 scores={ticket.scores}
-                                                                onSubmit={(lesson, mistakes, scores) => {
+                                                                onSubmit={(lesson, scores) => {
                                                                     setTrainingTickets((prev) => {
                                                                         return prev.map((t, i) => {
                                                                             if (i === index) {
                                                                                 return {
                                                                                     passed: scores.every((score) => score.passed),
                                                                                     lesson,
-                                                                                    mistakes,
                                                                                     scores,
                                                                                 }
                                                                             }
@@ -261,8 +259,8 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                         <Card variant="outlined">
                             <CardContent>
                                 <Typography variant="h6" sx={{mb: 2,}}>New Training Ticket</Typography>
-                                <TrainingTicketForm allLessons={allLessons} allCommonMistakes={allCommonMistakes}
-                                                    onSubmit={(lesson, mistakes, scores) => {
+                                <TrainingTicketForm allLessons={allLessons}
+                                                    onSubmit={(lesson, scores) => {
                                                         if (trainingTickets.map((t) => t.lesson.id).flat().includes(lesson.id)) {
                                                             toast('Lesson already added', {type: 'error'});
                                                             return false;
@@ -273,7 +271,6 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                                                 {
                                                                     passed: scores.every((score) => score.passed),
                                                                     lesson,
-                                                                    mistakes,
                                                                     scores,
                                                                 },
                                                             ];

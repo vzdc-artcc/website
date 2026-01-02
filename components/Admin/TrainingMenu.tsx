@@ -3,18 +3,19 @@ import {Badge, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import Link from "next/link";
 import {
     Assignment,
+    BorderColor,
     CalendarMonth,
     Checklist,
     Class,
     Clear,
-    FmdBad,
     Home,
     ListAlt,
     LocalActivity,
     ManageSearch,
     MilitaryTech,
     People,
-    PersonAdd, QueryStats,
+    PersonAdd,
+    QueryStats,
     Schedule,
     School,
     ViewWeek,
@@ -36,6 +37,12 @@ export default async function TrainingMenu() {
             staffPositions: {
                 has: "TA",
             },
+        },
+    });
+
+    const pendingOtsRecs = await prisma.otsRecommendation.count({
+        where: {
+            assignedInstructorId: null,
         },
     });
 
@@ -89,6 +96,16 @@ export default async function TrainingMenu() {
                         <Schedule/>
                     </ListItemIcon>
                     <ListItemText primary="Training Appointments"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/training/ots" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <Badge color="primary" badgeContent={pendingOtsRecs}>
+                            <BorderColor/>
+                        </Badge>
+                    </ListItemIcon>
+                    <ListItemText primary="OTS Recommendations"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/assignments" style={{textDecoration: 'none', color: 'inherit',}}>
@@ -167,14 +184,6 @@ export default async function TrainingMenu() {
                         <Assignment/>
                     </ListItemIcon>
                     <ListItemText primary="Progression Assignments"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/mistakes" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <FmdBad/>
-                    </ListItemIcon>
-                    <ListItemText primary="Mistakes"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/statistics" style={{textDecoration: 'none', color: 'inherit',}}>

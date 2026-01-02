@@ -26,13 +26,6 @@ export default async function Page() {
             order: 'asc',
         },
         include: {
-            certifications: {
-                where: {
-                    certificationOption: {
-                        not: 'NONE',
-                    },
-                }
-            },
             soloCertifications: true,
         }
     });
@@ -57,7 +50,6 @@ export default async function Page() {
                         <TableHead>
                             <TableRow>
                                 <TableCell>Name</TableCell>
-                                <TableCell>Controllers Certified</TableCell>
                                 <TableCell>Active Solo Endorsements</TableCell>
                                 <TableCell>Actions</TableCell>
                             </TableRow>
@@ -66,7 +58,6 @@ export default async function Page() {
                             {certificationTypes.map((certificationType) => (
                                 <TableRow key={certificationType.id}>
                                     <TableCell>{certificationType.name}</TableCell>
-                                    <TableCell>{certificationType.certifications.length}</TableCell>
                                     <TableCell>{certificationType.canSoloCert ? certificationType.soloCertifications.length :
                                         <Block/>}</TableCell>
                                     <TableCell>

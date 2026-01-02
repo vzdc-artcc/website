@@ -81,6 +81,8 @@ export default async function Page() {
         throw new Error('User not authenticated');
     }
 
+    const isInstructor = session.user.roles.includes('INSTRUCTOR');
+
     const allUsers = await prisma.user.findMany({
         where: {
             controllerStatus: {
@@ -248,6 +250,18 @@ export default async function Page() {
         }
     });
 
+    const otsAssignments = await prisma.otsRecommendation.findMany({
+        where: {
+            assignedInstructorId: session.user.id,
+        },
+        include: {
+            student: true,
+        },
+        orderBy: {
+            createdAt: 'asc',
+        },
+    });
+
     return (
         <Stack direction="column" spacing={2}>
             <Card>
@@ -334,6 +348,37 @@ export default async function Page() {
                     </TableContainer>}
                 </CardContent>
             </Card>
+            {isInstructor && <Card sx={{border: otsAssignments.length > 0 ? 2 : 0, borderColor: 'red',}}>
+                <CardContent>
+                    <Typography variant="h5" gutterBottom>OTS Assignments</Typography>
+                    {otsAssignments.length === 0 && <Typography>You have no OTS assignments.</Typography>}
+                    {otsAssignments.length > 0 &&
+                        <Typography sx={{mb: 2,}}>You have been assigned the following VATUSA OTS evaluations. Please
+                            reach out to the
+                            student(s) to schedule the session and make an appointment. The assignment will
+                            automatically get deleted when an OTS lesson ticket is submitted.</Typography>}
+                    {otsAssignments.length > 0 && <TableContainer>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Student</TableCell>
+                                    <TableCell>Submitted</TableCell>
+                                    <TableCell>Notes</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {otsAssignments.map((ots) => (
+                                    <TableRow key={ots.id}>
+                                        <TableCell>{ots.student.fullName}</TableCell>
+                                        <TableCell>{formatZuluDate(ots.createdAt)}</TableCell>
+                                        <TableCell>{ots.notes}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>}
+                </CardContent>
+            </Card>}
             <Card>
                 <CardContent>
                     <Typography variant="h5" sx={{mb: 1,}}>Primary Students</Typography>

@@ -8,9 +8,22 @@ export const getAllData = async () => {
 
     const session = await getServerSession(authOptions);
 
-    const lessons = await prisma.lesson.findMany();
-    const commonMistakes = await prisma.commonMistake.findMany();
-    const users = await prisma.user.findMany();
+    const lessons = await prisma.lesson.findMany({
+        orderBy: {
+            identifier: 'asc',
+        },
+    });
+    const users = await prisma.user.findMany({
+        where: {
+            controllerStatus: {
+                not: 'NONE',
+            },
+        },
+        orderBy: {
+            lastName: 'asc',
+        }
+    });
+
     const yourStudentIds = await prisma.user.findMany({
         where: {
             trainingAssignmentStudent: {
@@ -25,7 +38,7 @@ export const getAllData = async () => {
         },
     });
 
-    return {lessons, commonMistakes, users, yourStudentIds: yourStudentIds.map(u => u.id)};
+    return {lessons, users, yourStudentIds: yourStudentIds.map(u => u.id)};
 }
 
 export const getCriteriaForLesson = async (lessonId: string) => {
@@ -51,7 +64,6 @@ export const getTicketsForSession = async (trainingSessionId: string) => {
             sessionId: trainingSessionId,
         },
         include: {
-            mistakes: true,
             scores: true,
             lesson: true,
         },

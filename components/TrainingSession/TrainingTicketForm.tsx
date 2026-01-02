@@ -1,41 +1,25 @@
 'use client';
 import React, {useCallback, useEffect} from 'react';
-import {CommonMistake, Lesson, LessonRubricCell, LessonRubricCriteria, RubricCriteraScore} from "@prisma/client";
-import {
-    Alert,
-    Autocomplete,
-    Button,
-    Chip,
-    CircularProgress,
-    Grid2,
-    TextField,
-    Tooltip,
-    Typography
-} from "@mui/material";
+import {Lesson, LessonRubricCell, LessonRubricCriteria, RubricCriteraScore} from "@prisma/client";
+import {Alert, Autocomplete, Button, CircularProgress, Grid2, TextField} from "@mui/material";
 import LessonRubricGridInteractive from "@/components/Lesson/LessonRubricGridInteractive";
 import {getCriteriaForLesson} from "@/actions/trainingSessionFormHelper";
 import {toast} from "react-toastify";
 import {Check} from "@mui/icons-material";
-import Markdown from "react-markdown";
 
 export default function TrainingTicketForm({
                                                allLessons,
-                                               allCommonMistakes,
                                                lesson,
-                                               mistakes,
                                                scores,
                                                onSubmit
                                            }: {
     allLessons: Lesson[],
-    allCommonMistakes: CommonMistake[],
     lesson?: Lesson,
-    mistakes?: CommonMistake[],
     scores?: RubricCriteraScore[],
-    onSubmit: (lesson: Lesson, mistakes: CommonMistake[], scores: RubricCriteraScore[]) => boolean
+    onSubmit: (lesson: Lesson, scores: RubricCriteraScore[]) => boolean
 }) {
 
     const [selectedLesson, setSelectedLesson] = React.useState<Lesson | null>(lesson || null);
-    const [selectedMistakes, setSelectedMistakes] = React.useState<CommonMistake[]>(mistakes || []);
     const [criteria, setCriteria] = React.useState<LessonRubricCriteria[]>();
     const [cells, setCells] = React.useState<LessonRubricCell[]>();
     const [rubricScores, setRubricScores] = React.useState<RubricCriteraScore[]>(scores || []);
@@ -51,7 +35,7 @@ export default function TrainingTicketForm({
             toast('Please select a lesson', {type: 'error'});
             return;
         }
-        const success = onSubmit(selectedLesson, selectedMistakes, rubricScores.length !== criteria.length ?
+        const success = onSubmit(selectedLesson, rubricScores.length !== criteria.length ?
             criteria.map((criterion) => {
                 return {
                     id: '',
@@ -64,7 +48,6 @@ export default function TrainingTicketForm({
         if (success && !scores) {
             setRubricScores([]);
             setSelectedLesson(null);
-            setSelectedMistakes([]);
             setCriteria(undefined);
             setCells(undefined);
         }
@@ -79,10 +62,7 @@ export default function TrainingTicketForm({
     return (
         (<Grid2 container columns={2} spacing={2}>
             <Grid2
-                size={{
-                    xs: 2,
-                    md: 1
-                }}>
+                size={2}>
                 <Autocomplete
                     disabled={!!scores}
                     options={allLessons}
@@ -92,41 +72,6 @@ export default function TrainingTicketForm({
                         setSelectedLesson(newValue);
                     }}
                     renderInput={(params) => <TextField {...params} label="Lesson (search name or identifier)"/>}
-                />
-            </Grid2>
-            <Grid2
-                size={{
-                    xs: 2,
-                    md: 1
-                }}>
-                <Autocomplete
-                    multiple
-                    disableCloseOnSelect
-                    options={allCommonMistakes}
-                    getOptionLabel={(option) => `${option.facility ? option.facility + ' - ' : ''}${option.name}`}
-                    value={selectedMistakes}
-                    onChange={(event, newValue) => {
-                        setSelectedMistakes(newValue);
-                    }}
-                    renderInput={(params) => <TextField {...params} label="Common Mistakes (search name or facility)"/>}
-                    renderOption = {(props, option) => {
-                        return(
-                            <li {...props}>                        
-                                <>
-                                    <Tooltip placement="left" title={<h2><Markdown>{option.description}</Markdown></h2>}>
-                                        <Typography>{option.facility ? option.facility + ' - ' + option.name: option.name}</Typography>
-                                    </Tooltip>
-                                </>
-                            </li>
-                        )}
-                    }
-                    renderTags={(value, props)=>{
-                        return value.map((option, index) => (
-                            <Tooltip key={index} placement="top-start" title={<h2><Markdown>{option.description}</Markdown></h2>}>
-                                <Chip {...props({index})} key={index+1000} label={option.facility ? option.facility + ' - ' + option.name : option.name}/>
-                            </Tooltip>
-                        ))
-                    }}
                 />
             </Grid2>
             <Grid2 size={2}>
