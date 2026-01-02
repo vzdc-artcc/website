@@ -17,6 +17,7 @@ import {studentOtsAssignedNotification} from "@/templates/TrainingSession/Studen
 import {instructorOtsAssignedNotification} from "@/templates/TrainingSession/InstructorOtsAssignedNotification";
 import {instructorOtsUnassignedNotification} from "@/templates/TrainingSession/InstructorOtsUnassignedNotification";
 import {studentOtsUnassignedNotification} from "@/templates/TrainingSession/StudentOtsUnassignedNotification";
+import {otsRecDeleted} from "@/templates/TrainingSession/OtsRecDeleted";
 
 export const sendTrainingSessionCreatedEmail = async (student: User, trainingSession: TrainingSession) => {
 
@@ -99,6 +100,17 @@ export const sendInstructorOtsUnassignedNotificationEmail = async (student: User
     });
 }
 
+export const sendOtsRecDeletedEmail = async (student: User, instructor?: User) => {
+    const {html} = await otsRecDeleted(student);
+
+    await mailTransport.sendMail({
+        from: FROM_EMAIL,
+        to: FROM_EMAIL,
+        bcc: instructor ? [student.email, instructor.email].join(', ') : student.email,
+        subject: "OTS Recommendation Deleted",
+        html,
+    });
+}
 
 export const sendTrainingAssignmentUpdatedEmail = async (student: User, primaryTrainer: User, removedTrainers: User[], addedTrainers: User[], primaryChanged: boolean) => {
 

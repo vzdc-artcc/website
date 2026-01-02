@@ -269,7 +269,12 @@ export default async function Page() {
                     <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center" sx={{mb: 1,}}>
                         <Typography variant="h5">Your Upcoming Sessions</Typography>
                         <TrainingAppointmentFormDialog timeZone={session.user.timezone}
-                                                       assignedStudents={[...primaryStudents, ...otherStudents]}
+                                                       assignedStudents={[...primaryStudents, ...otherStudents, ...otsAssignments.map((oa) => ({
+                                                           user: oa.student as User,
+                                                           trainingAppointmentStudent: [],
+                                                           lastSession: undefined,
+                                                           trainingAssignmentId: undefined,
+                                                       }))]}
                                                        allStudents={allUsers as User[]}
                                                        allLessons={allLessons as Lesson[]}/>
                     </Stack>

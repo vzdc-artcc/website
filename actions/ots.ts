@@ -5,6 +5,7 @@ import prisma from "@/lib/db";
 import {
     sendInstructorOtsAssignedNotificationEmail,
     sendInstructorOtsUnassignedNotificationEmail,
+    sendOtsRecDeletedEmail,
     sendStudentOtsAssignedNotificationEmail,
     sendStudentOtsRecNotificationEmail,
     sendStudentOtsUnassignedNotificationEmail
@@ -72,4 +73,5 @@ export const deleteOtsRec = async (id: string) => {
 
     revalidatePath('/training/ots');
     await log("DELETE", "OTS_RECOMMENDATION", `Deleted OTS Recommendation for ${rec.student.fullName}`);
+    sendOtsRecDeletedEmail(rec.student as User).then();
 }
