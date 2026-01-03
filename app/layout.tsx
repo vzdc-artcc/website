@@ -65,7 +65,7 @@ export default async function RootLayout({
                     {children}
                     <Script
                         src="https://rybbit.vzdc.org/api/script.js"
-                        data-site-id="eb8468593399"
+                        data-site-id={process.env.NEXT_PUBLIC_RYBBIT_SITE_ID}
                         strategy="afterInteractive"
                     />
                 </Container>
