@@ -21,6 +21,7 @@ import {authOptions} from "@/auth/auth";
 import WelcomeMessageDialog from "@/components/WelcomeMessages/WelcomeMessageDialog";
 import prisma from "@/lib/db";
 import StaffTasksAlert from "@/components/Admin/StaffTasksAlert";
+import Script from "next/script"
 
 export const metadata: Metadata = {
     title: "Virtual Washington ARTCC",
@@ -62,6 +63,11 @@ export default async function RootLayout({
                 <Container maxWidth="xl" sx={{marginTop: 2,}}>
                     <StaffTasksAlert/>
                     {children}
+                    <Script
+                        src="https://rybbit.vzdc.org/api/script.js"
+                        data-site-id="eb8468593399"
+                        strategy="afterInteractive"
+                    />
                 </Container>
                 <Footer/>
                 <ToastContainer theme="dark"/>
