@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   postgres:
     image: postgres:alpine
@@ -31,10 +33,9 @@ services:
       VATUSA_API_KEY: ${VATUSA_API_KEY}
       UPLOADTHING_TOKEN: ${UPLOADTHING_TOKEN}
       AWS_SMTP_FROM: ${AWS_SMTP_FROM}
-      AWS_SMTP_HOST: ${AWS_SMTP_HOST}
-      AWS_SMTP_PORT: ${AWS_SMTP_PORT}
-      AWS_SMTP_USERNAME: ${AWS_SMTP_USERNAME}
-      AWS_SMTP_PASSWORD: ${AWS_SMTP_PASSWORD}
+      AWS_SMTP_REGION: ${AWS_SMTP_REGION}
+      AWS_SMTP_ACCESS_KEY_ID: ${AWS_SMTP_ACCESS_KEY_ID}
+      AWS_SMTP_SECRET_ACCESS_KEY: ${AWS_SMTP_SECRET_ACCESS_KEY}
       TS_KEY: ${TS_KEY}
       TRAINING_ENVIRONMENTS: ${TRAINING_ENVIRONMENTS}
       BUFFER_TIME: ${BUFFER_TIME}
@@ -43,7 +44,7 @@ services:
       BOT_API_BASE_URL: ${BOT_API_BASE_URL}
       BOT_API_SECRET_KEY: ${BOT_API_SECRET_KEY}
       DISCORD_GUILD_ID: ${DISCORD_GUILD_ID}
-      NEX_PUBLIC_DONATION_URL: ${NEX_PUBLIC_DONATION_URL}
+      NEXT_PUBLIC_DONATION_URL: ${NEXT_PUBLIC_DONATION_URL}
     env_file:
       - stack.env
 
@@ -61,7 +62,7 @@ services:
     image: ghcr.io/vzdc-artcc/website_updater:master-latest
     restart: always
     environment:
-      NEXT_AUTH_URL: ${NEXTAUTH_URL}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
       UPDATER_KEY: ${UPDATER_KEY}
     env_file:
       - stack.env
