@@ -21,7 +21,7 @@ import {authOptions} from "@/auth/auth";
 import WelcomeMessageDialog from "@/components/WelcomeMessages/WelcomeMessageDialog";
 import prisma from "@/lib/db";
 import StaffTasksAlert from "@/components/Admin/StaffTasksAlert";
-import Script from "next/script"
+import Script from "next/script";
 
 export const metadata: Metadata = {
     title: "Virtual Washington ARTCC",
