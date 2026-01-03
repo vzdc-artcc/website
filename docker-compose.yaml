@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASS}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    env_file:
+      - stack.env
+
+  website:
+    image: ghcr.io/vzdc-artcc/website:master-latest
+    restart: always
+    ports:
+      - "3001:3000"
+    depends_on:
+      - migrations_website
+      - postgres
+      - website_updater
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DEV_MODE: ${DEV_MODE}
+      GOOGLE_CAPTCHA_SECRET_KEY: ${GOOGLE_CAPTCHA_SECRET_KEY}
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      VATSIM_CLIENT_ID: ${VATSIM_CLIENT_ID}
+      VATSIM_CLIENT_SECRET: ${VATSIM_CLIENT_SECRET}
+      VATUSA_FACILITY: ${VATUSA_FACILITY}
+      VATUSA_API_KEY: ${VATUSA_API_KEY}
+      UPLOADTHING_TOKEN: ${UPLOADTHING_TOKEN}
+      AWS_SMTP_FROM: ${AWS_SMTP_FROM}
+      AWS_SMTP_HOST: ${AWS_SMTP_HOST}
+      AWS_SMTP_PORT: ${AWS_SMTP_PORT}
+      AWS_SMTP_USERNAME: ${AWS_SMTP_USERNAME}
+      AWS_SMTP_PASSWORD: ${AWS_SMTP_PASSWORD}
+      TS_KEY: ${TS_KEY}
+      TRAINING_ENVIRONMENTS: ${TRAINING_ENVIRONMENTS}
+      BUFFER_TIME: ${BUFFER_TIME}
+      DISCORD_TRAINING_CHANNEL_CREATE_URL: ${DISCORD_TRAINING_CHANNEL_CREATE_URL}
+      DISCORD_EVENT_POSITION_POST_URL: ${DISCORD_EVENT_POSITION_POST_URL}
+      BOT_API_BASE_URL: ${BOT_API_BASE_URL}
+      BOT_API_SECRET_KEY: ${BOT_API_SECRET_KEY}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID}
+      NEX_PUBLIC_DONATION_URL: ${NEX_PUBLIC_DONATION_URL}
+    env_file:
+      - stack.env
+
+  migrations_website:
+    image: ghcr.io/vzdc-artcc/website:master-latest
+    command: npx prisma migrate deploy
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      - postgres
+    env_file:
+      - stack.env
+
+  website_updater:
+    image: ghcr.io/vzdc-artcc/website_updater:master-latest
+    restart: always
+    environment:
+      NEXT_AUTH_URL: ${NEXTAUTH_URL}
+      UPDATER_KEY: ${UPDATER_KEY}
+    env_file:
+      - stack.env
+
+volumes:
+  db_data:
