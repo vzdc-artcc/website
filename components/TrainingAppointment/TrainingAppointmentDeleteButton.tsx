@@ -28,7 +28,8 @@ export default function TrainingAppointmentDeleteButton({trainingAppointment, fr
 
     return (
         <Tooltip title="Delete Appointment">
-            <IconButton size="small" onClick={handleClick}>
+            <IconButton size="small" onClick={handleClick}
+                        disabled={!fromAdmin && (new Date()).getTime() > trainingAppointment.start.getTime()}>
                 <Delete fontSize="small" color={clicked ? "warning" : "inherit"}/>
             </IconButton>
         </Tooltip>

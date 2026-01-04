@@ -116,7 +116,7 @@ export async function GET(req: NextRequest) {
         });
     }
 
-    await deleteOldTrainingAppointments();
+    // await deleteOldTrainingAppointments();
 
     await sendTrainingAppointmentWarningEmails();
 
@@ -159,28 +159,28 @@ const sendTrainingAppointmentWarningEmails = async () => {
     }));
 }
 
-const deleteOldTrainingAppointments = async () => {
-    const now = new Date();
-
-    const trainingAppointments = await prisma.trainingAppointment.findMany({
-        include: {
-            lessons: true,
-        },
-    });
-
-    for (const appointment of trainingAppointments) {
-        const totalLessonDurationInMs = appointment.lessons
-            .map((lesson) => lesson.duration * 60 * 1000) // Convert minutes to milliseconds
-            .reduce((acc, curr) => acc + curr, 0);
-
-        const endTime = new Date(appointment.start.getTime() + totalLessonDurationInMs + oneWeekInMS);
-
-        if (endTime <= now) {
-            await prisma.trainingAppointment.delete({
-                where: {
-                    id: appointment.id,
-                },
-            });
-        }
-    }
-};
+// const deleteOldTrainingAppointments = async () => {
+//     const now = new Date();
+//
+//     const trainingAppointments = await prisma.trainingAppointment.findMany({
+//         include: {
+//             lessons: true,
+//         },
+//     });
+//
+//     for (const appointment of trainingAppointments) {
+//         const totalLessonDurationInMs = appointment.lessons
+//             .map((lesson) => lesson.duration * 60 * 1000) // Convert minutes to milliseconds
+//             .reduce((acc, curr) => acc + curr, 0);
+//
+//         const endTime = new Date(appointment.start.getTime() + totalLessonDurationInMs + oneWeekInMS);
+//
+//         if (endTime <= now) {
+//             await prisma.trainingAppointment.delete({
+//                 where: {
+//                     id: appointment.id,
+//                 },
+//             });
+//         }
+//     }
+// };

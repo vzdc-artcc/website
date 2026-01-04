@@ -117,7 +117,7 @@ export default function TrainingAppointmentTable({sessionUser}: { sessionUser: U
     return (
         <DataTable
             columns={columns}
-            initialSort={[{field: 'start', sort: 'asc',}]}
+            initialSort={[{field: 'start', sort: 'desc',}]}
             fetchData={async (pagination, sortModel, filter,) => {
                 const fetchedAppointments = await fetchTrainingAppointments(pagination, sortModel, filter);
                 return {data: fetchedAppointments[1], rowCount: fetchedAppointments[0]};
