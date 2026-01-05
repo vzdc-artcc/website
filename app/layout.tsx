@@ -13,7 +13,6 @@ import theme from "@/theme/theme";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 import {ToastContainer} from "react-toastify";
-import {GoogleTagManager} from "@next/third-parties/google";
 import InitColorSchemeScript from "@mui/system/InitColorSchemeScript";
 import BroadcastViewer from "@/components/BroadcastViewer/BroadcastViewer";
 import {getServerSession} from "next-auth";
@@ -27,8 +26,6 @@ export const metadata: Metadata = {
     title: "Virtual Washington ARTCC",
     description: "The Virtual Washington ARTCC is a community of pilots and air traffic controllers on VATSIM who come together to enjoy the art of flight simulation.",
 };
-
-const googleAnalyticsId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID;
 
 const roboto = Roboto({
     weight: ['300', '400', '500', '700'],
@@ -53,7 +50,6 @@ export default async function RootLayout({
     <AppRouterCacheProvider>
         <ThemeProvider theme={theme}>
             <CssBaseline/>
-            <GoogleTagManager gtmId={googleAnalyticsId || ''}/>
             <InitColorSchemeScript attribute="class" defaultMode="system"/>
             <div>
                 {session?.user && <BroadcastViewer user={session.user}/>}
