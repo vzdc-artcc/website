@@ -155,5 +155,4 @@ License
 This project is licensed under the repository's LICENSE file.
 
 ---
-
-README updated to reflect the current Docker Compose setup, GHCR published images, and local development instructions.
+### Developed by the vZDC ARTCC Web Team.
