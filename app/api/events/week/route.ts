@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
         },
     });
 
-    const res = await fetch(`${BOT_API_BASE_URL}/regular_event_reminder`, {
+    const res = await fetch(`${BOT_API_BASE_URL}/weekly_event_reminder`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
