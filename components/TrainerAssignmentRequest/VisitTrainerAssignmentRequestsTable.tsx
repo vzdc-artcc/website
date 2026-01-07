@@ -14,7 +14,7 @@ import {Lesson} from "@prisma/client";
 import {Chip, Stack, Tooltip} from "@mui/material";
 import Link from "next/link";
 
-export default function HomeTrainerAssignmentRequestsTable({manageMode}: { manageMode: boolean }) {
+export default function VisitTrainerAssignmentRequestsTable({manageMode}: { manageMode: boolean }) {
 
     const router = useRouter();
 
