@@ -139,7 +139,7 @@ export default async function TrainingMenu() {
                             <PersonAdd/>
                         </Badge>
                     </ListItemIcon>
-                    <ListItemText primary=" Visitor Requests"/>
+                    <ListItemText primary="Visitor Requests"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/releases" style={{textDecoration: 'none', color: 'inherit',}}>
