@@ -183,7 +183,7 @@ const getWhere = (filter?: GridFilterItem, controllerStatus?: 'HOME' | 'VISITOR'
     }
 
     if (controllerStatus) {
-        const statusClause: Prisma.UserWhereInput = { controllerStatus: controllerStatus as any };
+        const statusClause: Prisma.UserWhereInput = { controllerStatus };
         if (studentClause) {
             studentClause = { AND: [studentClause, statusClause] };
         } else {
