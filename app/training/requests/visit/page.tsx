@@ -1,6 +1,6 @@
 import React from 'react';
 import {Card, CardContent, Typography} from "@mui/material";
-import TrainerAssignmentRequestsTable from "@/components/TrainerAssignmentRequest/TrainerAssignmentRequestsTable";
+import VisitTrainerAssignmentRequestsTable from "@/components/TrainerAssignmentRequest/HomeTrainerAssignmentRequestsTable";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
 
@@ -13,8 +13,8 @@ export default async function Page() {
     return (
         <Card>
             <CardContent>
-                <Typography variant="h5" sx={{mb: 1,}}>Trainer Assignment Requests</Typography>
-                <TrainerAssignmentRequestsTable manageMode={!!isTaOrAtaOrWm}/>
+                <Typography variant="h5" sx={{mb: 1,}}>Visiting Controller Trainer Assignment Requests</Typography>
+                <VisitTrainerAssignmentRequestsTable manageMode={!!isTaOrAtaOrWm}/>
             </CardContent>
         </Card>
     );
