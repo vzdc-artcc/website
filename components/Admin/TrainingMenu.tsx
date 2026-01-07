@@ -28,7 +28,13 @@ export default async function TrainingMenu() {
 
     const soloCertifications = await prisma.soloCertification.count();
 
-    const trainingRequests = await prisma.trainingAssignmentRequest.count();
+    const homeTrainingRequests = await prisma.trainingAssignmentRequest.count({
+        where: { student: { controllerStatus: "HOME" } },
+    });
+
+    const visitorTrainingRequests = await prisma.trainingAssignmentRequest.count({
+        where: { student: { controllerStatus: "VISITOR" } },
+    });
 
     const trainingReleaseRequests = await prisma.trainerReleaseRequest.count();
 
@@ -116,14 +122,24 @@ export default async function TrainingMenu() {
                     <ListItemText primary="Training Assignments"/>
                 </ListItemButton>
             </Link>
-            <Link href="/training/requests" style={{textDecoration: 'none', color: 'inherit',}}>
+            <Link href="/training/requests/home" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
-                        <Badge color="primary" badgeContent={trainingRequests}>
+                        <Badge color="primary" badgeContent={homeTrainingRequests}>
                             <PersonAdd/>
                         </Badge>
                     </ListItemIcon>
-                    <ListItemText primary="Trainer Requests"/>
+                    <ListItemText primary="Home Requests"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/training/requests/visit" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <Badge color="primary" badgeContent={visitorTrainingRequests}>
+                            <PersonAdd/>
+                        </Badge>
+                    </ListItemIcon>
+                    <ListItemText primary=" Visitor Requests"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/releases" style={{textDecoration: 'none', color: 'inherit',}}>
