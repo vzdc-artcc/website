@@ -14,7 +14,7 @@ import {Lesson} from "@prisma/client";
 import {Chip, Stack, Tooltip} from "@mui/material";
 import Link from "next/link";
 
-export default function TrainerAssignmentRequestsTable({manageMode}: { manageMode: boolean }) {
+export default function HomeTrainerAssignmentRequestsTable({manageMode}: { manageMode: boolean }) {
 
     const router = useRouter();
 
@@ -129,7 +129,7 @@ export default function TrainerAssignmentRequestsTable({manageMode}: { manageMod
             columns={columns}
             initialSort={[{field: 'submittedAt', sort: 'asc',}]}
             fetchData={async (pagination, sort, filter) => {
-                const requests = await fetchRequests(pagination, sort, filter);
+                const requests = await fetchRequests(pagination, sort, filter, 'HOME');
                 return {data: requests[1], rowCount: requests[0]};
             }}
         />

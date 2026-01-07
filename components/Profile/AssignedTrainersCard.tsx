@@ -20,20 +20,31 @@ export default async function AssignedTrainersCard({user}: { user: User, }) {
         },
     });
 
-    const requests = await prisma.trainingAssignmentRequest.findMany({
-        orderBy: {
-            submittedAt: 'asc',
-        },
-    });
-
     const release = await prisma.trainerReleaseRequest.findUnique({
         where: {
             studentId: user.id,
         },
     });
+    const requests = await prisma.trainingAssignmentRequest.findMany({
+        orderBy: { submittedAt: 'asc' },
+        include: {
+            student: {
+                select: {
+                    id: true,
+                    controllerStatus: true,
+                },
+            },
+        },
+    });
 
     const trainingAssignmentRequest = requests.find(request => request.studentId === user.id);
-    const positionInQueue = requests.findIndex(request => request.studentId === user.id) + 1;
+
+    const filterStatus = (user as any).controllerStatus; // ensure the user's controllerStatus is available
+    const filteredRequests = filterStatus
+        ? requests.filter(r => r.student?.controllerStatus === filterStatus)
+        : requests;
+
+    const positionInQueue = filteredRequests.findIndex(request => request.studentId === user.id) + 1;
 
     return (
         <Card sx={{height: '100%',}}>
