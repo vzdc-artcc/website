@@ -103,7 +103,12 @@ export const deleteTrainingAssignmentRequest = async (id: string) => {
     return request;
 }
 
-export const fetchRequests = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
+export const fetchRequests = async (
+    pagination: GridPaginationModel,
+    sort: GridSortModel,
+    filter?: GridFilterItem,
+    controllerStatus?: 'HOME' | 'VISITOR' | 'NONE'
+) => {
     const orderBy: Prisma.TrainingAssignmentRequestOrderByWithRelationInput = {};
     if (sort.length > 0 && sort[0].field === 'submittedAt') {
         orderBy['submittedAt'] = sort[0].sort === 'asc' ? 'asc' : 'desc';
@@ -116,10 +121,10 @@ export const fetchRequests = async (pagination: GridPaginationModel, sort: GridS
 
     return prisma.$transaction([
         prisma.trainingAssignmentRequest.count({
-            where: getWhere(filter),
+            where: getWhere(filter, controllerStatus),
         }),
         prisma.trainingAssignmentRequest.findMany({
-            where: getWhere(filter),
+            where: getWhere(filter, controllerStatus),
             orderBy,
             skip: pagination.page * pagination.pageSize,
             take: pagination.pageSize,
@@ -127,13 +132,13 @@ export const fetchRequests = async (pagination: GridPaginationModel, sort: GridS
                 student: {
                     include: {
                         trainingSessions: {
-                            orderBy: {start: 'desc'},
+                            orderBy: { start: 'desc' },
                             take: 1,
                             include: {
                                 tickets: {
                                     include: {
                                         lesson: true,
-                                    }
+                                    },
                                 },
                             },
                         },
@@ -143,58 +148,49 @@ export const fetchRequests = async (pagination: GridPaginationModel, sort: GridS
             },
         }),
     ]);
-}
+};
 
-const getWhere = (filter?: GridFilterItem) => {
+const getWhere = (filter?: GridFilterItem, controllerStatus?: 'HOME' | 'VISITOR' | 'NONE') => {
     const where: Prisma.TrainingAssignmentRequestWhereInput = {};
-    if (!filter) return where;
-    switch (filter.field) {
-        case 'student':
-            where['student'] = {
-                OR: [
-                    {
-                        cid: {
-                            [filter.operator]: filter.value as string,
-                            mode: 'insensitive',
-                        }
-                    },
-                    {
-                        fullName: {
-                            [filter.operator]: filter.value as string,
-                            mode: 'insensitive',
-                        }
-                    },
-                ],
-            };
-            break;
-        case 'cid':
-            where['student'] = {
-                cid: {
-                    [filter.operator]: filter.value as string,
-                    mode: 'insensitive',
-                }
-            };
-            break;
-        case 'interestedTrainers':
-            where['interestedTrainers'] = {
-                some: {
+    let studentClause: Prisma.UserWhereInput | undefined = undefined;
+
+    if (filter) {
+        switch (filter.field) {
+            case 'student':
+                studentClause = {
                     OR: [
-                        {
-                            cid: {
-                                [filter.operator]: filter.value as string,
-                                mode: 'insensitive',
-                            }
-                        },
-                        {
-                            fullName: {
-                                [filter.operator]: filter.value as string,
-                                mode: 'insensitive',
-                            }
-                        },
+                        { cid: { [filter.operator]: filter.value as string, mode: 'insensitive' } },
+                        { fullName: { [filter.operator]: filter.value as string, mode: 'insensitive' } },
                     ],
-                },
-            };
-            break;
+                };
+                break;
+            case 'cid':
+                studentClause = {
+                    cid: { [filter.operator]: filter.value as string, mode: 'insensitive' },
+                };
+                break;
+            case 'interestedTrainers':
+                where['interestedTrainers'] = {
+                    some: {
+                        OR: [
+                            { cid: { [filter.operator]: filter.value as string, mode: 'insensitive' } },
+                            { fullName: { [filter.operator]: filter.value as string, mode: 'insensitive' } },
+                        ],
+                    },
+                };
+                break;
+        }
     }
+
+    if (controllerStatus) {
+        const statusClause: Prisma.UserWhereInput = { controllerStatus: controllerStatus as any };
+        if (studentClause) {
+            studentClause = { AND: [studentClause, statusClause] };
+        } else {
+            studentClause = statusClause;
+        }
+    }
+
+    if (studentClause) where.student = studentClause;
     return where;
-}
+};
