@@ -1,6 +1,6 @@
 import React from 'react';
 import {Card, CardContent, Typography} from "@mui/material";
-import VisitTrainerAssignmentRequestsTable from "@/components/TrainerAssignmentRequest/HomeTrainerAssignmentRequestsTable";
+import VisitTrainerAssignmentRequestsTable from "@/components/TrainerAssignmentRequest/VisitTrainerAssignmentRequestsTable";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
 
