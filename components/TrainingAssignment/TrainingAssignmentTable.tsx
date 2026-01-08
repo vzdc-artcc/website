@@ -185,7 +185,6 @@ export default function TrainingAssignmentTable({manageMode, timezone}: { manage
                 manageMode ? <GridActionsCellItem
                     key={params.row.id}
                     icon={<Chat/>}
-                    disabled
                     label="Create Discord Channel"
                     onClick={() => createDiscordChannel(params.row.student, params.row.primaryTrainer, params.row.otherTrainers)}
                 /> : <></>,
