@@ -15,6 +15,7 @@ import {User} from "next-auth";
 
 const BOT_API_BASE_URL = process.env.BOT_API_BASE_URL || 'http://localhost:5500';
 const BOT_API_SECRET_KEY = process.env.BOT_API_SECRET_KEY || '1234';
+const {DISCORD_GUILD_ID} = process.env;
 
 export const createDiscordTrainingChannel = async (student: User, primaryTrainer: User, otherTrainers: User[]) => {
     try {
@@ -25,6 +26,7 @@ export const createDiscordTrainingChannel = async (student: User, primaryTrainer
                 'X-API-Key': `${BOT_API_SECRET_KEY}`,
             },
             body: JSON.stringify({
+                guild_id: DISCORD_GUILD_ID,
                 student,
                 primaryTrainer,
                 otherTrainers,
