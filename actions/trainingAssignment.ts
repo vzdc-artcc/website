@@ -13,12 +13,12 @@ import {
 } from "@/actions/mail/training";
 import {User} from "next-auth";
 
-const DISCORD_TRAINING_CHANNEL_CREATE_URL = process.env['DISCORD_TRAINING_CHANNEL_CREATE_URL'] || '';
+const BOT_API_BASE_URL = process.env.BOT_API_BASE_URL || 'http://localhost:5500';
 const BOT_API_SECRET_KEY = process.env.BOT_API_SECRET_KEY || '1234';
 
 export const createDiscordTrainingChannel = async (student: User, primaryTrainer: User, otherTrainers: User[]) => {
     try {
-        const res = await fetch(DISCORD_TRAINING_CHANNEL_CREATE_URL, {
+        const res = await fetch(`${BOT_API_BASE_URL}/create_training_channel`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
