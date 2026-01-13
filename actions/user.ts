@@ -111,7 +111,6 @@ export const refreshAccountData = async (user: User, silent?: boolean,) => {
             lastName: controller.lname,
             fullName: `${controller.fname} ${controller.lname}`,
             updatedAt: new Date(),
-            discordUid: controller.discord_id + "",
         },
         where: {
             id: user.id,
