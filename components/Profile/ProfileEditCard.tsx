@@ -89,11 +89,6 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
                             )}
                         />
                         <Divider/>
-                        {!admin && <>
-                            <Alert severity="info">The Teamspeak UID form has been moved to the profile dropdown
-                                above &quot;Refresh VATUSA Account Information&quot;</Alert>
-                            <Divider/>
-                        </>}
                         <TextField fullWidth variant="filled" name="preferredName" label="Preferred Name"
                                    defaultValue={user.preferredName || ''}/>
                         <TextField fullWidth multiline rows={5} variant="filled" name="bio" label="Bio"
