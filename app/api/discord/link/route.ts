@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth/auth";
 import { createDiscordAuthUrl } from "@/actions/discordLink";
-import type { NextRequest } from "next/server";
+
 
 export async function GET() {
     try {
