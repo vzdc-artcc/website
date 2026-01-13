@@ -4,7 +4,7 @@ import { authOptions } from "@/auth/auth";
 import { createDiscordAuthUrl } from "@/actions/discordLink";
 import type { NextRequest } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
     try {
         const session = await getServerSession(authOptions);
         if (!session?.user?.id) {
