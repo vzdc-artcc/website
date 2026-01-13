@@ -2,7 +2,7 @@
 import React from 'react';
 import {User} from "next-auth";
 import {Filter} from 'bad-words';
-import {Alert, Autocomplete, Card, CardContent, Divider, Stack, Switch, TextField, Tooltip} from "@mui/material";
+import {Autocomplete, Card, CardContent, Divider, Stack, Switch, TextField, Tooltip} from "@mui/material";
 import {getRating} from "@/lib/vatsim";
 import {z} from "zod";
 import {toast} from "react-toastify";
