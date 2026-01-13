@@ -24,9 +24,7 @@ export async function createDiscordAuthUrl(userId: string) {
         state,
     });
 
-    const authUrl = `https://discord.com/oauth2/authorize?${params.toString()}`;
-    console.log("createDiscordAuthUrl:", { userId, state, authUrl });
-    return authUrl;
+    return `${DISCORD_AUTHORIZE}?${params.toString()}`;
 }
 
 async function exchangeCodeForToken(code: string) {
@@ -49,7 +47,7 @@ async function exchangeCodeForToken(code: string) {
 }
 
 async function fetchDiscordUser(accessToken: string) {
-    const r = await fetch("https://discord.com/api/users/@me", {
+    const r = await fetch(DISCORD_API_ME, {
         headers: { Authorization: `Bearer ${accessToken}` },
     });
     if (!r.ok) throw new Error("failed fetching discord user");
