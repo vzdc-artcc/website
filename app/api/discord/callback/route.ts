@@ -19,7 +19,14 @@ export async function GET(req: NextRequest) {
     const saved = await prisma.discordOauthState.findUnique({ where: { state } });
     if (!saved) return baseRedirect({ discord_error: "invalid_state" });
     if (saved.expiresAt.getTime() < Date.now()) {
-        await prisma.discordOauthState.delete({ where: { state } }).catch(() => {});
+        await prisma.discordOauthState
+            .delete({ where: { state } })
+            .catch((err: unknown) => {
+                console.error("Failed to delete expired Discord OAuth state", {
+                    state,
+                    error: err,
+                });
+            });
         return baseRedirect({ discord_error: "state_expired" });
     }
 
