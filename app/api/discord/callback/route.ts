@@ -36,6 +36,7 @@ export async function GET(req: NextRequest) {
         return baseRedirect({ discord_linked: "1", discord_username: tag });
     } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err);
-        return baseRedirect({ discord_error: msg });
+        console.error("Discord OAuth callback failed:", { state, error: msg });
+        return baseRedirect({ discord_error: "internal_error" });
     }
 }
