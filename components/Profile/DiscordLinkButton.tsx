@@ -26,9 +26,6 @@ export default function DiscordLinkButton({
             const msg = usernameParam ? `Discord linked as ${usernameParam}` : "Discord account linked.";
             toast.success(msg);
             setIsLinked(true);
-            if (usernameParam) {
-                // optionally show tag somewhere else in your UI; we only set linked state
-            }
             params.delete("discord_linked");
             params.delete("discord_username");
         } else if (errParam) {
