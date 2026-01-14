@@ -86,7 +86,6 @@ async function rosterUpdate() {
                 },
                 data: {
                     controllerStatus: vatusaData.controllerStatus,
-                    discordUid: vatusaData.discordUid,
                     showWelcomeMessage: showWelcomeMessage,
                     joinDate: vatusaData.joinDate,
                     operatingInitials: newOperatingInitials,
