@@ -86,13 +86,14 @@ export default async function ProfileCard({user, admin, viewOnly}: {
                         <Typography variant="subtitle2">Timezone</Typography>
                         <Typography variant="body2">{user.timezone}</Typography>
                     </Grid2>
-                    <Grid2 size={{
+                    {!viewOnly && !admin &&
+                        <Grid2 size={{
                         xs: 2,
                         sm: 1
                     }}>
                         <Typography variant="subtitle2">Discord</Typography>
                         <DiscordLinkCard linked={!!user.discordUid} discordUid={user.discordUid} />
-                    </Grid2>
+                        </Grid2>}
                     <Grid2 size={2}>
                         <Typography variant="subtitle2">Bio</Typography>
                         <Typography variant="body2">{user.bio || 'None'}</Typography>
