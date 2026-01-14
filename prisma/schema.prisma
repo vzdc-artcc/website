@@ -74,8 +74,10 @@ model User {
   staffingRequests   StaffingRequest[]
   loas               LOA[]
 
-  joinDate   DateTime @default(now())
-  discordUid String?
+  joinDate           DateTime  @default(now())
+  discordUid         String?
+  discordConnectedAt DateTime?
+  discordTag         String?
 
   timezone String @default("America/New_York")
 
@@ -132,6 +134,7 @@ model User {
   suaBlocks                  SuaBlock[]
   studentOtsRec              OtsRecommendation[]   @relation("studentOtsRec")
   instructorOtsRec           OtsRecommendation[]   @relation("instructorOtsRec")
+  DiscordOauthState          DiscordOauthState[]
 }
 
 model TrainingAssignment {
@@ -919,4 +922,14 @@ model OtsRecommendation {
   notes String
 
   createdAt DateTime @default(now())
+}
+
+model DiscordOauthState {
+  id        String   @id @default(cuid())
+  state     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+
+  @@index([userId])
 }

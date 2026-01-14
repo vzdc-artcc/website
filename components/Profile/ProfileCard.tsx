@@ -5,6 +5,7 @@ import {User} from "next-auth";
 import {Edit} from "@mui/icons-material";
 import Link from "next/link";
 import {getChips} from "@/lib/staffPositions";
+import DiscordLinkCard from "@/components/Profile/DiscordLinkButton";
 
 export default async function ProfileCard({user, admin, viewOnly}: {
     user: User,
@@ -84,6 +85,13 @@ export default async function ProfileCard({user, admin, viewOnly}: {
                     }}>
                         <Typography variant="subtitle2">Timezone</Typography>
                         <Typography variant="body2">{user.timezone}</Typography>
+                    </Grid2>
+                    <Grid2 size={{
+                        xs: 2,
+                        sm: 1
+                    }}>
+                        <Typography variant="subtitle2">Discord</Typography>
+                        <DiscordLinkCard linked={!!user.discordUid} discordUid={user.discordUid} />
                     </Grid2>
                     <Grid2 size={2}>
                         <Typography variant="subtitle2">Bio</Typography>

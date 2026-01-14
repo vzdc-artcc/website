@@ -62,7 +62,6 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
     roles: Role[],
     staffPositions: StaffPosition[],
     joinDate: Date,
-    discordUid?: string,
     operatingInitials?: string,
 }> => {
 
@@ -83,7 +82,6 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
                 "ATM"
             ],
             joinDate: new Date(),
-            discordUid: undefined,
             operatingInitials,
         };
     }
@@ -97,7 +95,6 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
         cid: number,
         facility: string,
         facility_join: Date,
-        discord_id?: string,
         roles: {
             facility: string,
             role: string,
@@ -122,7 +119,6 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
     return {
         controllerStatus,
         joinDate: controllerStatus === "HOME" ? controller.facility_join : visitingFacilityEntry ? visitingFacilityEntry?.created_at : new Date(),
-        discordUid: controller.discord_id + "" || undefined,
         operatingInitials, ...getRolesAndStaffPositions(controllerRoles)
     };
 }
