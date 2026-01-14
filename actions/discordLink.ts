@@ -66,7 +66,9 @@ export async function handleDiscordCallback({
     const saved = await prisma.discordOauthState.findUnique({ where: { state } });
     if (!saved) throw new Error("invalid_state");
     if (saved.expiresAt.getTime() < Date.now()) {
-        await prisma.discordOauthState.delete({ where: { state } }).catch(() => {});
+        await prisma.discordOauthState.delete({ where: { state } }).catch((err) => {
+            console.error("Failed to delete expired Discord OAuth state:", err);
+        });
         throw new Error("state_expired");
     }
     if (currentUserId && saved.userId !== currentUserId) throw new Error("state_user_mismatch");
