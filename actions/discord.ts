@@ -137,7 +137,9 @@ export const sendDiscordEventPositionData = async (event: Event, positions: Even
             controllers: publishedPositions.map((position) => ({
                 controller_name: position.user?.fullName,
                 controller_rating: position.user?.rating,
-                controller_final_position: position.finalPosition
+                controller_final_position: position.finalPosition,
+                controller_final_start_time: position.finalStartTime,
+                controller_final_end_time: position.finalEndTime
             }))
         }),
     });
