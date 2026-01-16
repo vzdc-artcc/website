@@ -136,6 +136,7 @@ export const sendDiscordEventPositionData = async (event: Event, positions: Even
             event_end_time: event.end,
             controllers: publishedPositions.map((position) => ({
                 controller_name: position.user?.fullName,
+                controller_discord_id: position.user?.discordUid,
                 controller_rating: position.user?.rating,
                 controller_final_position: position.finalPosition,
                 controller_final_start_time: position.finalStartTime,
