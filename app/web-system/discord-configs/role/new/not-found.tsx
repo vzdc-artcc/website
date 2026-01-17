@@ -8,7 +8,7 @@ function NotFound() {
             <CardContent>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <Info color="error"/>
-                    <Typography>Tracon group not found.</Typography>
+                    <Typography>Discord role configuration not found.</Typography>
                 </Stack>
             </CardContent>
         </Card>
