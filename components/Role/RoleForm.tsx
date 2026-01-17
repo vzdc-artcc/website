@@ -7,7 +7,7 @@ import FormSaveButton from "@/components/Form/FormSaveButton";
 import {toast} from "react-toastify";
 import {saveRoles} from "@/actions/role";
 
-export default function RoleForm({user}: { user: User, }) {
+export default function RoleForm({user, isWebSystemMember = false}: { user: User, isWebSystemMember?: boolean, }) {
 
     const handleSubmit = async (formData: FormData) => {
         const {errors} = await saveRoles(formData);
@@ -18,6 +18,9 @@ export default function RoleForm({user}: { user: User, }) {
 
         toast("Roles saved successfully.", {type: 'success'});
     };
+
+    const allowedRoles = Object.keys(Role).filter((r) => r !== 'WEB_TEAM' || isWebSystemMember);
+    const defaultSelected = (user.roles || []).filter((r) => allowedRoles.includes(r));
 
     return (
         <>
@@ -36,16 +39,16 @@ export default function RoleForm({user}: { user: User, }) {
                             id="role-select"
                             multiple
                             name="roles"
-                            defaultValue={user.roles}
+                            defaultValue={defaultSelected}
                             label="Staff Position(s)"
-                            renderValue={(selected) => (
+                            renderValue={(selected: any) => (
                                 <Box sx={{display: 'flex', flexWrap: 'wrap', gap: 0.5}}>
-                                    {selected.map((value) => (
+                                    {selected.map((value: string) => (
                                         <Chip key={value} label={value}/>
                                     ))}
                                 </Box>
                             )}>
-                            {Object.keys(Role).map((role) => (
+                            {allowedRoles.map((role) => (
                                 <MenuItem key={role} value={role}>{role}</MenuItem>
                             ))}
                         </Select>
