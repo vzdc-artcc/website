@@ -349,6 +349,7 @@ enum LogModel {
 
   DISCORD_MESSAGE
   DISCORD_CHANNEL_UPDATE
+  DISCORD_CONFIG
 }
 
 model Log {
@@ -933,4 +934,50 @@ model DiscordOauthState {
   expiresAt DateTime
 
   @@index([userId])
+}
+
+model DiscordConfig {
+  id         String            @id @default(cuid())
+  name       String
+  guildId    String?           @unique
+  channels   DiscordChannel[]
+  roles      DiscordRole[]
+  categories DiscordCategory[]
+  updatedAt  DateTime          @updatedAt
+}
+
+model DiscordChannel {
+  id              String        @id @default(cuid())
+  discordConfigId String
+  DiscordConfig   DiscordConfig @relation(fields: [discordConfigId], references: [id], onDelete: Cascade)
+
+  name      String
+  channelId String @unique
+
+  @@unique([discordConfigId, name])
+  @@index([discordConfigId])
+}
+
+model DiscordRole {
+  id              String        @id @default(cuid())
+  discordConfigId String
+  DiscordConfig   DiscordConfig @relation(fields: [discordConfigId], references: [id], onDelete: Cascade)
+
+  name   String
+  roleId String @unique
+
+  @@unique([discordConfigId, name])
+  @@index([discordConfigId])
+}
+
+model DiscordCategory {
+  id              String        @id @default(cuid())
+  discordConfigId String
+  DiscordConfig   DiscordConfig @relation(fields: [discordConfigId], references: [id], onDelete: Cascade)
+
+  name       String
+  categoryId String @unique
+
+  @@unique([discordConfigId, name])
+  @@index([discordConfigId])
 }
