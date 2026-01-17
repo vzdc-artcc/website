@@ -1,11 +1,11 @@
 'use client';
 import React from 'react';
-import {DiscordCategory, DiscordRole} from "@prisma/client";
+import {DiscordCategory} from "@prisma/client";
 import {Grid2, TextField,} from "@mui/material";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {upsertCategory, upsertRole} from "@/actions/discordConfig";
+import {upsertCategory} from "@/actions/discordConfig";
 
 
 export default function DiscordCategoryForm({category, discordConfigId}: { category?: DiscordCategory, discordConfigId: string, }) {

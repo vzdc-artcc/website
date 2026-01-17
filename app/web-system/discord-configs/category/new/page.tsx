@@ -2,7 +2,6 @@ import React from 'react';
 import {notFound} from "next/navigation";
 import {Card, CardContent, Typography} from "@mui/material";
 import prisma from "@/lib/db";
-import ChannelForm from "@/components/DiscordConfig/ChannelForm";
 import DiscordCategoryForm from "@/components/DiscordConfig/DiscordCategoryForm";
 
 export default async function Page(props: { searchParams: Promise<{ discordConfigId?: string, }> }) {
