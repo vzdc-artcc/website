@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import prisma from "@/lib/db";
 import {getChipColor, getMinutesAgo, getTimeAgo} from "@/lib/date";
-import {getMonthHours} from "@/lib/hours";
 
 export default async function Page() {
 
