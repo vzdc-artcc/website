@@ -220,6 +220,7 @@ enum Role {
   INSTRUCTOR
   STAFF
   EVENT_STAFF
+  WEB_TEAM
 }
 
 enum StaffPosition {

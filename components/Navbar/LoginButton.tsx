@@ -26,7 +26,8 @@ import {
     Person,
     Radio,
     Refresh,
-    Settings
+    Settings,
+    Web
 } from "@mui/icons-material";
 import NavDropdown from "@/components/Navbar/NavDropdown";
 import Link from "next/link";
@@ -126,6 +127,10 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                         <Link href="/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                             <NavSidebarButton icon={<AdminPanelSettings/>} text="Facility Administration"/>
                         </Link>}
+                    {session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) &&
+                        <Link href="/web-system/overview" style={{textDecoration: 'none', color: 'inherit',}}>
+                            <NavSidebarButton icon={<Web/>} text="Web-System Administration"/>
+                        </Link>}
                     {session?.user.roles.some((r) => ["MENTOR", "INSTRUCTOR", "STAFF"].includes(r)) &&
                         <Link href="/training/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                             <NavSidebarButton icon={<Class/>} text="Training Administration"/>
@@ -162,6 +167,15 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                                 <AdminPanelSettings/>
                             </ListItemIcon>
                             <ListItemText>Facility Administration</ListItemText>
+                        </MenuItem>
+                    </Link>}
+                {session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) &&
+                    <Link href="/web-system/overview" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <MenuItem onClick={closeDropdown}>
+                            <ListItemIcon>
+                                <Web/>
+                            </ListItemIcon>
+                            <ListItemText>Web-System Administration</ListItemText>
                         </MenuItem>
                     </Link>}
                 {session?.user.roles.some((r) => ["MENTOR", "INSTRUCTOR", "STAFF"].includes(r)) &&
