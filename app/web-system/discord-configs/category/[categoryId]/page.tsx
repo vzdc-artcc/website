@@ -27,7 +27,7 @@ export default async function Page(props: { params: Promise<{ categoryId: string
         <Card>
             <CardContent>
                 <Typography variant="h5" sx={{mb: 2,}}>{category.name}</Typography>
-                <DiscordCategoryForm discordConfigId={category.discordConfigId}/>
+                <DiscordCategoryForm discordConfigId={category.discordConfigId} category={category}/>
             </CardContent>
         </Card>
     );

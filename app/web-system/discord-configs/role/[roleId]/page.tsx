@@ -27,7 +27,7 @@ export default async function Page(props: { params: Promise<{ roleId: string, }>
         <Card>
             <CardContent>
                 <Typography variant="h5" sx={{mb: 2,}}>{role.name}</Typography>
-                <DiscordRoleForm discordConfigId={role.discordConfigId}/>
+                <DiscordRoleForm discordConfigId={role.discordConfigId} role={role}/>
             </CardContent>
         </Card>
     );
