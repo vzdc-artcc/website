@@ -13,7 +13,7 @@ export default function CategoryDeleteButton({category}: { category: DiscordCate
     const handleClick = async () => {
         if (clicked) {
             await deleteCategory(category.id);
-            toast(`Channel: '${category.name}' deleted successfully!`, {type: 'success'});
+            toast(`Category: '${category.name}' deleted successfully!`, {type: 'success'});
         } else {
             toast(`Are you sure you want to delete '${category.name}'?  Click again to confirm.`, {type: 'warning'});
             setClicked(true);
