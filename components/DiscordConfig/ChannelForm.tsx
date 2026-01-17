@@ -19,10 +19,10 @@ export default function ChannelForm({channel, discordConfigId}: { channel?: Disc
             return;
         }
 
-        toast(`Airport '${savedChannel.name}' saved successfully!`, {type: 'success'});
+        toast(`Channel '${savedChannel.name}' saved successfully!`, {type: 'success'});
 
         if (!channel) {
-            router.push(`/web-system/discord-configs/channel/${savedChannel.id}`);
+            router.push(`/web-system/discord-configs/channel/new?discordConfigId=${discordConfigId}`);
         }
     }
 
