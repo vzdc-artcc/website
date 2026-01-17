@@ -13,7 +13,7 @@ import {
     Typography
 } from "@mui/material";
 import prisma from "@/lib/db";
-import {getChipColor, getMinutesAgo, getMonth, getTimeAgo} from "@/lib/date";
+import {getChipColor, getMinutesAgo, getTimeAgo} from "@/lib/date";
 import {getMonthHours} from "@/lib/hours";
 
 export default async function Page() {
