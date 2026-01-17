@@ -13,7 +13,7 @@ export default async function Page(props: { params: Promise<{ roleId: string, }>
 
     const {roleId} = params;
 
-    const role = await prisma.discordChannel.findUnique({
+    const role = await prisma.discordRole.findUnique({
         where: {
             id: roleId,
         },

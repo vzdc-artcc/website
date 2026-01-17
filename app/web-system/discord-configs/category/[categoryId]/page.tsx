@@ -6,28 +6,28 @@ import {
     CardContent,
     Typography
 } from "@mui/material";
-import ChannelForm from "@/components/DiscordConfig/ChannelForm";
+import DiscordCategoryForm from "@/components/DiscordConfig/DiscordCategoryForm";
 
-export default async function Page(props: { params: Promise<{ channelId: string, }>, }) {
+export default async function Page(props: { params: Promise<{ categoryId: string, }>, }) {
     const params = await props.params;
 
-    const {channelId} = params;
+    const {categoryId} = params;
 
-    const channel = await prisma.discordChannel.findUnique({
+    const category = await prisma.discordCategory.findUnique({
         where: {
-            id: channelId,
+            id: categoryId,
         },
     });
 
-    if (!channel) {
+    if (!category) {
         notFound();
     }
 
     return (
         <Card>
             <CardContent>
-                <Typography variant="h5" sx={{mb: 2,}}>{channel.name}</Typography>
-                <ChannelForm discordConfigId={channel.discordConfigId}/>
+                <Typography variant="h5" sx={{mb: 2,}}>{category.name}</Typography>
+                <DiscordCategoryForm discordConfigId={category.discordConfigId}/>
             </CardContent>
         </Card>
     );
