@@ -27,7 +27,10 @@ export default async function Page(props: { params: Promise<{ channelId: string,
         <Card>
             <CardContent>
                 <Typography variant="h5" sx={{mb: 2,}}>{channel.name}</Typography>
-                <ChannelForm discordConfigId={channel.discordConfigId}/>
+                <ChannelForm
+                    discordConfigId={channel.discordConfigId}
+                    channel={channel}
+                />
             </CardContent>
         </Card>
     );
