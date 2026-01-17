@@ -2,7 +2,6 @@ import React from 'react';
 import {Grid2, Typography} from "@mui/material";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
-import AdminMenu from "@/components/Admin/AdminMenu";
 import {Metadata} from "next";
 import WebSystemAdminMenu from "@/components/Admin/WebSystemAdminMenu";
 
