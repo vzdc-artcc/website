@@ -8,7 +8,7 @@ function NotFound() {
             <CardContent>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <Info color="error"/>
-                    <Typography>Airport not found.</Typography>
+                    <Typography>Category not found.</Typography>
                 </Stack>
             </CardContent>
         </Card>
