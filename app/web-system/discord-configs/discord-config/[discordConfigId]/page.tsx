@@ -2,7 +2,6 @@ import React from 'react';
 import prisma from "@/lib/db";
 import {notFound} from "next/navigation";
 import {Card, CardContent, Typography} from "@mui/material";
-import TraconGroupForm from "@/components/Airports/TraconGroupForm";
 import DiscordConfigForm from "@/components/DiscordConfig/DiscordConfigForm";
 
 export default async function Page(props: { params: Promise<{ discordConfigId: string, }>, }) {

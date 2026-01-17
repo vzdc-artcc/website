@@ -3,13 +3,10 @@ import React from 'react';
 import {DiscordConfig} from "@prisma/client";
 import {Stack, TextField} from "@mui/material";
 import {toast} from "react-toastify";
-import {useRouter} from "next/navigation";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {upsertDiscordConfig} from "@/actions/discordConfig";
 
 export default function DiscordConfigForm({discordConfig}: { discordConfig?: DiscordConfig }) {
-
-    const router = useRouter();
 
     const handleSubmit = async (formData: FormData) => {
 
