@@ -37,7 +37,7 @@ export default async function WebSystemAdminMenu() {
                     <ListItemText primary="Overview"/>
                 </ListItemButton>
             </Link>
-            <Link href="/web-system/discord-config" style={{textDecoration: 'none', color: 'inherit',}}>
+            <Link href="/web-system/discord-configs" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
                         <SettingsApplications/>

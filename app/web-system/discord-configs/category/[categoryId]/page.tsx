@@ -8,14 +8,14 @@ import {
 } from "@mui/material";
 import ChannelForm from "@/components/DiscordConfig/ChannelForm";
 
-export default async function Page(props: { params: Promise<{ categoryId: string, }>, }) {
+export default async function Page(props: { params: Promise<{ channelId: string, }>, }) {
     const params = await props.params;
 
-    const {categoryId} = params;
+    const {channelId} = params;
 
     const channel = await prisma.discordChannel.findUnique({
         where: {
-            id: categoryId,
+            id: channelId,
         },
     });
 

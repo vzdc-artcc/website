@@ -83,7 +83,7 @@ export const upsertChannel = async (formData: FormData) => {
     });
     await log(result.data.id ? "UPDATE" : "CREATE", "DISCORD_CONFIG", `Saved channel ${channel.name} (${channel.name})`);
     revalidatePath("/web-system/discord-configs");
-    revalidatePath(`web-system/discord-configs/channel/${channel.id}`);
+    revalidatePath(`/web-system/discord-configs/channel/${channel.id}`);
     return {channel};
 }
 
@@ -124,7 +124,7 @@ export const upsertRole = async (formData: FormData) => {
     });
     await log(result.data.id ? "UPDATE" : "CREATE", "DISCORD_CONFIG", `Saved role ${role.name} (${role.name})`);
     revalidatePath("/web-system/discord-configs");
-    revalidatePath(`web-system/discord-configs/role/${role.id}`);
+    revalidatePath(`/web-system/discord-configs/role/${role.id}`);
     return {role};
 }
 
@@ -165,7 +165,7 @@ export const upsertCategory = async (formData: FormData) => {
     });
     await log(result.data.id ? "UPDATE" : "CREATE", "DISCORD_CONFIG", `Saved category ${category.name} (${category.name})`);
     revalidatePath("/web-system/discord-configs");
-    revalidatePath(`web-system/discord-configs/category/${category.id}`);
+    revalidatePath(`/web-system/discord-configs/category/${category.id}`);
     return {category};
 }
 
