@@ -175,7 +175,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                             <ListItemIcon>
                                 <Web/>
                             </ListItemIcon>
-                            <ListItemText>Web-System Administration</ListItemText>
+                            <ListItemText>Web System Administration</ListItemText>
                         </MenuItem>
                     </Link>}
                 {session?.user.roles.some((r) => ["MENTOR", "INSTRUCTOR", "STAFF"].includes(r)) &&
