@@ -36,14 +36,14 @@ export default function DiscordRoleForm({role, discordConfigId}: { role?: Discor
                         xs: 2,
                         sm: 1
                     }}>
-                    <TextField fullWidth variant="filled" label="Name" name="name" defaultValue={role?.name || ''}/>
+                    <TextField fullWidth variant="filled" label="Name" name="name" defaultValue={role?.name}/>
                 </Grid2>
                 <Grid2
                     size={{
                         xs: 2,
                         sm: 1
                     }}>
-                    <TextField fullWidth variant="filled" label="Role ID" name="roleId" defaultValue={role?.roleId || ''}/>
+                    <TextField fullWidth variant="filled" label="Role ID" name="roleId" defaultValue={role?.roleId}/>
                 </Grid2>
                 <Grid2 size={2}>
                     <FormSaveButton />

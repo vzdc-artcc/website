@@ -23,8 +23,8 @@ export default function DiscordConfigForm({discordConfig}: { discordConfig?: Dis
         <form action={handleSubmit}>
             <input type="hidden" name="id" value={discordConfig?.id}/>
             <Stack direction="column" spacing={2}>
-                <TextField fullWidth variant="filled" label="Name*" name="name" defaultValue={discordConfig?.name || ''}/>
-                <TextField fullWidth variant="filled" label="Guild ID*" name="guildId" defaultValue={discordConfig?.guildId || ''} />
+                <TextField fullWidth variant="filled" label="Name*" name="name" defaultValue={discordConfig?.name}/>
+                <TextField fullWidth variant="filled" label="Guild ID*" name="guildId" defaultValue={discordConfig?.guildId} />
                 <FormSaveButton />
             </Stack>
         </form>

@@ -129,7 +129,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                         </Link>}
                     {session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) &&
                         <Link href="/web-system/overview" style={{textDecoration: 'none', color: 'inherit',}}>
-                            <NavSidebarButton icon={<Web/>} text="Web-System Administration"/>
+                            <NavSidebarButton icon={<Web/>} text="Web System Administration"/>
                         </Link>}
                     {session?.user.roles.some((r) => ["MENTOR", "INSTRUCTOR", "STAFF"].includes(r)) &&
                         <Link href="/training/overview" style={{textDecoration: 'none', color: 'inherit',}}>

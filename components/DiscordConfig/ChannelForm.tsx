@@ -36,14 +36,14 @@ export default function ChannelForm({channel, discordConfigId}: { channel?: Disc
                         xs: 2,
                         sm: 1
                     }}>
-                    <TextField fullWidth variant="filled" label="Name" name="name" defaultValue={channel?.name || ''}/>
+                    <TextField fullWidth variant="filled" label="Name" name="name" defaultValue={channel?.name}/>
                 </Grid2>
                 <Grid2
                     size={{
                         xs: 2,
                         sm: 1
                     }}>
-                    <TextField fullWidth variant="filled" label="Channel ID" name="channelId" defaultValue={channel?.channelId || ''}/>
+                    <TextField fullWidth variant="filled" label="Channel ID" name="channelId" defaultValue={channel?.channelId}/>
                 </Grid2>
                 <Grid2 size={2}>
                     <FormSaveButton />

@@ -15,7 +15,7 @@ export const upsertDiscordConfig = async (formData: FormData) => {
     const result = discordConfigZ.safeParse({
         id: formData.get("id") as string,
         name: formData.get("name") as string,
-        guildId: formData.get("guildId") as string | null,
+        guildId: formData.get("guildId") as string,
     });
 
     if (!result.success) {
@@ -81,7 +81,7 @@ export const upsertChannel = async (formData: FormData) => {
             id: result.data.id || '',
         },
     });
-    await log(result.data.id ? "UPDATE" : "CREATE", "DISCORD_CONFIG", `Saved channel ${channel.name} (${channel.name})`);
+    await log(result.data.id ? "UPDATE" : "CREATE", "DISCORD_CONFIG", `Saved channel ${channel.name}`);
     revalidatePath("/web-system/discord-configs");
     revalidatePath(`/web-system/discord-configs/channel/${channel.id}`);
     return {channel};
@@ -122,7 +122,7 @@ export const upsertRole = async (formData: FormData) => {
             id: result.data.id || '',
         },
     });
-    await log(result.data.id ? "UPDATE" : "CREATE", "DISCORD_CONFIG", `Saved role ${role.name} (${role.name})`);
+    await log(result.data.id ? "UPDATE" : "CREATE", "DISCORD_CONFIG", `Saved role ${role.name}`);
     revalidatePath("/web-system/discord-configs");
     revalidatePath(`/web-system/discord-configs/role/${role.id}`);
     return {role};
@@ -163,7 +163,7 @@ export const upsertCategory = async (formData: FormData) => {
             id: result.data.id || '',
         },
     });
-    await log(result.data.id ? "UPDATE" : "CREATE", "DISCORD_CONFIG", `Saved category ${category.name} (${category.name})`);
+    await log(result.data.id ? "UPDATE" : "CREATE", "DISCORD_CONFIG", `Saved category ${category.name}`);
     revalidatePath("/web-system/discord-configs");
     revalidatePath(`/web-system/discord-configs/category/${category.id}`);
     return {category};
