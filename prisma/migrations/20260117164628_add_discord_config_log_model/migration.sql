@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "LogModel" ADD VALUE 'DISCORD_CONFIG';
