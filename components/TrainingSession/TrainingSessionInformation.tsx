@@ -19,6 +19,7 @@ import Markdown from "react-markdown";
 import {formatZuluDate, getDuration} from "@/lib/date";
 import TrainingMarkdownSwitch from './TrainingMarkdownSwitch';
 import PerformanceIndicatorInformation from "@/components/TrainingSession/PerformanceIndicatorInformation";
+import Link from "next/link";
 
 export default async function TrainingSessionInformation({id, trainerView}: { id: string, trainerView?: boolean }) {
 
@@ -59,11 +60,20 @@ export default async function TrainingSessionInformation({id, trainerView}: { id
         notFound();
     }
 
+    const isOts = trainingSession.tickets.some((t) => t.lesson.instructorOnly);
+
     return (
         <Stack direction="column" spacing={2}>
             <Box>
-                <Typography variant="h5">Training
-                    Session{trainerView ? ` - ${trainingSession.student.firstName} ${trainingSession.student.lastName} (${trainingSession.student.cid})` : ''}</Typography>
+                <Typography variant="h5"
+                            color={isOts ? 'red' : 'inherit'}>{isOts ? 'OTS' : 'Training Session'}{trainerView ? ` - ${trainingSession.student.firstName} ${trainingSession.student.lastName} (${trainingSession.student.cid})` : ''}</Typography>
+                {trainerView && <Typography variant="subtitle2" fontWeight="bold">{trainingSession.additionalComments &&
+                    <span style={{color: 'green'}}>RMK</span>} {trainingSession.trainerComments &&
+                    <span style={{color: 'red'}}>RMK TRAINER</span>}</Typography>}
+                {trainerView && trainingSession.student.controllerStatus === 'VISITOR' &&
+                    <Typography variant="subtitle2" color="orange">VISITOR</Typography>}
+                {trainerView && trainingSession.student.controllerStatus === 'NONE' &&
+                    <Typography color="red">NOT ROSTERED</Typography>}
                 <Typography
                     variant="subtitle1">Trainer: {trainingSession.instructor.firstName} {trainingSession.instructor.lastName} ({trainingSession.instructor.cid})</Typography>
                 <Typography
@@ -125,6 +135,11 @@ export default async function TrainingSessionInformation({id, trainerView}: { id
                     </CardContent>
                 </Card>}
             <TrainingMarkdownSwitch trainingSession={trainingSession} trainerView={trainerView}/>
+            <Typography sx={{mt: 2}}>Questions? Email&nbsp;
+                <Link href={'mailto:training@vzdc.org'} style={{color: 'inherit',}}>
+                    training@vzdc.org
+                </Link> or contact your trainer.
+            </Typography>
         </Stack>
     );
 }

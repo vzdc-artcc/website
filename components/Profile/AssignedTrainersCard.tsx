@@ -39,23 +39,40 @@ export default async function AssignedTrainersCard({user}: { user: User, }) {
 
     const trainingAssignmentRequest = requests.find(request => request.studentId === user.id);
 
-    const filterStatus = (user as any).controllerStatus; // ensure the user's controllerStatus is available
+    const filterStatus = user.controllerStatus; // ensure the user's controllerStatus is available
     const filteredRequests = filterStatus
         ? requests.filter(r => r.student?.controllerStatus === filterStatus)
         : requests;
 
     const positionInQueue = filteredRequests.findIndex(request => request.studentId === user.id) + 1;
 
+    let estimatedWaitTime = positionInQueue > 3 && trainingAssignmentRequest ? `${Math.max(1, Math.ceil(differenceDays(trainingAssignmentRequest.submittedAt, filteredRequests[2].submittedAt) / 30))} months` : `Less than 1 month`;
+
+    if (user.controllerStatus === 'VISITOR') {
+        estimatedWaitTime = 'N/A for Visiting Controllers';
+    }
+
     return (
         <Card sx={{height: '100%',}}>
             <CardContent>
-                <Stack direction="row" spacing={1} alignItems="center" sx={{mb: 1,}}>
-                    <Typography variant="h6">Assigned Trainers</Typography>
-                </Stack>
+                <Typography variant="h6">Assigned Trainers</Typography>
+                <Typography variant="subtitle2" sx={{mb: 2,}} fontWeight="regular">Training assignments are made by the
+                    Training Administrator.</Typography>
                 {!trainingAssignment && trainingAssignmentRequest &&
                     <>
                         <Chip color="warning" label="REQUEST PENDING"/>
-                        <Typography sx={{my: 1,}}>Position: <b>{positionInQueue}</b></Typography>
+                        <Typography sx={{mt: 1,}} gutterBottom>Position: <b>{positionInQueue}</b></Typography>
+                        <Typography gutterBottom>Estimated Wait Time: <b>{estimatedWaitTime}</b></Typography>
+                        {user.controllerStatus === 'HOME' &&
+                            <Typography sx={{mb: 2, display: 'block'}} variant="caption"><b>Training wait time estimates
+                                may not be fully accurate.</b> Estimates are calculated based on your position in
+                                the {user.controllerStatus} training queue and those at the front of the
+                                queue.</Typography>}
+                        {user.controllerStatus === 'VISITOR' &&
+                            <Typography sx={{mb: 2, display: 'block'}} variant="caption"><b>Visiting controllers should
+                                expect much longer wait times for training.</b> Home controllers are prioritized in the
+                                training assignment queue over visitors. Message the Training Administrator if you have
+                                any questions about visitor training assignments.</Typography>}
                         <AssignedTrainerRequestCancelButton request={trainingAssignmentRequest}/>
                     </>
                 }
@@ -90,4 +107,9 @@ export default async function AssignedTrainersCard({user}: { user: User, }) {
 
         </Card>
     );
+}
+
+const differenceDays = (date1: Date, date2: Date) => {
+    const diffTime = Math.abs(date2.getTime() - date1.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }

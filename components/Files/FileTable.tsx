@@ -5,7 +5,11 @@ import Link from "next/link";
 import {Edit, OpenInNew} from "@mui/icons-material";
 import FileDeleteButton from "@/components/Files/FileDeleteButton";
 
-export default async function FileTable({files, admin}: { files: File[], admin?: boolean, }) {
+export default async function FileTable({files, admin, openInNewTab = true,}: {
+    files: File[],
+    admin?: boolean,
+    openInNewTab?: boolean,
+}) {
 
     return (
         <TableContainer sx={{}}>
@@ -23,10 +27,11 @@ export default async function FileTable({files, admin}: { files: File[], admin?:
                     {files.map((file) => (
                         <TableRow key={file.id}>
                             <TableCell>
-                                <Link href={`/publications/${file.id}`} target="_blank" style={{color: file.highlightColor || 'inherit', textDecoration: 'none'}}>
+                                <Link href={`/publications/${file.id}`} target={openInNewTab ? '_blank' : '_self'}
+                                      style={{color: file.highlightColor || 'inherit', textDecoration: 'none'}}>
                                     <Stack direction="row" alignItems="center">
                                         {file.name}
-                                        <OpenInNew fontSize="small"/>
+                                        {openInNewTab && <OpenInNew fontSize="small"/>}
                                     </Stack>
                                 </Link>
                             </TableCell>

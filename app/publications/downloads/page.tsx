@@ -9,7 +9,9 @@ export const metadata: Metadata = {
     description: 'vZDC downloads page',
 };
 
-export default async function Page() {
+export default async function Page({searchParams}: { searchParams: Promise<{ openInNewTab?: string, }> }) {
+
+    const {openInNewTab} = await searchParams;
 
     const fileCategories = await prisma.fileCategory.findMany({
         include: {
@@ -36,7 +38,7 @@ export default async function Page() {
                     <Card key={category.id}>
                         <CardContent>
                             <Typography variant="h6">{category.name}</Typography>
-                            <FileTable files={category.files}/>
+                            <FileTable files={category.files} openInNewTab={openInNewTab === 'true'}/>
                         </CardContent>
                     </Card>
                 ))}

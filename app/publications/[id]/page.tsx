@@ -1,6 +1,6 @@
 import React from 'react';
 import prisma from "@/lib/db";
-import {notFound} from "next/navigation";
+import {notFound, permanentRedirect} from "next/navigation";
 import {UTApi} from "uploadthing/server";
 import {Card, CardContent, IconButton, Typography} from "@mui/material";
 import {OpenInNew} from "@mui/icons-material";
@@ -28,9 +28,13 @@ export async function generateMetadata(props: { params: Promise<{ id: string, }>
     };
 }
 
-export default async function Page(props: { params: Promise<{ id: string, }>, }) {
+export default async function Page(props: {
+    params: Promise<{ id: string, }>,
+    searchParams: Promise<{ fileOnly?: string, }>,
+}) {
 
     const params = await props.params;
+    const {fileOnly} = await props.searchParams;
 
     const file = await prisma.file.findUnique({
         where: {
@@ -42,7 +46,11 @@ export default async function Page(props: { params: Promise<{ id: string, }>, })
         notFound();
     }
 
-    const url = (await ut.getFileUrls([file.key])).data[0]?.url;
+    const url = `https://utfs.io/f/${file.key}`;
+
+    if (fileOnly === 'true') {
+        permanentRedirect(url);
+    }
 
     return (
         <Card>
