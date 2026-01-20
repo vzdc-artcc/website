@@ -38,7 +38,7 @@ export default async function Page({searchParams}: { searchParams: Promise<{ ope
                     <Card key={category.id}>
                         <CardContent>
                             <Typography variant="h6">{category.name}</Typography>
-                            <FileTable files={category.files} openInNewTab={openInNewTab === 'true'}/>
+                            <FileTable files={category.files} openInNewTab={!(openInNewTab === 'false')}/>
                         </CardContent>
                     </Card>
                 ))}
