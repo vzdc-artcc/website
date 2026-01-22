@@ -95,7 +95,7 @@ export const createOrUpdateFile = async (formData: FormData) => {
         name: z.string().min(1, 'Name is required').max(100, 'Name is too long'),
         alias: z.string().optional(),
         description: z.string().max(255, 'Description is too long'),
-        highlightColor: z.string().min(1, "Type is required"),
+        highlightColor: z.string().min(1, "Highlight color is required"),
     });
 
     const result = fileZ.safeParse({
@@ -127,10 +127,12 @@ export const createOrUpdateFile = async (formData: FormData) => {
         return {errors: [{message: "Alias must be unique"}]};
     }
 
+    console.log('Uploading file from input...');
     const inputFile = formData.get('file') as File | null;
     let fileKey = fileExists?.key || '';
 
     if (inputFile && inputFile.size > 0) {
+        console.log('uploading to uploadthing');
         const res = await ut.uploadFiles(inputFile);
         if (res.error) {
             console.log(res.error);
@@ -138,6 +140,7 @@ export const createOrUpdateFile = async (formData: FormData) => {
         }
         fileKey = res.data.key;
         if (fileExists) {
+            console.log('deleting old file from uploadthing');
             await ut.deleteFiles(fileExists.key);
         }
     } else if (!fileExists) {
