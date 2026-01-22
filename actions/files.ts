@@ -89,7 +89,8 @@ export const deleteFileCategory = async (id: string) => {
 }
 
 export const createOrUpdateFile = async (formData: FormData) => {
-    const fileZ = z.object({
+    console.log('upserting file');
+const fileZ = z.object({
         categoryId: z.string(),
         id: z.string().optional(),
         name: z.string().min(1, 'Name is required').max(100, 'Name is too long'),
@@ -107,6 +108,7 @@ export const createOrUpdateFile = async (formData: FormData) => {
         highlightColor: formData.get('highlightColor') as string
     });
 
+console.log('validating data');
     if (!result.success) {
         return {errors: result.error.errors};
     }
