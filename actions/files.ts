@@ -89,8 +89,7 @@ export const deleteFileCategory = async (id: string) => {
 }
 
 export const createOrUpdateFile = async (formData: FormData) => {
-    console.log('upserting file');
-const fileZ = z.object({
+    const fileZ = z.object({
         categoryId: z.string(),
         id: z.string().optional(),
         name: z.string().min(1, 'Name is required').max(100, 'Name is too long'),
@@ -108,7 +107,6 @@ const fileZ = z.object({
         highlightColor: formData.get('highlightColor') as string
     });
 
-console.log('validating data');
     if (!result.success) {
         return {errors: result.error.errors};
     }
@@ -129,12 +127,10 @@ console.log('validating data');
         return {errors: [{message: "Alias must be unique"}]};
     }
 
-    console.log('Uploading file from input...');
     const inputFile = formData.get('file') as File | null;
     let fileKey = fileExists?.key || '';
 
     if (inputFile && inputFile.size > 0) {
-        console.log('uploading to uploadthing');
         const res = await ut.uploadFiles(inputFile);
         if (res.error) {
             console.log(res.error);
@@ -142,7 +138,6 @@ console.log('validating data');
         }
         fileKey = res.data.key;
         if (fileExists) {
-            console.log('deleting old file from uploadthing');
             await ut.deleteFiles(fileExists.key);
         }
     } else if (!fileExists) {

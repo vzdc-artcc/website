@@ -8,6 +8,8 @@ import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {log} from "@/actions/log";
 import {sendTrainingRequestDeletedEmail} from "@/actions/mail/training";
+import {z} from "zod";
+import {formatZuluDate} from "@/lib/date";
 
 export const submitTrainingAssignmentRequest = async () => {
     const session = await getServerSession(authOptions);
@@ -194,3 +196,42 @@ const getWhere = (filter?: GridFilterItem, controllerStatus?: 'HOME' | 'VISITOR'
     if (studentClause) where.student = studentClause;
     return where;
 };
+
+export const manualTrainingAssignmentRequest = async (userId: string, submittedTime: Date) => {
+    const requestZ = z.object({
+        userId: z.string().min(1, 'User ID is required.'),
+        submittedTime: z.date(),
+    });
+
+    const parsed = requestZ.safeParse({userId, submittedTime});
+    if (!parsed.success) {
+        const errors = parsed.error.errors.map((e) => e.message);
+        return {errors};
+    }
+
+    const existingRequest = await prisma.trainingAssignmentRequest.findUnique({
+        where: {
+            studentId: userId,
+        },
+    });
+
+    if (existingRequest) {
+        return {errors: ['This user already has a training assignment request pending.']};
+    }
+
+    const request = await prisma.trainingAssignmentRequest.create({
+        data: {
+            studentId: userId,
+            submittedAt: submittedTime,
+        },
+        include: {
+            student: true,
+        },
+    });
+
+    await log("CREATE", "TRAINING_ASSIGNMENT_REQUEST", `Manually submitted training assignment request for ${request.student.fullName} with timestamp ${formatZuluDate(submittedTime)}`);
+    revalidatePath("/training/requests/home");
+    revalidatePath("/training/requests/visit");
+    revalidatePath("/profile/overview");
+    return {request};
+}

@@ -122,6 +122,14 @@ export default async function TrainingMenu() {
                     <ListItemText primary="Training Assignments"/>
                 </ListItemButton>
             </Link>
+            <Link href="/training/requests/man-request" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <PersonAdd/>
+                    </ListItemIcon>
+                    <ListItemText primary="Manual Trainer Request"/>
+                </ListItemButton>
+            </Link>
             <Link href="/training/requests/home" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
