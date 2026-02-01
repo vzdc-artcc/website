@@ -35,7 +35,13 @@ async function rosterUpdate() {
     for (const user of users) {
 
         if (!user.excludedFromVatusaRosterUpdate) {
-            const vatusaData = await getVatusaData(user as User, users as User[]);
+            let vatusaData;
+            try {
+                vatusaData = await getVatusaData(user as User, users as User[]);
+            } catch (e) {
+                console.error(`ROSTER SYNC: Failed to fetch VATUSA data for user CID ${user.cid}:`, e);
+                continue;
+            }
             let newOperatingInitials = user.operatingInitials;
             let showWelcomeMessage = user.showWelcomeMessage;
             if (vatusaData.controllerStatus === "NONE") {

@@ -105,7 +105,9 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
         }[],
     };
 
-    if (!res.ok) return {controllerStatus: "NONE", roles: [], staffPositions: [], joinDate: new Date(),};
+    if (!res.ok) {
+        throw new Error('Failed to fetch VATUSA data');
+    }
     const controllerRoles = controller.roles.filter(r => r.facility === VATUSA_FACILITY).map(r => r.role);
 
     const visitingFacilityEntry = controller.visiting_facilities.find(vf => vf.facility === VATUSA_FACILITY);
