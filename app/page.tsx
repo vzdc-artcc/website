@@ -173,22 +173,39 @@ export default async function Home() {
                                       style={{color: 'inherit', textDecoration: 'none',}}><OpenInNew fontSize="small"
                                                                                                      sx={{ml: 1,}}/></Link></Typography>
                             <Stack direction="column" spacing={1}>
-                                {typeof atcBookings !== 'string' && atcBookings.length > 0 ? atcBookings.filter(b => new Date(b.start.replace(" ", "T") + "Z") > new Date()).slice(0, 10).map((booking, i) => (
-                                    <Card elevation={0} key={booking.id}>
-                                        <CardContent>
+                                {typeof atcBookings !== 'string' && atcBookings.length > 0 ? atcBookings.filter(b => new Date(b.start.replace(" ", "T") + "Z") > new Date()).slice(0, 10).map((booking, i) => {
+                             
+                                    const trainer = bookingUsers.find(u => u?.cid === String(booking.cid));
+
+                                    return (
+                                        <Card elevation={0} key={booking.id}>
+                                            <CardContent>
                                             <Stack direction="row" spacing={1} justifyContent="space-between">
                                                 <Typography fontWeight="bold">{booking.callsign}</Typography>
-                                                <Tooltip arrow
-                                                         title={`${formatZuluDate(new Date(booking.start.replace(" ", "T") + "Z"))} | Duration: ${getDuration(new Date(booking.start), new Date(booking.end))}`}>
-                                                    <Typography>{getTimeIn(new Date(booking.start.replace(" ", "T") + "Z"))}</Typography>
+                                                <Tooltip
+                                                arrow
+                                                title={`${formatZuluDate(new Date(booking.start.replace(" ", "T") + "Z"))} | Duration: ${getDuration(new Date(booking.start.replace(" ", "T") + "Z"), new Date(booking.end.replace(" ", "T") + "Z"))}`}
+                                                >
+                                                <Typography>{getTimeIn(new Date(booking.start.replace(" ", "T") + "Z"))}</Typography>
                                                 </Tooltip>
                                             </Stack>
-                                            <Typography>{bookingUsers[i]?.firstName} {bookingUsers[i]?.lastName} ({getRating(bookingUsers[i]?.rating || 1)})</Typography>
-                                            {booking.type === 'training' && <Typography
-                                                variant="caption">Student: {trainingAppointments.find((a) => a?.atcBookingId === booking.id + "")?.student.firstName} {trainingAppointments.find((a) => a?.atcBookingId === booking.id + "")?.student.lastName} {getRating(trainingAppointments.find((a) => a?.atcBookingId === booking.id + "")?.student.rating || 1)}</Typography>}
-                                        </CardContent>
-                                    </Card>
-                                )) : <Typography>No upcoming ATC bookings</Typography>}
+
+                                            <Typography>
+                                                {trainer?.firstName} {trainer?.lastName} ({getRating(trainer?.rating || 1)})
+                                            </Typography>
+
+                                            {booking.type === 'training' && (
+                                                <Typography variant="caption">
+                                                Student:{' '}
+                                                {trainingAppointments.find(a => a?.atcBookingId === String(booking.id))?.student.firstName}{' '}
+                                                {trainingAppointments.find(a => a?.atcBookingId === String(booking.id))?.student.lastName}{' '}
+                                                {getRating(trainingAppointments.find(a => a?.atcBookingId === String(booking.id))?.student.rating || 1)}
+                                                </Typography>
+                                            )}
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                }) : <Typography>No upcoming ATC bookings</Typography>}
                             </Stack>
                         </CardContent>
                     </Card>
