@@ -26,7 +26,7 @@ export default function LinksCard() {
                             <ListItemIcon>
                                 <Feedback color="info"/>
                             </ListItemIcon>
-                            <ListItemText primary="Events Feedback"/>
+                            <ListItemText primary="Events Team Feedback"/>
                         </ListItemButton>
                     </Link>
                     <Link href="https://wkf.ms/3C3CEpl" target="_blank"
