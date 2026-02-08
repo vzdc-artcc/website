@@ -20,6 +20,15 @@ export default function LinksCard() {
                             <ListItemText primary="General Facility Feedback"/>
                         </ListItemButton>
                     </Link>
+                    <Link href="https://wkf.ms/4jM2UWK" target="_blank"
+                          style={{color: 'inherit', textDecoration: 'none',}}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <Feedback color="info"/>
+                            </ListItemIcon>
+                            <ListItemText primary="Events Feedback"/>
+                        </ListItemButton>
+                    </Link>
                     <Link href="https://wkf.ms/3C3CEpl" target="_blank"
                           style={{color: 'inherit', textDecoration: 'none',}}>
                         <ListItemButton>
