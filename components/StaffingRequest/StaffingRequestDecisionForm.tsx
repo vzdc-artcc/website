@@ -14,7 +14,7 @@ function StaffingRequestDecisionForm({staffingRequest}: { staffingRequest: Staff
 
     const handleSubmit = async () => {
         await closeStaffingRequest(staffingRequest);
-        router.replace("/admin/staffing-requests");
+        router.replace("/events/admin/staffing-requests");
         toast("Staffing request closed successfully!", {type: "success",});
     }
 
