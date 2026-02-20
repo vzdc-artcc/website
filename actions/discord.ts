@@ -116,7 +116,7 @@ export async function sendAnnouncement(
     }
 }
 
-export const sendDiscordEventPositionData = async (event: Event, positions: EventPositionWithSolo[]) => {
+export const sendDiscordEventPositionData = async (event: Event, positions: EventPositionWithSolo[], ping: boolean) => {
 
     const publishedPositions = positions.filter((position) => position.published);
 
@@ -141,7 +141,8 @@ export const sendDiscordEventPositionData = async (event: Event, positions: Even
                 controller_final_position: position.finalPosition,
                 controller_final_start_time: position.finalStartTime,
                 controller_final_end_time: position.finalEndTime
-            }))
+            })),
+            ping_users: ping
         }),
     });
 
