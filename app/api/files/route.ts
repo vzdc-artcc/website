@@ -5,6 +5,7 @@ export async function GET() {
         select: {
             key: true,
             name: true,
+            updatedAt: true,
         },
     });
 
