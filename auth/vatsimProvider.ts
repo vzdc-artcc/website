@@ -6,6 +6,7 @@ import {OAuthConfig} from "next-auth/providers/oauth";
 
 // vatusa facility id from environment variables
 const VATUSA_FACILITY = process.env['VATUSA_FACILITY'];
+const VATUSA_API_KEY = process.env['VATUSA_API_KEY'] || '';
 // detect if the app is in development mode
 const DEV_MODE = process.env.NODE_ENV === "development";
 // vatsim oauth endpoint base url from environment variables
@@ -85,11 +86,13 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
             operatingInitials,
         };
     }
-    const res = await fetch(`https://api.vatusa.net/v2/user/${data.cid}`, {
+
+    const res = await fetch(`https://api.vatusa.net/v2/user/${data.cid}?apikey=${VATUSA_API_KEY}`, {
         next: {
             revalidate: 0,
         }
     });
+
     const userData = await res.json();
     const controller = userData.data as {
         cid: number,
@@ -99,7 +102,7 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
             facility: string,
             role: string,
         }[],
-        visits: {
+        visiting_facilities: {
             facility: string,
             created_at: Date,
         }[],
@@ -110,7 +113,7 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
     }
     const controllerRoles = controller.roles.filter(r => r.facility === VATUSA_FACILITY).map(r => r.role);
 
-    const visitingFacilityEntry = controller.visits.find(vf => vf.facility === VATUSA_FACILITY);
+    const visitingFacilityEntry = controller.visiting_facilities.find(vf => vf.facility === VATUSA_FACILITY);
 
     const controllerStatus: ControllerStatus = controller.facility === VATUSA_FACILITY ? "HOME" : visitingFacilityEntry ? "VISITOR" : "NONE";
 
