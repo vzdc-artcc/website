@@ -99,7 +99,7 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
             facility: string,
             role: string,
         }[],
-        visiting_facilities: {
+        visits: {
             facility: string,
             created_at: Date,
         }[],
@@ -110,7 +110,7 @@ export const getVatusaData = async (data: Profile | User, allUsers?: User[]): Pr
     }
     const controllerRoles = controller.roles.filter(r => r.facility === VATUSA_FACILITY).map(r => r.role);
 
-    const visitingFacilityEntry = controller.visiting_facilities.find(vf => vf.facility === VATUSA_FACILITY);
+    const visitingFacilityEntry = controller.visits.find(vf => vf.facility === VATUSA_FACILITY);
 
     const controllerStatus: ControllerStatus = controller.facility === VATUSA_FACILITY ? "HOME" : visitingFacilityEntry ? "VISITOR" : "NONE";
 
