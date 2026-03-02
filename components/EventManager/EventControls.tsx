@@ -1,12 +1,9 @@
-import { ButtonGroup, IconButton, Tooltip, Typography } from "@mui/material";
-import { Divider } from "@mui/material";
-import { Event } from "@prisma/client";
+import {ButtonGroup, Card, CardContent, Divider, IconButton, Stack, Tooltip, Typography} from "@mui/material";
+import {Event} from "@prisma/client";
 import ToggleVisibilityButton from "./ToggleVisibilityButton";
-import { Info } from "@mui/icons-material";
-import { Card, CardContent, Stack } from "@mui/material";
+import {Edit, Info} from "@mui/icons-material";
 import ArchiveToggleButton from "./ArchiveToggleButton";
-import { Edit } from "@mui/icons-material";
-import { eventGetDuration, formatZuluDate } from "@/lib/date";
+import {eventGetDuration, formatZuluDate} from "@/lib/date";
 import Link from "next/link";
 
 export default async function EventControls({ event }: { event: Event, }) {
@@ -16,7 +13,8 @@ export default async function EventControls({ event }: { event: Event, }) {
     return (
         <Card>
             <CardContent>
-                <Typography variant="body2">Event Manager - <b>{event.type}</b></Typography>
+                <Typography variant="body2">Event Manager - <b>{event.type}</b> {event.enableBufferTimes ?
+                    <span style={{color: 'violet',}}>(BUFFERED)</span> : <></>}</Typography>
                 <Typography variant="h4">{event.name}</Typography>
                 <Typography>START &nbsp;{formatZuluDate(event.start)} (IN {eventGetDuration(new Date(), event.start, true).toFixed(2)} days)</Typography>
                 <Typography>END &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{formatZuluDate(event.end)} (+{eventGetDuration(event.start, event.end).toFixed(2)} hours)</Typography>

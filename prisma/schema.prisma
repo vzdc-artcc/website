@@ -690,6 +690,8 @@ model Event {
 
   positions       EventPosition[]
   presetPositions String[]
+
+  enableBufferTimes Boolean @default(false)
 }
 
 enum EventType {
@@ -711,8 +713,9 @@ model EventPosition {
   user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String?
 
-  requestedPosition String
-  notes             String?
+  requestedPosition          String
+  requestedSecondaryPosition String @default("UNKNOWN")
+  notes                      String?
 
   requestedStartTime DateTime
   requestedEndTime   DateTime

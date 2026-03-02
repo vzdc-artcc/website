@@ -43,13 +43,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
     const session = await getServerSession(authOptions);
 
-    const positions: EventPositionWithSolo[] = await Promise.all(event.positions.map(async (position) => {
+    const positions: EventPositionWithSolo[] = (await Promise.all(event.positions.map(async (position) => {
         if (!position.user) {
             return { ...position, soloCert: undefined, user: undefined };
         }
         const soloCert = await getSoloCertification(position.user);
         return { ...position, soloCert };
-    }));
+    }))).sort((a, b) => (a.user?.lastName || '').localeCompare(b.user?.lastName || ''));
 
     return session?.user && (
         <Stack spacing={2}>

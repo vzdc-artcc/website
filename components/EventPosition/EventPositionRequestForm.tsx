@@ -20,11 +20,20 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
     dayjs.extend(utc);
     dayjs.extend(timezone);
 
+    const minDateAllowed = event.enableBufferTimes ?
+        dayjs.utc(event.start).subtract(1, 'hour').tz(currentUser.timezone) :
+        dayjs.utc(event.start).tz(currentUser.timezone);
+
+    const maxDateAllowed = event.enableBufferTimes ?
+        dayjs.utc(event.end).add(1, 'hour').tz(currentUser.timezone) :
+        dayjs.utc(event.end).tz(currentUser.timezone);
+
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [user, setUser] = useState<string>(currentUser.id || '');
     const [position, setPosition] = useState(eventPosition?.requestedPosition || '');
-    const [start, setStart] = useState<Dayjs | null>(dayjs.utc(eventPosition?.requestedStartTime || event.start).tz(currentUser.timezone));
-    const [end, setEnd] = useState<Dayjs | null>(dayjs.utc(eventPosition?.requestedEndTime || event.end).tz(currentUser.timezone));
+    const [secondaryPosition, setSecondaryPosition] = useState(eventPosition?.requestedSecondaryPosition || '');
+    const [start, setStart] = useState<Dayjs | null>(eventPosition?.requestedStartTime ? dayjs.utc(eventPosition.requestedStartTime).tz(currentUser.timezone) : minDateAllowed);
+    const [end, setEnd] = useState<Dayjs | null>(eventPosition?.requestedEndTime ? dayjs.utc(eventPosition.requestedEndTime).tz(currentUser.timezone) : maxDateAllowed);
     const [notes, setNotes] = useState(eventPosition?.notes || '');
 
     const handleSubmit = async (formData: FormData) => {
@@ -34,6 +43,7 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
         formData.set('userId', user);
         formData.set('eventId', event.id);
         formData.set('requestedPosition', position);
+        formData.set('requestedSecondaryPosition', secondaryPosition);
         formData.set('requestedStartTime', start!.toISOString());
         formData.set('requestedEndTime', end!.toISOString());
         formData.set('notes', notes);
@@ -72,7 +82,7 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
                             renderInput={(params) => <TextField {...params} label="Controller"/>}
                         />
                     </Grid2> }
-                    <Grid2 size={{ xs: 6, md: 2, }}>
+                    <Grid2 size={{xs: 6, sm: 3,}}>
                         <Autocomplete
                             disabled={!admin && (!!eventPosition || event.positionsLocked)}
                             freeSolo
@@ -83,19 +93,39 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
                             onInputChange={(e, value) => setPosition(value)}
                         />
                     </Grid2>
-                    <Grid2 size={{ xs: 6, sm: 3, md: 2, }}>
+                    <Grid2 size={{xs: 6, sm: 3,}}>
+                        <Autocomplete
+                            disabled={!admin && (!!eventPosition || event.positionsLocked)}
+                            fullWidth
+                            options={event.presetPositions}
+                            renderInput={(params) => <TextField {...params} variant="filled"
+                                                                label={admin ? 'Secondary Position' : 'Requested Secondary Position'}
+                                                                helperText="You must pick from the selections."/>}
+                            inputValue={secondaryPosition}
+                            onInputChange={(e, value) => setSecondaryPosition(value)}
+                        />
+                    </Grid2>
+                    <Grid2 size={{xs: 6, sm: 3,}}>
                         <DateTimePicker sx={{width: '100%',}}
                                         disabled={!admin && (!!eventPosition || event.positionsLocked)} disablePast
-                                        ampm={false} minDateTime={dayjs.utc(event.start).tz(currentUser.timezone)}
-                                        maxDateTime={dayjs.utc(event.end).tz(currentUser.timezone)} name="start"
+                                        ampm={false} minDateTime={minDateAllowed}
+                                        maxDateTime={maxDateAllowed} name="start"
                                         label={admin ? 'FINAL Start' : 'Requested Start'} value={start}
                                         onChange={setStart}/>
                     </Grid2>
-                    <Grid2 size={{ xs: 6, sm: 3, md: 2, }}>
-                        <DateTimePicker sx={{ width: '100%', }} disabled={!admin && (!!eventPosition || event.positionsLocked)} disablePast ampm={false} minDateTime={dayjs.utc(event.start)} maxDateTime={dayjs.utc(event.end)} name="end" label={admin ? 'FINAL End' : 'Requested End'} value={end} onChange={setEnd} />
+                    <Grid2 size={{xs: 6, sm: 3,}}>
+                        <DateTimePicker sx={{width: '100%',}}
+                                        disabled={!admin && (!!eventPosition || event.positionsLocked)} disablePast
+                                        ampm={false} minDateTime={minDateAllowed} maxDateTime={maxDateAllowed}
+                                        name="end" label={admin ? 'FINAL End' : 'Requested End'} value={end}
+                                        onChange={setEnd}/>
                     </Grid2>
                     <Grid2 size={6}>
-                        <TextField variant="filled" fullWidth multiline rows={4} disabled={!admin && (!!eventPosition || event.positionsLocked)} name="notes" label={admin ? 'FINAL Notes (optional)' : 'Notes (optional)'} value={notes} onChange={(e) => setNotes(e.target.value)} />
+                        <TextField variant="filled" fullWidth multiline rows={4}
+                                   disabled={!admin && (!!eventPosition || event.positionsLocked)} name="notes"
+                                   label={admin ? 'FINAL Notes (optional)' : 'Notes (optional)'} value={notes}
+                                   onChange={(e) => setNotes(e.target.value)}
+                                   helperText="Mention anything that you would like the event staff to know, but be consice."/>
                     </Grid2>
                     <Grid2 size={6}>
                         { admin && <FormSaveButton text="Add" icon={<Add />} /> }

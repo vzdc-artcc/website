@@ -29,29 +29,118 @@ import SendDiscordEventDataButton from "@/components/EventManager/SendDiscordEve
 import EventPositionCsvButton from "@/components/EventManager/EventPositionCsvButton";
 
 
-
 export default async function EventPositionsTable({ event, positions }: { event: Event, positions: EventPositionWithSolo[] }) {
 
     const getTimeRectangle = (position: EventPosition, eventStart: Date, start: Date, eventEnd: Date, end: Date) => {
 
-        if (eventStart.getTime() > start.getTime() || eventEnd.getTime() < end.getTime()) {
+        const bufferMs = 60 * 60 * 1000;
+        const totalStart = event.enableBufferTimes ? new Date(eventStart.getTime() - bufferMs) : eventStart;
+        const totalEnd = event.enableBufferTimes ? new Date(eventEnd.getTime() + bufferMs) : eventEnd;
+
+        if (totalStart.getTime() > start.getTime() || totalEnd.getTime() < end.getTime()) {
             return <>
                 <div style={{ position: 'relative', height: '20px', backgroundColor: 'red', width: '80px' }} />
                 <Typography variant="caption">INVALID (hover)</Typography>
             </>;
         }
 
-        const totalDuration = eventEnd.getTime() - eventStart.getTime();
-        const startOffset = start.getTime() - eventStart.getTime();
-        const endOffset = end.getTime() - eventStart.getTime();
-    
-        const startPercentage = (startOffset / totalDuration) * 100;
-        const endPercentage = (endOffset / totalDuration) * 100;
-    
-        return <div style={{ position: 'relative', height: '20px', backgroundColor: 'cyan', width: '80px' }}>
-            <div key={position.id} style={{ position: 'absolute', left: `${startPercentage}%`, width: `${endPercentage - startPercentage}%`, height: '100%', backgroundColor: 'orange' }} />
-            </div>;
+        const totalDuration = totalEnd.getTime() - totalStart.getTime();
+
+        const startPct = ((start.getTime() - totalStart.getTime()) / totalDuration) * 100;
+        const endPct = ((end.getTime() - totalStart.getTime()) / totalDuration) * 100;
+
+        const coreStartPct = ((eventStart.getTime() - totalStart.getTime()) / totalDuration) * 100;
+        const coreEndPct = ((eventEnd.getTime() - totalStart.getTime()) / totalDuration) * 100;
+
+        // Pre-buffer: used portion (position extends into pre-buffer)
+        const preBufferUsedStart = startPct;
+        const preBufferUsedEnd = Math.min(endPct, coreStartPct);
+        // Pre-buffer: unused portion (buffer exists but position doesn't cover it)
+        const preBufferUnusedStart = 0;
+        const preBufferUnusedEnd = Math.min(startPct, coreStartPct);
+
+        // Core event segment
+        const coreSegStart = Math.max(startPct, coreStartPct);
+        const coreSegEnd = Math.min(endPct, coreEndPct);
+
+        // Post-buffer: used portion (position extends into post-buffer)
+        const postBufferUsedStart = Math.max(startPct, coreEndPct);
+        const postBufferUsedEnd = endPct;
+        // Post-buffer: unused portion (buffer exists but position doesn't cover it)
+        const postBufferUnusedStart = Math.max(endPct, coreEndPct);
+        const postBufferUnusedEnd = 100;
+
+        return (
+            <div style={{position: 'relative', height: '20px', backgroundColor: 'cyan', width: '80px'}}>
+                {/* Pre-buffer: unused (gray) */}
+                {event.enableBufferTimes && preBufferUnusedEnd > preBufferUnusedStart && (
+                    <div
+                        key={`${position.id}-pre-unused`}
+                        style={{
+                            position: 'absolute',
+                            left: `${preBufferUnusedStart}%`,
+                            width: `${preBufferUnusedEnd - preBufferUnusedStart}%`,
+                            height: '100%',
+                            backgroundColor: '#9e9e9e',
+                        }}
+                    />
+                )}
+                {/* Pre-buffer: used (purple) */}
+                {event.enableBufferTimes && preBufferUsedEnd > preBufferUsedStart && (
+                    <div
+                        key={`${position.id}-pre`}
+                        style={{
+                            position: 'absolute',
+                            left: `${preBufferUsedStart}%`,
+                            width: `${preBufferUsedEnd - preBufferUsedStart}%`,
+                            height: '100%',
+                            backgroundColor: '#ab47bc',
+                        }}
+                    />
+                )}
+                {/* Core event segment (orange) */}
+                {coreSegEnd > coreSegStart && (
+                    <div
+                        key={`${position.id}-core`}
+                        style={{
+                            position: 'absolute',
+                            left: `${coreSegStart}%`,
+                            width: `${coreSegEnd - coreSegStart}%`,
+                            height: '100%',
+                            backgroundColor: 'orange',
+                        }}
+                    />
+                )}
+                {/* Post-buffer: used (purple) */}
+                {event.enableBufferTimes && postBufferUsedEnd > postBufferUsedStart && (
+                    <div
+                        key={`${position.id}-post`}
+                        style={{
+                            position: 'absolute',
+                            left: `${postBufferUsedStart}%`,
+                            width: `${postBufferUsedEnd - postBufferUsedStart}%`,
+                            height: '100%',
+                            backgroundColor: '#ab47bc',
+                        }}
+                    />
+                )}
+                {/* Post-buffer: unused (gray) */}
+                {event.enableBufferTimes && postBufferUnusedEnd > postBufferUnusedStart && (
+                    <div
+                        key={`${position.id}-post-unused`}
+                        style={{
+                            position: 'absolute',
+                            left: `${postBufferUnusedStart}%`,
+                            width: `${postBufferUnusedEnd - postBufferUnusedStart}%`,
+                            height: '100%',
+                            backgroundColor: '#9e9e9e',
+                        }}
+                    />
+                )}
+            </div>
+        );
     }
+
 
     return (
         <Card>
@@ -85,13 +174,14 @@ export default async function EventPositionsTable({ event, positions }: { event:
                         <TableHead>
                             <TableRow>
                                 <TableCell>Controller</TableCell>
-                                <TableCell>Solo?</TableCell>
-                                <TableCell>Requested Position</TableCell>
-                                <TableCell>Requested Time</TableCell>
+                                <TableCell>Solo</TableCell>
+                                <TableCell>Rq Pos</TableCell>
+                                <TableCell>Rq Sec Pos</TableCell>
+                                <TableCell>Rq Time</TableCell>
                                 <TableCell>Notes</TableCell>
-                                <TableCell>Final Position</TableCell>
-                                <TableCell>Final Time</TableCell>
-                                <TableCell>Final Notes</TableCell>
+                                <TableCell>Fin Pos</TableCell>
+                                <TableCell>Fin Time</TableCell>
+                                <TableCell>Fin Notes</TableCell>
                                 { !event.archived && <TableCell>Actions</TableCell> }
                             </TableRow>
                         </TableHead>
@@ -114,6 +204,7 @@ export default async function EventPositionsTable({ event, positions }: { event:
                                     </Stack>
                                     : ''}</TableCell>
                                     <TableCell>{position.requestedPosition}</TableCell>
+                                    <TableCell>{position.requestedSecondaryPosition}</TableCell>
                                     <TableCell>
                                         <Tooltip title={`${formatZuluDate(position.requestedStartTime)} - ${formatZuluDate(position.requestedEndTime)}`}>
                                             {getTimeRectangle(position, new Date(event.start), new Date(position.requestedStartTime), new Date(event.end), new Date(position.requestedEndTime))}
