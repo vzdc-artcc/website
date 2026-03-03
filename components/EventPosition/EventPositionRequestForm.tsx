@@ -132,7 +132,7 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
                         { !admin && !eventPosition && !event.positionsLocked && <FormSaveButton text="Request" icon={<Add />} /> }
                         { !admin && eventPosition && !event.positionsLocked && <Button type="button" variant="contained" color="error" startIcon={<Delete />} onClick={() => deleteEventPosition(event, eventPosition.id)}>Delete</Button> }
                         { !admin && event.positionsLocked && <Typography sx={{ mt: 2, }}>Positions are locked for this event.</Typography> }
-                        { !admin && <Typography sx={{ mt: 2, }}>You will recieve an email once your final position and time has been published.</Typography> }
+                        { !admin && <Typography sx={{ mt: 2, }}>You will receive an email once your final position and time has been published.</Typography> }
                         { admin && <Typography variant="subtitle2" sx={{ mt: 1, }}>The position will be unpublished after being added.</Typography> }
                     </Grid2>
                 </Grid2>
