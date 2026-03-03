@@ -97,7 +97,7 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
                         <Autocomplete
                             disabled={!admin && (!!eventPosition || event.positionsLocked)}
                             fullWidth
-                            options={event.presetPositions}
+                            options={["Delivery", "Ground", "Tower", "Approach", "Center"]}
                             renderInput={(params) => <TextField {...params} variant="filled"
                                                                 label={admin ? 'Secondary Position' : 'Requested Secondary Position'}
                                                                 helperText="You must pick from the selections."/>}
