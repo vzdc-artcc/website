@@ -170,7 +170,7 @@ export default async function EventPositionsTable({ event, positions }: { event:
                     <EventPositionCsvButton event={event} positions={positions}/>
                 </Box>
                 <TableContainer>
-                    <Table>
+                    <Table size="small">
                         <TableHead>
                             <TableRow>
                                 <TableCell>Controller</TableCell>
