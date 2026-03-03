@@ -134,6 +134,7 @@ export const sendDiscordEventPositionData = async (event: Event, positions: Even
             event_banner_url: `https://utfs.io/f/${event.bannerKey}`,
             event_start_time: event.start,
             event_end_time: event.end,
+            enable_buffer_times: event.enablebuffertimes,
             controllers: publishedPositions.map((position) => ({
                 controller_name: position.user?.fullName,
                 controller_discord_id: position.user?.discordUid,
