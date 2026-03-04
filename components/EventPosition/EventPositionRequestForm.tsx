@@ -28,12 +28,20 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
         dayjs.utc(event.end).add(1, 'hour').tz(currentUser.timezone) :
         dayjs.utc(event.end).tz(currentUser.timezone);
 
+    const defaultStart = eventPosition?.requestedStartTime
+        ? dayjs.utc(eventPosition.requestedStartTime).tz(currentUser.timezone)
+        : dayjs.utc(event.start).tz(currentUser.timezone);
+
+    const defaultEnd = eventPosition?.requestedEndTime
+        ? dayjs.utc(eventPosition.requestedEndTime).tz(currentUser.timezone)
+        : dayjs.utc(event.end).tz(currentUser.timezone);
+
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [user, setUser] = useState<string>(currentUser.id || '');
     const [position, setPosition] = useState(eventPosition?.requestedPosition || '');
     const [secondaryPosition, setSecondaryPosition] = useState(eventPosition?.requestedSecondaryPosition || '');
-    const [start, setStart] = useState<Dayjs | null>(eventPosition?.requestedStartTime ? dayjs.utc(eventPosition.requestedStartTime).tz(currentUser.timezone) : minDateAllowed);
-    const [end, setEnd] = useState<Dayjs | null>(eventPosition?.requestedEndTime ? dayjs.utc(eventPosition.requestedEndTime).tz(currentUser.timezone) : maxDateAllowed);
+    const [start, setStart] = useState<Dayjs | null>(defaultStart);
+    const [end, setEnd] = useState<Dayjs | null>(defaultEnd);
     const [notes, setNotes] = useState(eventPosition?.notes || '');
 
     const handleSubmit = async (formData: FormData) => {
