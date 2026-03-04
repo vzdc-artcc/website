@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
                 categories: true,
             },
         });
-        
+
         return NextResponse.json(configs);
     } catch (err) {
         console.error(err);
