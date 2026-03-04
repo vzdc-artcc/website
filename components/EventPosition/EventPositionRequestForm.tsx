@@ -125,7 +125,7 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
                                    disabled={!admin && (!!eventPosition || event.positionsLocked)} name="notes"
                                    label={admin ? 'FINAL Notes (optional)' : 'Notes (optional)'} value={notes}
                                    onChange={(e) => setNotes(e.target.value)}
-                                   helperText="Mention anything that you would like the event staff to know, but be consice."/>
+                                   helperText="Mention anything that you would like the event staff to know, but be concise."/>
                     </Grid2>
                     <Grid2 size={6}>
                         { admin && <FormSaveButton text="Add" icon={<Add />} /> }
