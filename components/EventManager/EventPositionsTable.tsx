@@ -187,13 +187,14 @@ export default async function EventPositionsTable({ event, positions }: { event:
                         </TableHead>
                         <TableBody>
                             {positions.map((position) => position.user && (
+
                                 <TableRow key={position.id}>
                                     <TableCell>
                                         <Link href={`/admin/controller/${position.user.cid}`} passHref target="_blank">
                                             <Chip
                                                 label={`${position.user.firstName} ${position.user.lastName} - ${getRating(position.user.rating)}` || 'Unknown'}
-                                                color={position.published ? 'success' : 'default'}
                                                 size="small"
+                                                color={`${position.user.controllerStatus === "HOME" ? "default" : "secondary"}`}
                                             />
                                         </Link>
                                     </TableCell>
