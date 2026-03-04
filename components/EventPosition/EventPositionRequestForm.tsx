@@ -21,11 +21,11 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
     dayjs.extend(timezone);
 
     const minDateAllowed = event.enableBufferTimes ?
-        dayjs.utc(event.start).subtract(1, 'hour').tz(currentUser.timezone) :
+        dayjs.utc(event.start).subtract(2, 'hour').tz(currentUser.timezone) :
         dayjs.utc(event.start).tz(currentUser.timezone);
 
     const maxDateAllowed = event.enableBufferTimes ?
-        dayjs.utc(event.end).add(1, 'hour').tz(currentUser.timezone) :
+        dayjs.utc(event.end).add(2, 'hour').tz(currentUser.timezone) :
         dayjs.utc(event.end).tz(currentUser.timezone);
 
     const defaultStart = eventPosition?.requestedStartTime
