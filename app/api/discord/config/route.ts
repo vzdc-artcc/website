@@ -3,23 +3,37 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth/auth";
 
-const BOT_API_SECRET_KEY = process.env.BOT_API_SECRET_KEY ?? "1234";
+const envBotApiSecretKey = process.env.BOT_API_SECRET_KEY;
 
+if (!envBotApiSecretKey) {
+    throw new Error("BOT_API_SECRET_KEY environment variable is not set");
+}
+
+const BOT_API_SECRET_KEY = envBotApiSecretKey;
 export async function GET(req: NextRequest) {
     try {
         const apiKey =
-            req.headers.get("API-Key") ?? req.headers.get("api-key") ?? null;
+            req.headers.get("x-api-key") ??
+            req.headers.get("X-API-Key") ??
+            req.headers.get("API-Key") ??
+            req.headers.get("api-key") ??
+            null;
 
-        const session = await getServerSession(authOptions);
+        const hasValidApiKey = apiKey === BOT_API_SECRET_KEY;
 
-        const positions = Array.isArray(session?.user?.staffPositions)
-            ? session.user.staffPositions
-            : [];
+        let isWm = false;
 
-        const isWm =
-            positions.includes("WM") || positions.includes("AWM");
+        if (!hasValidApiKey) {
+            const session = await getServerSession(authOptions);
 
-        if (!(isWm || apiKey === BOT_API_SECRET_KEY)) {
+            const positions = Array.isArray(session?.user?.staffPositions)
+                ? session.user.staffPositions
+                : [];
+
+            isWm = positions.includes("WM") || positions.includes("AWM");
+        }
+
+        if (!(isWm || hasValidApiKey)) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
