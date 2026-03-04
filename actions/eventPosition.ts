@@ -71,11 +71,13 @@ export const saveEventPosition = async (event: Event, formData: FormData, admin?
     const minStart = event.enableBufferTimes ? dayjs.utc(event.start).subtract(1, 'hour').toDate() : event.start;
     const maxEnd = event.enableBufferTimes ? dayjs.utc(event.end).add(1, 'hour').toDate() : event.end;
 
+    const secondaryPositionRequest = ["Delivery", "Ground", "Tower", "Approach", "Center"]
+
     const eventPositionZ = z.object({
         controllerId: z.string().min(1, { message: 'Controller is required' }),
         requestedPosition: z.string().min(1, { message: 'Requested Position is required' }).max(50, { message: 'Requested Position must be less than 50 characters' }),
         requestedSecondaryPosition: z.string().refine((val) => {
-            return event.presetPositions.includes(val);
+            return secondaryPositionRequest.includes(val);
         }, {message: 'Requested Secondary Position must be one of the preset positions'}),
         requestedStartTime: z.date().min(minStart, {message: 'Requested time must be within the event'}).max(maxEnd, {message: 'Requested time must be within the event'}),
         requestedEndTime: z.date().min(minStart, {message: 'Requested time must be within the event'}).max(maxEnd, {message: 'Requested time must be within the event'}),
