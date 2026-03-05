@@ -47,7 +47,7 @@ export default function EventPositionEditButton({ event, position, }: { event: E
         dayjs.utc(event.start);
 
     const maxDateAllowed = event.enableBufferTimes ?
-        dayjs.utc(event.end).add(1, 'hour') :
+        dayjs.utc(event.end).add(2, 'hour') :
         dayjs.utc(event.end);
 
     const handleClick = () => {
