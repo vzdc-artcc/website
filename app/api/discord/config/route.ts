@@ -3,14 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth/auth";
 
-const envBotApiSecretKey = process.env.BOT_API_SECRET_KEY;
+const BOT_API_SECRET_KEY = process.env.BOT_API_SECRET_KEY;
 
-if (!envBotApiSecretKey) {
-    throw new Error("BOT_API_SECRET_KEY environment variable is not set");
-}
-
-const BOT_API_SECRET_KEY = envBotApiSecretKey;
 export async function GET(req: NextRequest) {
+    if (!BOT_API_SECRET_KEY) {
+        throw new Error("BOT_API_SECRET_KEY environment variable is not set");\
+    }
+
     try {
         const apiKey =
             req.headers.get("x-api-key") ??
