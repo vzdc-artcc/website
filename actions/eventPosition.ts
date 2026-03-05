@@ -14,6 +14,7 @@ import {
     sendEventPositionRequestDeletedEmail
 } from "./mail/event";
 import {ZodErrorSlimResponse} from "@/types";
+import dayjs from "dayjs";
 
 export const toggleManualPositionOpen = async (event: Event) => {
 
@@ -67,17 +68,26 @@ export const saveEventPosition = async (event: Event, formData: FormData, admin?
         return { errors: [{ message: admin ? 'This controller already has a position request' : 'You have already requested a position for this event' }] };
     }
 
+    const minStart = event.enableBufferTimes ? dayjs.utc(event.start).subtract(2, 'hour').toDate() : event.start;
+    const maxEnd = event.enableBufferTimes ? dayjs.utc(event.end).add(2, 'hour').toDate() : event.end;
+
+    const secondaryPositionRequest = ["Delivery", "Ground", "Tower", "Approach", "Center"]
+
     const eventPositionZ = z.object({
         controllerId: z.string().min(1, { message: 'Controller is required' }),
         requestedPosition: z.string().min(1, { message: 'Requested Position is required' }).max(50, { message: 'Requested Position must be less than 50 characters' }),
-        requestedStartTime: z.date().min(event.start, { message: 'Requested time must be within the event' }).max(event.end, { message: 'Requested time must be within the event' }),
-        requestedEndTime: z.date().min(event.start, { message: 'Requested time must be within the event' }).max(event.end, { message: 'Requested time must be within the event' }),
+        requestedSecondaryPosition: z.string().refine((val) => {
+            return secondaryPositionRequest.includes(val);
+        }, {message: 'Requested Secondary Position must be one of the preset positions'}),
+        requestedStartTime: z.date().min(minStart, {message: 'Requested time must be within the event'}).max(maxEnd, {message: 'Requested time must be within the event'}),
+        requestedEndTime: z.date().min(minStart, {message: 'Requested time must be within the event'}).max(maxEnd, {message: 'Requested time must be within the event'}),
         notes: z.string().optional(),
     });
 
     const result = eventPositionZ.safeParse({
         controllerId: admin ? formData.get('userId') : session.user.id,
         requestedPosition: formData.get('requestedPosition'),
+        requestedSecondaryPosition: formData.get('requestedSecondaryPosition'),
         requestedStartTime: new Date(formData.get('requestedStartTime') as string),
         requestedEndTime: new Date(formData.get('requestedEndTime') as string),
         notes: formData.get('notes'),
@@ -92,6 +102,7 @@ export const saveEventPosition = async (event: Event, formData: FormData, admin?
             eventId: event.id,
             userId: result.data.controllerId,
             requestedPosition: result.data.requestedPosition,
+            requestedSecondaryPosition: result.data.requestedSecondaryPosition,
             requestedStartTime: result.data.requestedStartTime,
             requestedEndTime: result.data.requestedEndTime,
             notes: `${result.data.notes}${admin ? `\n(MAN ASSIGN)` : ''}`,
@@ -177,10 +188,14 @@ export const deleteEventPosition = async (event: Event, eventPositionId: string,
 }
 
 export const validateFinalEventPosition = async (event: Event, formData: FormData, zodResponse?: boolean): Promise<ZodErrorSlimResponse | SafeParseReturnType<any, any>> => {
+
+    const minStart = event.enableBufferTimes ? dayjs.utc(event.start).subtract(2, 'hour').toDate() : event.start;
+    const maxEnd = event.enableBufferTimes ? dayjs.utc(event.end).add(2, 'hour').toDate() : event.end;
+
     const eventPositionZ = z.object({
         finalPosition: z.string().min(1, { message: 'Final Position is required and could not be autofilled.' }).max(50, { message: 'Final Position must be less than 50 characters' }),
-        finalStartTime: z.date().min(event.start, { message: 'Final time must be within the event' }).max(event.end, { message: 'Final time must be within the event' }),
-        finalEndTime: z.date().min(event.start, { message: 'Final time must be within the event' }).max(event.end, { message: 'Final time must be within the event' }),
+        finalStartTime: z.date().min(minStart, {message: 'Final time must be within the event'}).max(maxEnd, {message: 'Final time must be within the event'}),
+        finalEndTime: z.date().min(minStart, {message: 'Final time must be within the event'}).max(maxEnd, {message: 'Final time must be within the event'}),
         finalNotes: z.string().optional(),
     });
 

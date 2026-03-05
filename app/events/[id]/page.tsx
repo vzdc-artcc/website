@@ -2,6 +2,7 @@ import React from 'react';
 import prisma from "@/lib/db";
 import {notFound} from "next/navigation";
 import {
+    Alert,
     Box,
     Card,
     CardContent,
@@ -123,6 +124,11 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 { session?.user && session.user.controllerStatus !== 'NONE' && !session.user.noEventSignup && !eventPosition?.published && <Card>
                     <CardContent>
                         <Typography variant="h6" gutterBottom>Request Position</Typography>
+                        {event.enableBufferTimes && <Alert severity="info" sx={{mb: 2,}}>
+                            This event has buffer times enabled. You may request to sign up for an extended period
+                            of <b>two hours before</b> and <b>two hours after the event</b>. By default, your requested
+                            time will be the duration of the event, <b>NOT including the buffer times</b>.
+                        </Alert>}
                         <EventPositionRequestForm event={event} eventPosition={eventPosition} currentUser={session.user as User} />
                     </CardContent>
                 </Card> }

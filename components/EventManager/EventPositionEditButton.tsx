@@ -1,16 +1,27 @@
 'use client';
-import { adminSaveEventPosition, publishEventPosition } from "@/actions/eventPosition";
-import { EventPositionWithSolo } from "@/app/events/admin/events/[id]/manager/page";
-import { formatZuluDate } from "@/lib/date";
-import { Edit } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Stack, TextField, Tooltip } from "@mui/material";
-import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Event } from "@prisma/client";
+import {adminSaveEventPosition, publishEventPosition} from "@/actions/eventPosition";
+import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
+import {formatZuluDate} from "@/lib/date";
+import {Edit} from "@mui/icons-material";
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    IconButton,
+    Stack,
+    TextField,
+    Tooltip
+} from "@mui/material";
+import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {Event} from "@prisma/client";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { useState } from "react";
-import { toast } from "react-toastify";
+import {useState} from "react";
+import {toast} from "react-toastify";
 
 export default function EventPositionEditButton({ event, position, }: { event: Event, position: EventPositionWithSolo, }) {
 
@@ -30,6 +41,14 @@ export default function EventPositionEditButton({ event, position, }: { event: E
     const [finalStartTime, setFinalStartTime] = useState<dayjs.Dayjs | null>(finalStart);
     const [finalEndTime, setFinalEndTime] = useState<dayjs.Dayjs | null>(finalEnd);
     const [finalNotes, setFinalNotes] = useState(position.finalNotes || '');
+
+    const minDateAllowed = event.enableBufferTimes ?
+        dayjs.utc(event.start).subtract(2, 'hour') :
+        dayjs.utc(event.start);
+
+    const maxDateAllowed = event.enableBufferTimes ?
+        dayjs.utc(event.end).add(2, 'hour') :
+        dayjs.utc(event.end);
 
     const handleClick = () => {
         setOpen(true);
@@ -74,7 +93,7 @@ export default function EventPositionEditButton({ event, position, }: { event: E
                     <Edit />
                 </IconButton>
             </Tooltip>
-            <Dialog open={open} onClose={() => setOpen(false)}>
+            <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>Position -  {position.user?.firstName} {position.user?.lastName}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>REQUESTED &apos;{position.requestedPosition}&apos;</DialogContentText>
@@ -85,8 +104,12 @@ export default function EventPositionEditButton({ event, position, }: { event: E
                     <br />
                     <Stack direction="column" spacing={2}>
                         <TextField fullWidth variant="filled" label="Final Position" value={finalPosition} onChange={(e) => setFinalPosition(e.target.value)} />
-                        <DateTimePicker sx={{ width: '100%', }} disablePast ampm={false} minDateTime={eventStart} maxDateTime={eventEnd} name="start" label="Final Start" value={finalStartTime} onChange={setFinalStartTime} />
-                        <DateTimePicker sx={{ width: '100%', }} disablePast ampm={false} minDateTime={eventStart} maxDateTime={eventEnd} name="end" label="Final End" value={finalEndTime} onChange={setFinalEndTime} />
+                        <DateTimePicker sx={{width: '100%',}} disablePast ampm={false} minDateTime={minDateAllowed}
+                                        maxDateTime={maxDateAllowed} name="start" label="Final Start"
+                                        value={finalStartTime} onChange={setFinalStartTime}/>
+                        <DateTimePicker sx={{width: '100%',}} disablePast ampm={false} minDateTime={minDateAllowed}
+                                        maxDateTime={maxDateAllowed} name="end" label="Final End" value={finalEndTime}
+                                        onChange={setFinalEndTime}/>
                         <TextField fullWidth variant="filled" multiline rows={4} name="finalNotes" label="Final Notes (optional)" value={finalNotes} onChange={(e) => setFinalNotes(e.target.value)} />
                     </Stack>
                 </DialogContent>

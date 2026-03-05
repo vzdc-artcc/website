@@ -7,7 +7,7 @@ import CertificationsCard from "@/components/Profile/CertificationsCard";
 import FeedbackCard from "@/components/Profile/FeedbackCard";
 import TrainingCard from "@/components/Profile/TrainingCard";
 import LinksCard from "@/components/Profile/LinksCard";
-import EventSignupCard from "@/components/Profile/EventSignupCard";
+import EventsCard from "@/components/Profile/EventsCard";
 import prisma from "@/lib/db";
 import LoaDeleteButton from "@/components/LOA/LoaDeleteButton";
 import Link from "next/link";
@@ -163,7 +163,7 @@ export default async function Page() {
                     xs: 6,
                     md: 2
                 }}>
-                <EventSignupCard user={user}/>
+                <EventsCard user={user}/>
             </Grid2>
             <Grid2
                 size={8}>

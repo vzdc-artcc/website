@@ -17,6 +17,7 @@ import {
     Radio,
     RadioGroup,
     Stack,
+    Switch,
     TextField,
     ToggleButton,
     ToggleButtonGroup,
@@ -51,6 +52,7 @@ export default function EventForm({ event }: { event?: Event, }) {
     const [host, setHost] = useState<string>(event?.host || '');
     const [start, setStart] = useState<Dayjs | null>(dayjs.utc(event?.start || new Date()));
     const [end, setEnd] = useState<Dayjs | null>(dayjs.utc(event?.end || new Date()));
+    const [enableBufferTimes, setEnableBufferTimes] = useState<boolean>(!!event?.enableBufferTimes);
     const [type, setType] = useState<EventType | undefined>(event?.type);
     const [bannerUrl, setBannerUrl] = useState<string>('');
     const [description, setDescription] = useState<string>(event?.description || '');
@@ -81,6 +83,7 @@ export default function EventForm({ event }: { event?: Event, }) {
                 start: start?.toDate(),
                 end: end?.toDate(),
                 type: type?.toString() || '',
+                enableBufferTimes,
                 description,
                 bannerUrl,
                 featuredFields,
@@ -109,6 +112,7 @@ export default function EventForm({ event }: { event?: Event, }) {
         formData.set('start', start?.toISOString() || '');
         formData.set('end', end?.toISOString() || '');
         formData.set('type', type || EventType.HOME);
+        formData.set('enableBufferTimes', enableBufferTimes.toString());
         formData.set('bannerUrl', bannerUrl);
         formData.set('description', description);
         formData.set('featuredFields', JSON.stringify(featuredFields));
@@ -184,6 +188,12 @@ export default function EventForm({ event }: { event?: Event, }) {
                                 </Grid2>
                                 <Grid2 size={2}>
                                     <Typography variant="caption" color="text.secondary">All times are in UTC.  Event must be at least 30 minutes long and cannot be before today.</Typography>
+                                </Grid2>
+                                <Grid2 size={2}>
+                                    <FormControlLabel control={<Switch/>} name="enableBufferTimes"
+                                                      label="Enable buffer times (+/- 1 hour)?"
+                                                      checked={enableBufferTimes}
+                                                      onChange={(_e, c) => setEnableBufferTimes(c)}/>
                                 </Grid2>
                                 <Grid2 size={2}>
                                     {NextButton}
@@ -309,39 +319,6 @@ export default function EventForm({ event }: { event?: Event, }) {
                                     />
                                 )}
                             />
-                            {NextButton}                        
-                        </AccordionDetails>
-                    </Accordion>
-
-                    <Accordion expanded={open === 5} onChange={handleOpen(5)}>
-                        <AccordionSummary expandIcon={<ExpandMore />}>
-                            <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
-                                <Typography variant="h6">Important Event Information</Typography>
-                                {event?.archived ? <CheckCircle color="success" /> : <Info color="info" /> }
-                            </Stack>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <ul>
-                                <li>
-                                    <Typography gutterBottom>By default, when an event is created, it is shown to the
-                                        calendar or list view.</Typography>
-                                </li>
-                                <li>
-                                    <Typography gutterBottom>This event will be archived, not deleted, <b>24 hours</b> after the published end date.  This can be reverted through the event manager.</Typography>
-                                </li>
-                                <li>
-                                    <Typography gutterBottom>Create, publish, modify, and delete positions through the Event Manager, which you will be redirected to after submission.</Typography>
-                                </li>
-                                <li>
-                                    <Typography gutterBottom>Editing this event later on will have no impact on the Event Manager, since it only deals with positions.</Typography>
-                                </li>
-                                <li>
-                                    <Typography gutterBottom>You can un-hide this event from the events manager among other common tasks.</Typography>
-                                </li>
-                                <li>
-                                    <Typography gutterBottom fontWeight="bold">You will be notified of any errors in your submission after you submit the form.  All changes will be saved as long as you dont leave this page or refresh.</Typography>
-                                </li>
-                            </ul>
                             {NextButton}                        
                         </AccordionDetails>
                     </Accordion>

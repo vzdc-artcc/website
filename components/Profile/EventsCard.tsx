@@ -1,9 +1,11 @@
 import React from 'react';
 import {User} from "next-auth";
 import {
+    Button,
     Card,
     CardContent,
     IconButton,
+    Stack,
     Table,
     TableBody,
     TableCell,
@@ -15,9 +17,9 @@ import {
 import prisma from '@/lib/db';
 import {formatTimezoneDate} from '@/lib/date';
 import Link from 'next/link';
-import {Check, Close, Edit, Visibility} from '@mui/icons-material';
+import {Check, Close, Edit, KeyboardArrowRight, Visibility} from '@mui/icons-material';
 
-export default async function EventSignupCard({user}: { user: User, }) {
+export default async function EventsCard({user}: { user: User, }) {
 
     const positions = await prisma.eventPosition.findMany({
         where: {
@@ -40,16 +42,16 @@ export default async function EventSignupCard({user}: { user: User, }) {
     return (
         <Card sx={{height: '100%',}}>
             <CardContent>
-                <Typography variant="h6" sx={{mb: 1,}}>Event Signups</Typography>
+                <Typography variant="h6" sx={{mb: 1,}}>Events</Typography>
                 {positions.length === 0 && <Typography>You are not signed up for any events.</Typography>}
                 {positions.length > 0 && <TableContainer>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>Event Name</TableCell>
+                                <TableCell>Event</TableCell>
                                 <TableCell>Position</TableCell>
-                                <TableCell>Final</TableCell>
-                                <TableCell>Start (for you)</TableCell>
+                                <TableCell>Final?</TableCell>
+                                <TableCell>Start</TableCell>
                                 <TableCell>Actions</TableCell>
                             </TableRow>
                         </TableHead>
@@ -59,7 +61,7 @@ export default async function EventSignupCard({user}: { user: User, }) {
                                     <TableCell>{position.event.name}</TableCell>
                                     <TableCell>{position.published ? position.finalPosition : position.requestedPosition}</TableCell>
                                     <TableCell>{position.published ? <Check /> : <Close />}</TableCell>
-                                    <TableCell>{formatTimezoneDate(position.finalStartTime || position.event.start, user.timezone)}</TableCell>
+                                    <TableCell>{formatTimezoneDate(position.published ? position.finalStartTime || new Date() : position.event.start, user.timezone)}</TableCell>
                                     <TableCell>
                                         <Link href={`/events/${position.eventId}`}>
                                             <IconButton>
@@ -72,6 +74,11 @@ export default async function EventSignupCard({user}: { user: User, }) {
                         </TableBody>
                     </Table>
                 </TableContainer>}
+                <Stack direction="row" justifyContent="flex-end" sx={{mt: 2,}}>
+                    <Link href="/profile/events" style={{color: 'inherit', textDecoration: 'none',}}>
+                        <Button color="inherit" endIcon={<KeyboardArrowRight/>}>Previous events</Button>
+                    </Link>
+                </Stack>
             </CardContent>
         </Card>
     );
