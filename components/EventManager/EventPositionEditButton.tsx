@@ -43,7 +43,7 @@ export default function EventPositionEditButton({ event, position, }: { event: E
     const [finalNotes, setFinalNotes] = useState(position.finalNotes || '');
 
     const minDateAllowed = event.enableBufferTimes ?
-        dayjs.utc(event.start).subtract(1, 'hour') :
+        dayjs.utc(event.start).subtract(2, 'hour') :
         dayjs.utc(event.start);
 
     const maxDateAllowed = event.enableBufferTimes ?

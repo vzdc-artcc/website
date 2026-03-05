@@ -68,8 +68,8 @@ export const saveEventPosition = async (event: Event, formData: FormData, admin?
         return { errors: [{ message: admin ? 'This controller already has a position request' : 'You have already requested a position for this event' }] };
     }
 
-    const minStart = event.enableBufferTimes ? dayjs.utc(event.start).subtract(1, 'hour').toDate() : event.start;
-    const maxEnd = event.enableBufferTimes ? dayjs.utc(event.end).add(1, 'hour').toDate() : event.end;
+    const minStart = event.enableBufferTimes ? dayjs.utc(event.start).subtract(2, 'hour').toDate() : event.start;
+    const maxEnd = event.enableBufferTimes ? dayjs.utc(event.end).add(2, 'hour').toDate() : event.end;
 
     const secondaryPositionRequest = ["Delivery", "Ground", "Tower", "Approach", "Center"]
 
@@ -189,8 +189,8 @@ export const deleteEventPosition = async (event: Event, eventPositionId: string,
 
 export const validateFinalEventPosition = async (event: Event, formData: FormData, zodResponse?: boolean): Promise<ZodErrorSlimResponse | SafeParseReturnType<any, any>> => {
 
-    const minStart = event.enableBufferTimes ? dayjs.utc(event.start).subtract(1, 'hour').toDate() : event.start;
-    const maxEnd = event.enableBufferTimes ? dayjs.utc(event.end).add(1, 'hour').toDate() : event.end;
+    const minStart = event.enableBufferTimes ? dayjs.utc(event.start).subtract(2, 'hour').toDate() : event.start;
+    const maxEnd = event.enableBufferTimes ? dayjs.utc(event.end).add(2, 'hour').toDate() : event.end;
 
     const eventPositionZ = z.object({
         finalPosition: z.string().min(1, { message: 'Final Position is required and could not be autofilled.' }).max(50, { message: 'Final Position must be less than 50 characters' }),

@@ -33,7 +33,7 @@ export default async function EventPositionsTable({ event, positions }: { event:
 
     const getTimeRectangle = (position: EventPosition, eventStart: Date, start: Date, eventEnd: Date, end: Date) => {
 
-        const bufferMs = 60 * 60 * 1000;
+        const bufferMs = 60 * 60 * 1000 * 2;
         const totalStart = event.enableBufferTimes ? new Date(eventStart.getTime() - bufferMs) : eventStart;
         const totalEnd = event.enableBufferTimes ? new Date(eventEnd.getTime() + bufferMs) : eventEnd;
 
