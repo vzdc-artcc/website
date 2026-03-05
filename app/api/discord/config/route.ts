@@ -7,7 +7,7 @@ const BOT_API_SECRET_KEY = process.env.BOT_API_SECRET_KEY;
 
 export async function GET(req: NextRequest) {
     if (!BOT_API_SECRET_KEY) {
-        throw new Error("BOT_API_SECRET_KEY environment variable is not set");\
+        throw new Error("BOT_API_SECRET_KEY environment variable is not set");
     }
 
     try {
