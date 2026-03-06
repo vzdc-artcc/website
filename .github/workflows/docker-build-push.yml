@@ -88,4 +88,4 @@ jobs:
         env:
           IMAGE_TAG: ghcr.io/${{ github.repository }}:master-${{ env.COMMIT_HASH }}
         run: |
-          kubectl set image deployment/website website=$IMAGE_TAG run-migrations=$IMAGE_TAG -n default
+          kubectl set image deployment/website website=$IMAGE_TAG -n default
