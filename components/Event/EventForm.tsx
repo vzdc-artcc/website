@@ -191,7 +191,7 @@ export default function EventForm({ event }: { event?: Event, }) {
                                 </Grid2>
                                 <Grid2 size={2}>
                                     <FormControlLabel control={<Switch/>} name="enableBufferTimes"
-                                                      label="Enable buffer times (+/- 1 hour)?"
+                                                      label="Enable buffer times (+/- 2 hours)?"
                                                       checked={enableBufferTimes}
                                                       onChange={(_e, c) => setEnableBufferTimes(c)}/>
                                 </Grid2>
