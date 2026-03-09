@@ -194,7 +194,12 @@ export default async function EventPositionsTable({ event, positions }: { event:
                                             <Chip
                                                 label={`${position.user.firstName} ${position.user.lastName} - ${getRating(position.user.rating)}` || 'Unknown'}
                                                 size="small"
-                                                color={`${position.user.controllerStatus === "HOME" ? "default" : "secondary"}`}
+                                                color={`${position.published
+                                                    ? "success"
+                                                    : position.user?.controllerStatus === "HOME"
+                                                        ? "default"
+                                                        : "secondary"
+                                                }`}
                                             />
                                         </Link>
                                     </TableCell>
