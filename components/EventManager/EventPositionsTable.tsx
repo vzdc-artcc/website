@@ -174,7 +174,6 @@ export default async function EventPositionsTable({ event, positions }: { event:
                         <TableHead>
                             <TableRow>
                                 <TableCell>Controller</TableCell>
-                                <TableCell>Solo</TableCell>
                                 <TableCell>Rq Pos</TableCell>
                                 <TableCell>Rq Sec Pos</TableCell>
                                 <TableCell>Rq Time</TableCell>
@@ -190,25 +189,28 @@ export default async function EventPositionsTable({ event, positions }: { event:
 
                                 <TableRow key={position.id}>
                                     <TableCell>
-                                        <Link href={`/admin/controller/${position.user.cid}`} passHref target="_blank">
-                                            <Chip
-                                                label={`${position.user.firstName} ${position.user.lastName} - ${getRating(position.user.rating)}` || 'Unknown'}
-                                                size="small"
-                                                color={`${position.published
-                                                    ? "success"
-                                                    : position.user?.controllerStatus === "HOME"
-                                                        ? "default"
-                                                        : "secondary"
-                                                }`}
-                                            />
-                                        </Link>
+                                        <Tooltip
+                                            title={position.soloCert ? `${position.soloCert.position} - ${formatZuluDate(position.soloCert.expires)}` : ''}
+                                            disableHoverListener={!position.soloCert}
+                                            disableFocusListener={!position.soloCert}
+                                            disableTouchListener={!position.soloCert}
+                                        >
+                                            <Link href={`/admin/controller/${position.user.cid}`} passHref target="_blank">
+                                                <Chip
+                                                    label={`${position.user.firstName} ${position.user.lastName} - ${getRating(position.user.rating)}` || 'Unknown'}
+                                                    size="small"
+                                                    color={`${  position.published
+                                                            ? "success"
+                                                            : position.soloCert
+                                                                ? "error"
+                                                            : position.user?.controllerStatus === "HOME"
+                                                                ? "default"
+                                                                : "secondary"
+                                                    }`}
+                                                />
+                                            </Link>
+                                        </Tooltip>
                                     </TableCell>
-                                    <TableCell>{position.soloCert ? 
-                                    <Stack direction="column" alignItems="center">
-                                        <Typography variant="caption">{position.soloCert.position}</Typography>
-                                        <Typography variant="caption">{formatZuluDate(position.soloCert.expires)}</Typography>
-                                    </Stack>
-                                    : ''}</TableCell>
                                     <TableCell>{position.requestedPosition}</TableCell>
                                     <TableCell>{position.requestedSecondaryPosition}</TableCell>
                                     <TableCell>
