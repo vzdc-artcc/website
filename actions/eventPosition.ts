@@ -529,13 +529,42 @@ export const saveOpsPlanFreeText = async (event: Event, formData: FormData, admi
 
 
 export async function setOpsPlanPublished(formData: FormData) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+        return { errors: [{ message: "You must be logged in to perform this action" }] };
+    }
+
+    const allowed = session.user.roles.includes("STAFF") || session.user.roles.includes("EVENT_STAFF");
+    if (!allowed) {
+        return { errors: [{ message: "You do not have permission to perform this action" }] };
+    }
+
     const eventId = String(formData.get('eventId'));
     const publish = String(formData.get('publish')) === 'true';
 
-    const updated = await prisma.event.update({
-        where: { id: eventId },
-        data: { opsPlanPublished: publish },
-    });
+    try {
+        const updated = await prisma.event.update({
+            where: { id: eventId },
+            data: { opsPlanPublished: publish },
+        });
 
-    return updated;
+        after(async () => {
+            await log(
+                "UPDATE",
+                "EVENT",
+                `Set OPS plan published=${publish} for event ${eventId}`
+            );
+        });
+
+        try {
+            revalidatePath(`/events/admin/events/${eventId}/manager`);
+        } catch (e) {
+            // Ignore revalidation errors
+        }
+
+        return updated;
+    } catch (err) {
+        console.error("setOpsPlanPublished error:", err);
+        return { errors: [{ message: "Failed to update OPS plan published status." }] };
+    }
 }
