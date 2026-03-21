@@ -128,7 +128,12 @@ function FinalPositionsTable({ title, positions }: { title: string; positions: a
                                 const notes = p.finalNotes || p.notes || '';
 
                                 return (
-                                    <TableRow key={p.id ?? `${p.requestedPosition}-${user.id ?? Math.random()}`}>
+                                    <TableRow
+                                        key={
+                                            p.id ??
+                                            `${p.requestedPosition || 'unknown'}-${user.id ?? user.cid ?? 'nouser'}-${p.finalStartTime ?? p.requestedStartTime ?? ''}`
+                                        }
+                                    >
                                         <TableCell>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 <Box sx={{ minWidth: 0 }}>
