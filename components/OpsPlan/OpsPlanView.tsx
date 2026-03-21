@@ -239,11 +239,17 @@ export default async function OpsPlanView({ eventId }: Props) {
                         </Box>
                         <Stack direction="row" spacing={1} alignItems="center">
                             <Tooltip title={event.hidden ? 'You must show the event to view information.' : 'View Event Page'}>
-                                <Link href={event.hidden ? '' : `/events/${event.id}`} passHref>
-                                    <IconButton disabled={event.hidden} size="large">
+                                {event.hidden ? (
+                                    <IconButton disabled size="large">
                                         <OpenInNew />
                                     </IconButton>
-                                </Link>
+                                ) : (
+                                    <Link href={`/events/${event.id}`} passHref>
+                                        <IconButton size="large">
+                                            <OpenInNew />
+                                        </IconButton>
+                                    </Link>
+                                )}
                             </Tooltip>
                         </Stack>
                     </Stack>
