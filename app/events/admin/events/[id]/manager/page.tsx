@@ -103,7 +103,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     <Typography variant="h6" gutterBottom>OPS Plan Files</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <OpsPlanFileForm/>
+                    <OpsPlanFileForm eventId={event.id} />
                 </AccordionDetails>
             </Accordion>
 
