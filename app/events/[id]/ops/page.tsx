@@ -27,6 +27,7 @@ export default async function Page({ params }: Params) {
     });
 
     if (!event) return notFound();
+    if (event.hidden || event.archived) return notFound();
 
     if (event.opsPlanPublished) {
         return (
