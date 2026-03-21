@@ -735,11 +735,11 @@ model EventPosition {
   finalNotes    String?
 
   controllingCategory ControllingCategory?
-  isInstructor        Boolean?             @default(false)
-  isSolo              Boolean?             @default(false)
-  isOts               Boolean?             @default(false)
-  isTmu               Boolean?             @default(false)
-  isCic               Boolean?             @default(false)
+  isInstructor        Boolean              @default(false)
+  isSolo              Boolean              @default(false)
+  isOts               Boolean              @default(false)
+  isTmu               Boolean              @default(false)
+  isCic               Boolean              @default(false)
 
   published Boolean @default(false)
 
