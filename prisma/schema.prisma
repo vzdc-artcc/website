@@ -698,7 +698,7 @@ model Event {
   tmis                 String?
   eventTmis            EventTmi[]
   opsFreeText          String?       @db.Text
-  opsPlanPublished     Boolean?      @default(false)
+  opsPlanPublished     Boolean       @default(false)
   opsPlanFiles         OpsPlanFile[]
 }
 
