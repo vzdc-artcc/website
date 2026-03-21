@@ -24,13 +24,6 @@ export default async function OpsPlanFileForm({ eventId }: { eventId?: string })
 
     const fmt = (d: Date | null | undefined) => (d ? format(d, 'MM/dd/yy HH:mm') : 'N/A');
 
-    async function handleDelete(formData: FormData) {
-        'use server';
-        const id = String(formData.get('id') || '');
-        if (!id) return;
-        await deleteOpsPlanFile(id);
-    }
-
     return (
         <Stack spacing={2}>
             <Paper sx={{ p: 2 }}>
