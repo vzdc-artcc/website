@@ -118,8 +118,12 @@ export default function TmiForm({ admin, event, eventPosition }: Props) {
                         label="Delete"
                         warningMessage="Are you sure you want to delete this TMI? Click again to confirm."
                         deleteFunction={async (id) => {
-                            // wrap deleteTmi to include admin flag if needed
-                            return deleteTmi(id, admin);
+                            // wrap deleteTmi to include admin flag if needed and throw on errors
+                            const result = await deleteTmi(id, admin);
+                            if (result && (result as any).errors) {
+                                throw new Error("Failed to delete TMI");
+                            }
+                            return result;
                         }}
                         onSuccess={async () => {
                             toast.success("TMI deleted successfully!");
