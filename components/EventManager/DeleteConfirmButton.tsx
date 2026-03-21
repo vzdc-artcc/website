@@ -1,7 +1,7 @@
 'use client';
 
 import React, {useRef, useState} from 'react';
-import {IconButton, CircularProgress} from '@mui/material';
+import {IconButton} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {toast} from 'react-toastify';
 import {useRouter} from 'next/navigation';
