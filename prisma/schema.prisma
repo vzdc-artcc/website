@@ -350,6 +350,8 @@ enum LogModel {
   DISCORD_MESSAGE
   DISCORD_CHANNEL_UPDATE
   DISCORD_CONFIG
+
+  OPS_PLAN_FILE
 }
 
 model Log {
@@ -691,7 +693,13 @@ model Event {
   positions       EventPosition[]
   presetPositions String[]
 
-  enableBufferTimes Boolean @default(false)
+  enableBufferTimes    Boolean       @default(false)
+  featuredFieldConfigs Json?
+  tmis                 String?
+  eventTmis            EventTmi[]
+  opsFreeText          String?       @db.Text
+  opsPlanPublished     Boolean?      @default(false)
+  opsPlanFiles         OpsPlanFile[]
 }
 
 enum EventType {
@@ -714,7 +722,7 @@ model EventPosition {
   userId String?
 
   requestedPosition          String
-  requestedSecondaryPosition String @default("UNKNOWN")
+  requestedSecondaryPosition String  @default("UNKNOWN")
   notes                      String?
 
   requestedStartTime DateTime
@@ -725,6 +733,13 @@ model EventPosition {
 
   finalPosition String?
   finalNotes    String?
+
+  controllingCategory ControllingCategory?
+  isInstructor        Boolean?             @default(false)
+  isSolo              Boolean?             @default(false)
+  isOts               Boolean?             @default(false)
+  isTmu               Boolean?             @default(false)
+  isCic               Boolean?             @default(false)
 
   published Boolean @default(false)
 
@@ -983,4 +998,45 @@ model DiscordCategory {
 
   @@unique([discordConfigId, name])
   @@index([discordConfigId])
+}
+
+enum TmiCategory {
+  LOCAL
+  TERMINAL
+  ENROUTE
+}
+
+model EventTmi {
+  id        String      @id @default(cuid())
+  event     Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  eventId   String
+  category  TmiCategory
+  text      String      @db.Text
+  createdBy String? // optional user id
+  createdAt DateTime    @default(now())
+
+  @@index([eventId])
+}
+
+enum ControllingCategory {
+  ADMIN
+  ENROUTE
+  TERMINAL
+  LOCAL
+}
+
+model OpsPlanFile {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  key         String // key returned from UploadThing (remote storage)
+  createdBy   String? // user id who uploaded it (optional)
+  eventId     String? // optional FK to Event if you want per-event files
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Optional relation to Event if you want; remove if not desired
+  event Event? @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import {Checklist, Edit, OpenInNew} from "@mui/icons-material";
+import {Article, Checklist, Edit, OpenInNew} from "@mui/icons-material";
 import {getGridSingleSelectOperators, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import {EventType} from "@prisma/client";
 import Link from "next/link";
@@ -55,6 +55,15 @@ export default function EventTable({ archived }: { archived?: boolean, }) {
             flex: 1,
             renderCell: (params) => {
                 return params.row.bannerKey ? <Link href={`https://utfs.io/f/${params.row.bannerKey}`} target="_blank" style={{ color: 'inherit', }}><OpenInNew /></Link> : 'N/A';
+            },
+        },
+        {
+            field: 'opsPlanKey',
+            type: 'actions',
+            headerName: 'OPS Plan',
+            flex: 1,
+            renderCell: (params) => {
+                return params.row.bannerKey ? <Link href={`/events/${params.row.id}/ops`} target="_blank" style={{ color: 'inherit', }}><Article /></Link> : 'N/A';
             },
         },
         {

@@ -7,10 +7,15 @@ import HiddenAlert from "@/components/EventManager/HiddenAlert";
 import EventPositionRequestForm from "@/components/EventPosition/EventPositionRequestForm";
 import prisma from "@/lib/db";
 import {ExpandMore} from "@mui/icons-material";
-import {Accordion, AccordionDetails, AccordionSummary, Stack, Typography} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, Box, Paper, Stack, Typography} from "@mui/material";
 import {EventPosition, SoloCertification, User} from "@prisma/client";
 import {getServerSession} from "next-auth";
 import {notFound} from "next/navigation";
+import OpsPlanForm from "@/components/EventManager/OpsPlanForm";
+import TmiForm from "@/components/EventManager/TmiForm";
+import OpsPlanFreeTextForm from "@/components/EventManager/OpsPlanFreeTextForm";
+import OpsPlanView from "@/components/OpsPlan/OpsPlanView";
+import OpsPlanFileForm from "@/components/EventManager/OpsPlanFileForm";
 
 export type EventPositionWithSolo = EventPosition & { 
     soloCert: SoloCertification | null | undefined,
@@ -68,6 +73,42 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
             <Accordion>
                 <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Typography variant="h6" gutterBottom>OPS Plan</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <OpsPlanForm event={event} admin currentUser={session.user as User} />
+                </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+                <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Typography variant="h6" gutterBottom>TMIs</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <TmiForm event={event} admin currentUser={session.user as User} />
+                </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+                <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Typography variant="h6" gutterBottom>OPS Plan Free Text</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <OpsPlanFreeTextForm event={event} admin currentUser={session.user as User} />
+                </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+                <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Typography variant="h6" gutterBottom>OPS Plan Files</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <OpsPlanFileForm/>
+                </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+                <AccordionSummary expandIcon={<ExpandMore />}>
                     <Typography variant="h6" gutterBottom>Manually Assign Controller</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
@@ -76,6 +117,17 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             </Accordion>
 
             <EventPositionsTable event={event} positions={positions} />
+
+            <Accordion>
+                <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Typography variant="h6" gutterBottom>OPS Plan Preview</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <Paper elevation={2} sx={{ p: 4 }}>
+                        <OpsPlanView eventId={event.id}/>
+                    </Paper>
+                </AccordionDetails>
+            </Accordion>
         </Stack>
     );
 }

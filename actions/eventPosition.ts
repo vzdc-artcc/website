@@ -197,7 +197,30 @@ export const validateFinalEventPosition = async (event: Event, formData: FormDat
         finalStartTime: z.date().min(minStart, {message: 'Final time must be within the event'}).max(maxEnd, {message: 'Final time must be within the event'}),
         finalEndTime: z.date().min(minStart, {message: 'Final time must be within the event'}).max(maxEnd, {message: 'Final time must be within the event'}),
         finalNotes: z.string().optional(),
+
+        controllingCategory: z.enum(['ADMIN','ENROUTE','TERMINAL','LOCAL']).optional(),
+        isInstructor: z.preprocess((v) => {
+            if (typeof v === 'string') return v === 'true';
+            return v;
+        }, z.boolean().optional()),
+        isSolo: z.preprocess((v) => {
+            if (typeof v === 'string') return v === 'true';
+            return v;
+        }, z.boolean().optional()),
+        isOts: z.preprocess((v) => {
+            if (typeof v === 'string') return v === 'true';
+            return v;
+        }, z.boolean().optional()),
+        isTmu: z.preprocess((v) => {
+            if (typeof v === 'string') return v === 'true';
+            return v;
+        }, z.boolean().optional()),
+        isCic: z.preprocess((v) => {
+            if (typeof v === 'string') return v === 'true';
+            return v;
+        }, z.boolean().optional()),
     });
+
 
     const requestedPosition = formData.get('requestedPosition') as string;
     let finalPosition = formData.get('finalPosition') as string;
@@ -205,12 +228,19 @@ export const validateFinalEventPosition = async (event: Event, formData: FormDat
         finalPosition = requestedPosition;
     }
 
-    const data =  eventPositionZ.safeParse({
+    const data = eventPositionZ.safeParse({
         finalPosition,
         finalStartTime: new Date(formData.get('finalStartTime') as string),
         finalEndTime: new Date(formData.get('finalEndTime') as string),
         finalNotes: formData.get('finalNotes'),
+        controllingCategory: formData.get('controllingCategory') as string | null,
+        isInstructor: formData.get('isInstructor'),
+        isSolo: formData.get('isSolo'),
+        isOts: formData.get('isOts'),
+        isTmu: formData.get('isTmu'),
+        isCic: formData.get('isCic'),
     });
+
 
     if (zodResponse) {
         return data;
@@ -234,19 +264,24 @@ export const adminSaveEventPosition = async (event: Event, position: EventPositi
     }
 
     const eventPosition = await prisma.eventPosition.update({
-        where: {
-            id: position.id,
-        },
+        where: { id: position.id },
         data: {
             finalPosition: result.data.finalPosition,
             finalStartTime: result.data.finalStartTime,
             finalEndTime: result.data.finalEndTime,
             finalNotes: result.data.finalNotes,
+            controllingCategory: result.data.controllingCategory ?? undefined,
+            isInstructor: result.data.isInstructor ?? false,
+            isSolo: result.data.isSolo ?? false,
+            isOts: result.data.isOts ?? false,
+            isTmu: result.data.isTmu ?? false,
+            isCic: result.data.isCic ?? false,
         },
         include: {
             user: true,
         },
     });
+
 
     after(async () => {
         if (eventPosition) {
@@ -356,4 +391,151 @@ export const fetchAllUsers = async () => {
             },
         },
     });
+}
+
+export const fetchCertificationsForUsers = async (userIds: string[]): Promise<Record<string, any[]>> => {
+    if (!userIds || userIds.length === 0) {
+        return {};
+    }
+
+    const certs = await prisma.certification.findMany({
+        where: {
+            userId: { in: userIds },
+        },
+        include: {
+            certificationType: true,
+        },
+        orderBy: { certificationTypeId: 'asc' },
+    });
+
+    // group by userId
+    const map: Record<string, any[]> = {};
+    for (const c of certs) {
+        if (!map[c.userId]) map[c.userId] = [];
+        map[c.userId].push(c);
+    }
+    return map;
+};
+
+export const fetchLastControlledEventForUser = async (userId: string) => {
+    if (!userId) return null;
+
+    const pos = await prisma.eventPosition.findFirst({
+        where: {
+            userId,
+            published: true,
+            event: { archived: { not: null } },
+        },
+        include: {
+            event: true,
+        },
+        orderBy: [
+            { event: { start: 'desc' } },
+        ],
+    });
+
+    if (!pos || !(pos as any).event) return null;
+
+    const evt = (pos as any).event;
+    return {
+        id: evt.id,
+        name: evt.name,
+        date: evt.start ?? null,
+        assignedPosition: pos.finalPosition ?? pos.requestedPosition ?? null,
+        eventPositionId: pos.id,
+    };
+};
+
+
+export const fetchLastControlledEventsForUsers = async (userIds: string[]) : Promise<Record<string, {
+    id: string;
+    name: string;
+    date: Date | null;
+    assignedPosition: string | null;
+    eventPositionId: string;
+}>> => {
+    if (!userIds || userIds.length === 0) return {};
+
+    const positions = await prisma.eventPosition.findMany({
+        where: {
+            userId: { in: userIds },
+            published: true,
+            event: { archived: { not: null } },
+        },
+        include: {
+            event: true,
+        },
+        orderBy: [{ event: { start: 'desc' } }],
+    });
+
+    const map: Record<string, any> = {};
+    for (const p of positions as any[]) {
+        if (!p.userId || !p.event) continue;
+        if (!map[p.userId]) {
+            map[p.userId] = {
+                id: p.event.id,
+                name: p.event.name,
+                date: p.event.start ?? null,
+                assignedPosition: p.finalPosition ?? p.requestedPosition ?? null,
+                eventPositionId: p.id,
+            };
+        }
+    }
+
+    return map;
+};
+
+export const saveOpsPlanFreeText = async (event: Event, formData: FormData, admin?: boolean) => {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+        return { errors: [{ message: "You must be logged in to perform this action" }] };
+    }
+
+    const allowed = session.user.roles.includes("STAFF") || session.user.roles.includes("EVENT_STAFF") || !!admin;
+    if (!allowed) {
+        return { errors: [{ message: "You do not have permission to perform this action" }] };
+    }
+
+    if (!admin && (await prisma.event.findUnique({ where: { id: event.id } }))?.positionsLocked) {
+        return { errors: [{ message: "Positions are locked for this event" }] };
+    }
+
+    const opsFreeText = String(formData.get("opsFreeText") || "");
+
+    try {
+        const updated = await prisma.event.update({
+            where: { id: event.id },
+            data: {
+                opsFreeText: opsFreeText || null,
+            },
+        });
+
+        after(async () => {
+            await log("UPDATE", "EVENT", `Updated OPS free text for event ${event.name}`);
+        });
+
+        try {
+            const { revalidatePath } = await import("next/cache");
+            revalidatePath(`/events/admin/events/${event.id}/manager`);
+        } catch (e) {
+        }
+
+        return { event: updated };
+    } catch (err) {
+        console.error("saveOpsPlanFreeText error:", err);
+        return { errors: [{ message: "Failed to save OPS free text." }] };
+    }
+};
+
+
+export async function setOpsPlanPublished(formData: FormData) {
+    const eventId = String(formData.get('eventId'));
+    const publish = String(formData.get('publish')) === 'true';
+
+    const updated = await prisma.event.update({
+        where: { id: eventId },
+        data: { opsPlanPublished: publish },
+    });
+
+    return updated;
 }

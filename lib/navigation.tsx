@@ -2,7 +2,7 @@ import React from "react";
 import {
     Add,
     AddComment,
-    AirplanemodeActive,
+    AirplanemodeActive, Article,
     BarChart,
     CalendarMonth,
     Chat,
@@ -128,6 +128,11 @@ export const NAVIGATION: NavigationButton[] = [
                     label: 'Upcoming Events',
                     link: '/events',
                     icon: <CalendarMonth/>,
+                },
+                {
+                    label: 'OPS Plans',
+                    link: '/events/ops',
+                    icon: <Article/>
                 },
             ],
         },

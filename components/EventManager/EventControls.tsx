@@ -1,14 +1,13 @@
 import {ButtonGroup, Card, CardContent, Divider, IconButton, Stack, Tooltip, Typography} from "@mui/material";
 import {Event} from "@prisma/client";
 import ToggleVisibilityButton from "./ToggleVisibilityButton";
-import {Edit, Info} from "@mui/icons-material";
+import {Article, Edit, Info} from "@mui/icons-material";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import {eventGetDuration, formatZuluDate} from "@/lib/date";
 import Link from "next/link";
+import OpsPlanPublishButton from "@/components/EventManager/OpsPlanPublishButton";
 
 export default async function EventControls({ event }: { event: Event, }) {
-
-    
 
     return (
         <Card>
@@ -27,6 +26,16 @@ export default async function EventControls({ event }: { event: Event, }) {
                             </IconButton>
                         </Link>
                     </Tooltip>
+                    <Tooltip title={
+                        event.hidden ? 'You must show the event to view information.'
+                            : (!event.opsPlanPublished ? 'You must publish the OPS Plan to view.' : 'OPS Plan Page')
+                    }>
+                        <Link href={(event.hidden || !event.opsPlanPublished) ? '' : `/events/${event.id}/ops`} passHref>
+                            <IconButton disabled={event.hidden || !event.opsPlanPublished}>
+                                <Article/>
+                            </IconButton>
+                        </Link>
+                    </Tooltip>
                     <Tooltip title="Edit Event">
                         <Link href={`/events/admin/events/${event.id}`} passHref>
                             <IconButton>
@@ -39,6 +48,7 @@ export default async function EventControls({ event }: { event: Event, }) {
                 <Stack direction="row" spacing={2}>
                     <ToggleVisibilityButton event={event} />
                     <ArchiveToggleButton event={event} />
+                    <OpsPlanPublishButton event={event} />
                 </Stack>
             </CardContent>
         </Card>
