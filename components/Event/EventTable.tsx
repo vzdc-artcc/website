@@ -58,12 +58,12 @@ export default function EventTable({ archived }: { archived?: boolean, }) {
             },
         },
         {
-            field: 'opsPlanKey',
+            field: 'opsPlanPublished',
             type: 'actions',
             headerName: 'OPS Plan',
             flex: 1,
             renderCell: (params) => {
-                return params.row.bannerKey ? <Link href={`/events/${params.row.id}/ops`} target="_blank" style={{ color: 'inherit', }}><Article /></Link> : 'N/A';
+                return params.row.opsPlanPublished && !params.row.hidden ? <Link href={`/events/${params.row.id}/ops`} target="_blank" style={{ color: 'inherit', }}><Article /></Link> : 'N/A';
             },
         },
         {

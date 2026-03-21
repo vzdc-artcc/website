@@ -13,11 +13,12 @@ const ut = new UTApi();
 
 export const createOrUpdateOpsPlanFile = async (formData: FormData) => {
     const session = await getServerSession(authOptions);
+
     if (!session?.user) {
         return { errors: [{ message: 'You must be logged in to perform this action' }] };
     }
-    const allowed = session.user.roles.includes('STAFF') || session.user.roles.includes('EVENT_STAFF');
-    if (!allowed) {
+
+    if (!session.user.roles.includes('STAFF') && !session.user.roles.includes('EVENT_STAFF')) {
         return { errors: [{ message: 'You do not have permission to perform this action' }] };
     }
 
@@ -26,7 +27,6 @@ export const createOrUpdateOpsPlanFile = async (formData: FormData) => {
         name: z.string().min(1, 'Name is required').max(250),
         description: z.string().optional(),
         eventId: z.string().optional(),
-        createdBy: z.string().optional(),
     });
 
     const parsed = schema.safeParse({
@@ -34,7 +34,6 @@ export const createOrUpdateOpsPlanFile = async (formData: FormData) => {
         name: formData.get('name') ? String(formData.get('name')) : '',
         description: formData.get('description') ? String(formData.get('description')) : undefined,
         eventId: formData.get('eventId') ? String(formData.get('eventId')) : undefined,
-        createdBy: formData.get('createdBy') ? String(formData.get('createdBy')) : undefined,
     });
 
     if (!parsed.success) {
@@ -73,7 +72,7 @@ export const createOrUpdateOpsPlanFile = async (formData: FormData) => {
             description: parsed.data.description || null,
             key: fileKey,
             eventId: parsed.data.eventId || null,
-            createdBy: parsed.data.createdBy || null,
+            createdBy: session.user.id,
         },
         update: {
             name: parsed.data.name,
@@ -96,11 +95,12 @@ export const createOrUpdateOpsPlanFile = async (formData: FormData) => {
 
 export const deleteOpsPlanFile = async (id: string) => {
     const session = await getServerSession(authOptions);
+
     if (!session?.user) {
         return { error: 'You must be logged in to perform this action' };
     }
-    const allowed = session.user.roles.includes('STAFF') || session.user.roles.includes('EVENT_STAFF');
-    if (!allowed) {
+
+    if (!session.user.roles.includes('STAFF') && !session.user.roles.includes('EVENT_STAFF')) {
         return { error: 'You do not have permission to perform this action' };
     }
 
