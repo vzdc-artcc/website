@@ -56,20 +56,34 @@ export default async function Page() {
                         <>
                             <Stack direction="row" alignItems="center">
                                 <Typography variant="h4" sx={{ mr: 1, }}>{upcomingEvents[0].name || 'N/A'}</Typography>
-                                <Link href={upcomingEvents[0].hidden ? '' : `/events/${upcomingEvents[0].id}`} style={{ color: 'inherit', textDecoration: 'none', }}>
-                                    <IconButton disabled={upcomingEvents[0].hidden}>
+                                {upcomingEvents[0].hidden ? (
+                                    <IconButton disabled>
                                         <Info />
                                     </IconButton>
-                                </Link>
+                                ) : (
+                                    <Link href={`/events/${upcomingEvents[0].id}`} style={{ color: 'inherit', textDecoration: 'none', }}>
+                                        <IconButton>
+                                            <Info />
+                                        </IconButton>
+                                    </Link>
+                                )}
                                 <Tooltip title={
                                     upcomingEvents[0].hidden ? 'You must show the event to view information.'
                                         : (!upcomingEvents[0].opsPlanPublished ? 'You must publish the OPS Plan to view.' : 'OPS Plan Page')
                                 }>
-                                    <Link href={(upcomingEvents[0].hidden || !upcomingEvents[0].opsPlanPublished) ? '' : `/events/${upcomingEvents[0].id}/ops`} passHref>
-                                        <IconButton disabled={upcomingEvents[0].hidden || !upcomingEvents[0].opsPlanPublished}>
-                                            <Article/>
-                                        </IconButton>
-                                    </Link>
+                                    {(upcomingEvents[0].hidden || !upcomingEvents[0].opsPlanPublished) ? (
+                                        <span>
+                                            <IconButton disabled>
+                                                <Article/>
+                                            </IconButton>
+                                        </span>
+                                    ) : (
+                                        <Link href={`/events/${upcomingEvents[0].id}/ops`} passHref style={{ color: 'inherit', textDecoration: 'none', }}>
+                                            <IconButton>
+                                                <Article/>
+                                            </IconButton>
+                                        </Link>
+                                    )}
                                 </Tooltip>
                                 <Link href={`/events/admin/events/${upcomingEvents[0].id}/manager`} style={{ color: 'inherit', textDecoration: 'none', }}>
                                     <IconButton>
