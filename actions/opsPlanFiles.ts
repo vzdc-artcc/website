@@ -6,10 +6,21 @@ import prisma from '@/lib/db';
 import { log } from '@/actions/log';
 import { revalidatePath } from 'next/cache';
 import { LogModel } from '@prisma/client';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth/auth';
 
 const ut = new UTApi();
 
 export const createOrUpdateOpsPlanFile = async (formData: FormData) => {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+        return { errors: [{ message: 'You must be logged in to perform this action' }] };
+    }
+    const allowed = session.user.roles.includes('STAFF') || session.user.roles.includes('EVENT_STAFF');
+    if (!allowed) {
+        return { errors: [{ message: 'You do not have permission to perform this action' }] };
+    }
+
     const schema = z.object({
         id: z.string().optional(),
         name: z.string().min(1, 'Name is required').max(250),
@@ -84,6 +95,15 @@ export const createOrUpdateOpsPlanFile = async (formData: FormData) => {
 };
 
 export const deleteOpsPlanFile = async (id: string) => {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+        return { error: 'You must be logged in to perform this action' };
+    }
+    const allowed = session.user.roles.includes('STAFF') || session.user.roles.includes('EVENT_STAFF');
+    if (!allowed) {
+        return { error: 'You do not have permission to perform this action' };
+    }
+
     const file = await prisma.opsPlanFile.findUnique({ where: { id } });
     if (!file) return { error: 'Not found' };
 
