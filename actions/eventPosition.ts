@@ -197,7 +197,7 @@ export const validateFinalEventPosition = async (event: Event, formData: FormDat
         finalStartTime: z.date().min(minStart, {message: 'Final time must be within the event'}).max(maxEnd, {message: 'Final time must be within the event'}),
         finalEndTime: z.date().min(minStart, {message: 'Final time must be within the event'}).max(maxEnd, {message: 'Final time must be within the event'}),
         finalNotes: z.string().optional(),
-
+        
         controllingCategory: z.enum(['ADMIN','ENROUTE','TERMINAL','LOCAL']).optional(),
         isInstructor: z.preprocess((v) => {
             if (typeof v === 'string') return v === 'true';
@@ -311,6 +311,12 @@ export const publishEventPosition = async (event: Event, position: EventPosition
     formData.set('finalStartTime', position.finalStartTime?.toISOString() || position.requestedStartTime?.toISOString() || '');
     formData.set('finalEndTime', position.finalEndTime?.toISOString() || position.requestedEndTime?.toISOString() || '');
     formData.set('finalNotes', position.finalNotes || '');
+    formData.set('controllingCategory', position.controllingCategory || 'LOCAL');
+    formData.set('isInstructor', String(Boolean(position.isInstructor)));
+    formData.set('isSolo', String(Boolean(position.isSolo)));
+    formData.set('isOts', String(Boolean(position.isOts)));
+    formData.set('isTmu', String(Boolean(position.isTmu)));
+    formData.set('isCic', String(Boolean(position.isCic)));
 
     const result = await validateFinalEventPosition(event, formData, true) as SafeParseReturnType<any, any>;
 

@@ -1,6 +1,6 @@
 import prisma from "@/lib/db";
 import { notFound } from "next/navigation";
-import { Box, Paper, Typography } from "@mui/material";
+import {Box, Divider, Paper, Typography} from "@mui/material";
 import OpsPlanView from "@/components/OpsPlan/OpsPlanView";
 import OpsPlanFiles from "@/components/OpsPlan/OpsPlanFiles";
 
@@ -34,6 +34,7 @@ export default async function Page({ params }: Params) {
             <Box sx={{ px: 2, py: 3 }}>
                 <Paper elevation={2} sx={{ p: 4 }}>
                     <OpsPlanView eventId={event.id} />
+                    <Divider sx={{ my: 2 }} />
                     <Box sx={{ mt: 3 }}>
                         <OpsPlanFiles eventId={event.id} />
                     </Box>
@@ -57,7 +58,7 @@ export default async function Page({ params }: Params) {
                 </Typography>
 
                 <Typography variant="body1" sx={{ mt: 1 }}>
-                    The OPS Plan for <strong>{event.name}</strong> has not been published yet.
+                    The OPS Plan for {event.name} has not been published yet.
                 </Typography>
 
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
