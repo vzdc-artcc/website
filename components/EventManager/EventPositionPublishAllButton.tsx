@@ -124,6 +124,12 @@ const getErrors = async (event: Event, positions: EventPositionWithSolo[]): Prom
         formData.set('finalStartTime', modPosition.finalStartTime.toISOString());
         formData.set('finalEndTime', modPosition.finalEndTime.toISOString());
         formData.set('finalNotes', modPosition.finalNotes);
+        formData.set('controllingCategory', modPosition.controllingCategory || 'LOCAL');
+        formData.set('isInstructor', String(Boolean(modPosition.isInstructor)));
+        formData.set('isSolo', String(Boolean(modPosition.isSolo)));
+        formData.set('isOts', String(Boolean(modPosition.isOts)));
+        formData.set('isTmu', String(Boolean(modPosition.isTmu)));
+        formData.set('isCic', String(Boolean(modPosition.isCic)));
 
         const parse = await validateFinalEventPosition(event, formData) as ZodErrorSlimResponse;
 

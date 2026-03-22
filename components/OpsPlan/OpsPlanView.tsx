@@ -25,10 +25,37 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { classifyPosition } from "@/actions/classifyPosition";
 import Markdown from "react-markdown";
+import OpsPlanTmiTable from "@/components/OpsPlan/OpsPlanTmiTable";
 
 type Props = {
     eventId: string;
 };
+
+const RATING_ID_TO_SHORT: Record<number, string> = {
+    [-1]: "INA",
+    0: "SUS",
+    1: "OBS",
+    2: "S1",
+    3: "S2",
+    4: "S3",
+    5: "C1",
+    6: "C2",
+    7: "C3",
+    8: "I1",
+    9: "I2",
+    10: "I3",
+    11: "SUP",
+    12: "ADM",
+};
+
+function getShortRating(rating: unknown): string | null {
+    if (rating === null || rating === undefined || rating === '') return null;
+
+    const numeric = typeof rating === 'number' ? rating : Number(rating);
+    if (!Number.isFinite(numeric)) return String(rating);
+
+    return RATING_ID_TO_SHORT[numeric] ?? String(numeric);
+}
 
 function parseFeaturedConfigs(raw: any): Record<string, any> {
     if (!raw) return {};
@@ -67,14 +94,16 @@ function renderFlags(p: any): React.ReactNode {
     if (p.isCic) chips.push(<Chip key="cic" label="CIC" color="secondary" size="small" sx={{ mr: 0.5 }} />);
     if (p.published) chips.push(<Chip key="published" label="Published" color="default" size="small" sx={{ mr: 0.5 }} />);
 
-    // return as a React fragment (React.ReactNode)
     return <>{chips}</>;
 }
 
 type CategoryKey = 'Local' | 'Terminal' | 'Enroute';
 
+function isAdminCategory(p: any): boolean {
+    return String(p?.controllingCategory || '').toUpperCase() === 'ADMIN';
+}
+
 function getCategoryForPosition(p: any): CategoryKey {
-    // Prefer explicit controllingCategory if present and meaningful
     if (p && p.controllingCategory) {
         const up = String(p.controllingCategory).toUpperCase();
         if (up === 'ENROUTE' || up === 'CTR') return 'Enroute';
@@ -82,16 +111,13 @@ function getCategoryForPosition(p: any): CategoryKey {
         return 'Local';
     }
 
-    // Fallback: use the finalPosition or requestedPosition string via classifyPosition
     const posLabel = (p && (p.finalPosition || p.requestedPosition)) ? String(p.finalPosition || p.requestedPosition) : '';
     try {
         const cat = classifyPosition(posLabel || '');
-        // classifyPosition in your code returns 'Local'|'Terminal'|'Enroute', so return as-is.
         if (cat === 'Local' || cat === 'Terminal' || cat === 'Enroute') return cat;
     } catch (e) {
-        // ignore and fallthrough
     }
-    return 'Terminal'; // safe default
+    return 'Terminal';
 }
 
 function FinalPositionsTable({ title, positions }: { title: string; positions: any[] }) {
@@ -122,6 +148,7 @@ function FinalPositionsTable({ title, positions }: { title: string; positions: a
                                 const user = p.user || {};
                                 const controllerName = user ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() : '';
                                 const altName = controllerName || (user.cid ? `CID ${user.cid}` : 'Unknown');
+                                const rating = getShortRating(user.rating);
                                 const posLabel = p.finalPosition || p.requestedPosition || 'Unknown';
                                 const start = p.finalStartTime ? formatZuluDate(p.finalStartTime) : (p.requestedStartTime ? formatZuluDate(p.requestedStartTime) : '');
                                 const end = p.finalEndTime ? formatZuluDate(p.finalEndTime) : (p.requestedEndTime ? formatZuluDate(p.requestedEndTime) : '');
@@ -138,7 +165,7 @@ function FinalPositionsTable({ title, positions }: { title: string; positions: a
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 <Box sx={{ minWidth: 0 }}>
                                                     <Typography variant="body2" sx={{ fontWeight: 700 }}>{altName}</Typography>
-                                                    {user.rating ? <Typography variant="caption" color="text.secondary">Rating: {user.rating}</Typography> : null}
+                                                    {rating ? <Typography variant="caption" color="text.secondary">Rating: {rating}</Typography> : null}
                                                 </Box>
                                             </Box>
                                         </TableCell>
@@ -166,7 +193,7 @@ function FinalPositionsTable({ title, positions }: { title: string; positions: a
                                                     WebkitLineClamp: 3,
                                                     WebkitBoxOrient: 'vertical',
                                                 }}>
-                                                    {notes || <span style={{ color: 'rgba(0,0,0,0.6)' }}>No notes</span>}
+                                                    {notes || "No Notes"}
                                                 </Typography>
                                             </Tooltip>
                                         </TableCell>
@@ -219,17 +246,37 @@ export default async function OpsPlanView({ eventId }: Props) {
         )
         : [];
 
-    // group final positions into categories (Local / Terminal / Enroute)
+    const adminFinalPositions = finalPositions.filter((p: any) => isAdminCategory(p));
+    const nonAdminFinalPositions = finalPositions.filter((p: any) => !isAdminCategory(p));
+
+    // group non-admin final positions into categories (Local / Terminal / Enroute)
     const finalGrouped: Record<CategoryKey, any[]> = {
         Local: [],
         Terminal: [],
         Enroute: [],
     };
 
-    for (const p of finalPositions) {
+    for (const p of nonAdminFinalPositions) {
         const cat = getCategoryForPosition(p);
         finalGrouped[cat].push(p);
     }
+
+    const eventTmis = Array.isArray((event as any).eventTmis)
+        ? (event as any).eventTmis
+        : [];
+
+    const legacyTmis = String((event as any).tmis || '')
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((text, idx) => ({
+            id: `legacy-${idx}`,
+            category: 'LOCAL',
+            text,
+            createdAt: null,
+        }));
+
+    const tmisForDisplay = eventTmis.length > 0 ? eventTmis : legacyTmis;
 
 
     return (
@@ -290,7 +337,7 @@ export default async function OpsPlanView({ eventId }: Props) {
                     )}
                 </Grid2>
 
-                <Divider sx={{ my: 4 }} />
+                <Divider sx={{ my: 2 }} />
 
                 <Grid2 size={12}>
                     <Box>
@@ -331,6 +378,12 @@ export default async function OpsPlanView({ eventId }: Props) {
 
                 <Divider sx={{ my: 2 }} />
 
+                <Grid2 size={12}>
+                    <FinalPositionsTable title="Admin Positions" positions={adminFinalPositions} />
+                </Grid2>
+
+                <Divider sx={{ my: 2 }} />
+
                 {/* Final Positions Table */}
                 <Grid2 size={12}>
                     <Grid2 container spacing={2}>
@@ -345,11 +398,16 @@ export default async function OpsPlanView({ eventId }: Props) {
                         </Grid2>
                     </Grid2>
                 </Grid2>
-                {/* Ops Plan Free Text */}
+
+                <Divider sx={{ my: 2 }} />
+
+                <Grid2 size={12}>
+                    <OpsPlanTmiTable tmis={tmisForDisplay} />
+                </Grid2>
+
                 {event.opsFreeText ? (
                     <>
-                        <Divider sx={{ my: 4 }} />
-
+                        <Divider sx={{ my: 2 }} />
                         <Grid2 size={12}>
                             <Paper sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
@@ -357,14 +415,12 @@ export default async function OpsPlanView({ eventId }: Props) {
                                 </Stack>
 
                                 {event.opsPlanPublished ? (
-                                    // Published => render full markdown
                                     <Box sx={{ mt: 1 }}>
                                         <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.default' }}>
                                             <Markdown>{String(event.opsFreeText)}</Markdown>
                                         </Paper>
                                     </Box>
                                 ) : (
-                                    // Unpublished => show preview only when there's text (we are inside event.opsFreeText truthy)
                                     <Box sx={{ mt: 1 }}>
                                         <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                                             Ops plan is not published — preview (not visible to general users):
