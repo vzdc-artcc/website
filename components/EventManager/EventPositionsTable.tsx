@@ -4,7 +4,6 @@ import {
     ButtonGroup,
     Card,
     CardContent,
-    Chip,
     Stack,
     Table,
     TableBody,
@@ -16,8 +15,6 @@ import {
     Typography
 } from "@mui/material";
 import {formatZuluDate} from "@/lib/date";
-import {getRating} from "@/lib/vatsim";
-import Link from "next/link";
 import {Event, EventPosition} from "@prisma/client";
 import TogglePositionsLockButton from "./TogglePositionsLockButton";
 import ForcePositionsToggleSwitch from "./ForcePositionsToggleSwitch";
@@ -27,9 +24,22 @@ import EventPositionPublishButton from "./EventPositionPublishButton";
 import EventPositionPublishAllButton from "./EventPositionPublishAllButton";
 import SendDiscordEventDataButton from "@/components/EventManager/SendDiscordEventDataButton";
 import EventPositionCsvButton from "@/components/EventManager/EventPositionCsvButton";
-
+import {fetchCertificationsForUsers, fetchLastControlledEventsForUsers} from "@/actions/eventPosition";
+import ControllerChip from "@/components/EventManager/ControllerChip";
 
 export default async function EventPositionsTable({ event, positions }: { event: Event, positions: EventPositionWithSolo[] }) {
+    const userIds = Array.from(
+        new Set(
+            positions
+                .map(p => p.user?.id)
+                .filter((id): id is string => typeof id === 'string' && id.length > 0)
+        )
+    );
+
+    const certificationsByUser: Record<string, any[]> = await fetchCertificationsForUsers(userIds);
+    const lastControlledByUser = await fetchLastControlledEventsForUsers(userIds);
+
+
 
     const getTimeRectangle = (position: EventPosition, eventStart: Date, start: Date, eventEnd: Date, end: Date) => {
 
@@ -52,21 +62,16 @@ export default async function EventPositionsTable({ event, positions }: { event:
         const coreStartPct = ((eventStart.getTime() - totalStart.getTime()) / totalDuration) * 100;
         const coreEndPct = ((eventEnd.getTime() - totalStart.getTime()) / totalDuration) * 100;
 
-        // Pre-buffer: used portion (position extends into pre-buffer)
         const preBufferUsedStart = startPct;
         const preBufferUsedEnd = Math.min(endPct, coreStartPct);
-        // Pre-buffer: unused portion (buffer exists but position doesn't cover it)
         const preBufferUnusedStart = 0;
         const preBufferUnusedEnd = Math.min(startPct, coreStartPct);
 
-        // Core event segment
         const coreSegStart = Math.max(startPct, coreStartPct);
         const coreSegEnd = Math.min(endPct, coreEndPct);
 
-        // Post-buffer: used portion (position extends into post-buffer)
         const postBufferUsedStart = Math.max(startPct, coreEndPct);
         const postBufferUsedEnd = endPct;
-        // Post-buffer: unused portion (buffer exists but position doesn't cover it)
         const postBufferUnusedStart = Math.max(endPct, coreEndPct);
         const postBufferUnusedEnd = 100;
 
@@ -189,27 +194,20 @@ export default async function EventPositionsTable({ event, positions }: { event:
 
                                 <TableRow key={position.id}>
                                     <TableCell>
-                                        <Tooltip
-                                            title={position.soloCert ? `${position.soloCert.position} - ${formatZuluDate(position.soloCert.expires)}` : ''}
-                                            disableHoverListener={!position.soloCert}
-                                            disableFocusListener={!position.soloCert}
-                                            disableTouchListener={!position.soloCert}
-                                        >
-                                            <Link href={`/admin/controller/${position.user.cid}`} passHref target="_blank">
-                                                <Chip
-                                                    label={`${position.user.firstName} ${position.user.lastName} - ${getRating(position.user.rating)}` || 'Unknown'}
-                                                    size="small"
-                                                    color={`${  position.published
-                                                            ? "success"
-                                                            : position.soloCert
-                                                                ? "error"
-                                                            : position.user?.controllerStatus === "HOME"
-                                                                ? "default"
-                                                                : "secondary"
-                                                    }`}
-                                                />
-                                            </Link>
-                                        </Tooltip>
+                                        <ControllerChip
+                                            user={position.user}
+                                            soloCert={position.soloCert as any}
+                                            published={position.published}
+                                            eventInfo={{
+                                                requestedPosition: position.requestedPosition ?? null,
+                                                eventNotes: position.notes ?? null,
+                                                finalPosition: position.finalPosition ?? null,
+                                                finalNotes: position.finalNotes ?? null,
+                                                assignedPosition: (position as any).assignedPosition ?? null,
+                                                lastControlledEvent: lastControlledByUser[position.user.id] ?? null,
+                                                certifications: certificationsByUser[position.user.id] ?? null,
+                                            }}
+                                        />
                                     </TableCell>
                                     <TableCell>{position.requestedPosition}</TableCell>
                                     <TableCell>{position.requestedSecondaryPosition}</TableCell>
