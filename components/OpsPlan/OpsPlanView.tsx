@@ -223,7 +223,6 @@ export default async function OpsPlanView({ eventId }: Props) {
 
     const preset = Array.isArray(event.presetPositions) ? event.presetPositions : [];
 
-    // compute groups (reset first if needed)
     const grouped: Record<'Local'|'Terminal'|'Enroute', string[]> = {
         Local: [],
         Terminal: [],
@@ -235,7 +234,6 @@ export default async function OpsPlanView({ eventId }: Props) {
         grouped[cat].push(pos);
     }
 
-    // compute final positions (already present)...
     const finalPositions = Array.isArray((event as any).positions)
         ? (event as any).positions.filter((p: any) =>
             (p.finalPosition !== undefined && p.finalPosition !== null)
@@ -249,7 +247,6 @@ export default async function OpsPlanView({ eventId }: Props) {
     const adminFinalPositions = finalPositions.filter((p: any) => isAdminCategory(p));
     const nonAdminFinalPositions = finalPositions.filter((p: any) => !isAdminCategory(p));
 
-    // group non-admin final positions into categories (Local / Terminal / Enroute)
     const finalGrouped: Record<CategoryKey, any[]> = {
         Local: [],
         Terminal: [],

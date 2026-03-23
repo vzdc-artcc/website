@@ -10,8 +10,8 @@ export function classifyPosition(positionRaw?: string): 'Local' | 'Terminal' | '
 
     const last3 = lettersOnly.length >= 3 ? lettersOnly.slice(-3) : lettersOnly;
 
-    const localSet = new Set(['GND', 'DEL', 'TWR']);
-    if (/_GND$/.test(s) || /_DEL$/.test(s) || /_TWR$/.test(s)) return 'Local';
+    const localSet = new Set(['GND', 'DEL', 'TWR', 'RMP']);
+    if (/_GND$/.test(s) || /_DEL$/.test(s) || /_TWR$/.test(s) || /_RMP$/.test(s)) return 'Local';
     if (localSet.has(last3) || localSet.has(lastToken)) return 'Local';
 
     if (/_CTR$/.test(s) || lastToken === 'CTR' || last3 === 'CTR') return 'Enroute';
