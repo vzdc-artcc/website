@@ -28,6 +28,7 @@ export default async function FileTable({files, admin, ids = true,}: {
                         <TableRow key={file.id}>
                             <TableCell>
                                 <Link href={ids ? `https://utfs.io/f/${file.key}` : `/publications/${file.id}`}
+                                      target={ids ? '_self' : '_blank'}
                                       style={{color: file.highlightColor || 'inherit', textDecoration: 'none'}}>
                                     <Stack direction="row" alignItems="center">
                                         {file.name}
