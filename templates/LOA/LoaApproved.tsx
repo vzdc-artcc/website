@@ -1,7 +1,7 @@
 import {User} from "next-auth";
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
-import {LOA} from "@prisma/client";
+import {LOA} from "@/generated/prisma/client";
 import {formatZuluDate} from "@/lib/date";
 
 export const loaApproved = (controller: User, loa: LOA) => {

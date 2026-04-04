@@ -1,6 +1,6 @@
 import React from 'react';
 import {User} from "next-auth";
-import {SuaBlock} from "@prisma/client";
+import {SuaBlock} from "@/generated/prisma/client";
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
 

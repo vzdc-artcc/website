@@ -1,6 +1,6 @@
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
-import {SoloCertification} from "@prisma/client";
+import {SoloCertification} from "@/generated/prisma/client";
 import {User} from "next-auth";
 
 export const soloDeleted = (controller: User, solo: SoloCertification) => {

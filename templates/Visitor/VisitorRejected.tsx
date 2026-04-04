@@ -1,7 +1,7 @@
 import {User} from "next-auth";
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
-import {VisitorApplication} from "@prisma/client";
+import {VisitorApplication} from "@/generated/prisma/client";
 
 export const visitorRejected = (user: User, application: VisitorApplication) => {
     return renderReactToMjml(

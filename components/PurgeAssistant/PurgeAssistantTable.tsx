@@ -2,7 +2,7 @@
 import React from 'react';
 import {User} from "next-auth";
 import {Box, Button, Stack, Tab, Tabs, Typography} from "@mui/material";
-import {DataGrid, GridColDef, GridToolbar} from '@mui/x-data-grid';
+import {DataGrid, GridColDef} from '@mui/x-data-grid';
 import {getRating} from "@/lib/vatsim";
 import {toast} from "react-toastify";
 import {purgeControllers} from "@/actions/controller";
@@ -85,11 +85,9 @@ export default function PurgeAssistantTable({controllers, user}: {
                     disableRowSelectionOnClick
                     checkboxSelection
                     onRowSelectionModelChange={(newSelection) => {
-                        setSelectedIds(newSelection as string[]);
+                        setSelectedIds(newSelection as unknown as string[]);
                     }}
-                    slots={{
-                        toolbar: GridToolbar,
-                    }}
+                    showToolbar
                 />
             </Box>
             <Box hidden={selectedRoster !== "visit"}>
@@ -102,11 +100,9 @@ export default function PurgeAssistantTable({controllers, user}: {
                     disableRowSelectionOnClick
                     checkboxSelection
                     onRowSelectionModelChange={(newSelection) => {
-                        setSelectedIds(newSelection as string[]);
+                        setSelectedIds(newSelection as unknown as string[]);
                     }}
-                    slots={{
-                        toolbar: GridToolbar,
-                    }}
+                    showToolbar
                 />
             </Box>
             <Typography variant="h5" sx={{

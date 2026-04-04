@@ -1,5 +1,6 @@
-import React from 'react';
-import { format } from 'date-fns';
+'use client';
+import React, {useEffect, useState} from 'react';
+import {format} from 'date-fns';
 import {
     Box,
     Button,
@@ -16,47 +17,58 @@ import {
 } from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import FormSaveButton from '@/components/Form/FormSaveButton';
-import { createOrUpdateOpsPlanFile, deleteOpsPlanFile, fetchOpsPlanFiles } from '@/actions/opsPlanFiles';
+import {createOrUpdateOpsPlanFile, deleteOpsPlanFile, fetchOpsPlanFiles} from '@/actions/opsPlanFiles';
 import DeleteConfirmButton from '@/components/EventManager/DeleteConfirmButton';
+import Form from "next/form";
+import {OpsPlanFile} from "@/generated/prisma/browser";
 
-export default async function OpsPlanFileForm({ eventId }: { eventId?: string }) {
-    const files = await fetchOpsPlanFiles(eventId);
+export default function OpsPlanFileForm({eventId}: { eventId?: string }) {
+
+    const [files, setFiles] = useState<OpsPlanFile[]>();
+
+    useEffect(() => {
+        fetchOpsPlanFiles(eventId).then(setFiles);
+    }, []);
 
     const fmt = (d: Date | null | undefined) => (d ? format(d, 'MM/dd/yy HH:mm') : 'N/A');
+
 
     return (
         <Stack spacing={2}>
             <Paper sx={{ p: 2 }}>
                 <Typography variant="h6">Upload OPS Plan File</Typography>
 
-                <Box
-                    component="form"
-                    action={createOrUpdateOpsPlanFile}
-                    sx={{ mt: 1 }}
-                >
-                    {eventId && <input type="hidden" name="eventId" value={eventId} />}
+                <Box sx={{mt: 1,}}>
+                    <Form
+                        action={(fd) => {
+                            createOrUpdateOpsPlanFile(fd).then(() => fetchOpsPlanFiles(eventId).then(setFiles));
+                        }}>
+                        {eventId && <input type="hidden" name="eventId" value={eventId}/>}
 
-                    <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center">
-                        <TextField name="name" label="File name" required sx={{ minWidth: 240, flex: 1 }} />
+                        <Stack direction={{xs: 'column', md: 'row'}} spacing={2} alignItems="center">
+                            <TextField name="name" label="File name" required sx={{minWidth: 240, flex: 1}}/>
 
-                        <Button variant="contained" component="label" startIcon={<UploadFileIcon />}>
-                            Choose file
-                            <input type="file" name="file" hidden required />
-                        </Button>
+                            <Button variant="contained" component="label" startIcon={<UploadFileIcon/>}>
+                                Choose file
+                                <input type="file" name="file" hidden required/>
+                            </Button>
 
-                        <Box sx={{ ml: 'auto' }}>
-                            <FormSaveButton text="Upload" />
-                        </Box>
-                    </Stack>
+                            <Box sx={{ml: 'auto'}}>
+                                <FormSaveButton text="Upload"/>
+                            </Box>
+                        </Stack>
 
-                    <TextField name="description" label="Description (optional)" fullWidth multiline rows={2} sx={{ mt: 1 }} />
+                        <TextField name="description" label="Description (optional)" fullWidth multiline rows={2}
+                                   sx={{mt: 1}}/>
+                    </Form>
                 </Box>
+
             </Paper>
 
             <Paper sx={{ p: 2 }}>
                 <Typography variant="h6">Existing Files</Typography>
 
-                {files.length === 0 ? (
+                {files?.length === 0 ? (
                     <Typography color="text.secondary" sx={{ mt: 1 }}>
                         No files uploaded.
                     </Typography>
@@ -73,7 +85,7 @@ export default async function OpsPlanFileForm({ eventId }: { eventId?: string })
                             </TableHead>
 
                             <TableBody>
-                                {files.map((f) => (
+                                {files?.map((f) => (
                                     <TableRow key={f.id}>
                                         <TableCell>
                                             <Typography>{f.name}</Typography>

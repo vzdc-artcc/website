@@ -1,5 +1,5 @@
 import {User} from "next-auth";
-import {Feedback} from "@prisma/client";
+import {Feedback} from "@/generated/prisma/client";
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
 

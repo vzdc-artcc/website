@@ -1,6 +1,6 @@
 import {renderReactToMjml} from "@/actions/mjml";
 import {User} from "next-auth";
-import {Event} from "@prisma/client";
+import {Event} from "@/generated/prisma/client";
 import SingleRecipientEmailWrapper from "../Wrapper/SingleRecipientEmailWrapper";
 import {formatZuluDate} from "@/lib/date";
 

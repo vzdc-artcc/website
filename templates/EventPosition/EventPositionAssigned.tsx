@@ -1,4 +1,4 @@
-import {EventPosition, Event} from "@prisma/client";
+import {Event, EventPosition} from "@/generated/prisma/client";
 import {User} from "next-auth";
 import {renderReactToMjml} from "@/actions/mjml";
 import {formatZuluDate} from "@/lib/date";

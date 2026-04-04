@@ -1,4 +1,4 @@
-import {TrainingSession} from "@prisma/client";
+import {TrainingSession} from "@/generated/prisma/client";
 import {User} from "next-auth";
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
