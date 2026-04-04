@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
-import {Event} from "@prisma/client";
+import {Event} from "@/generated/prisma/browser";
 import {IconButton, Tooltip} from "@mui/material";
 import {Download} from "@mui/icons-material";
 import {formatZuluDate} from "@/lib/date";

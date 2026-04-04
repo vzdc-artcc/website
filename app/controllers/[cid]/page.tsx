@@ -1,7 +1,7 @@
 import React from 'react';
 import prisma from "@/lib/db";
 import {notFound} from "next/navigation";
-import {Card, CardContent, Grid2, Typography} from "@mui/material";
+import {Card, CardContent, Grid, Typography} from "@mui/material";
 import ProfileCard from "@/components/Profile/ProfileCard";
 import {User} from "next-auth";
 import StatisticsTable from "@/components/Statistics/StatisticsTable";
@@ -64,11 +64,11 @@ export default async function Page(props: { params: Promise<{ cid: string }> }) 
     });
 
     return (
-        (<Grid2 container columns={2} spacing={2}>
-            <Grid2 size={2}>
+        (<Grid container columns={2} spacing={2}>
+            <Grid size={2}>
                 <ProfileCard user={user as User} viewOnly/>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 2,
                     lg: 1
@@ -79,8 +79,8 @@ export default async function Page(props: { params: Promise<{ cid: string }> }) 
                         <StatisticsTable heading="Month" logs={getMonthLog(logs)}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 2,
                     lg: 1
@@ -91,7 +91,7 @@ export default async function Page(props: { params: Promise<{ cid: string }> }) 
                         <ControllingSessionsTable positions={positionsWorked}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>)
+            </Grid>
+        </Grid>)
     );
 }

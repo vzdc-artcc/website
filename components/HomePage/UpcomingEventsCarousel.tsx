@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import {Event} from "@prisma/client";
+import {Event} from "@/generated/prisma/browser";
 import Carousel from "react-material-ui-carousel";
 import {Box, Typography} from "@mui/material";
 import Image from "next/image";

@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {ChangeBroadcast, User} from "@prisma/client";
+import {ChangeBroadcast, User} from "@/generated/prisma/browser";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip} from "@mui/material";
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {Gavel} from "@mui/icons-material";

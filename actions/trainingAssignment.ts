@@ -5,7 +5,7 @@ import prisma from "@/lib/db";
 import {revalidatePath} from "next/cache";
 import {log} from "@/actions/log";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {Prisma} from "@prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 import {
     sendTrainingAssignmentDeletedEmail,
     sendTrainingAssignmentUpdatedEmail,

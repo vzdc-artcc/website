@@ -1,10 +1,10 @@
 'use client';
 
 import React, {useState} from 'react';
-import { setOpsPlanPublished } from "@/actions/eventPosition";
-import { Button } from "@mui/material";
-import { Event } from "@prisma/client";
-import { toast } from "react-toastify";
+import {setOpsPlanPublished} from "@/actions/eventPosition";
+import {Button} from "@mui/material";
+import {Event} from "@/generated/prisma/browser";
+import {toast} from "react-toastify";
 
 export default function OpsPlanPublishButton({ event }: { event: Event }) {
     const [published, setPublished] = useState<boolean>(Boolean(event.opsPlanPublished));

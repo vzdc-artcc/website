@@ -1,5 +1,5 @@
 import React from 'react';
-import {File} from '@prisma/client';
+import {File} from '@/generated/prisma/browser';
 import {IconButton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import Link from "next/link";
 import {Edit, OpenInNew} from "@mui/icons-material";

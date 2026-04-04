@@ -1,6 +1,5 @@
 import prisma from "@/lib/db";
-import { Card, CardContent, Typography } from "@mui/material";
-import { Event } from "@prisma/client";
+import {Event} from "@/generated/prisma/browser";
 import PresetSelectorForm from "./PresetSelectorForm";
 
 export default async function EventPresetSelector({ event }: { event: Event, }) {

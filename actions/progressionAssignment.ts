@@ -8,7 +8,7 @@ import {
     TrainingProgressionStep,
     TrainingSession,
     TrainingTicket
-} from "@prisma/client";
+} from "@/generated/prisma/client";
 import prisma from "@/lib/db";
 import {log} from "@/actions/log";
 import {revalidatePath} from "next/cache";

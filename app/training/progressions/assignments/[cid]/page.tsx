@@ -4,7 +4,7 @@ import {authOptions} from "@/auth/auth";
 import {Card, CardContent, Stack, Typography} from "@mui/material";
 import {Info} from "@mui/icons-material";
 import prisma from "@/lib/db";
-import {TrainingProgression} from "@prisma/client";
+import {TrainingProgression} from "@/generated/prisma/client";
 import {notFound} from "next/navigation";
 import ProgressionAssignmentForm from "@/components/ProgressionAssignment/ProgressionAssignmentForm";
 

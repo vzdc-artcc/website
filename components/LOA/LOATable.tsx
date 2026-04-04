@@ -3,7 +3,7 @@ import React from 'react';
 import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import DataTable from "@/components/DataTable/DataTable";
 import {fetchLoas} from "@/actions/loa";
-import {LOAStatus} from "@prisma/client";
+import {LOAStatus} from "@/generated/prisma/browser";
 import {Chip, Tooltip} from "@mui/material";
 import {Grading, Info} from "@mui/icons-material";
 import LoaDeleteButton from "@/components/LOA/LoaDeleteButton";

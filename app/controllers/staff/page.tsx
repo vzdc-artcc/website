@@ -3,7 +3,7 @@ import prisma from "@/lib/db";
 import {
     Card,
     CardContent,
-    Grid2,
+    Grid,
     Table,
     TableBody,
     TableCell,
@@ -140,15 +140,15 @@ export default async function Page() {
     });
 
     return (
-        (<Grid2 container columns={12} spacing={2}>
-            <Grid2 size={12}>
+        (<Grid container columns={12} spacing={2}>
+            <Grid size={12}>
                 <Card>
                     <CardContent>
                         <Typography variant="h6">{VATUSA_FACILITY} Staff</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 12,
                     md: 6
@@ -160,8 +160,8 @@ export default async function Page() {
                         <Typography>atm@vzdc.org</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 12,
                     md: 6
@@ -173,8 +173,8 @@ export default async function Page() {
                         <Typography>datm@vzdc.org</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 12,
                     md: 6,
@@ -207,8 +207,8 @@ export default async function Page() {
                         </TableContainer>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 12,
                     md: 6,
@@ -240,8 +240,8 @@ export default async function Page() {
                         </TableContainer>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 12,
                     md: 6,
@@ -273,8 +273,8 @@ export default async function Page() {
                         </TableContainer>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 12,
                     md: 6,
@@ -306,8 +306,8 @@ export default async function Page() {
                         </TableContainer>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 12,
                     md: 6
@@ -335,8 +335,8 @@ export default async function Page() {
                         </TableContainer>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 12,
                     md: 6
@@ -364,8 +364,8 @@ export default async function Page() {
                         </TableContainer>
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>)
+            </Grid>
+        </Grid>)
     );
 
 }

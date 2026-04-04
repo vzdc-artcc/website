@@ -8,7 +8,7 @@ import {
     FormControlLabel,
     FormGroup,
     FormLabel,
-    Grid2,
+    Grid,
     TextField,
     Typography,
     useTheme,
@@ -113,7 +113,7 @@ export default function RoutePracticeForm({
 
   return (
     <Box>
-      <Grid2
+        <Grid
         container
         spacing={2}
         columns={8}
@@ -123,13 +123,13 @@ export default function RoutePracticeForm({
           paddingTop: 20,
         }}
       >
-        <Grid2 size={1}>
+            <Grid size={1}>
           <Typography align="center">AID</Typography>
           <Typography align="center" style={{ color: textColor }}>
             {flightPlan.callsign}
           </Typography>
-        </Grid2>
-        <Grid2 size={0.5}>
+            </Grid>
+            <Grid size={0.5}>
           <Typography align="center">CID</Typography>
           <TextField
             value={flightPlan.cid}
@@ -140,8 +140,8 @@ export default function RoutePracticeForm({
               },
             }}
           />
-        </Grid2>
-        <Grid2 size={0.75}>
+            </Grid>
+            <Grid size={0.75}>
           <Typography align="center">BCN</Typography>
           <TextField
             value={flightPlan.bcn}
@@ -152,8 +152,8 @@ export default function RoutePracticeForm({
               },
             }}
           />
-        </Grid2>
-        <Grid2 size={1}>
+            </Grid>
+            <Grid size={1}>
           <Typography align="center">TYP</Typography>
           <TextField
             value={flightPlan.typ}
@@ -164,8 +164,8 @@ export default function RoutePracticeForm({
               },
             }}
           />
-        </Grid2>
-        <Grid2 size={0.5}>
+            </Grid>
+            <Grid size={0.5}>
           <Typography align="center">EQ</Typography>
           <TextField
             value={flightPlan.eq}
@@ -176,8 +176,8 @@ export default function RoutePracticeForm({
               },
             }}
           />
-        </Grid2>
-        <Grid2 size={1}>
+            </Grid>
+            <Grid size={1}>
           <Typography align="center">DEP</Typography>
           <TextField
             value={flightPlan.dep}
@@ -188,8 +188,8 @@ export default function RoutePracticeForm({
               },
             }}
           />
-        </Grid2>
-        <Grid2 size={1}>
+            </Grid>
+            <Grid size={1}>
           <Typography align="center">DEST</Typography>
           <TextField
             value={flightPlan.dest}
@@ -200,8 +200,8 @@ export default function RoutePracticeForm({
               },
             }}
           />
-        </Grid2>
-        <Grid2 size={1}>
+            </Grid>
+            <Grid size={1}>
           <Typography align="center">SPD</Typography>
           <TextField
             value={flightPlan.spd}
@@ -212,8 +212,8 @@ export default function RoutePracticeForm({
               },
             }}
           />
-        </Grid2>
-        <Grid2 size={1}>
+            </Grid>
+            <Grid size={1}>
           <Typography align="center">ALT</Typography>
           <TextField
             value={flightPlan.alt}
@@ -224,11 +224,11 @@ export default function RoutePracticeForm({
               },
             }}
           />
-        </Grid2>
-        <Grid2 size={0.75}>
+            </Grid>
+            <Grid size={0.75}>
           <Typography align="right">RTE</Typography>
-        </Grid2>
-        <Grid2 size={7}>
+            </Grid>
+            <Grid size={7}>
           <TextField
             fullWidth
             multiline
@@ -239,11 +239,11 @@ export default function RoutePracticeForm({
               },
             }}
           />
-        </Grid2>
-        <Grid2 size={0.75}>
+            </Grid>
+            <Grid size={0.75}>
           <Typography align="right">RMK</Typography>
-        </Grid2>
-        <Grid2 size={7}>
+            </Grid>
+            <Grid size={7}>
           <TextField
             fullWidth
             value={"FOR TRAINING USE ONLY"}
@@ -253,8 +253,8 @@ export default function RoutePracticeForm({
               },
             }}
           />
-        </Grid2>
-      </Grid2>
+            </Grid>
+        </Grid>
       <Box display="flex" flexDirection="column" alignItems="flex-end" mt={2}>
         <FormControl component="fieldset" variant="standard">
           <FormLabel

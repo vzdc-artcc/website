@@ -3,7 +3,7 @@ import React from 'react';
 import {User} from "next-auth";
 import {Autocomplete, TextField} from "@mui/material";
 import {assignOts} from "@/actions/ots";
-import {OtsRecommendation} from "@prisma/client";
+import {OtsRecommendation} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
 
 export default function InstructorDropdown({rec, allInstructors, assignedInstructorId,}: {

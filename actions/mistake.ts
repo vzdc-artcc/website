@@ -5,7 +5,7 @@ import {log} from "@/actions/log";
 import {revalidatePath} from "next/cache";
 import {z} from "zod";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {Prisma} from "@prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 
 export const deleteMistake = async (id: string) => {
     const mistake = await prisma.commonMistake.delete({

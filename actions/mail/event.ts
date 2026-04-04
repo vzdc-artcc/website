@@ -1,11 +1,11 @@
 'use server';
 import {User} from "next-auth";
-import {Event, EventPosition} from "@prisma/client";
+import {Event, EventPosition} from "@/generated/prisma/client";
 import {FROM_EMAIL, mailTransport} from "@/lib/email";
 import {eventPositionAssigned} from "@/templates/EventPosition/EventPositionAssigned";
 import {eventPositionRemoved} from "@/templates/EventPosition/EventPositionRemoved";
-import { positionRequestDeleted } from "@/templates/EventPosition/RequestDeleted";
-import { newEventPosted } from "@/templates/Event/NewEventPosted";
+import {positionRequestDeleted} from "@/templates/EventPosition/RequestDeleted";
+import {newEventPosted} from "@/templates/Event/NewEventPosted";
 
 export const sendEventPostedEmail = async (controller: User, event: Event) => {
 

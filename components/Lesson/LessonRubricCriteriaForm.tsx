@@ -1,7 +1,7 @@
 'use client';
 import React, {useState} from 'react';
-import {Lesson, LessonRubricCriteria} from "@prisma/client";
-import {Box, Grid2, TextField, Typography, useTheme} from "@mui/material";
+import {Lesson, LessonRubricCriteria} from "@/generated/prisma/browser";
+import {Box, Grid, TextField, Typography, useTheme} from "@mui/material";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {createOrUpdateLessonRubricCriteria} from "@/actions/lessonRubricCriteria";
@@ -36,20 +36,20 @@ export default function LessonRubricCriteriaForm({lesson, criteria}: {
             <input type="hidden" name="rubricCriteriaId" value={criteria?.id || ''}/>
             <input type="hidden" name="rubricId" value={lesson?.rubricId || ''}/>
             <input type="hidden" name="description" value={description}/>
-            <Grid2 container columns={2} spacing={2}>
-                <Grid2 size={2}>
+            <Grid container columns={2} spacing={2}>
+                <Grid size={2}>
                     <TextField fullWidth required variant="filled" name="criteria" label="Name"
                                defaultValue={criteria?.criteria || ''}/>
-                </Grid2>
-                <Grid2
+                </Grid>
+                <Grid
                     size={{
                         xs: 2,
                         md: 1
                     }}>
                     <TextField fullWidth required variant="filled" type="number" name="maxPoints" label="Maximum Points"
                                defaultValue={criteria?.maxPoints || 0}/>
-                </Grid2>
-                <Grid2
+                </Grid>
+                <Grid
                     size={{
                         xs: 2,
                         md: 1
@@ -57,8 +57,8 @@ export default function LessonRubricCriteriaForm({lesson, criteria}: {
                     <TextField fullWidth required variant="filled" type="number" name="passing" label="Passing Points"
                                defaultValue={criteria?.passing || 0}
                                helperText="The smallest number of points required to pass this criteria."/>
-                </Grid2>
-                <Grid2 size={2}>
+                </Grid>
+                <Grid size={2}>
                     <Box sx={{maxWidth: '700px',}} data-color-mode={theme.palette.mode}>
                         <Typography variant="subtitle1" sx={{mb: 1,}}>Description</Typography>
                         <MarkdownEditor
@@ -68,11 +68,11 @@ export default function LessonRubricCriteriaForm({lesson, criteria}: {
                             onChange={(d) => setDescription(d)}
                         />
                     </Box>
-                </Grid2>
-                <Grid2 size={2}>
+                </Grid>
+                <Grid size={2}>
                     <FormSaveButton/>
-                </Grid2>
-            </Grid2>
+                </Grid>
+            </Grid>
         </form>)
     );
 }

@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import {User} from "next-auth";
-import {CommonMistake, Lesson} from "@prisma/client";
+import {CommonMistake, Lesson} from "@/generated/prisma/browser";
 import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import {fetchTrainingSessions} from "@/actions/trainingSession";
 import {Chip, IconButton} from "@mui/material";

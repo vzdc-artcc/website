@@ -5,7 +5,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth/auth';
 import { after } from 'next/server';
 import { log } from './log';
-import { TmiCategory, EventTmi } from '@prisma/client';
+import {TmiCategory, EventTmi} from '@/generated/prisma/client';
 
 export const fetchTmis = async (eventId: string): Promise<EventTmi[]> => {
     const tmis = await prisma.eventTmi.findMany({

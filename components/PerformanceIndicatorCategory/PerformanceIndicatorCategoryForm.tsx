@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {PerformanceIndicatorCriteriaCategory, PerformanceIndicatorTemplate} from "@prisma/client";
+import {PerformanceIndicatorCriteriaCategory, PerformanceIndicatorTemplate} from "@/generated/prisma/browser";
 import Form from "next/form";
 import {TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";

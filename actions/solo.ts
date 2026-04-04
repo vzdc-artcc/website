@@ -7,7 +7,7 @@ import {revalidatePath} from "next/cache";
 import {addVatusaSolo, deleteVatusaSolo} from "@/actions/vatusa/controller";
 import {sendSoloAddedEmail, sendSoloDeletedEmail, sendSoloExpiredEmail} from "@/actions/mail/solo";
 import {User} from "next-auth";
-import {Prisma} from "@prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
 
 export const addSolo = async (formData: FormData) => {

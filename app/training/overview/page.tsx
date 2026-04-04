@@ -3,7 +3,7 @@ import {
     Card,
     CardContent,
     Chip,
-    Grid2,
+    Grid,
     Table,
     TableBody,
     TableCell,
@@ -16,7 +16,7 @@ import {
 import {getChipColor, getMinutesAgo, getMonth, getTimeAgo, getTimeIn} from "@/lib/date";
 import prisma from "@/lib/db";
 import {TRAINING_ONLY_LOG_MODELS} from "@/lib/log";
-import {Lesson} from "@prisma/client";
+import {Lesson} from "@/generated/prisma/client";
 import {Info, PendingOutlined} from "@mui/icons-material";
 
 const TRAINING_ENVIRONMENTS = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["ERR-CONFIG"];
@@ -108,8 +108,8 @@ export default async function Page() {
     }));
 
     return (
-        (<Grid2 container columns={4} spacing={2}>
-            <Grid2
+        (<Grid container columns={4} spacing={2}>
+            <Grid
                 size={{
                     xs: 4,
                     md: 2,
@@ -121,8 +121,8 @@ export default async function Page() {
                         <Typography variant="h4">{mentors.length}</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 4,
                     md: 2,
@@ -134,8 +134,8 @@ export default async function Page() {
                         <Typography variant="h4">{instructors.length}</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 4,
                     md: 2,
@@ -147,8 +147,8 @@ export default async function Page() {
                         <Typography variant="h4">{sessions.length}</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 4,
                     md: 2,
@@ -160,8 +160,8 @@ export default async function Page() {
                         <Typography variant="h4">{totalHours}</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={{xs: 4, md: 2,}}>
+            </Grid>
+            <Grid size={{xs: 4, md: 2,}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography sx={{mb: 1,}}>Appointments Sync</Typography>
@@ -170,8 +170,8 @@ export default async function Page() {
                             color={getChipColor(syncTimes?.appointments)}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={{xs: 4, md: 2,}}>
+            </Grid>
+            <Grid size={{xs: 4, md: 2,}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography sx={{mb: 1,}}>Environment Status</Typography>
@@ -187,8 +187,8 @@ export default async function Page() {
                         })}
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 4,
                 }}>
@@ -254,8 +254,8 @@ export default async function Page() {
                             </TableContainer>}
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={4}>
+            </Grid>
+            <Grid size={4}>
                 <Card>
                     <CardContent>
                         <Typography variant="h5">Recent Training Activity</Typography>
@@ -286,7 +286,7 @@ export default async function Page() {
                         </TableContainer>}
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>)
+            </Grid>
+        </Grid>)
     );
 }

@@ -3,7 +3,7 @@ import { updateEventPresetPositions } from "@/actions/event";
 import { Box, Stack, TextField } from "@mui/material";
 import { Autocomplete } from "@mui/material";
 import { Chip } from "@mui/material";
-import { Event, EventPositionPreset } from "@prisma/client";
+import {Event, EventPositionPreset} from "@/generated/prisma/browser";
 import Form from "next/form";
 import { useState } from "react";
 import FormSaveButton from "../Form/FormSaveButton";

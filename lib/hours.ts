@@ -1,5 +1,5 @@
 import prisma from "@/lib/db";
-import {ControllerLogMonth} from "@prisma/client";
+import {ControllerLogMonth} from "@/generated/prisma/browser";
 import {getMonth} from "@/lib/date";
 
 export async function getMonthHours(month: number, year: number) {

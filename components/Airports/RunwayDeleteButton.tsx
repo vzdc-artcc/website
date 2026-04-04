@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {Runway} from "@prisma/client";
+import {Runway} from "@/generated/prisma/browser";
 import {deleteRunway} from "@/actions/airports";
 import {toast} from "react-toastify";
 import {IconButton, Tooltip} from "@mui/material";

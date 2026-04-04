@@ -1,13 +1,13 @@
 'use server';
 
-import { UTApi } from 'uploadthing/server';
-import { z } from 'zod';
+import {UTApi} from 'uploadthing/server';
+import {z} from 'zod';
 import prisma from '@/lib/db';
-import { log } from '@/actions/log';
-import { revalidatePath } from 'next/cache';
-import { LogModel } from '@prisma/client';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/auth/auth';
+import {log} from '@/actions/log';
+import {revalidatePath} from 'next/cache';
+import {LogModel} from '@/generated/prisma/client';
+import {getServerSession} from 'next-auth';
+import {authOptions} from '@/auth/auth';
 
 const ut = new UTApi();
 
@@ -87,6 +87,7 @@ export const createOrUpdateOpsPlanFile = async (formData: FormData) => {
     await log('CREATE', LogModel.OPS_PLAN_FILE, `Uploaded ops plan file ${opsFile.name}`);
     if (opsFile.eventId) {
         revalidatePath(`/events/${opsFile.eventId}/ops`);
+        revalidatePath(`/events/admin/${opsFile.eventId}/manager`);
     }
     revalidatePath('/events/ops');
 
@@ -116,7 +117,11 @@ export const deleteOpsPlanFile = async (id: string) => {
     await prisma.opsPlanFile.delete({ where: { id } });
     await log('DELETE', LogModel.OPS_PLAN_FILE, `Deleted ops plan file ${file.name}`);
 
-    if (file.eventId) revalidatePath(`/events/${file.eventId}/ops`);
+    if (file.eventId) {
+        revalidatePath(`/events/${file.eventId}/ops`);
+        revalidatePath(`/events/admin/${file.eventId}/manager`);
+
+    }
     revalidatePath('/events/ops');
 
     return { ok: true };

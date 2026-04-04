@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {Lesson, TrainingAppointment} from "@prisma/client";
+import {Lesson, TrainingAppointment} from "@/generated/prisma/browser";
 import {
     Accordion,
     AccordionDetails,

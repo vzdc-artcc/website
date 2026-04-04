@@ -1,4 +1,4 @@
-import {ChangeBroadcast} from "@prisma/client";
+import {ChangeBroadcast} from "@/generated/prisma/client";
 import {renderReactToMjml} from "@/actions/mjml";
 import MultipleRecipientsEmailWrapper from "@/templates/Wrapper/MultipleRecipientsEmailWrapper";
 

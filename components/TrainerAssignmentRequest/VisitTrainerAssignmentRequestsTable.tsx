@@ -10,7 +10,7 @@ import TrainerAssignmentRequestDeleteButton
     from "@/components/TrainerAssignmentRequest/TrainerAssignmentRequestDeleteButton";
 import {useRouter} from "next/navigation";
 import {getRating} from "@/lib/vatsim";
-import {Lesson} from "@prisma/client";
+import {Lesson} from "@/generated/prisma/browser";
 import {Chip, Stack, Tooltip} from "@mui/material";
 import Link from "next/link";
 

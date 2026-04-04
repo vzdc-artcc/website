@@ -1,7 +1,7 @@
 'use client';
 import React, {useEffect, useState} from 'react';
 import {TrainingSessionIndicatorWithAll} from "@/components/TrainingSession/TrainingSessionForm";
-import {Lesson, TrainingSessionPerformanceIndicatorCriteria} from "@prisma/client";
+import {Lesson, TrainingSessionPerformanceIndicatorCriteria} from "@/generated/prisma/browser";
 import {getData} from "@/actions/trainingSessionPerformanceIndicator";
 import {
     Box,

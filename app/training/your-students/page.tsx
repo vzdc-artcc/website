@@ -20,7 +20,7 @@ import {authOptions} from "@/auth/auth";
 import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
 import {Check, Close, Event, Info, LocalActivity, MilitaryTech, PendingOutlined, People} from "@mui/icons-material";
-import {Lesson} from "@prisma/client";
+import {Lesson} from "@/generated/prisma/client";
 import {formatTimezoneDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
 import TrainingAppointmentFormDialog from "@/components/TrainingAppointment/TrainingAppointmentFormDialog";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";

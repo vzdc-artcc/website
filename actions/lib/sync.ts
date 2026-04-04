@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from "@/lib/db";
-import {Prisma} from "@prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 import SyncTimesUncheckedUpdateInput = Prisma.SyncTimesUncheckedUpdateInput;
 
 export const updateSyncTime = async (data: SyncTimesUncheckedUpdateInput) => {

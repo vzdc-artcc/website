@@ -4,7 +4,7 @@ import prisma from "@/lib/db";
 import {log} from "./log";
 import {after} from "next/server";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {EventType, Prisma} from "@prisma/client";
+import {EventType, Prisma} from "@/generated/prisma/client";
 import {SafeParseReturnType, z} from "zod";
 import {UTApi} from "uploadthing/server";
 import {revalidatePath} from "next/cache";

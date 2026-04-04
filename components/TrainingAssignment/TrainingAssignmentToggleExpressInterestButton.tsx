@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingAssignmentRequest} from "@prisma/client";
+import {TrainingAssignmentRequest} from "@/generated/prisma/browser";
 import {Button} from "@mui/material";
 import {expressInterest, removeInterest} from "@/actions/trainingAssignment";
 import {User} from "next-auth";

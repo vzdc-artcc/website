@@ -6,7 +6,7 @@ import prisma from "@/lib/db";
 import {log} from "@/actions/log";
 import {revalidatePath} from "next/cache";
 import {OrderItem} from "@/components/Order/OrderList";
-import {FileCategory, HighlightColorType} from "@prisma/client";
+import {FileCategory, HighlightColorType} from "@/generated/prisma/client";
 
 const ut = new UTApi();
 

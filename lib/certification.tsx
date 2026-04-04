@@ -1,5 +1,5 @@
 import {ReactNode} from "react";
-import {CertificationOption, SoloCertification} from "@prisma/client";
+import {CertificationOption, SoloCertification} from "@/generated/prisma/browser";
 import {Check, Circle, Clear, Timer} from "@mui/icons-material";
 import {Tooltip} from "@mui/material";
 import {getDaysLeft} from "@/lib/date";

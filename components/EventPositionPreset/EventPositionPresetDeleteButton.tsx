@@ -1,10 +1,10 @@
-import { deleteEventPreset } from "@/actions/eventPreset";
-import { Delete } from "@mui/icons-material";
-import { Tooltip } from "@mui/material";
-import { GridActionsCellItem } from "@mui/x-data-grid";
-import { EventPositionPreset } from "@prisma/client";
-import { useState } from "react";
-import { toast } from "react-toastify";
+import {deleteEventPreset} from "@/actions/eventPreset";
+import {Delete} from "@mui/icons-material";
+import {Tooltip} from "@mui/material";
+import {GridActionsCellItem} from "@mui/x-data-grid";
+import {EventPositionPreset} from "@/generated/prisma/browser";
+import {useState} from "react";
+import {toast} from "react-toastify";
 
 export function EventPositionPresetDeleteButton({ positionPreset }: { positionPreset: EventPositionPreset }) {
     const [clicked, setClicked] = useState(false);

@@ -4,7 +4,7 @@ import {log} from "@/actions/log";
 import {revalidatePath} from "next/cache";
 import {z} from "zod";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {Prisma} from "@prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 import {after} from "next/server";
 
 export const deleteLesson = async (id: string) => {

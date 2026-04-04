@@ -1,6 +1,6 @@
 'use server';
 import {User} from "next-auth";
-import {SuaBlock} from "@prisma/client";
+import {SuaBlock} from "@/generated/prisma/client";
 import {FROM_EMAIL, mailTransport} from "@/lib/email";
 import {missionCreated} from "@/templates/SuaRequest/MissionCreated";
 

@@ -1,7 +1,7 @@
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
 import {User} from "next-auth";
-import {LOA} from "@prisma/client";
+import {LOA} from "@/generated/prisma/client";
 
 export const loaDenied = (controller: User, loa: LOA) => {
     return renderReactToMjml(

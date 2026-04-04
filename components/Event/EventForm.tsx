@@ -13,7 +13,7 @@ import {
     CircularProgress,
     FormControl,
     FormControlLabel,
-    Grid2,
+    Grid,
     Radio,
     RadioGroup,
     Stack,
@@ -25,7 +25,7 @@ import {
 } from "@mui/material";
 import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import {Event, EventType} from "@prisma/client";
+import {Event, EventType} from "@/generated/prisma/browser";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import dayjs, {Dayjs} from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -176,29 +176,29 @@ export default function EventForm({ event }: { event?: Event, }) {
                             </Stack>
                         </AccordionSummary>
                         <AccordionDetails>
-                            <Grid2 container columns={2} spacing={2}>
-                                <Grid2 size={2}>
+                            <Grid container columns={2} spacing={2}>
+                                <Grid size={2}>
                                     <TextField fullWidth variant="filled" name="name" label="Event Name" value={name} onChange={(e) => setName(e.target.value)} disabled={!!event?.archived} />
-                                </Grid2>
-                                <Grid2 size={1}>
+                                </Grid>
+                                <Grid size={1}>
                                     <DateTimePicker sx={{ width: '100%', }} name="start" label="Start" value={start} disablePast ampm={false} onChange={setStart} />
-                                </Grid2>
-                                <Grid2 size={1}>
+                                </Grid>
+                                <Grid size={1}>
                                     <DateTimePicker sx={{ width: '100%', }} name="end" label="End" value={end} disablePast ampm={false} onChange={setEnd} />
-                                </Grid2>
-                                <Grid2 size={2}>
+                                </Grid>
+                                <Grid size={2}>
                                     <Typography variant="caption" color="text.secondary">All times are in UTC.  Event must be at least 30 minutes long and cannot be before today.</Typography>
-                                </Grid2>
-                                <Grid2 size={2}>
+                                </Grid>
+                                <Grid size={2}>
                                     <FormControlLabel control={<Switch/>} name="enableBufferTimes"
                                                       label="Enable buffer times (+/- 2 hours)?"
                                                       checked={enableBufferTimes}
                                                       onChange={(_e, c) => setEnableBufferTimes(c)}/>
-                                </Grid2>
-                                <Grid2 size={2}>
+                                </Grid>
+                                <Grid size={2}>
                                     {NextButton}
-                                </Grid2>
-                            </Grid2>
+                                </Grid>
+                            </Grid>
                         </AccordionDetails>
                     </Accordion>
 

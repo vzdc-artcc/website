@@ -1,7 +1,7 @@
-import config from './package.json' with {type: 'json'};
 import {NextConfig} from "next";
 
 const nextConfig: NextConfig = {
+    reactCompiler: true,
     images: {
         remotePatterns: [
             {
@@ -19,10 +19,6 @@ const nextConfig: NextConfig = {
         },
     },
     output: 'standalone',
-    publicRuntimeConfig: {
-        version: config.version,
-        author: config.author,
-    },
 };
 
 export default nextConfig;

@@ -1,4 +1,4 @@
-import {TrainingAppointment} from "@prisma/client";
+import {TrainingAppointment} from "@/generated/prisma/client";
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";
 import {formatTimezoneDate} from "@/lib/date";

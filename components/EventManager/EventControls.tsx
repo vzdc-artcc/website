@@ -1,5 +1,5 @@
 import {ButtonGroup, Card, CardContent, Divider, IconButton, Stack, Tooltip, Typography} from "@mui/material";
-import {Event} from "@prisma/client";
+import {Event} from "@/generated/prisma/browser";
 import ToggleVisibilityButton from "./ToggleVisibilityButton";
 import {Article, Edit, Info} from "@mui/icons-material";
 import ArchiveToggleButton from "./ArchiveToggleButton";

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import {Runway} from "@prisma/client";
+import {Runway} from "@/generated/prisma/browser";
 import {Box, Stack, TextField} from "@mui/material";
 import {toast} from "react-toastify";
 import {upsertRunway} from "@/actions/airports";

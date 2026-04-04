@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {LessonRubricCell, LessonRubricCriteria, RubricCriteraScore} from "@prisma/client";
+import {LessonRubricCell, LessonRubricCriteria, RubricCriteraScore} from "@/generated/prisma/browser";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip} from "@mui/material";
 import Markdown from "react-markdown";
 

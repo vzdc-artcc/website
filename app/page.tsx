@@ -1,4 +1,4 @@
-import {Card, CardContent, Grid2, IconButton, Stack, Tooltip, Typography} from "@mui/material";
+import {Card, CardContent, Grid, IconButton, Stack, Tooltip, Typography} from "@mui/material";
 import {Roboto} from "next/font/google";
 import prisma from "@/lib/db";
 import UpcomingEventsCarousel from "@/components/HomePage/UpcomingEventsCarousel";
@@ -105,16 +105,16 @@ export default async function Home() {
     const top3Controllers = getTop3Controllers(top3Logs);
 
     return (
-        (<Grid2 container columns={8} spacing={4}>
+        (<Grid container columns={8} spacing={4}>
             <BackgroundImage/>
-            <Grid2 size={8}>
+            <Grid size={8}>
                 <Card>
                     <CardContent>
                         <HeaderText/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 8,
                     lg: 6
@@ -125,8 +125,8 @@ export default async function Home() {
                         <UpcomingEventsCarousel events={upcomingEvents} imageUrls={imageUrls}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 8,
                     lg: 2
@@ -137,8 +137,8 @@ export default async function Home() {
                         <QuickLinksList/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 8,
                     lg: 2
@@ -210,8 +210,8 @@ export default async function Home() {
                         </CardContent>
                     </Card>
                 </Stack>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 8,
                     lg: 4
@@ -244,8 +244,8 @@ export default async function Home() {
                         </Stack>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 8,
                     lg: 2
@@ -270,7 +270,7 @@ export default async function Home() {
                         </Stack>
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>)
+            </Grid>
+        </Grid>)
     );
 }

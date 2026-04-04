@@ -1,4 +1,4 @@
-import {Event} from "@prisma/client";
+import {Event} from "@/generated/prisma/client";
 import {User} from "next-auth";
 import {renderReactToMjml} from "@/actions/mjml";
 import SingleRecipientEmailWrapper from "@/templates/Wrapper/SingleRecipientEmailWrapper";

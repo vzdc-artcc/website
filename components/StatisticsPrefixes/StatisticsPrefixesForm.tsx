@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {StatisticsPrefixes} from "@prisma/client";
+import {StatisticsPrefixes} from "@/generated/prisma/browser";
 import {Autocomplete, Chip, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {updatePrefixes} from "@/actions/statisticsPrefixes";

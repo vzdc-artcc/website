@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {Lesson, TrainingProgression} from "@prisma/client";
+import {Lesson, TrainingProgression} from "@/generated/prisma/browser";
 import {GridColDef} from "@mui/x-data-grid";
 import {Chip} from "@mui/material";
 import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";

@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {CertificationOption, CertificationType} from "@prisma/client";
+import {CertificationOption, CertificationType} from "@/generated/prisma/browser";
 import {useRouter} from "next/navigation";
 import {toast} from "react-toastify";
 import {createOrUpdateCertificationType} from "@/actions/certificationTypes";

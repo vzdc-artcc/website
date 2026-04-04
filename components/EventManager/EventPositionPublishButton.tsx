@@ -1,10 +1,9 @@
 'use client';
-import { publishEventPosition, unpublishEventPosition } from "@/actions/eventPosition";
-import { Publish, Unpublished } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
-import { Tooltip } from "@mui/material";
-import { Event, EventPosition } from "@prisma/client";
-import { toast } from "react-toastify";
+import {publishEventPosition, unpublishEventPosition} from "@/actions/eventPosition";
+import {Publish, Unpublished} from "@mui/icons-material";
+import {IconButton, Tooltip} from "@mui/material";
+import {Event, EventPosition} from "@/generated/prisma/browser";
+import {toast} from "react-toastify";
 
 export default function EventPositionPublishButton({ event, position, }: { event: Event, position: EventPosition, }) {
     

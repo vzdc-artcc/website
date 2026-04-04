@@ -1,5 +1,5 @@
 import {renderReactToMjml} from "@/actions/mjml";
-import {TrainingAppointment} from "@prisma/client";
+import {TrainingAppointment} from "@/generated/prisma/client";
 import {User} from "next-auth";
 import {formatTimezoneDate} from "@/lib/date";
 import {getRating} from "@/lib/vatsim";

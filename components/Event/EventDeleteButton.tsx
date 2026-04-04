@@ -1,12 +1,12 @@
 'use client';
 
-import { deleteEvent } from "@/actions/event";
-import { Delete } from "@mui/icons-material";
-import { Tooltip } from "@mui/material";
-import { GridActionsCellItem } from "@mui/x-data-grid";
-import { Event } from "@prisma/client";
-import { useState } from "react";
-import { toast } from "react-toastify";
+import {deleteEvent} from "@/actions/event";
+import {Delete} from "@mui/icons-material";
+import {Tooltip} from "@mui/material";
+import {GridActionsCellItem} from "@mui/x-data-grid";
+import {Event} from "@/generated/prisma/browser";
+import {useState} from "react";
+import {toast} from "react-toastify";
 
 export default function EventDeleteButton({ event }: { event: Event }) {
     const [clicked, setClicked] = useState(false);

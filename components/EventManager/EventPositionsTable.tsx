@@ -15,7 +15,7 @@ import {
     Typography
 } from "@mui/material";
 import {formatZuluDate} from "@/lib/date";
-import {Event, EventPosition} from "@prisma/client";
+import {Event, EventPosition} from "@/generated/prisma/browser";
 import TogglePositionsLockButton from "./TogglePositionsLockButton";
 import ForcePositionsToggleSwitch from "./ForcePositionsToggleSwitch";
 import EventPositionDeleteButton from "./EventPositionDeleteButton";

@@ -2,7 +2,7 @@
 
 import {Article, Checklist, Edit, OpenInNew} from "@mui/icons-material";
 import {getGridSingleSelectOperators, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
-import {EventType} from "@prisma/client";
+import {EventType} from "@/generated/prisma/browser";
 import Link from "next/link";
 import EventDeleteButton from "./EventDeleteButton";
 import {Tooltip} from "@mui/material";

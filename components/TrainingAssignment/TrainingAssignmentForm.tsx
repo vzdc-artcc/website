@@ -1,6 +1,6 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {TrainingAssignment, TrainingAssignmentRequest} from "@prisma/client";
+import {TrainingAssignment, TrainingAssignmentRequest} from "@/generated/prisma/browser";
 import {User} from "next-auth";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {Autocomplete, Box, Chip, CircularProgress, Stack, TextField} from "@mui/material";

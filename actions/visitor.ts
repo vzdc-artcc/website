@@ -1,6 +1,6 @@
 'use server';
 
-import {Prisma, VisitorApplication, VisitorApplicationStatus} from "@prisma/client";
+import {Prisma, VisitorApplication, VisitorApplicationStatus} from "@/generated/prisma/client";
 import prisma from "@/lib/db";
 import {z} from "zod";
 import {revalidatePath} from "next/cache";

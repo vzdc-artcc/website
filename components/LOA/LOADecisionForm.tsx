@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {LOA} from "@prisma/client";
+import {LOA} from "@/generated/prisma/browser";
 import {Button, Stack} from "@mui/material";
 import {Check, Close} from "@mui/icons-material";
 import {approveLoa, denyLoa} from "@/actions/loa";

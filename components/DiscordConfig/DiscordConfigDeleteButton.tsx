@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {toast} from "react-toastify";
 import {IconButton, Tooltip} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-import {DiscordConfig} from "@prisma/client";
+import {DiscordConfig} from "@/generated/prisma/browser";
 import {deleteDiscordConfig} from "@/actions/discordConfig";
 
 export default function DiscordConfigDeleteButton({discordConfig}: { discordConfig: DiscordConfig }) {

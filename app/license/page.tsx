@@ -1,12 +1,12 @@
-import {Button, Card, CardContent, Grid2, Typography} from "@mui/material";
+import {Button, Card, CardContent, Grid, Typography} from "@mui/material";
 import Link from "next/link";
 import {Check, Close, Info, OpenInNew} from "@mui/icons-material";
 
 export default async function Home() {
 
     return (
-        (<Grid2 container columns={9} spacing={4}>
-            <Grid2 size={9}>
+        (<Grid container columns={9} spacing={4}>
+            <Grid size={9}>
                 <Card>
                     <CardContent>
                         <Typography variant="h4">License Information</Typography>
@@ -15,8 +15,8 @@ export default async function Home() {
                                 about repository licenses</Link></Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={3}>
+            </Grid>
+            <Grid size={3}>
                 <Card>
                     <CardContent>
                         <Typography variant="h5" sx={{mb: 1,}}>Permissions</Typography>
@@ -30,8 +30,8 @@ export default async function Home() {
                             use</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={3}>
+            </Grid>
+            <Grid size={3}>
                 <Card>
                     <CardContent>
                         <Typography variant="h5" sx={{mb: 1,}}>Limitations</Typography>
@@ -40,8 +40,8 @@ export default async function Home() {
                             use</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={3}>
+            </Grid>
+            <Grid size={3}>
                 <Card>
                     <CardContent>
                         <Typography variant="h5" sx={{mb: 1,}}>Conditions</Typography>
@@ -53,8 +53,8 @@ export default async function Home() {
                             changes</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={9}>
+            </Grid>
+            <Grid size={9}>
                 <Card>
                     <CardContent>
                         <Typography variant="h6" sx={{mb: 1,}}>Apache License 3.0</Typography>
@@ -63,7 +63,7 @@ export default async function Home() {
                         </Link>
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>)
+            </Grid>
+        </Grid>)
     );
 }

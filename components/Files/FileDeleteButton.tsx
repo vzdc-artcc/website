@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {File} from "@prisma/client";
+import {File} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
 import {IconButton} from "@mui/material";
 import {Delete} from "@mui/icons-material";

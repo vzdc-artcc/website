@@ -1,12 +1,12 @@
 'use client';
-import { GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
-import DataTable, { containsOnlyFilterOperator, equalsOnlyFilterOperator } from "../DataTable/DataTable";
-import { fetchEventPresets } from "@/actions/eventPreset";
-import { EventPositionPreset } from "@prisma/client";
-import { EventPositionPresetDeleteButton } from "./EventPositionPresetDeleteButton";
-import { Tooltip } from "@mui/material";
-import { Edit } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
+import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
+import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "../DataTable/DataTable";
+import {fetchEventPresets} from "@/actions/eventPreset";
+import {EventPositionPreset} from "@/generated/prisma/browser";
+import {EventPositionPresetDeleteButton} from "./EventPositionPresetDeleteButton";
+import {Tooltip} from "@mui/material";
+import {Edit} from "@mui/icons-material";
+import {useRouter} from "next/navigation";
 
 export function EventPositionPresetTable() {
     

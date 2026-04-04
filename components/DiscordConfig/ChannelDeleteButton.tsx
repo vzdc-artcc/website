@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {DiscordChannel} from "@prisma/client";
+import {DiscordChannel} from "@/generated/prisma/browser";
 import {Delete} from "@mui/icons-material";
 import {IconButton, Tooltip} from "@mui/material";
 import {toast} from "react-toastify";

@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {Lesson, TrainingProgression} from "@prisma/client";
+import {Lesson, TrainingProgression} from "@/generated/prisma/browser";
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {Edit} from "@mui/icons-material";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip} from "@mui/material";

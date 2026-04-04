@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {toast} from "react-toastify";
 import {IconButton, Tooltip} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-import {TrainingAssignmentRequest} from "@prisma/client";
+import {TrainingAssignmentRequest} from "@/generated/prisma/browser";
 import {deleteTrainingAssignmentRequest} from "@/actions/trainingAssignmentRequest";
 import {useRouter} from "next/navigation";
 import {GridActionsCellItem} from "@mui/x-data-grid";

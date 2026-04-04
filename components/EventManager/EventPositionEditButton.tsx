@@ -1,35 +1,35 @@
 'use client';
-import { adminSaveEventPosition, publishEventPosition } from "@/actions/eventPosition";
-import { EventPositionWithSolo } from "@/app/events/admin/events/[id]/manager/page";
-import { formatZuluDate } from "@/lib/date";
-import { Edit } from "@mui/icons-material";
+import {adminSaveEventPosition, publishEventPosition} from "@/actions/eventPosition";
+import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
+import {formatZuluDate} from "@/lib/date";
+import {Edit} from "@mui/icons-material";
 import {
+    Box,
     Button,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
-    IconButton,
-    Stack,
-    TextField,
-    Tooltip,
-    Select,
-    MenuItem,
     FormControl,
-    InputLabel,
-    FormGroup,
     FormControlLabel,
+    FormGroup,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Select,
+    Stack,
     Switch,
-    Box
+    TextField,
+    Tooltip
 } from "@mui/material";
-import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Event } from "@prisma/client";
+import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {Event} from "@/generated/prisma/browser";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { useState } from "react";
-import { toast } from "react-toastify";
+import {useState} from "react";
+import {toast} from "react-toastify";
 
 export default function EventPositionEditButton({
                                                     event,

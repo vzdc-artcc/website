@@ -1,6 +1,6 @@
 'use server';
 
-import {TrainingAppointment} from "@prisma/client";
+import {TrainingAppointment} from "@/generated/prisma/client";
 import {User} from "next-auth";
 import {FROM_EMAIL, mailTransport} from "@/lib/email";
 import {appointmentScheduled} from "@/templates/TrainingAppointment/AppointmentScheduled";

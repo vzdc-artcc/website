@@ -1,5 +1,5 @@
 import {Profile, User} from "next-auth";
-import {ControllerStatus, Role, StaffPosition} from "@prisma/client";
+import {ControllerStatus, Role, StaffPosition} from "@/generated/prisma/client";
 import prisma from "@/lib/db";
 import {getOperatingInitials} from "@/actions/lib/oi";
 import {OAuthConfig} from "next-auth/providers/oauth";

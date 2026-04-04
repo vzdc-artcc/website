@@ -127,7 +127,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                         <Link href="/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                             <NavSidebarButton icon={<AdminPanelSettings/>} text="Facility Administration"/>
                         </Link>}
-                    {session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) &&
+                    {session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) || session?.user.staffPositions.includes("WM") &&
                         <Link href="/web-system/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                             <NavSidebarButton icon={<Web/>} text="Web System Administration"/>
                         </Link>}
@@ -169,7 +169,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                             <ListItemText>Facility Administration</ListItemText>
                         </MenuItem>
                     </Link>}
-                {session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) &&
+                {session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) || session?.user.staffPositions.includes("WM") &&
                     <Link href="/web-system/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                         <MenuItem onClick={closeDropdown}>
                             <ListItemIcon>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, {useState} from 'react';
-import {Autocomplete, Box, Button, Grid2, TextField} from '@mui/material';
+import {Autocomplete, Box, Button, Grid, TextField} from '@mui/material';
 import {useFormStatus} from 'react-dom';
 import {toast} from 'react-toastify';
 import dynamic from 'next/dynamic';
@@ -78,8 +78,8 @@ export default function DiscordAnnouncementForm() {
     return (
         <Box sx={{ p: 3, border: '1px solid #ccc', borderRadius: '8px' }}>
             <form id="announcement-form" action={handleSubmit}>
-                <Grid2 container spacing={2} sx={{ mb: 2 }}>
-                    <Grid2 size={{ xs: 12, md: 6 }}>
+                <Grid container spacing={2} sx={{mb: 2}}>
+                    <Grid size={{xs: 12, md: 6}}>
                         <Autocomplete
                             id="announcement-type-autocomplete"
                             options={ANNOUNCEMENT_TYPES_OPTIONS_FLAT}
@@ -103,8 +103,8 @@ export default function DiscordAnnouncementForm() {
                             disableClearable={false}
                             disabled={pending}
                         />
-                    </Grid2>
-                    <Grid2 size={{ xs: 12, md: 6 }}>
+                    </Grid>
+                    <Grid size={{xs: 12, md: 6}}>
                         <TextField
                             required
                             fullWidth
@@ -115,8 +115,8 @@ export default function DiscordAnnouncementForm() {
                             onChange={(e) => setTitle(e.target.value)}
                             disabled={pending}
                         />
-                    </Grid2>
-                    <Grid2 size={12}>
+                    </Grid>
+                    <Grid size={12}>
                         <DynamicMarkdownEditor
                             value={body}
                             onChange={(value: string) => {
@@ -127,8 +127,8 @@ export default function DiscordAnnouncementForm() {
                             toolbarBottom={true}
                             readOnly={pending}
                         />
-                    </Grid2>
-                </Grid2>
+                    </Grid>
+                </Grid>
                 <Button
                     type="submit"
                     variant="contained"

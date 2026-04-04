@@ -6,7 +6,7 @@ import {after} from "next/server";
 import {log} from "@/actions/log";
 import {revalidatePath} from "next/cache";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {Prisma} from "@prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 
 export const getLessonPerformanceIndicator = async (lessonId: string) => {
     return prisma.lessonPerformanceIndicator.findUnique({

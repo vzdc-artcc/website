@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {Certification, CertificationOption, CertificationType, SoloCertification} from "@prisma/client";
+import {Certification, CertificationOption, CertificationType, SoloCertification} from "@/generated/prisma/browser";
 import {FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
 import Link from "next/link";
 import {saveCertifications} from "@/actions/certifications";

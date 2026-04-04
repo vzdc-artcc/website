@@ -2,7 +2,7 @@
 
 import { toggleEventHidden } from "@/actions/eventManagement";
 import { Button } from "@mui/material";
-import { Event } from "@prisma/client";
+import {Event} from "@/generated/prisma/browser";
 
 export default function ToggleVisibilityButton({ event }: { event: Event, }) {
     return (

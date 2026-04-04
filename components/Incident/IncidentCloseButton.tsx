@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import {IncidentReport} from "@prisma/client";
+import {IncidentReport} from "@/generated/prisma/browser";
 import {Button} from "@mui/material";
 import {closeIncident} from "@/actions/incident";
 import {toast} from "react-toastify";

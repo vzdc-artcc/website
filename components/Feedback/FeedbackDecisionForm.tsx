@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {Feedback} from "@prisma/client";
+import {Feedback} from "@/generated/prisma/browser";
 import {Box, Button, Divider, Stack, TextField} from "@mui/material";
 import {Delete, Send} from "@mui/icons-material";
 import {toast} from "react-toastify";

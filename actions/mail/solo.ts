@@ -1,7 +1,7 @@
 'use server';
 
 import {User} from "next-auth";
-import {SoloCertification} from "@prisma/client";
+import {SoloCertification} from "@/generated/prisma/client";
 import {FROM_EMAIL, mailTransport} from "@/lib/email";
 import {soloAdded} from "@/templates/Solo/SoloAdded";
 import {soloDeleted} from "@/templates/Solo/SoloDeleted";

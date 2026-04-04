@@ -1,8 +1,8 @@
 'use client';
 import React, {useState} from 'react';
-import {ChangeBroadcast, File} from "@prisma/client";
+import {ChangeBroadcast, File} from "@/generated/prisma/browser";
 import Form from "next/form";
-import {Autocomplete, FormControlLabel, Grid2, Switch, TextField, Typography} from "@mui/material";
+import {Autocomplete, FormControlLabel, Grid, Switch, TextField, Typography} from "@mui/material";
 import {MailGroup} from "@/app/admin/mail/page";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import FormSaveButton from "@/components/Form/FormSaveButton";
@@ -54,8 +54,8 @@ export default function BroadcastForm({broadcast, file, allFiles, groups,}: {
         <Form action={handleSubmit}>
             <input type="hidden" name="id" value={broadcast?.id}/>
             <input type="hidden" name="users" value={uniqueSelectedIds}/>
-            <Grid2 container columns={2} spacing={2}>
-                {!broadcast && <Grid2 size={2}>
+            <Grid container columns={2} spacing={2}>
+                {!broadcast && <Grid size={2}>
                     <Autocomplete
                         id="group-user-autocomplete"
                         options={options}
@@ -70,12 +70,12 @@ export default function BroadcastForm({broadcast, file, allFiles, groups,}: {
                         multiple
                         disableCloseOnSelect
                     />
-                </Grid2>}
-                <Grid2 size={2}>
+                </Grid>}
+                <Grid size={2}>
                     <TextField fullWidth variant="filled" name="title" label="Title"
                                defaultValue={broadcast?.title || ''}/>
-                </Grid2>
-                <Grid2 size={2}>
+                </Grid>
+                <Grid size={2}>
                     <Typography gutterBottom>Description:</Typography>
                     <MarkdownEditor
                         enableScroll={false}
@@ -83,13 +83,13 @@ export default function BroadcastForm({broadcast, file, allFiles, groups,}: {
                         value={description}
                         onChange={(d) => setDescription(d)}
                     />
-                </Grid2>
-                {!broadcast && <Grid2 size={2}>
+                </Grid>
+                {!broadcast && <Grid size={2}>
                     <FormControlLabel name="exemptStaff"
                                       control={<Switch/>}
                                       label="Exempt 'STAFF'? (Cannot be changed later)"/>
-                </Grid2>}
-                <Grid2 size={2}>
+                </Grid>}
+                <Grid size={2}>
                     <Autocomplete
                         id="file-autocomplete"
                         options={allFiles}
@@ -100,11 +100,11 @@ export default function BroadcastForm({broadcast, file, allFiles, groups,}: {
                         value={selectedFile}
                         renderInput={(params) => <TextField {...params} label="File (optional)" variant="filled"/>}
                     />
-                </Grid2>
-                <Grid2 size={2}>
+                </Grid>
+                <Grid size={2}>
                     <FormSaveButton/>
-                </Grid2>
-            </Grid2>
+                </Grid>
+            </Grid>
         </Form>
     );
 }

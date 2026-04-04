@@ -1,7 +1,7 @@
 'use client';
 import React, {useState} from 'react';
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle} from "@mui/material";
-import {ChangeBroadcast} from "@prisma/client";
+import {ChangeBroadcast} from "@/generated/prisma/browser";
 import {handleAgreeBroadcast, handleSeenBroadcast} from "@/actions/broadcastViewer";
 import {User} from "next-auth";
 import {Check} from "@mui/icons-material";

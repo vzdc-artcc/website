@@ -6,7 +6,7 @@ import TrainingAppointmentCalendar, {
 import prisma from "@/lib/db";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
-import {StaffPosition} from "@prisma/client";
+import {StaffPosition} from "@/generated/prisma/client";
 import Link from "next/link";
 
 export default async function Page({searchParams}: { searchParams: Promise<{ you: string, }>, }) {

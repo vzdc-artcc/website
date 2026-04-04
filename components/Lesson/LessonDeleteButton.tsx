@@ -5,7 +5,7 @@ import {Delete} from "@mui/icons-material";
 import {toast} from "react-toastify";
 import {deleteLesson} from "@/actions/lesson";
 import {Tooltip} from "@mui/material";
-import {Lesson} from "@prisma/client";
+import {Lesson} from "@/generated/prisma/browser";
 
 export default function LessonDeleteButton({lesson}: { lesson: Lesson }) {
     const [clicked, setClicked] = useState(false);

@@ -1,5 +1,5 @@
 import React from 'react';
-import {DossierEntry} from "@prisma/client";
+import {DossierEntry} from "@/generated/prisma/browser";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 
 function DossierTable({dossier, ableToViewConfidential,}: {

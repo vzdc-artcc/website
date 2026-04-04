@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {Event} from "@prisma/client";
+import {Event} from "@/generated/prisma/browser";
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {Campaign, Send} from "@mui/icons-material";
 import {

@@ -1,6 +1,11 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {CertificationType, LessonRosterChange, OtsRecommendation, TrainerReleaseRequest} from "@prisma/client";
+import {
+    CertificationType,
+    LessonRosterChange,
+    OtsRecommendation,
+    TrainerReleaseRequest
+} from "@/generated/prisma/browser";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack} from "@mui/material";
 import {ArrowForward} from "@mui/icons-material";
 

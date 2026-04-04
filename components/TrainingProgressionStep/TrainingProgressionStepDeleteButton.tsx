@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingProgressionStep} from "@prisma/client";
+import {TrainingProgressionStep} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
 import {Tooltip} from "@mui/material";
 import {Delete} from "@mui/icons-material";

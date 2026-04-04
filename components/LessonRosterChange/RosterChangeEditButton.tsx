@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {CertificationType, Lesson, LessonRosterChange} from "@prisma/client";
+import {CertificationType, Lesson, LessonRosterChange} from "@/generated/prisma/browser";
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton} from "@mui/material";
 import {Edit} from "@mui/icons-material";
 import RosterChangeForm from "@/components/LessonRosterChange/RosterChangeForm";

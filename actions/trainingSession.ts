@@ -16,7 +16,7 @@ import {
     TrainerReleaseRequest,
     TrainingSession,
     TrainingTicket
-} from "@prisma/client";
+} from "@/generated/prisma/client";
 import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {

@@ -1,6 +1,6 @@
 import React from 'react';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
-import {PerformanceIndicatorCriteria, PerformanceIndicatorCriteriaCategory} from "@prisma/client";
+import {PerformanceIndicatorCriteria, PerformanceIndicatorCriteriaCategory} from "@/generated/prisma/browser";
 import PerformanceIndicatorCriteriaDialogForm
     from "@/components/PerformanceIndicatorCriteria/PerformanceIndicatorCriteriaDialogForm";
 import PerformanceIndicatorCriteriaDeleteButton

@@ -1,7 +1,7 @@
 import React from 'react';
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
-import {Alert, Button, Card, CardActions, CardContent, Chip, Grid2, Stack, Typography} from "@mui/material";
+import {Alert, Button, Card, CardActions, CardContent, Chip, Grid, Stack, Typography} from "@mui/material";
 import ProfileCard from "@/components/Profile/ProfileCard";
 import CertificationsCard from "@/components/Profile/CertificationsCard";
 import FeedbackCard from "@/components/Profile/FeedbackCard";
@@ -12,7 +12,7 @@ import prisma from "@/lib/db";
 import LoaDeleteButton from "@/components/LOA/LoaDeleteButton";
 import Link from "next/link";
 import {Edit} from "@mui/icons-material";
-import {LOAStatus} from "@prisma/client";
+import {LOAStatus} from "@/generated/prisma/client";
 import AssignedTrainersCard from "@/components/Profile/AssignedTrainersCard";
 import ProgressionCard from "@/components/Profile/ProgressionCard";
 import {formatTimezoneDate, getTimeIn} from "@/lib/date";
@@ -66,11 +66,11 @@ export default async function Page() {
     }
 
     return user && (
-        <Grid2 container columns={6} spacing={2}>
-            <Grid2 size={6}>
+        <Grid container columns={6} spacing={2}>
+            <Grid size={6}>
                 <Typography variant="h4">Your Profile</Typography>
-            </Grid2>
-            {trainingAppointment && <Grid2 size={6}>
+            </Grid>
+            {trainingAppointment && <Grid size={6}>
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Training
@@ -95,8 +95,8 @@ export default async function Page() {
                                                    lessons={trainingAppointment.lessons}/>
                     </CardActions>
                 </Card>
-            </Grid2>}
-            {loa && <Grid2 size={6}>
+            </Grid>}
+            {loa && <Grid size={6}>
                 <Card>
                     <CardContent>
                         <Stack direction="row" spacing={1} alignItems="center" sx={{mb: 1,}}>
@@ -115,61 +115,61 @@ export default async function Page() {
                         <LoaDeleteButton loa={loa}/>
                     </CardActions>
                 </Card>
-            </Grid2>}
-            <Grid2
+            </Grid>}
+            <Grid
                 size={{
                     xs: 6,
                     md: 2
                 }}>
                 <ProfileCard user={user}/>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 6,
                     md: 2
                 }}>
                 <AssignedTrainersCard user={user}/>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 6,
                     md: 2
                 }}>
                 <CertificationsCard cid={user.cid}/>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 6,
                     md: 4
                 }}>
                 <ProgressionCard user={user}/>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 6,
                     md: 2
                 }}>
                 <LinksCard/>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 6,
                     md: 4
                 }}>
                 <FeedbackCard user={user}/>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 6,
                     md: 2
                 }}>
                 <EventsCard user={user}/>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={8}>
                 <TrainingCard user={user}/>
-            </Grid2>
+            </Grid>
 
-        </Grid2>
+        </Grid>
     );
 }

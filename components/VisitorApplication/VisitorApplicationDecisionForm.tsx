@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {VisitorApplication} from "@prisma/client";
+import {VisitorApplication} from "@/generated/prisma/browser";
 import {Box, Button, Divider, Stack, TextField} from "@mui/material";
 import {Check, Clear} from "@mui/icons-material";
 import {addVisitor, rejectVisitor} from "@/actions/visitor";

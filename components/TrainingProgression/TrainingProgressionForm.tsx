@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingProgression} from "@prisma/client";
+import {TrainingProgression} from "@/generated/prisma/browser";
 import Form from "next/form";
 import {Autocomplete, Box, FormControlLabel, Stack, Switch, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";

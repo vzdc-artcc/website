@@ -1,7 +1,7 @@
 'use client';
 import React, {useCallback, useEffect} from 'react';
-import {Lesson, LessonRubricCell, LessonRubricCriteria, RubricCriteraScore} from "@prisma/client";
-import {Alert, Autocomplete, Button, CircularProgress, Grid2, TextField} from "@mui/material";
+import {Lesson, LessonRubricCell, LessonRubricCriteria, RubricCriteraScore} from "@/generated/prisma/browser";
+import {Alert, Autocomplete, Button, CircularProgress, Grid, TextField} from "@mui/material";
 import LessonRubricGridInteractive from "@/components/Lesson/LessonRubricGridInteractive";
 import {getCriteriaForLesson} from "@/actions/trainingSessionFormHelper";
 import {toast} from "react-toastify";
@@ -60,8 +60,8 @@ export default function TrainingTicketForm({
     }, [getCriteria, selectedLesson]);
 
     return (
-        (<Grid2 container columns={2} spacing={2}>
-            <Grid2
+        (<Grid container columns={2} spacing={2}>
+            <Grid
                 size={2}>
                 <Autocomplete
                     disabled={!!scores}
@@ -73,8 +73,8 @@ export default function TrainingTicketForm({
                     }}
                     renderInput={(params) => <TextField {...params} label="Lesson (search name or identifier)"/>}
                 />
-            </Grid2>
-            <Grid2 size={2}>
+            </Grid>
+            <Grid size={2}>
                 {selectedLesson && (!criteria || !cells) && <CircularProgress/>}
                 {criteria && cells && <LessonRubricGridInteractive criteria={criteria} cells={cells} scores={scores}
                                                                    updateScores={(scores) => {
@@ -88,17 +88,17 @@ export default function TrainingTicketForm({
                                                                            }
                                                                        }));
                                                                    }}/>}
-            </Grid2>
-            <Grid2 size={2}>
+            </Grid>
+            <Grid size={2}>
                 <Button variant="contained" onClick={handleSubmit} startIcon={<Check/>}>Save Ticket</Button>
-            </Grid2>
-            <Grid2 size={2}>
+            </Grid>
+            <Grid size={2}>
                 <Alert severity="warning">
                     If the lesson pass standards, criteria, or rubric cells have changed after the ticket was previously
                     saved, the ticket will be re-scored with the new criteria.
                 </Alert>
-            </Grid2>
-        </Grid2>)
+            </Grid>
+        </Grid>)
     );
 
 }

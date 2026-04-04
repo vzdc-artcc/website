@@ -1,11 +1,11 @@
 'use server';
 
 import prisma from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth/auth";
-import { after } from "next/server";
-import { log } from "./log";
-import { Event } from "@prisma/client";
+import {getServerSession} from "next-auth";
+import {authOptions} from "@/auth/auth";
+import {after} from "next/server";
+import {log} from "./log";
+import {Event} from "@/generated/prisma/client";
 
 export const saveOpsPlan = async (event: Event, formData: FormData, admin?: boolean) => {
     const session = await getServerSession(authOptions);
