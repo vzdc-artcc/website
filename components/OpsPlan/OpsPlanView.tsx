@@ -57,6 +57,18 @@ function getShortRating(rating: unknown): string | null {
     return RATING_ID_TO_SHORT[numeric] ?? String(numeric);
 }
 
+function formatPlanner(planner: any): string {
+    if (!planner) return 'Unassigned';
+
+    const name = [planner.firstName, planner.lastName].filter(Boolean).join(' ').trim()
+        || planner.fullName
+        || `CID ${planner.cid ?? 'Unknown'}`;
+    const rating = getShortRating(planner.rating);
+    const cid = planner.cid ? ` (${planner.cid})` : '';
+
+    return `${name}${rating ? ` - ${rating}` : ''}${cid}`;
+}
+
 function parseFeaturedConfigs(raw: any): Record<string, any> {
     if (!raw) return {};
     if (typeof raw === 'string') {
@@ -152,7 +164,7 @@ function FinalPositionsTable({ title, positions }: { title: string; positions: a
                                 const posLabel = p.finalPosition || p.requestedPosition || 'Unknown';
                                 const start = p.finalStartTime ? formatZuluDate(p.finalStartTime) : (p.requestedStartTime ? formatZuluDate(p.requestedStartTime) : '');
                                 const end = p.finalEndTime ? formatZuluDate(p.finalEndTime) : (p.requestedEndTime ? formatZuluDate(p.requestedEndTime) : '');
-                                const notes = p.finalNotes || p.notes || '';
+                                const notes = p.finalNotes ?? '';
 
                                 return (
                                     <TableRow
@@ -215,7 +227,7 @@ function FinalPositionsTable({ title, positions }: { title: string; positions: a
 }
 
 export default async function OpsPlanView({ eventId }: Props) {
-    const event = await fetchFullEvent(eventId);
+    const event: any = await fetchFullEvent(eventId);
     if (!event) return notFound();
 
     const configs = parseFeaturedConfigs(event.featuredFieldConfigs);
@@ -274,6 +286,7 @@ export default async function OpsPlanView({ eventId }: Props) {
         }));
 
     const tmisForDisplay = eventTmis.length > 0 ? eventTmis : legacyTmis;
+    const planner = (event as any).opsPlanner;
 
 
     return (
@@ -285,6 +298,9 @@ export default async function OpsPlanView({ eventId }: Props) {
                             <Typography variant="h4">{event.name} - OPS Plan</Typography>
                             <Typography>START &nbsp;{formatZuluDate(event.start)} (IN {eventGetDuration(new Date(), event.start, true).toFixed(2)} days)</Typography>
                             <Typography>END &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{formatZuluDate(event.end)} (+{eventGetDuration(event.start, event.end).toFixed(2)} hours)</Typography>
+                            <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 0.5 }}>
+                                Event Planner: {formatPlanner(planner)}
+                            </Typography>
                         </Box>
                         <Stack direction="row" spacing={1} alignItems="center">
                             <Tooltip title={event.hidden ? 'You must show the event to view information.' : 'View Event Page'}>
@@ -315,7 +331,7 @@ export default async function OpsPlanView({ eventId }: Props) {
                             </Box>
                         </Grid2>
                     ) : (
-                        featured.map((field) => {
+                        featured.map((field: string) => {
                             const cfg = getConfigForField(field, configs);
                             const display = cfg == null ? 'No configuration provided.' :
                                 typeof cfg === 'string' ? cfg : JSON.stringify(cfg, null, 2);

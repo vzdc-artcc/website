@@ -4,36 +4,28 @@ import React, { useEffect, useState } from "react";
 import {Autocomplete, Grid2, TextField, Box, Typography, Button, Divider} from "@mui/material";
 import {getRating} from "@/lib/vatsim";
 import {fetchAllUsers} from "@/actions/eventPosition";
-import {Event, EventPosition, User} from "@prisma/client";
+import {User} from "@prisma/client";
 import Form from "next/form";
 import {toast} from "react-toastify";
 import FormSaveButton from "../Form/FormSaveButton";
 import {saveOpsPlan} from "@/actions/opsPlan";
 
-export default function OpsPlanForm({
-                                           admin,
-                                           currentUser,
-                                           event,
-                                           eventPosition,
-                                       }: {
-    admin?: boolean;
-    currentUser: User;
-    event: Event;
-    eventPosition?: EventPosition | null;
-}) {
+
+export default function OpsPlanForm({ admin, currentUser, event, eventPosition }: any) {
     const [allUsers, setAllUsers] = useState<User[]>([]);
-    const [user, setUser] = useState<string>(currentUser.id || '');
+    const [user, setUser] = useState<string>(event.opsPlannerId ?? event.opsPlanner?.id ?? currentUser.id ?? '');
     const [fieldConfigs, setFieldConfigs] = useState<Record<string, string>>({});
     const [saving, setSaving] = useState<boolean>(false);
 
-    const hasFeaturedFields = (event?.featuredFields || []).length > 0;
+    const featuredFields: string[] = Array.isArray(event?.featuredFields) ? event.featuredFields : [];
+    const hasFeaturedFields = featuredFields.length > 0;
 
     useEffect(() => {
         const initial: Record<string, string> = {};
 
         const configs = (event as any)?.featuredFieldConfigs || {};
 
-        (event?.featuredFields || []).forEach((f) => {
+        featuredFields.forEach((f: string) => {
             const keyUpper = (f || '').toString().toUpperCase();
 
             let value: any = undefined;
@@ -61,6 +53,10 @@ export default function OpsPlanForm({
         setFieldConfigs(initial);
     }, [event?.id, event?.featuredFields, (event as any)?.featuredFieldConfigs]);
 
+    useEffect(() => {
+        setUser(event.opsPlannerId ?? event.opsPlanner?.id ?? currentUser.id ?? '');
+    }, [event?.id, event?.opsPlannerId, event?.opsPlanner?.id, currentUser.id]);
+
 
     useEffect(() => {
         if (admin) {
@@ -77,7 +73,7 @@ export default function OpsPlanForm({
             formData.set('eventId', event.id);
             formData.set('featuredFieldConfigs', JSON.stringify(fieldConfigs));
 
-            const { event: updatedEvent, errors } = await saveOpsPlan(event, formData, admin);
+            const { errors } = await saveOpsPlan(event, formData, admin);
 
             if (errors) {
                 toast.error(errors.map((error) => error.message).join('.  '));
@@ -119,7 +115,7 @@ export default function OpsPlanForm({
                 ) }
 
                 { hasFeaturedFields ? (
-                    (event.featuredFields || []).map((field) => (
+                    featuredFields.map((field: string) => (
                         <Grid2 size={2} key={field}>
                             <TextField
                                 fullWidth
