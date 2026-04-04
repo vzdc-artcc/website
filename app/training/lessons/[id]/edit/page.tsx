@@ -2,7 +2,7 @@ import React from 'react';
 import {
     Card,
     CardContent,
-    Grid2,
+    Grid,
     IconButton,
     Stack,
     Table,
@@ -72,8 +72,8 @@ export default async function Page(props: { params: Promise<{ id: string, }>, })
     }
 
     return (
-        <Grid2 container spacing={2} columns={2}>
-            <Grid2 size={2}>
+        <Grid container spacing={2} columns={2}>
+            <Grid size={2}>
                 <Card>
                     <CardContent>
                         <Stack direction="row" spacing={2} alignItems="center" sx={{mb: 2,}}>
@@ -90,16 +90,16 @@ export default async function Page(props: { params: Promise<{ id: string, }>, })
                         <LessonForm lesson={lesson}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={2}>
+            </Grid>
+            <Grid size={2}>
                 <Card>
                     <CardContent>
                         <Typography variant="h6" sx={{mb: 2,}}>Performance Indicator</Typography>
                         <LessonPerformanceIndicatorForm lesson={lesson}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={{xs: 2, md: 1,}}>
+            </Grid>
+            <Grid size={{xs: 2, md: 1,}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="h6" sx={{mb: 1,}}>Lesson Rubric Criteria</Typography>
@@ -137,17 +137,17 @@ export default async function Page(props: { params: Promise<{ id: string, }>, })
                         </TableContainer>}
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={{xs: 2, md: 1,}}>
+            </Grid>
+            <Grid size={{xs: 2, md: 1,}}>
                 <Card>
                     <CardContent>
                         <Typography variant="h6" sx={{mb: 2,}}>New Lesson Rubric Criteria</Typography>
                         <LessonRubricCriteriaForm lesson={lesson}/>
                     </CardContent>
                 </Card>
-            </Grid2>
+            </Grid>
 
-            <Grid2 size={{xs: 2, md: 1,}}>
+            <Grid size={{xs: 2, md: 1,}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="h6" sx={{mb: 2,}}>Roster Modifications</Typography>
@@ -179,15 +179,15 @@ export default async function Page(props: { params: Promise<{ id: string, }>, })
                         </TableContainer>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={{xs: 2, md: 1,}}>
+            </Grid>
+            <Grid size={{xs: 2, md: 1,}}>
                 <Card>
                     <CardContent>
                         <Typography variant="h6" sx={{mb: 2,}}>New Roster Modification</Typography>
                         <RosterChangeForm lesson={lesson} allCertificationTypes={allCertificationTypes}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>
+            </Grid>
+        </Grid>
     );
 }

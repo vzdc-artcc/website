@@ -1,16 +1,16 @@
 import React from 'react';
-import {Box, Card, CardContent, Chip, Grid2, Typography} from "@mui/material";
+import {Box, Card, CardContent, Chip, Grid, Typography} from "@mui/material";
 import {
-    getAllSessionsInYear,
-    getPassedSessionsCountInYear,
-    getFailedSessionsCountInYear,
-    getTopTrainingStaffByHours,
-    endOfYearUTC,
-    startOfYearUTC,
     calculatePassRate,
-    getMostRunLesson,
+    endOfYearUTC,
+    getAllSessionsInYear,
+    getFailedSessionsCountInYear,
     getLessonDistributionData,
     getMonthlySessionCountsForYear,
+    getMostRunLesson,
+    getPassedSessionsCountInYear,
+    getTopTrainingStaffByHours,
+    startOfYearUTC,
 } from "@/actions/trainingStats";
 import TrainingSessionsByMonthGraph from "@/components/TrainingStatistics/TrainingSessionsByMonthGraph";
 import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
@@ -55,15 +55,15 @@ export default async function Page(props: { params: Promise<{ year: string }> })
     const lessonDistributionYearly = await getLessonDistributionData(yearStart, yearEnd);
 
     return (
-        <Grid2 container columns={30} spacing={2}>
-            <Grid2 size={30}>
+        <Grid container columns={30} spacing={2}>
+            <Grid size={30}>
                 <Card>
                     <CardContent>
                         <Typography variant="h4">Training Statistics</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -75,8 +75,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         <Typography variant="h4">{sessionsInYear.length}</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -88,8 +88,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         <Typography variant="h4">{totalHoursInYear}</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -101,8 +101,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         <Typography variant="h4">{passedSessionsInYear}</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -114,8 +114,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         <Typography variant="h4">{failedSessionsInYear}</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -132,8 +132,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         />
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -154,9 +154,9 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         )}
                     </CardContent>
                 </Card>
-            </Grid2>
+            </Grid>
             {top3TrainersYearly.map((trainer, idx) => (
-                <Grid2
+                <Grid
                     key={trainer.user.id}
                     size={{
                         xs: 30,
@@ -173,16 +173,16 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                             <Typography variant="h6">{trainer.hours.toPrecision(3)} hours</Typography>
                         </CardContent>
                     </Card>
-                </Grid2>
+                </Grid>
             ))}
-            <Grid2 size={30}>
+            <Grid size={30}>
                 <Card>
                     <CardContent>
                         <TrainingSessionsByMonthGraph data={monthlyGraphData} />
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={30}>
+            </Grid>
+            <Grid size={30}>
                 <Card>
                     <CardContent>
                         {lessonDistributionYearly.length > 0 ? (
@@ -192,7 +192,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         )}
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>
+            </Grid>
+        </Grid>
     )
 }

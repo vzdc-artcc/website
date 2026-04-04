@@ -1,4 +1,4 @@
-import {Card, CardContent, Grid2, Stack, Typography} from "@mui/material";
+import {Card, CardContent, Grid, Stack, Typography} from "@mui/material";
 import Link from "next/link";
 import {GitHub} from "@mui/icons-material";
 import {Aguafina_Script} from "next/font/google";
@@ -8,8 +8,8 @@ const fancyFont = Aguafina_Script({subsets: ['latin'], weight: ["400"]});
 export default async function Home() {
 
     return (
-        (<Grid2 container columns={6} spacing={4}>
-            <Grid2 size={6}>
+        (<Grid container columns={6} spacing={4}>
+            <Grid size={6}>
                 <Card>
                     <CardContent>
                         <Typography variant="h3">Credit Information</Typography>
@@ -18,8 +18,8 @@ export default async function Home() {
                             style={{color: '#29B6F6', textDecoration: 'none',}}>our public GitHub.</Link></Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={6}>
+            </Grid>
+            <Grid size={6}>
                 <Card>
                     <CardContent>
                         <Typography variant="h4" gutterBottom>Main Contributors</Typography>
@@ -40,7 +40,7 @@ export default async function Home() {
                         </Stack>
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>)
+            </Grid>
+        </Grid>)
     );
 }

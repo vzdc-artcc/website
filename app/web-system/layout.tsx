@@ -1,5 +1,5 @@
 import React from 'react';
-import {Grid2, Typography} from "@mui/material";
+import {Grid, Typography} from "@mui/material";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {Metadata} from "next";
@@ -21,17 +21,17 @@ export default async function Layout({children}: { children: React.ReactNode }) 
     }
 
     return (
-        (<Grid2 container columns={9} spacing={2}>
-            <Grid2
+        (<Grid container columns={9} spacing={2}>
+            <Grid
                 size={{
                     xs: 9,
                     lg: 2
                 }}>
                 <WebSystemAdminMenu/>
-            </Grid2>
-            <Grid2 size="grow">
+            </Grid>
+            <Grid size="grow">
                 {children}
-            </Grid2>
-        </Grid2>)
+            </Grid>
+        </Grid>)
     );
 }

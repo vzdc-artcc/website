@@ -1,7 +1,7 @@
 import React from 'react';
 import prisma from "@/lib/db";
 import {notFound} from "next/navigation";
-import {Card, CardContent, Chip, Grid2, Stack, Typography} from "@mui/material";
+import {Card, CardContent, Chip, Grid, Stack, Typography} from "@mui/material";
 import VisitorApplicationDecisionForm from "@/components/VisitorApplication/VisitorApplicationDecisionForm";
 import {VisitorApplicationStatus} from "@prisma/client";
 import {getRating} from "@/lib/vatsim";
@@ -48,48 +48,48 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 <Typography
                     variant="subtitle2">{application.user.fullName} ({application.user.cid})</Typography>
                 <Typography variant="subtitle2">{application.submittedAt.toUTCString()}</Typography>
-                <Grid2 container spacing={2} columns={2} sx={{mt: 2, mb: 4,}}>
-                    <Grid2
+                <Grid container spacing={2} columns={2} sx={{mt: 2, mb: 4,}}>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Email</Typography>
                         <Typography variant="body2">{application.user.email}</Typography>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
                         }}>
                         <Typography variant="subtitle2">CID</Typography>
                         <Typography variant="body2">{application.user.cid}</Typography>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Rating</Typography>
                         <Typography variant="body2">{getRating(application.user.rating)}</Typography>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Home Facility</Typography>
                         <Typography variant="body2">{application.homeFacility}</Typography>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <Typography variant="subtitle2">Reason for Visiting</Typography>
                         <Typography variant="body2">{application.whyVisit}</Typography>
-                    </Grid2>
-                    {application.status === "DENIED" && <Grid2 size={2}>
+                    </Grid>
+                    {application.status === "DENIED" && <Grid size={2}>
                         <Typography variant="subtitle2">Reason for Denial</Typography>
                         <Typography variant="body2">{application.reasonForDenial || 'N/A'}</Typography>
-                    </Grid2>}
-                </Grid2>
+                    </Grid>}
+                </Grid>
                 {application.status === "PENDING" &&
                     <VisitorApplicationDecisionForm application={application} user={application.user as User}/>}
             </CardContent>

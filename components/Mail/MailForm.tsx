@@ -2,7 +2,7 @@
 import React, {useState} from 'react';
 import {MailGroup} from "@/app/admin/mail/page";
 import {User} from "next-auth";
-import {Autocomplete, Grid2, TextField} from "@mui/material";
+import {Autocomplete, Grid, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {sendMail} from "@/actions/mail/general";
 import {toast} from "react-toastify";
@@ -52,8 +52,8 @@ export default function MailForm({allUsers, groups}: { allUsers: User[], groups:
     return (
         (<form action={handleSubmit}>
             <input type="hidden" name="to" value={uniqueSelectedIds}/>
-            <Grid2 container columns={2} spacing={2}>
-                <Grid2
+            <Grid container columns={2} spacing={2}>
+                <Grid
                     size={{
                         xs: 2,
                         md: 1
@@ -71,25 +71,25 @@ export default function MailForm({allUsers, groups}: { allUsers: User[], groups:
                         multiple
                         disableCloseOnSelect
                     />
-                </Grid2>
-                <Grid2
+                </Grid>
+                <Grid
                     size={{
                         xs: 2,
                         md: 1
                     }}>
                     <TextField required fullWidth variant="filled" name="subject" label="Subject"/>
-                </Grid2>
-                <Grid2 size={2}>
+                </Grid>
+                <Grid size={2}>
                     <TextField required fullWidth variant="filled" name="replyTo" label="Reply To"/>
-                </Grid2>
-                <Grid2 size={2}>
+                </Grid>
+                <Grid size={2}>
                     <TextField required fullWidth multiline rows={5} variant="filled" name="body"
                                label="Body"/>
-                </Grid2>
-                <Grid2 size={2}>
+                </Grid>
+                <Grid size={2}>
                     <FormSaveButton/>
-                </Grid2>
-            </Grid2>
+                </Grid>
+            </Grid>
         </form>)
     );
 }

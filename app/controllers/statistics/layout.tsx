@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, CardContent, Container, Grid2, Stack, Typography} from "@mui/material";
+import {Card, CardContent, Container, Grid, Stack, Typography} from "@mui/material";
 import {getAllTimeHours} from "@/lib/hours";
 import StatisticsTimeSelector from "@/components/Statistics/StatisticsTimeSelector";
 import {Metadata} from "next";
@@ -35,16 +35,16 @@ export default async function Layout({children}: { children: React.ReactNode }) 
     return (
         (<Container maxWidth="lg">
             <Stack direction="column" spacing={2}>
-                <Grid2 container columns={4} spacing={2}>
-                    <Grid2
+                <Grid container columns={4} spacing={2}>
+                    <Grid
                         size={{
                             xs: 4,
                             sm: 2,
                             md: 3
                         }}>
                         <StatisticsTimeSelector controllers={controllers as User[]}/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 4,
                             sm: 2,
@@ -56,11 +56,11 @@ export default async function Layout({children}: { children: React.ReactNode }) 
                                 <Typography variant="h6">{allTimeHours.toFixed(3)} hours</Typography>
                             </CardContent>
                         </Card>
-                    </Grid2>
-                    <Grid2 size={4}>
+                    </Grid>
+                    <Grid size={4}>
                         {children}
-                    </Grid2>
-                </Grid2>
+                    </Grid>
+                </Grid>
             </Stack>
         </Container>)
     );

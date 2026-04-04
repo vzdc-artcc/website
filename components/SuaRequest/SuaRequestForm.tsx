@@ -2,7 +2,7 @@
 import React, {useState} from 'react';
 import {User} from "next-auth";
 import {
-    Grid2,
+    Grid,
     Table,
     TableBody,
     TableCell,
@@ -49,48 +49,48 @@ export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: s
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <form action={handleSubmit}>
                 <input type="hidden" name="userId" value={user.id}/>
-                <Grid2 container columns={2} spacing={2}>
-                    <Grid2
+                <Grid container columns={2} spacing={2}>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotName" label="Your Name"
                                    defaultValue={user.fullName} disabled/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotEmail" label="Your Email"
                                    defaultValue={user.email} disabled/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotCid" label="Your VATSIM CID"
                                    defaultValue={user.cid} disabled/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="afiliation" label="Affiliation" required
                                    helperText="Which organization you are associated with."/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
                         }}>
                         <DateTimePicker ampm={false} label="Start" value={dayjs.utc(start)}
                                         onChange={(d) => setStart(d?.toDate() || new Date())}/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
@@ -99,13 +99,13 @@ export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: s
                                         onChange={(d) => setEnd(d?.toDate() || new Date())}/>
                         <Typography variant="caption" sx={{display: 'block',}}>Must be longer than 30
                             minutes.</Typography>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <TextField fullWidth required multiline rows={5} variant="filled" name="details"
                                    label="Details"
                                    helperText="Include any information that might be helpful to the controller.  You can block airspace below.  Please be concise so our controllers can read it in a timely manner."/>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <Typography variant="subtitle1" gutterBottom>
                             <b>Instructions:</b> Enter the three digit altitude in FL for the bottom and top of each SUA
                             you wish to block. If you do not wish to use a certain SUA, leave the field blank. Enter 000
@@ -149,11 +149,11 @@ export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: s
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <RequestSubmitButton/>
-                    </Grid2>
-                </Grid2>
+                    </Grid>
+                </Grid>
             </form>
         </LocalizationProvider>
     );

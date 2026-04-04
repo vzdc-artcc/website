@@ -1,28 +1,28 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {
     Box,
     Button,
-    MenuItem,
-    Select,
-    SelectChangeEvent,
-    TextField,
-    Typography,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
-    Grid2
+    Grid,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    TextField,
+    Typography
 } from "@mui/material";
-import { DataGrid, GridColDef, GridActionsCellItem } from "@mui/x-data-grid";
+import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import Form from "next/form";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import { Event, EventPosition, User, TmiCategory } from "@prisma/client";
-import { fetchTmis, addTmi, updateTmi, deleteTmi } from "@/actions/tmi";
+import {Event, EventPosition, TmiCategory, User} from "@prisma/client";
+import {addTmi, deleteTmi, fetchTmis, updateTmi} from "@/actions/tmi";
 import TmiDeleteButton from "@/components/EventManager/TmiDeleteButton";
 
 type Props = {
@@ -207,7 +207,7 @@ export default function TmiForm({ admin, event, eventPosition }: Props) {
 
             )}
             <Form action={handleAdd}>
-                    <Grid2 container spacing={2} sx={{ mt: 2 }}>
+                <Grid container spacing={2} sx={{mt: 2}}>
                         <Select
                             value={newCategory}
                             onChange={(e: SelectChangeEvent) => setNewCategory(e.target.value)}
@@ -230,7 +230,7 @@ export default function TmiForm({ admin, event, eventPosition }: Props) {
                             onChange={(e) => setNewText(e.target.value)}
                             name="text"
                         />
-                    </Grid2>
+                </Grid>
                     <div style={{ marginTop: 16 }}>
                         {saveDisabled ? (
                             <Button variant="contained" disabled startIcon={<SaveIcon />} fullWidth>

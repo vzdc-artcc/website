@@ -5,7 +5,7 @@ import vatusa from "@/public/img/vatusa.png";
 import vatsim from "@/public/img/vatsim.png";
 import Image from "next/image";
 import Link from "next/link";
-import getConfig from "next/config";
+import config from '@/package.json' with {type: 'json'};
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import DonationButton from "@/components/Donation/DonationButton";
@@ -14,7 +14,6 @@ const DEV_MODE = process.env['DEV_MODE'] === 'true';
 
 export default async function Footer() {
 
-    const { publicRuntimeConfig } = getConfig();
     const session = await getServerSession(authOptions);
 
     return (
@@ -41,12 +40,12 @@ export default async function Footer() {
                             <Image src={vatsim} alt="VATSIM" height={50}/>
                         </Link>
                     </Stack>
-                    <Tooltip title={`Developed by ${publicRuntimeConfig?.author}`}>
+                    <Tooltip title={`Developed by ${config.author}`}>
                         <Box sx={{mt: 2, textAlign: 'center',}}>
                             <Link href="/changelog" style={{color: 'inherit',textDecoration: 'none'}}>
                                 {DEV_MODE &&
                                     <Typography variant="subtitle2" color="limegreen">Development Build</Typography>}
-                                {!DEV_MODE && <Typography>v{publicRuntimeConfig?.version}</Typography>}
+                                {!DEV_MODE && <Typography>v{config.version}</Typography>}
                             </Link>
                         </Box>
                     </Tooltip>

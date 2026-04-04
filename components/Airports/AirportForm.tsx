@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import {Airport} from "@prisma/client";
-import {Grid2, TextField,} from "@mui/material";
+import {Grid, TextField,} from "@mui/material";
 import {toast} from "react-toastify";
 import {upsertAirport} from "@/actions/airports";
 import {useRouter} from "next/navigation";
@@ -29,39 +29,39 @@ export default function AirportForm({airport, traconGroupId}: { airport?: Airpor
         (<form action={handleSubmit}>
             <input type="hidden" name="traconGroupId" value={traconGroupId}/>
             <input type="hidden" name="id" value={airport?.id}/>
-            <Grid2 container columns={2} spacing={2}>
-                <Grid2
+            <Grid container columns={2} spacing={2}>
+                <Grid
                     size={{
                         xs: 2,
                         sm: 1
                     }}>
                     <TextField fullWidth variant="filled" label="ICAO" name="icao" defaultValue={airport?.icao || ''}/>
-                </Grid2>
-                <Grid2
+                </Grid>
+                <Grid
                     size={{
                         xs: 2,
                         sm: 1
                     }}>
                     <TextField fullWidth variant="filled" label="IATA" name="iata" defaultValue={airport?.iata || ''}/>
-                </Grid2>
-                <Grid2
+                </Grid>
+                <Grid
                     size={{
                         xs: 2,
                         sm: 1
                     }}>
                     <TextField fullWidth variant="filled" label="Name" name="name" defaultValue={airport?.name || ''}/>
-                </Grid2>
-                <Grid2
+                </Grid>
+                <Grid
                     size={{
                         xs: 2,
                         sm: 1
                     }}>
                     <TextField fullWidth variant="filled" label="City" name="city" defaultValue={airport?.city || ''}/>
-                </Grid2>
-                <Grid2 size={2}>
+                </Grid>
+                <Grid size={2}>
                     <FormSaveButton />
-                </Grid2>
-            </Grid2>
+                </Grid>
+            </Grid>
         </form>)
     );
 

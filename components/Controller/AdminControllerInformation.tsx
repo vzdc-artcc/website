@@ -3,7 +3,7 @@ import prisma from "@/lib/db";
 import {notFound} from "next/navigation";
 import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
-import {Card, CardContent, Grid2, Typography} from "@mui/material";
+import {Card, CardContent, Grid, Typography} from "@mui/material";
 import ProfileCard from "@/components/Profile/ProfileCard";
 import DossierForm from "@/components/Dossier/DossierForm";
 import DossierTable from "@/components/Dossier/DossierTable";
@@ -58,15 +58,15 @@ export default async function AdminControllerInformation({cid}: { cid: string, }
     }
 
     return session?.user && (
-        <Grid2 container columns={4} spacing={2}>
-            <Grid2
+        <Grid container columns={4} spacing={2}>
+            <Grid
                 size={{
                     xs: 4,
                     lg: 3
                 }}>
                 <ProfileCard user={controller as User} admin={session.user.roles.includes("STAFF")}/>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 4,
                     lg: 1
@@ -79,8 +79,8 @@ export default async function AdminControllerInformation({cid}: { cid: string, }
                         {session.user.roles.includes("STAFF") && <UserSettingsForm user={controller as User}/>}
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 4,
                     lg: 4
@@ -92,8 +92,8 @@ export default async function AdminControllerInformation({cid}: { cid: string, }
                                   onlyUser={controller as User}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 4,
                     lg: 2
@@ -109,8 +109,8 @@ export default async function AdminControllerInformation({cid}: { cid: string, }
                                       })}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 4,
                     lg: 2
@@ -123,7 +123,7 @@ export default async function AdminControllerInformation({cid}: { cid: string, }
                                            soloCertifications={controller.soloCertifications}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>
+            </Grid>
+        </Grid>
     );
 }

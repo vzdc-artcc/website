@@ -1,7 +1,7 @@
 import React from 'react';
 import prisma from "@/lib/db";
 import {getMonth} from "@/lib/date";
-import {Card, CardContent, Grid2, Typography} from "@mui/material";
+import {Card, CardContent, Grid, Typography} from "@mui/material";
 import {getRating} from "@/lib/vatsim";
 import StatisticsTable from "@/components/Statistics/StatisticsTable";
 import {getMonthLog, getTotalHours} from "@/lib/hours";
@@ -79,8 +79,8 @@ export default async function Page(props: { params: Promise<{ year: string, mont
     const monthLog = getMonthLog(logs);
 
     return (
-        (<Grid2 container columns={30} spacing={2}>
-            <Grid2 size={30}>
+        (<Grid container columns={30} spacing={2}>
+            <Grid size={30}>
                 <Card>
                     <CardContent>
                         <Typography
@@ -91,8 +91,8 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                         <Typography>{parseInt(month) >= 0 && `${getMonth(parseInt(month))}, `}{year} Statistics</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -104,8 +104,8 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                         <Typography variant="h6">{totalHours.deliveryHours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -117,8 +117,8 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                         <Typography variant="h6">{totalHours.groundHours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -130,8 +130,8 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                         <Typography variant="h6">{totalHours.towerHours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -143,8 +143,8 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                         <Typography variant="h6">{totalHours.approachHours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -156,8 +156,8 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                         <Typography variant="h6">{totalHours.centerHours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -170,23 +170,23 @@ export default async function Page(props: { params: Promise<{ year: string, mont
                             variant="h6">{(totalHours.deliveryHours + totalHours.groundHours + totalHours.towerHours + totalHours.approachHours + totalHours.centerHours).toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={30}>
+            </Grid>
+            <Grid size={30}>
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Controlling Sessions</Typography>
                         <ControllingSessionsTable positions={positionsWorked}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            {isNaN(parseInt(month)) && <Grid2 size={30}>
+            </Grid>
+            {isNaN(parseInt(month)) && <Grid size={30}>
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Monthly Totals</Typography>
                         <StatisticsTable heading="Month" logs={monthLog.filter((log) => !!log)}/>
                     </CardContent>
                 </Card>
-            </Grid2>}
-        </Grid2>)
+            </Grid>}
+        </Grid>)
     );
 }

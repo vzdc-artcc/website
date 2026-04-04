@@ -1,9 +1,9 @@
 import React from 'react';
 import prisma from "@/lib/db";
-import {Box, Card, CardContent, Grid2, Stack, Tooltip, Typography} from "@mui/material";
+import {Box, Card, CardContent, Grid, Stack, Tooltip, Typography} from "@mui/material";
 import Link from "next/link";
 import OperatingInitialAssignmentItem from '@/components/OperatingInitials/OperatingInitialAssignmentItem';
-import { User } from 'next-auth';
+import {User} from 'next-auth';
 
 export default async function Page() {
 
@@ -53,11 +53,11 @@ export default async function Page() {
             </Card>
             <Card>
                 <CardContent>
-                    <Grid2 container columns={26} spacing={1}>
+                    <Grid container columns={26} spacing={1}>
                         {allPossibleOperatingInitials.map((initials) => {
                             const inUse = inUseOperatingInitials.find((oi) => oi.operatingInitials === initials);
                             return inUse ? (
-                                <Grid2
+                                <Grid
                                     key={initials}
                                     size={{
                                         xs: 4,
@@ -77,12 +77,12 @@ export default async function Page() {
                                             </Box>
                                         </Link>
                                     </Tooltip>
-                                </Grid2>
+                                </Grid>
                             ) : (
                                 <OperatingInitialAssignmentItem allControllers={allControllers as User[]} initials={initials} key={initials} />
                             );
                         })}
-                    </Grid2>
+                    </Grid>
                 </CardContent>
             </Card>
         </Stack>)
