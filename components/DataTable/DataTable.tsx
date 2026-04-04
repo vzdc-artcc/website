@@ -90,7 +90,11 @@ export default function DataTable<T>(
 
     const handleFilterChange = (newFilters: GridFilterModel) => {
         if (newFilters.quickFilterValues?.join(',')) {
-            const filterCol = columns.find((c) => c.filterable === true || c.filterable === undefined);
+            const filterCol = columns.find((c) => {
+                console.log(c.filterable);
+                return c.filterable === undefined || c.filterable;
+            });
+            console.log(filterCol);
             if (!filterCol) return;
 
             setFilter({
@@ -100,7 +104,7 @@ export default function DataTable<T>(
             });
 
             updateQueryParams({
-                filterField: columns[0].field,
+                filterField: filterCol.field,
                 filterValue: newFilters.quickFilterValues.join(','),
                 filterOperator: 'contains',
             });

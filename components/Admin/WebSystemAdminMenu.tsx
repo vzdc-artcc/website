@@ -1,10 +1,7 @@
 import React from 'react';
 import {ListItemButton, ListItemIcon, ListItemText,} from "@mui/material";
 import Link from "next/link";
-import {
-    Home,
-    SettingsApplications,
-} from "@mui/icons-material";
+import {Home, SettingsApplications,} from "@mui/icons-material";
 import prisma from "@/lib/db";
 import MenuWrapper from './MenuWrapper';
 
@@ -24,7 +21,7 @@ export default async function WebSystemAdminMenu() {
 
     return (
         <MenuWrapper
-            title="Web-System Administration"
+            title="Web System Administration"
             subheadings={[
                 `WM: ${wmName}`,
             ]}
