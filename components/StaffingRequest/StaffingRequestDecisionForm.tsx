@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {StaffingRequest} from "@prisma/client";
+import {StaffingRequest} from "@/generated/prisma/browser";
 import StaffingRequestDecisionButton from "@/components/StaffingRequest/StaffingRequestDecisionButton";
 import {Typography} from "@mui/material";
 import Link from "next/link";

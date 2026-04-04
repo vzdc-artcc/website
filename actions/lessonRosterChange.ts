@@ -3,7 +3,7 @@
 import prisma from "@/lib/db";
 import {log} from "@/actions/log";
 import {z} from "zod";
-import {CertificationOption} from "@prisma/client";
+import {CertificationOption} from "@/generated/prisma/client";
 import {revalidatePath} from "next/cache";
 
 export const createOrUpdateLessonRosterChange = async (formData: FormData) => {

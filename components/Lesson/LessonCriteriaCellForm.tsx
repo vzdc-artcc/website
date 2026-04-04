@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {Lesson, LessonRubricCell, LessonRubricCriteria} from "@prisma/client";
+import {Lesson, LessonRubricCell, LessonRubricCriteria} from "@/generated/prisma/browser";
 import {Grid, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {createOrUpdateLessonCriteriaCell} from "@/actions/lessonCriteriaCell";

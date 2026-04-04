@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import {toast} from "react-toastify";
 import {IconButton} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-import {LessonRubricCriteria} from "@prisma/client";
+import {LessonRubricCriteria} from "@/generated/prisma/browser";
 import {deleteLessonRubricCriteria} from "@/actions/lessonRubricCriteria";
 
 export default function LessonRubricCriteriaDeleteButton({rubricCriteria}: { rubricCriteria: LessonRubricCriteria, }) {

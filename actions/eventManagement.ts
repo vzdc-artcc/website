@@ -1,13 +1,13 @@
 'use server';
 
 import prisma from "@/lib/db";
-import { after } from "next/server";
-import { log } from "./log";
-import { User as NAUser } from "next-auth";
-import { Event } from "@prisma/client";
-import { revalidatePath } from "next/cache";
-import { sendEventPositionEmail, sendEventPositionRemovalEmail, sendEventPostedEmail } from "./mail/event";
-import { UTApi } from "uploadthing/server";
+import {after} from "next/server";
+import {log} from "./log";
+import {User as NAUser} from "next-auth";
+import {Event} from "@/generated/prisma/client";
+import {revalidatePath} from "next/cache";
+import {sendEventPositionEmail, sendEventPositionRemovalEmail, sendEventPostedEmail} from "./mail/event";
+import {UTApi} from "uploadthing/server";
 
 const ut = new UTApi();
 

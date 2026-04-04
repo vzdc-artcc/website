@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {Lesson, TrainingAppointment} from "@prisma/client";
+import {Lesson, TrainingAppointment} from "@/generated/prisma/browser";
 import {User} from "next-auth";
 import {Visibility} from "@mui/icons-material";
 import {GridActionsCellItem} from "@mui/x-data-grid";

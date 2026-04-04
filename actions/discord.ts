@@ -1,12 +1,10 @@
 'use server';
-import {Event, PrismaClient} from '@prisma/client';
+import {Event} from '@/generated/prisma/client';
 import {getServerSession} from 'next-auth';
 import {authOptions} from "@/auth/auth";
 import {log} from "@/actions/log";
 import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
-
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/db";
 
 const BOT_API_BASE_URL = process.env.BOT_API_BASE_URL || 'http://localhost:5500';
 const BOT_API_SECRET_KEY = process.env.BOT_API_SECRET_KEY || '1234';

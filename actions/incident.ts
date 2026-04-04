@@ -5,7 +5,7 @@ import prisma from "@/lib/db";
 import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {revalidatePath} from "next/cache";
-import {IncidentReport, Prisma} from "@prisma/client";
+import {IncidentReport, Prisma} from "@/generated/prisma/client";
 import {sendIncidentReportClosedEmail} from "@/actions/mail/incident";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
 

@@ -5,7 +5,7 @@ import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import ProgressionAssignmentForm from "@/components/ProgressionAssignment/ProgressionAssignmentForm";
 import prisma from "@/lib/db";
-import {TrainingProgression} from "@prisma/client";
+import {TrainingProgression} from "@/generated/prisma/client";
 
 export default async function Page() {
 

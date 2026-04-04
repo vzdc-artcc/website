@@ -1,10 +1,10 @@
 'use client';
 import React, {useState} from 'react';
-import {Version} from "@prisma/client";
+import {Version} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
 import {IconButton} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-import { deleteChangeLog } from '@/actions/changeLog';
+import {deleteChangeLog} from '@/actions/changeLog';
 
 export default function TrainingSessionDeleteButton({changeLog}: { changeLog: Version, }) {
     const [clicked, setClicked] = useState(false);

@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {OtsRecommendation} from "@prisma/client";
+import {OtsRecommendation} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
 import {IconButton, Tooltip} from "@mui/material";
 import {Delete} from "@mui/icons-material";

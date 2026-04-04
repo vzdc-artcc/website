@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {FileCategory} from "@prisma/client";
+import {FileCategory} from "@/generated/prisma/browser";
 import {TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {toast} from "react-toastify";

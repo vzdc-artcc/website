@@ -2,7 +2,7 @@
 import React from 'react';
 import {getGridSingleSelectOperators, GridColDef} from "@mui/x-data-grid";
 import {fetchLogs} from "@/actions/log";
-import {LogModel, LogType} from "@prisma/client";
+import {LogModel, LogType} from "@/generated/prisma/browser";
 import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
 
 export default function LogTable({onlyModels}: { onlyModels?: LogModel[], }) {

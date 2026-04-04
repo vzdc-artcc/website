@@ -3,7 +3,7 @@ import React from 'react';
 import dayGridPlugin from "@fullcalendar/daygrid";
 import FullCalendar from "@fullcalendar/react";
 import {useRouter} from "next/navigation";
-import {EventType} from '@prisma/client';
+import {EventType} from '@/generated/prisma/browser';
 import dayjs from "dayjs";
 
 export default function EventCalendar({events, timeZone}: { events: any[], timeZone: string, }) {

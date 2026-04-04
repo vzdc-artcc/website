@@ -1,16 +1,12 @@
 'use server';
 
 import prisma from "@/lib/db";
-import { GridPaginationModel } from "@mui/x-data-grid";
-
-import { GridSortModel } from "@mui/x-data-grid";
-
-import { GridFilterItem } from "@mui/x-data-grid";
-import { Prisma } from "@prisma/client";
-import { after } from "next/server";
-import { log } from "./log";
-import { z } from "zod";
-import { revalidatePath } from "next/cache";
+import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
+import {Prisma} from "@/generated/prisma/client";
+import {after} from "next/server";
+import {log} from "./log";
+import {z} from "zod";
+import {revalidatePath} from "next/cache";
 
 export const fetchEventPresets = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
 

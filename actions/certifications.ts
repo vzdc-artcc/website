@@ -1,6 +1,6 @@
 'use server';
 
-import {Certification} from "@prisma/client";
+import {Certification} from "@/generated/prisma/client";
 import prisma from "@/lib/db";
 import {revalidatePath} from "next/cache";
 import {writeDossier} from "@/actions/dossier";

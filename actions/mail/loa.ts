@@ -1,7 +1,7 @@
 'use server';
 
 import {User} from "next-auth";
-import {LOA} from "@prisma/client";
+import {LOA} from "@/generated/prisma/client";
 import {FROM_EMAIL, mailTransport} from "@/lib/email";
 import {loaApproved} from "@/templates/LOA/LoaApproved";
 import {loaDenied} from "@/templates/LOA/LoaDenied";

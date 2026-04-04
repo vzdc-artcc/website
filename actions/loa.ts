@@ -6,14 +6,9 @@ import {getServerSession, User} from "next-auth";
 import {authOptions} from "@/auth/auth";
 import {log} from "@/actions/log";
 import {revalidatePath} from "next/cache";
-import {
-    sendLoaApprovedEmail,
-    sendLoaDeletedEmail,
-    sendLoaDeniedEmail,
-    sendLoaExpiredEmail,
-} from "@/actions/mail/loa";
+import {sendLoaApprovedEmail, sendLoaDeletedEmail, sendLoaDeniedEmail, sendLoaExpiredEmail,} from "@/actions/mail/loa";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {LOAStatus, Prisma} from "@prisma/client";
+import {LOAStatus, Prisma} from "@/generated/prisma/client";
 
 export const createOrUpdateLoa = async (formData: FormData) => {
     const loaZ = z.object({

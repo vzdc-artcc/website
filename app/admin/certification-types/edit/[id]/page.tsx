@@ -1,5 +1,5 @@
 import React from 'react';
-import {CertificationType} from "@prisma/client";
+import {CertificationType} from "@/generated/prisma/client";
 import prisma from "@/lib/db";
 import {Box, Card, CardContent, IconButton, Stack, Tooltip, Typography} from "@mui/material";
 import Link from "next/link";

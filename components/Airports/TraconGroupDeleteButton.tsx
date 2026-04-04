@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {TraconGroup} from "@prisma/client";
+import {TraconGroup} from "@/generated/prisma/browser";
 import {deleteTraconGroup} from "@/actions/airports";
 import {toast} from "react-toastify";
 import {IconButton, Tooltip} from "@mui/material";

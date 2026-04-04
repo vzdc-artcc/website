@@ -1,5 +1,5 @@
 import React from 'react';
-import {Feedback, FeedbackStatus} from "@prisma/client";
+import {Feedback, FeedbackStatus} from "@/generated/prisma/browser";
 import {Card, CardContent, Chip, Grid, Rating, Stack, Typography} from "@mui/material";
 import FeedbackDecisionForm from "@/components/Feedback/FeedbackDecisionForm";
 

@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {PerformanceIndicatorCriteriaCategory} from "@prisma/client";
+import {PerformanceIndicatorCriteriaCategory} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
 import {IconButton} from "@mui/material";
 import {Delete} from "@mui/icons-material";

@@ -2,7 +2,7 @@
 import React from 'react';
 import {User} from "next-auth";
 import {Autocomplete, FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@mui/material";
-import {CertificationType} from "@prisma/client";
+import {CertificationType} from "@/generated/prisma/browser";
 import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";

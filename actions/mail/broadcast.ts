@@ -2,7 +2,7 @@
 
 import {User} from "next-auth";
 import {FROM_EMAIL, mailTransport} from "@/lib/email";
-import {ChangeBroadcast} from "@prisma/client";
+import {ChangeBroadcast} from "@/generated/prisma/client";
 import {broadcastPosted} from "@/templates/Broadcast/BroadcastPosted";
 
 export const sendBroadcastPostedEmail = async (broadcast: ChangeBroadcast, users: User[]) => {

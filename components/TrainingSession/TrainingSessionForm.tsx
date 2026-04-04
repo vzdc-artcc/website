@@ -9,7 +9,7 @@ import {
     TrainingSessionPerformanceIndicator,
     TrainingSessionPerformanceIndicatorCategory,
     TrainingSessionPerformanceIndicatorCriteria
-} from "@prisma/client";
+} from "@/generated/prisma/browser";
 import {getAllData, getTicketsForSession} from "@/actions/trainingSessionFormHelper";
 import {
     Accordion,

@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {ChangeBroadcast, File} from "@prisma/client";
+import {ChangeBroadcast, File} from "@/generated/prisma/browser";
 import Form from "next/form";
 import {Autocomplete, FormControlLabel, Grid, Switch, TextField, Typography} from "@mui/material";
 import {MailGroup} from "@/app/admin/mail/page";

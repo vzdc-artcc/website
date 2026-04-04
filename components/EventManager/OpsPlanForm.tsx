@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import {Autocomplete, Grid2, TextField, Box, Typography, Button, Divider} from "@mui/material";
 import {getRating} from "@/lib/vatsim";
 import {fetchAllUsers} from "@/actions/eventPosition";
-import {User} from "@prisma/client";
+import {Event, EventPosition, User} from "@/generated/prisma/browser";
 import Form from "next/form";
 import {toast} from "react-toastify";
 import FormSaveButton from "../Form/FormSaveButton";

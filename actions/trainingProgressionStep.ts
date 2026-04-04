@@ -1,7 +1,7 @@
 'use server';
 
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {Prisma, TrainingProgression} from "@prisma/client";
+import {Prisma, TrainingProgression} from "@/generated/prisma/client";
 import prisma from "@/lib/db";
 import {log} from "@/actions/log";
 import {revalidatePath} from "next/cache";

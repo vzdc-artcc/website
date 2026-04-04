@@ -1,5 +1,5 @@
 import React from 'react';
-import {ControllerPosition} from "@prisma/client";
+import {ControllerPosition} from "@/generated/prisma/browser";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
 import {formatZuluDate, getDuration} from "@/lib/date";
 

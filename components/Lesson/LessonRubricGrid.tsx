@@ -1,5 +1,5 @@
 import React from 'react';
-import {RubricCriteraScore} from "@prisma/client";
+import {RubricCriteraScore} from "@/generated/prisma/browser";
 import prisma from "@/lib/db";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip} from "@mui/material";
 import Markdown from "react-markdown";

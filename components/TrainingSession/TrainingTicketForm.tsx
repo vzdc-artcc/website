@@ -1,6 +1,6 @@
 'use client';
 import React, {useCallback, useEffect} from 'react';
-import {Lesson, LessonRubricCell, LessonRubricCriteria, RubricCriteraScore} from "@prisma/client";
+import {Lesson, LessonRubricCell, LessonRubricCriteria, RubricCriteraScore} from "@/generated/prisma/browser";
 import {Alert, Autocomplete, Button, CircularProgress, Grid, TextField} from "@mui/material";
 import LessonRubricGridInteractive from "@/components/Lesson/LessonRubricGridInteractive";
 import {getCriteriaForLesson} from "@/actions/trainingSessionFormHelper";

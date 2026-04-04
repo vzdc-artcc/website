@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {Lesson} from "@prisma/client";
+import {Lesson} from "@/generated/prisma/browser";
 import {Box, FormControlLabel, FormGroup, Grid, MenuItem, Switch, TextField, Typography, useTheme} from "@mui/material";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import {createOrUpdateLessonDetails} from "@/actions/lesson";

@@ -16,7 +16,7 @@ import {
 import {getChipColor, getMinutesAgo, getMonth, getTimeAgo, getTimeIn} from "@/lib/date";
 import prisma from "@/lib/db";
 import {TRAINING_ONLY_LOG_MODELS} from "@/lib/log";
-import {Lesson} from "@prisma/client";
+import {Lesson} from "@/generated/prisma/client";
 import {Info, PendingOutlined} from "@mui/icons-material";
 
 const TRAINING_ENVIRONMENTS = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["ERR-CONFIG"];

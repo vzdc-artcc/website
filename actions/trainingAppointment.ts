@@ -8,7 +8,7 @@ import {revalidatePath} from "next/cache";
 import {log} from "@/actions/log";
 import {formatZuluDate} from "@/lib/date";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {Prisma} from "@prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 import {
     sendTrainingAppointmentCanceledEmail,
     sendTrainingAppointmentCancelledTrainerEmail,

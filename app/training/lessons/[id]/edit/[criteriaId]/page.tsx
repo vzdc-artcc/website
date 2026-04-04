@@ -15,7 +15,7 @@ import {
     Typography
 } from "@mui/material";
 import LessonRubricCriteriaForm from "@/components/Lesson/LessonRubricCriteriaForm";
-import {LessonRubricCriteria} from "@prisma/client";
+import {LessonRubricCriteria} from "@/generated/prisma/client";
 import Link from "next/link";
 import {ArrowBack, Edit} from "@mui/icons-material";
 import LessonCriteriaCellDeleteButton from "@/components/Lesson/LessonCriteriaCellDeleteButton";

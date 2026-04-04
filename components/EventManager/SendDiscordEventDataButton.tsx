@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {Event} from "@prisma/client";
+import {Event} from "@/generated/prisma/browser";
 import {Button, ButtonGroup, Tooltip} from "@mui/material";
 import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
 import {toast} from "react-toastify";

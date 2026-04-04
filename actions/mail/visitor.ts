@@ -3,7 +3,7 @@
 import {User} from "next-auth";
 import {FROM_EMAIL, mailTransport} from "@/lib/email";
 import {visitorAccepted} from "@/templates/Visitor/VisitorAccepted";
-import {VisitorApplication} from "@prisma/client";
+import {VisitorApplication} from "@/generated/prisma/client";
 import {visitorRejected} from "@/templates/Visitor/VisitorRejected";
 
 export const sendVisitorApplicationAcceptedEmail = async (user: User) => {

@@ -1,6 +1,6 @@
 'use server';
 
-import {CertificationOption} from "@prisma/client";
+import {CertificationOption} from "@/generated/prisma/client";
 import {z} from "zod";
 import prisma from "@/lib/db";
 import {revalidatePath} from "next/cache";

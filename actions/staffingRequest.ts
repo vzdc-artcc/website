@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from "@/lib/db";
-import {Prisma, StaffingRequest} from "@prisma/client";
+import {Prisma, StaffingRequest} from "@/generated/prisma/client";
 import {log} from "@/actions/log";
 import {revalidatePath} from "next/cache";
 import {z} from "zod";

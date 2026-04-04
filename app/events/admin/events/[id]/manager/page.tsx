@@ -8,7 +8,7 @@ import EventPositionRequestForm from "@/components/EventPosition/EventPositionRe
 import prisma from "@/lib/db";
 import {ExpandMore} from "@mui/icons-material";
 import {Accordion, AccordionDetails, AccordionSummary, Paper, Stack, Typography} from "@mui/material";
-import {EventPosition, SoloCertification, User} from "@prisma/client";
+import {EventPosition, SoloCertification, User} from "@/generated/prisma/client";
 import {getServerSession} from "next-auth";
 import {notFound} from "next/navigation";
 import OpsPlanForm from "@/components/EventManager/OpsPlanForm";
@@ -26,22 +26,20 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
     const { id } = await params;
 
-    const eventInclude: any = {};
-    eventInclude.positions = {
-        include: {
-            user: true,
-        },
-        orderBy: {
-            submittedAt: 'asc',
-        },
-    };
-    eventInclude.opsPlanner = true;
-
-    const event: any = await prisma.event.findUnique({
+    const event = await prisma.event.findUnique({
         where: {
             id,
         },
-        include: eventInclude,
+        include: {
+            positions: {
+                include: {
+                    user: true,
+                },
+                orderBy: {
+                    submittedAt: 'asc',
+                }
+            },
+        },
     });
 
     if (!event) {
@@ -50,13 +48,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
     const session = await getServerSession(authOptions);
 
-    const positions: EventPositionWithSolo[] = (await Promise.all(((event.positions || []) as any[]).map(async (position: any) => {
+    const positions: EventPositionWithSolo[] = (await Promise.all(event.positions.map(async (position) => {
         if (!position.user) {
             return { ...position, soloCert: undefined, user: undefined };
         }
         const soloCert = await getSoloCertification(position.user);
         return { ...position, soloCert };
-    }))).sort((a: EventPositionWithSolo, b: EventPositionWithSolo) => (a.user?.lastName || '').localeCompare(b.user?.lastName || ''));
+    }))).sort((a, b) => (a.user?.lastName || '').localeCompare(b.user?.lastName || ''));
 
     return session?.user && (
         <Stack spacing={2}>
@@ -78,7 +76,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     <Typography variant="h6" gutterBottom>OPS Plan</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <OpsPlanForm event={event as any} admin currentUser={session.user as User} />
+                    <OpsPlanForm event={event} admin currentUser={session.user as User} />
                 </AccordionDetails>
             </Accordion>
 

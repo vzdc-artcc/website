@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingSessionPerformanceIndicatorCriteria} from "@prisma/client";
+import {TrainingSessionPerformanceIndicatorCriteria} from "@/generated/prisma/browser";
 import {
     Button,
     Dialog,

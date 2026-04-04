@@ -25,7 +25,7 @@ import {
 } from "@mui/material";
 import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import {Event, EventType} from "@prisma/client";
+import {Event, EventType} from "@/generated/prisma/browser";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import dayjs, {Dayjs} from "dayjs";
 import utc from "dayjs/plugin/utc";

@@ -1,9 +1,9 @@
 'use client';
 
-import { toggleEventArchived } from "@/actions/eventManagement";
-import { Button } from "@mui/material";
-import { Event } from "@prisma/client";
-import { toast } from "react-toastify";
+import {toggleEventArchived} from "@/actions/eventManagement";
+import {Button} from "@mui/material";
+import {Event} from "@/generated/prisma/browser";
+import {toast} from "react-toastify";
 
 export default function ArchiveToggleButton({ event }: { event: Event,}) {
     

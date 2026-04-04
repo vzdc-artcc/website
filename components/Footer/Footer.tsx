@@ -42,11 +42,9 @@ export default async function Footer() {
                     </Stack>
                     <Tooltip title={`Developed by ${config.author}`}>
                         <Box sx={{mt: 2, textAlign: 'center',}}>
-                            <Link href="/changelog" style={{color: 'inherit',textDecoration: 'none'}}>
-                                {DEV_MODE &&
-                                    <Typography variant="subtitle2" color="limegreen">Development Build</Typography>}
-                                {!DEV_MODE && <Typography>v{config.version}</Typography>}
-                            </Link>
+                            {DEV_MODE &&
+                                <Typography variant="subtitle2" color="limegreen">Development Build</Typography>}
+                            {!DEV_MODE && <Typography>v{config.version}</Typography>}
                         </Box>
                     </Tooltip>
                     <Box sx={{textAlign: 'center', my: 2,}}>

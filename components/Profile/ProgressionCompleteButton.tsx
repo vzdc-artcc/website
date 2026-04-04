@@ -1,10 +1,10 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingProgression} from "@prisma/client";
+import {TrainingProgression} from "@/generated/prisma/browser";
 import {User} from "next-auth";
 import {Done} from "@mui/icons-material";
 import {assignNextProgressionOrRemove} from "@/actions/progressionAssignment";
-import LoadingButton from "@mui/lab/LoadingButton";
+import {Button} from "@mui/material";
 
 export default function ProgressionCompleteButton({user, progression}: {
     user: User,
@@ -19,7 +19,7 @@ export default function ProgressionCompleteButton({user, progression}: {
     }
 
     return (
-        <LoadingButton variant="contained" size="large" color="success" startIcon={<Done/>} loading={loading}
-                       onClick={handleClick}>Complete Progression</LoadingButton>
+        <Button variant="contained" size="large" color="success" startIcon={<Done/>} loading={loading}
+                onClick={handleClick}>Complete Progression</Button>
     );
 }

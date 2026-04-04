@@ -6,7 +6,7 @@ import Form from "next/form";
 import {toast} from "react-toastify";
 import FormSaveButton from "../Form/FormSaveButton";
 import MarkdownEditor from "@uiw/react-markdown-editor";
-import {Event, EventPosition, User} from "@prisma/client";
+import {Event, EventPosition, User} from "@/generated/prisma/browser";
 import {saveOpsPlanFreeText} from "@/actions/eventPosition";
 
 export default function OpsPlanFreeTextForm({

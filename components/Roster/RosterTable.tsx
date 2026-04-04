@@ -6,7 +6,7 @@ import {getRating} from "@/lib/vatsim";
 import {getIconForCertificationOption} from "@/lib/certification";
 import {getChips} from "@/lib/staffPositions";
 import Link from "next/link";
-import {LOA} from "@prisma/client";
+import {LOA} from "@/generated/prisma/browser";
 
 const VATUSA_FACILITY = process.env.VATUSA_FACILITY || 'ZDC';
 

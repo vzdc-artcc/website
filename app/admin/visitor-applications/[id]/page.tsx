@@ -3,7 +3,7 @@ import prisma from "@/lib/db";
 import {notFound} from "next/navigation";
 import {Card, CardContent, Chip, Grid, Stack, Typography} from "@mui/material";
 import VisitorApplicationDecisionForm from "@/components/VisitorApplication/VisitorApplicationDecisionForm";
-import {VisitorApplicationStatus} from "@prisma/client";
+import {VisitorApplicationStatus} from "@/generated/prisma/client";
 import {getRating} from "@/lib/vatsim";
 import {User} from "next-auth";
 

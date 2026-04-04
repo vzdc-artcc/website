@@ -10,7 +10,7 @@ import TrainingAssignmentDeleteButton from "@/components/TrainingAssignment/Trai
 import {useRouter} from "next/navigation";
 import {getRating} from "@/lib/vatsim";
 import Link from "next/link";
-import {Lesson} from "@prisma/client";
+import {Lesson} from "@/generated/prisma/browser";
 import {formatTimezoneDate, formatZuluDate, getTimeAgo, getTimeIn} from "@/lib/date";
 import {toast} from "react-toastify";
 

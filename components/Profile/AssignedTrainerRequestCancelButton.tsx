@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingAssignmentRequest} from "@prisma/client";
+import {TrainingAssignmentRequest} from "@/generated/prisma/browser";
 import {Button} from "@mui/material";
 import {toast} from "react-toastify";
 import {cancelTrainingAssignmentRequest} from "@/actions/trainingAssignmentRequest";

@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {Lesson, LessonRubricCriteria} from "@prisma/client";
+import {Lesson, LessonRubricCriteria} from "@/generated/prisma/browser";
 import {Box, Grid, TextField, Typography, useTheme} from "@mui/material";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import FormSaveButton from "@/components/Form/FormSaveButton";

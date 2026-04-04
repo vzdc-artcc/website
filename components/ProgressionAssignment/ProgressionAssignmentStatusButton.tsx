@@ -18,7 +18,7 @@ import {
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {ArrowDownward, Done, QueryStats} from "@mui/icons-material";
 import {getProgressionStatus, TrainingProgressionStepStatus} from "@/actions/progressionAssignment";
-import {TrainingProgression, TrainingProgressionStep} from "@prisma/client";
+import {TrainingProgression, TrainingProgressionStep} from "@/generated/prisma/browser";
 import {formatZuluDate} from "@/lib/date";
 import Link from "next/link";
 

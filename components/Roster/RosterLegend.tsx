@@ -1,6 +1,6 @@
 import React from 'react';
 import {Grid, Stack, Typography} from "@mui/material";
-import {CertificationOption} from "@prisma/client";
+import {CertificationOption} from "@/generated/prisma/browser";
 import {getIconForCertificationOption} from "@/lib/certification";
 
 function RosterLegend() {

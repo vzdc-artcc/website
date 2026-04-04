@@ -5,7 +5,7 @@ import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@
 import {fetchSoloCertifications} from "@/actions/solo";
 import SoloCertificationDeleteButton from "@/components/SoloCertification/SoloCertificationDeleteButton";
 import {formatZuluDate} from "@/lib/date";
-import {CertificationType} from "@prisma/client";
+import {CertificationType} from "@/generated/prisma/browser";
 import {Chip, Tooltip} from "@mui/material";
 import Link from "next/link";
 

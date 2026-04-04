@@ -6,7 +6,7 @@ import {authOptions} from "@/auth/auth";
 import {log} from "@/actions/log";
 import {revalidatePath} from "next/cache";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {Prisma} from "@prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 import {sendReleaseRequestApprovedEmail} from "@/actions/mail/training";
 
 export const releaseTrainingAssignment = async (student?: User) => {

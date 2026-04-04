@@ -24,7 +24,7 @@ import {formatTimezoneDate, formatZuluDate} from '@/lib/date';
 import {getServerSession} from 'next-auth';
 import {authOptions} from '@/auth/auth';
 import EventPositionRequestForm from '@/components/EventPosition/EventPositionRequestForm';
-import {User} from '@prisma/client';
+import {User} from '@/generated/prisma/client';
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {
 

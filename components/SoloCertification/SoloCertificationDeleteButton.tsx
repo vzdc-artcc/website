@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {SoloCertification} from "@prisma/client";
+import {SoloCertification} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
 import {Tooltip} from "@mui/material";
 import {Delete} from "@mui/icons-material";

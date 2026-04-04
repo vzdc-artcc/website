@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {DiscordCategory} from "@prisma/client";
+import {DiscordCategory} from "@/generated/prisma/browser";
 import {Grid, TextField,} from "@mui/material";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";

@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {DiscordConfig} from "@prisma/client";
+import {DiscordConfig} from "@/generated/prisma/browser";
 import {Stack, TextField} from "@mui/material";
 import {toast} from "react-toastify";
 import FormSaveButton from "@/components/Form/FormSaveButton";

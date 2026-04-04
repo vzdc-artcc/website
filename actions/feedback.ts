@@ -1,7 +1,7 @@
 'use server';
 
 import {z} from "zod";
-import {Feedback, FeedbackStatus, Prisma} from "@prisma/client";
+import {Feedback, FeedbackStatus, Prisma} from "@/generated/prisma/client";
 import prisma from "@/lib/db";
 import {revalidatePath} from "next/cache";
 import {log} from "@/actions/log";

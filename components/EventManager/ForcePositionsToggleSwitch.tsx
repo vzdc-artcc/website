@@ -1,9 +1,7 @@
 'use client';
-import { toggleManualPositionOpen } from "@/actions/eventPosition";
-import { FormControlLabel } from "@mui/material";
-
-import { Switch } from "@mui/material";
-import { Event } from "@prisma/client";
+import {toggleManualPositionOpen} from "@/actions/eventPosition";
+import {FormControlLabel, Switch} from "@mui/material";
+import {Event} from "@/generated/prisma/browser";
 
 export default function ForcePositionsToggleSwitch({ event }: { event: Event }) {
     return (

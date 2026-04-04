@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {SuaBlock} from "@prisma/client";
+import {SuaBlock} from "@/generated/prisma/browser";
 import {Delete} from "@mui/icons-material";
 import {Button} from "@mui/material";
 import {deleteSuaRequest} from "@/actions/sua";

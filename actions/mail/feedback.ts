@@ -1,7 +1,7 @@
 'use server';
 import {User} from "next-auth";
 import {FROM_EMAIL, mailTransport} from "@/lib/email";
-import {Feedback} from "@prisma/client";
+import {Feedback} from "@/generated/prisma/client";
 import {newFeedback} from "@/templates/Feedback/NewFeedback";
 
 export const sendNewFeedbackEmail = async (controller: User, feedback: Feedback) => {

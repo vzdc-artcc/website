@@ -3,7 +3,7 @@ import {publishEventPosition, unpublishEventPosition, validateFinalEventPosition
 import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
 import {ZodErrorSlimResponse} from "@/types";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
-import {Event,} from "@prisma/client";
+import {Event,} from "@/generated/prisma/browser";
 import {User} from "next-auth";
 import {useState} from "react";
 import {toast} from "react-toastify";

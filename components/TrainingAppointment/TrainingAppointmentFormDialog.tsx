@@ -20,7 +20,7 @@ import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import dayjs, {Dayjs} from "dayjs";
 import utc from "dayjs/plugin/utc";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import {Lesson} from "@prisma/client";
+import {Lesson} from "@/generated/prisma/browser";
 import {createOrUpdateTrainingAppointment} from "@/actions/trainingAppointment";
 import {toast} from "react-toastify";
 import {formatZuluDate} from "@/lib/date";

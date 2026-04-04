@@ -1,6 +1,6 @@
 'use server';
 
-import {Role, StaffPosition} from "@prisma/client";
+import {Role, StaffPosition} from "@/generated/prisma/client";
 import {z} from "zod";
 import prisma from "@/lib/db";
 import {getServerSession} from "next-auth";

@@ -4,7 +4,7 @@
 import prisma from "@/lib/db";
 import {z} from "zod";
 import {revalidatePath} from "next/cache";
-import {Prisma} from '@prisma/client'
+import {Prisma} from '@/generated/prisma/client'
 
 export async function createChangeLog(versionNumber: string, changeLogDetails: string, id?: string) {
 

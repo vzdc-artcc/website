@@ -1,6 +1,6 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {Lesson, PerformanceIndicatorTemplate} from "@prisma/client";
+import {Lesson, PerformanceIndicatorTemplate} from "@/generated/prisma/browser";
 import Form from "next/form";
 import {Autocomplete, Box, CircularProgress, TextField} from "@mui/material";
 import {fetchAllPerformanceIndicators, getLessonPerformanceIndicator} from "@/actions/performanceIndicator";

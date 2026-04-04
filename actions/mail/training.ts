@@ -1,6 +1,6 @@
 'use server';
 
-import {Lesson, OtsRecommendation, TrainingSession} from "@prisma/client";
+import {Lesson, OtsRecommendation, TrainingSession} from "@/generated/prisma/client";
 import {User} from "next-auth";
 import {FROM_EMAIL, mailTransport} from "@/lib/email";
 import {trainingSessionCreated} from "@/templates/TrainingSession/TrainingSessionCreated";

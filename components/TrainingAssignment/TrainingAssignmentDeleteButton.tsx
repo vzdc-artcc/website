@@ -1,6 +1,6 @@
 'use client'
 import React, {useState} from 'react';
-import {TrainingAssignment} from "@prisma/client";
+import {TrainingAssignment} from "@/generated/prisma/browser";
 import {useRouter} from "next/navigation";
 import {toast} from "react-toastify";
 import {IconButton, Tooltip} from "@mui/material";

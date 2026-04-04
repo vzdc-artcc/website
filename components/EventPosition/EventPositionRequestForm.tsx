@@ -3,7 +3,7 @@ import {Autocomplete, Button, Grid, TextField, Typography} from "@mui/material";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
-import {Event, EventPosition, User} from "@prisma/client";
+import {Event, EventPosition, User} from "@/generated/prisma/browser";
 import dayjs, {Dayjs} from "dayjs";
 import utc from "dayjs/plugin/utc";
 import Form from "next/form";

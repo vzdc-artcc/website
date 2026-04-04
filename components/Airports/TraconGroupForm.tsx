@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {TraconGroup} from "@prisma/client";
+import {TraconGroup} from "@/generated/prisma/browser";
 import {Stack, TextField} from "@mui/material";
 import {toast} from "react-toastify";
 import {upsertTraconGroup} from "@/actions/airports";

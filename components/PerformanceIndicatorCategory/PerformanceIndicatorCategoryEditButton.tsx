@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {PerformanceIndicatorCriteriaCategory, PerformanceIndicatorTemplate} from "@prisma/client";
+import {PerformanceIndicatorCriteriaCategory, PerformanceIndicatorTemplate} from "@/generated/prisma/browser";
 import {Dialog, DialogContent, DialogTitle, IconButton} from "@mui/material";
 import {Edit} from "@mui/icons-material";
 import PerformanceIndicatorCategoryForm

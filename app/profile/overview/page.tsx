@@ -12,7 +12,7 @@ import prisma from "@/lib/db";
 import LoaDeleteButton from "@/components/LOA/LoaDeleteButton";
 import Link from "next/link";
 import {Edit} from "@mui/icons-material";
-import {LOAStatus} from "@prisma/client";
+import {LOAStatus} from "@/generated/prisma/client";
 import AssignedTrainersCard from "@/components/Profile/AssignedTrainersCard";
 import ProgressionCard from "@/components/Profile/ProgressionCard";
 import {formatTimezoneDate, getTimeIn} from "@/lib/date";

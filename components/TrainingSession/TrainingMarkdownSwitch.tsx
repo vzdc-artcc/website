@@ -1,7 +1,7 @@
 import React from 'react';
 import {Card, CardContent, Typography,} from "@mui/material";
 import Markdown from "react-markdown";
-import {TrainingSession} from "@prisma/client"
+import {TrainingSession} from "@/generated/prisma/browser"
 
 export default function TrainingMarkdownSwitch({trainingSession, trainerView}: { trainingSession:TrainingSession ,trainerView?: boolean }){
 

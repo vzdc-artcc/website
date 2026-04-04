@@ -1,7 +1,7 @@
-import { Accordion, AccordionDetails, AccordionSummary, Card, CardContent, Typography } from "@mui/material";
-import { Event, User } from "@prisma/client";
+import {Accordion, AccordionDetails, AccordionSummary, Typography} from "@mui/material";
+import {Event, User} from "@/generated/prisma/browser";
 import EventPositionRequestForm from "../EventPosition/EventPositionRequestForm";
-import { ExpandMore } from "@mui/icons-material";
+import {ExpandMore} from "@mui/icons-material";
 
 export default function ManualControllerAddForm({ event, user }: { event: Event, user: User}) {
 

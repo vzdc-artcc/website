@@ -1,7 +1,7 @@
 'use client';
 import React, {useState} from 'react';
 import {User} from "next-auth";
-import {TrainingProgression} from "@prisma/client";
+import {TrainingProgression} from "@/generated/prisma/browser";
 import Form from "next/form";
 import {Autocomplete, Box, Stack, TextField} from "@mui/material";
 import FormSaveButton from '@/components/Form/FormSaveButton';

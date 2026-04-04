@@ -1,6 +1,6 @@
 'use server';
 
-import {TrainingProgression} from "@prisma/client";
+import {TrainingProgression} from "@/generated/prisma/client";
 import {User} from "next-auth";
 import {progressionAssigned} from "@/templates/TrainingProgression/ProgressionAssigned";
 import {FROM_EMAIL, mailTransport} from "@/lib/email";

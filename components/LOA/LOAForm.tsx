@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {LOA} from "@prisma/client";
+import {LOA} from "@/generated/prisma/browser";
 import {Grid, TextField} from "@mui/material";
 import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";

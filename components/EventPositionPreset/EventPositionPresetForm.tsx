@@ -1,12 +1,12 @@
 'use client';
-import { Autocomplete, Box, Chip, Stack, TextField } from "@mui/material";
-import { EventPositionPreset } from "@prisma/client";
+import {Autocomplete, Box, Chip, Stack, TextField} from "@mui/material";
+import {EventPositionPreset} from "@/generated/prisma/browser";
 import Form from "next/form";
-import { useState } from "react";
+import {useState} from "react";
 import FormSaveButton from "../Form/FormSaveButton";
-import { createOrUpdateEventPreset } from "@/actions/eventPreset";
-import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import {createOrUpdateEventPreset} from "@/actions/eventPreset";
+import {toast} from "react-toastify";
+import {useRouter} from "next/navigation";
 
 export default function EventPositionPresetForm({ positionPreset }: { positionPreset?: EventPositionPreset }) {
     

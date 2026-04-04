@@ -2,7 +2,7 @@
 import React from 'react';
 import {User} from "next-auth";
 import {Box, Chip, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography} from '@mui/material';
-import {StaffPosition} from "@prisma/client";
+import {StaffPosition} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
 import {saveStaffPositions} from "@/actions/role";
 import FormSaveButton from "@/components/Form/FormSaveButton";

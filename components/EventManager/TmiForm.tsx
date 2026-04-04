@@ -21,7 +21,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import Form from "next/form";
 import {toast} from "react-toastify";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {Event, EventPosition, TmiCategory, User} from "@prisma/client";
+import {Event, EventPosition, TmiCategory, User} from "@/generated/prisma/browser";
 import {addTmi, deleteTmi, fetchTmis, updateTmi} from "@/actions/tmi";
 import TmiDeleteButton from "@/components/EventManager/TmiDeleteButton";
 

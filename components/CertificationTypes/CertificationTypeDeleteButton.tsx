@@ -4,7 +4,7 @@ import {Delete} from "@mui/icons-material";
 import {IconButton} from "@mui/material";
 import {deleteCertificationType} from "@/actions/certificationTypes";
 import {toast} from "react-toastify";
-import {CertificationType} from "@prisma/client";
+import {CertificationType} from "@/generated/prisma/browser";
 
 export default function CertificationTypeDeleteButton({certificationType}: { certificationType: CertificationType }) {
 

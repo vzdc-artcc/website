@@ -5,7 +5,7 @@ import Link from "next/link";
 import {Chip} from "@mui/material";
 import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
 import {formatTimezoneDate} from "@/lib/date";
-import {Lesson, StaffPosition} from "@prisma/client";
+import {Lesson, StaffPosition} from "@/generated/prisma/browser";
 import {fetchTrainingAppointments} from "@/actions/trainingAppointment";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 import {User} from "next-auth";

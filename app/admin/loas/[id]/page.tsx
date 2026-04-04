@@ -2,7 +2,7 @@ import React from 'react';
 import prisma from "@/lib/db";
 import {notFound} from "next/navigation";
 import {Card, CardContent, Chip, Grid, Stack, Typography} from "@mui/material";
-import {LOAStatus} from "@prisma/client";
+import {LOAStatus} from "@/generated/prisma/client";
 import LoaDecisionForm from "@/components/LOA/LOADecisionForm";
 
 export default async function Page(props: { params: Promise<{ id: string }> }) {

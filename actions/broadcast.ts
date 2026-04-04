@@ -8,7 +8,7 @@ import {sendBroadcastPostedEmail} from "@/actions/mail/broadcast";
 import {User} from "next-auth";
 import {revalidatePath} from "next/cache";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
-import {Prisma} from "@prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 import {handleAgreeBroadcast} from "@/actions/broadcastViewer";
 
 export const fetchBroadcasts = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {

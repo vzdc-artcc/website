@@ -3,7 +3,7 @@ import React from 'react';
 import {getGridNumericOperators, getGridSingleSelectOperators, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
 import {fetchFeedback} from "@/actions/feedback";
-import {FeedbackStatus} from "@prisma/client";
+import {FeedbackStatus} from "@/generated/prisma/browser";
 import {Grading, Info} from "@mui/icons-material";
 import {useRouter} from "next/navigation";
 import {formatZuluDate} from "@/lib/date";

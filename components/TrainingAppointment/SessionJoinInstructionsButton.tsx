@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingAppointment} from "@prisma/client";
+import {TrainingAppointment} from "@/generated/prisma/browser";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider} from "@mui/material";
 import {formatZuluDate} from "@/lib/date";
 import {Start} from "@mui/icons-material";

@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {DiscordChannel} from "@prisma/client";
+import {DiscordChannel} from "@/generated/prisma/browser";
 import {Grid, TextField,} from "@mui/material";
 import {toast} from "react-toastify";
 import {upsertChannel} from "@/actions/discordConfig";

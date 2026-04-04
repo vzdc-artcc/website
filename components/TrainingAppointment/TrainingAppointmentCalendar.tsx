@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {Lesson, TrainingAppointment} from "@prisma/client";
+import {Lesson, TrainingAppointment} from "@/generated/prisma/browser";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import FullCalendar from "@fullcalendar/react";
 import {User} from "next-auth";

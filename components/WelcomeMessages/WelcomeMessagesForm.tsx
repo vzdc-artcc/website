@@ -1,6 +1,6 @@
 'use client';
 import React, {useState} from 'react';
-import {WelcomeMessages} from "@prisma/client";
+import {WelcomeMessages} from "@/generated/prisma/browser";
 import Form from "next/form";
 import {Box, Stack, Typography, useTheme} from "@mui/material";
 import MarkdownEditor from "@uiw/react-markdown-editor";
