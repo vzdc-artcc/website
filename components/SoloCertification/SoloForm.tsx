@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import {User} from "next-auth";
-import {Autocomplete, FormControl, Grid2, InputLabel, MenuItem, Select, TextField} from "@mui/material";
+import {Autocomplete, FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@mui/material";
 import {CertificationType} from "@prisma/client";
 import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
@@ -34,8 +34,8 @@ export default function SoloForm({controllers, certificationTypes,}: {
     return (
         (<LocalizationProvider dateAdapter={AdapterDayjs}>
             <form action={handleSubmit}>
-                <Grid2 container columns={2} spacing={2}>
-                    <Grid2
+                <Grid container columns={2} spacing={2}>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
@@ -49,8 +49,8 @@ export default function SoloForm({controllers, certificationTypes,}: {
                             fullWidth
                         />
                         <input type="hidden" name="controller" value={controller?.id}/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
@@ -70,25 +70,25 @@ export default function SoloForm({controllers, certificationTypes,}: {
                                 ))}
                             </Select>
                         </FormControl>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
                         }}>
                         <TextField fullWidth variant="filled" name="position" label="Position" required/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
                         }}>
                         <DateTimePicker ampm={false} name="expires" defaultValue={dayjs(new Date()).add(1, "month")}/>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <FormSaveButton/>
-                    </Grid2>
-                </Grid2>
+                    </Grid>
+                </Grid>
             </form>
         </LocalizationProvider>)
     );

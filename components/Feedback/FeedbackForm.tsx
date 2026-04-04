@@ -2,7 +2,7 @@
 "use client";
 import React, {useState} from 'react';
 import {User} from "next-auth";
-import {Autocomplete, Box, Grid2, Rating, TextField, Typography} from "@mui/material";
+import {Autocomplete, Box, Grid, Rating, TextField, Typography} from "@mui/material";
 import {toast} from "react-toastify";
 import {submitFeedback} from "@/actions/feedback";
 import {useRouter} from "next/navigation";
@@ -95,39 +95,39 @@ export default function FeedbackForm({controllers, user}: { controllers: User[],
                 <input type="hidden" name="pilotId" value={user.id}/>
                 <input type="hidden" name="controllerId" value={controller}/>
                 <input type="hidden" name="controllerPosition" value={controllerPosition}/>
-                <Grid2 container columns={2} spacing={2}>
-                    <Grid2
+                <Grid container columns={2} spacing={2}>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotName" label="Your Name"
                                    defaultValue={user.fullName} disabled/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotEmail" label="Your Email"
                                    defaultValue={user.email} disabled/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotCid" label="Your VATSIM CID"
                                    defaultValue={user.cid} disabled/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotCallsign" label="Your Callsign" required/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
@@ -142,8 +142,8 @@ export default function FeedbackForm({controllers, user}: { controllers: User[],
                             }}
                             renderInput={(params) => <TextField {...params} required label="Controller"/>}
                         />
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
@@ -164,21 +164,21 @@ export default function FeedbackForm({controllers, user}: { controllers: User[],
                                                                 helperText="You can pick from the selections OR type in a custom position."
                                                                 label="Position Staffed" required/>}
                         />
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <Typography component="legend">Rating*</Typography>
                         <Rating
                             name="rating"
                         />
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <TextField fullWidth multiline rows={5} variant="filled" name="comments"
                                    label="Additional Comments"/>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <FeedbackFormSubmitButton/>
-                    </Grid2>
-                </Grid2>
+                    </Grid>
+                </Grid>
             </Form>
         </Box>)
     );

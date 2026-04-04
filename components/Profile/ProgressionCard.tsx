@@ -1,6 +1,6 @@
 import React from 'react';
 import {User} from "next-auth";
-import {Card, CardContent, Chip, Grid2, Stack, Typography} from "@mui/material";
+import {Card, CardContent, Chip, Grid, Stack, Typography} from "@mui/material";
 import {getProgressionStatus} from "@/actions/progressionAssignment";
 import {East, South} from "@mui/icons-material";
 import {formatZuluDate} from "@/lib/date";
@@ -31,11 +31,11 @@ export default async function ProgressionCard({user}: { user: User }) {
                 <Typography
                     variant="h6">{status[0]?.progression ? `Progression - ${status[0].progression.name}` : 'Training Progression'}</Typography>
                 <Typography gutterBottom>Click on a lesson to view the ticket submitted for it.</Typography>
-                <Grid2 container columns={11} spacing={1}>
+                <Grid container columns={11} spacing={1}>
                     {status.map((step, i) => (
                         <>
                             {i !== 0 &&
-                                <Grid2 size={{
+                                <Grid size={{
                                     xs: 11,
                                     md: 1,
                                 }} key={`progression-arrow-${i}`}>
@@ -44,9 +44,9 @@ export default async function ProgressionCard({user}: { user: User }) {
                                         <East fontSize="large" sx={{display: {xs: 'none', md: 'inherit',}}}/>
                                         <South fontSize="large" sx={{display: {md: 'none',}}}/>
                                     </Stack>
-                                </Grid2>
+                                </Grid>
                             }
-                            <Grid2 size={{
+                            <Grid size={{
                                 xs: 11,
                                 md: 4,
                                 lg: 2,
@@ -71,10 +71,10 @@ export default async function ProgressionCard({user}: { user: User }) {
                                     </CardContent>
                                 </Card>
 
-                            </Grid2>
+                            </Grid>
                         </>
                     ))}
-                    {!user.noForceProgressionFinish && allRequiredCompleted && <Grid2 size={11} sx={{mt: 2,}}>
+                    {!user.noForceProgressionFinish && allRequiredCompleted && <Grid size={11} sx={{mt: 2,}}>
                         <ProgressionCompleteButton user={user} progression={status[0].progression}/>
                         <Typography variant="subtitle2" sx={{mt: 1,}}>Even though you meet all the requirements to
                             complete this progression, we strongly encourage you to complete all of the optional steps
@@ -82,8 +82,8 @@ export default async function ProgressionCard({user}: { user: User }) {
                             assigned.</Typography>
                         <Typography color="red">You will NOT be able to return to this progression unless it is
                             reassigned.</Typography>
-                    </Grid2>}
-                </Grid2>
+                    </Grid>}
+                </Grid>
             </CardContent>
         </Card>
     );

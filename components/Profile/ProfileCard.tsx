@@ -1,5 +1,5 @@
 import React from 'react';
-import {Avatar, Box, Card, CardContent, Chip, Grid2, IconButton, Stack, Tooltip, Typography} from "@mui/material";
+import {Avatar, Box, Card, CardContent, Chip, Grid, IconButton, Stack, Tooltip, Typography} from "@mui/material";
 import {getRating} from "@/lib/vatsim";
 import {User} from "next-auth";
 import {Edit} from "@mui/icons-material";
@@ -39,66 +39,66 @@ export default async function ProfileCard({user, admin, viewOnly}: {
                     </Box>}
                 </Stack>
 
-                <Grid2 container columns={2} spacing={2} sx={{mt: 1,}}>
-                    <Grid2
+                <Grid container columns={2} spacing={2} sx={{mt: 1,}}>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <Typography variant="subtitle2">VATSIM CID</Typography>
                         <Typography variant="body2">{user.cid}</Typography>
-                    </Grid2>
-                    {!viewOnly && <Grid2
+                    </Grid>
+                    {!viewOnly && <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <Typography variant="subtitle2">Email</Typography>
                         <Typography variant="body2">{user.email}</Typography>
-                    </Grid2>}
-                    <Grid2
+                    </Grid>}
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <Typography variant="subtitle2">Preferred Name</Typography>
                         <Typography variant="body2">{user.preferredName || 'None'}</Typography>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             sm: 1
                         }}>
                         <Typography variant="subtitle2">Rating</Typography>
                         <Typography variant="body2">{getRating(user.rating)}</Typography>
-                    </Grid2>
-                    <Grid2 size={{
+                    </Grid>
+                    <Grid size={{
                         xs: 2,
                         sm: 1
                     }}>
                         <Typography variant="subtitle2">Receive Email</Typography>
                         <Typography variant="body2">{user.receiveEmail ? "Yes" : "No"}</Typography>
-                    </Grid2>
-                    <Grid2 size={{
+                    </Grid>
+                    <Grid size={{
                         xs: 2,
                         sm: 1
                     }}>
                         <Typography variant="subtitle2">Timezone</Typography>
                         <Typography variant="body2">{user.timezone}</Typography>
-                    </Grid2>
+                    </Grid>
                     {!viewOnly && !admin &&
-                        <Grid2 size={{
+                        <Grid size={{
                         xs: 2,
                         sm: 1
                     }}>
                         <Typography variant="subtitle2">Discord</Typography>
                         <DiscordLinkCard linked={!!user.discordUid} discordUid={user.discordUid} />
-                        </Grid2>}
-                    <Grid2 size={2}>
+                        </Grid>}
+                    <Grid size={2}>
                         <Typography variant="subtitle2">Bio</Typography>
                         <Typography variant="body2">{user.bio || 'None'}</Typography>
-                    </Grid2>
-                </Grid2>
+                    </Grid>
+                </Grid>
             </CardContent>
         </Card>)
     );

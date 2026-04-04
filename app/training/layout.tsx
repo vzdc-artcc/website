@@ -1,7 +1,7 @@
 import React from 'react';
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
-import {Alert, Grid2, Stack, Typography} from "@mui/material";
+import {Alert, Grid, Stack, Typography} from "@mui/material";
 import TrainingMenu from "@/components/Admin/TrainingMenu";
 import {Metadata} from "next";
 import prisma from "@/lib/db";
@@ -32,15 +32,15 @@ export default async function Layout({children}: { children: React.ReactNode }) 
     });
 
     return (
-        (<Grid2 container columns={9} spacing={2}>
-            <Grid2
+        (<Grid container columns={9} spacing={2}>
+            <Grid
                 size={{
                     xs: 9,
                     lg: 2
                 }}>
                 <TrainingMenu/>
-            </Grid2>
-            <Grid2 size="grow">
+            </Grid>
+            <Grid size="grow">
                 <Stack direction="column" spacing={2}>
                     {numDoubleBookedAppointments > 0 &&
                         <Alert severity="warning">There are one or more double booked training
@@ -49,7 +49,7 @@ export default async function Layout({children}: { children: React.ReactNode }) 
                             consider rescheduling.<br/>Appointment Buffer Time: {BUFFER_TIME} minutes</Alert>}
                     {children}
                 </Stack>
-            </Grid2>
-        </Grid2>)
+            </Grid>
+        </Grid>)
     );
 }

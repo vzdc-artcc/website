@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import {DiscordChannel} from "@prisma/client";
-import {Grid2, TextField,} from "@mui/material";
+import {Grid, TextField,} from "@mui/material";
 import {toast} from "react-toastify";
 import {upsertChannel} from "@/actions/discordConfig";
 import {useRouter} from "next/navigation";
@@ -30,25 +30,25 @@ export default function ChannelForm({channel, discordConfigId}: { channel?: Disc
         (<form action={handleSubmit}>
             <input type="hidden" name="discordConfigId" value={discordConfigId} />
             <input type="hidden" name="id" value={channel?.id}/>
-            <Grid2 container columns={2} spacing={2}>
-                <Grid2
+            <Grid container columns={2} spacing={2}>
+                <Grid
                     size={{
                         xs: 2,
                         sm: 1
                     }}>
                     <TextField fullWidth variant="filled" label="Name" name="name" defaultValue={channel?.name}/>
-                </Grid2>
-                <Grid2
+                </Grid>
+                <Grid
                     size={{
                         xs: 2,
                         sm: 1
                     }}>
                     <TextField fullWidth variant="filled" label="Channel ID" name="channelId" defaultValue={channel?.channelId}/>
-                </Grid2>
-                <Grid2 size={2}>
+                </Grid>
+                <Grid size={2}>
                     <FormSaveButton />
-                </Grid2>
-            </Grid2>
+                </Grid>
+            </Grid>
         </form>)
     );
 

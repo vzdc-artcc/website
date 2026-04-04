@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import {DiscordRole} from "@prisma/client";
-import {Grid2, TextField,} from "@mui/material";
+import {Grid, TextField,} from "@mui/material";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
 import FormSaveButton from "@/components/Form/FormSaveButton";
@@ -30,25 +30,25 @@ export default function DiscordRoleForm({role, discordConfigId}: { role?: Discor
         (<form action={handleSubmit}>
             <input type="hidden" name="discordConfigId" value={discordConfigId} />
             <input type="hidden" name="id" value={role?.id}/>
-            <Grid2 container columns={2} spacing={2}>
-                <Grid2
+            <Grid container columns={2} spacing={2}>
+                <Grid
                     size={{
                         xs: 2,
                         sm: 1
                     }}>
                     <TextField fullWidth variant="filled" label="Name" name="name" defaultValue={role?.name}/>
-                </Grid2>
-                <Grid2
+                </Grid>
+                <Grid
                     size={{
                         xs: 2,
                         sm: 1
                     }}>
                     <TextField fullWidth variant="filled" label="Role ID" name="roleId" defaultValue={role?.roleId}/>
-                </Grid2>
-                <Grid2 size={2}>
+                </Grid>
+                <Grid size={2}>
                     <FormSaveButton />
-                </Grid2>
-            </Grid2>
+                </Grid>
+            </Grid>
         </form>)
     );
 

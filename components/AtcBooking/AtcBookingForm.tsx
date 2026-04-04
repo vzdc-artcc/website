@@ -1,7 +1,7 @@
 'use client';
 import React, {useState} from 'react';
 import Form from "next/form";
-import {Grid2, TextField} from "@mui/material";
+import {Grid, TextField} from "@mui/material";
 import {AtcBooking} from "@/lib/atcBooking";
 import dayjs, {Dayjs} from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -56,11 +56,11 @@ export default function AtcBookingForm({ booking, user }: { booking?: AtcBooking
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
             <Form action={handleSubmit}>
-                <Grid2 container columns={2} spacing={2}>
-                    <Grid2 size={2}>
+                <Grid container columns={2} spacing={2}>
+                    <Grid size={2}>
                         <TextField fullWidth variant="filled" label="Position/Callsign" name="position" defaultValue={booking?.callsign} required />
-                    </Grid2>
-                    <Grid2 size={{ xs: 2, sm: 1}}>
+                    </Grid>
+                    <Grid size={{xs: 2, sm: 1}}>
                         <DateTimePicker
                             sx={{width: '100%'}}
                             disablePast
@@ -72,8 +72,8 @@ export default function AtcBookingForm({ booking, user }: { booking?: AtcBooking
                             value={start}
                             onChange={setStart}
                         />
-                    </Grid2>
-                    <Grid2 size={{ xs: 2, sm: 1}}>
+                    </Grid>
+                    <Grid size={{xs: 2, sm: 1}}>
                         <DateTimePicker
                             sx={{width: '100%'}}
                             disablePast
@@ -85,11 +85,11 @@ export default function AtcBookingForm({ booking, user }: { booking?: AtcBooking
                             value={end}
                             onChange={setEnd}
                         />
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <FormSaveButton />
-                    </Grid2>
-                </Grid2>
+                    </Grid>
+                </Grid>
             </Form>
         </LocalizationProvider>
     );

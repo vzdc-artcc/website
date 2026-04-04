@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Box, Button, Grid2, Typography } from "@mui/material";
+import React, {useEffect, useState} from "react";
+import {Button, Grid} from "@mui/material";
 import Form from "next/form";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 import FormSaveButton from "../Form/FormSaveButton";
 import MarkdownEditor from "@uiw/react-markdown-editor";
-import { Event, EventPosition, User } from "@prisma/client";
-import { saveOpsPlanFreeText } from "@/actions/eventPosition";
+import {Event, EventPosition, User} from "@prisma/client";
+import {saveOpsPlanFreeText} from "@/actions/eventPosition";
 
 export default function OpsPlanFreeTextForm({
                                                 admin,
@@ -81,16 +81,16 @@ export default function OpsPlanFreeTextForm({
 
     return (
         <Form action={handleSubmit}>
-            <Grid2 container spacing={2} columns={6}>
-                <Grid2 size={6}>
+            <Grid container spacing={2} columns={6}>
+                <Grid size={6}>
                     <MarkdownEditor
                         value={text}
                         onChange={(value?: string) => setText(value ?? "")}
                         enableScroll={false}
                         minHeight="400px"
                     />
-                </Grid2>
-                <Grid2 size={6}>
+                </Grid>
+                <Grid size={6}>
                     {saveDisabled ? (
                         <Button variant="contained" disabled>
                             Save
@@ -98,8 +98,8 @@ export default function OpsPlanFreeTextForm({
                     ) : (
                         <FormSaveButton text="Save" />
                     )}
-                </Grid2>
-            </Grid2>
+                </Grid>
+            </Grid>
         </Form>
     );
 }

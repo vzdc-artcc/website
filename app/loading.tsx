@@ -8,23 +8,23 @@ export default function Loading() {
     return <Skeleton variant="rectangular" width="100%" height={1000}/>;
 
     // return (
-    //     <Grid2 container columns={8} spacing={4}>
+    //     <Grid container columns={8} spacing={4}>
     //         <BackgroundImage />
-    //         <Grid2 size={8}>
+    //         <Grid size={8}>
     //             <Card>
     //                 <CardContent>
     //                     <HeaderText />
     //                 </CardContent>
     //             </Card>
-    //         </Grid2>
-    //         <Grid2
+    //         </Grid>
+    //         <Grid
     //             size={{
     //                 xs: 8,
     //                 lg: 6
     //             }}>
     //             <Skeleton variant="rectangular" width="100%" height={600} />
-    //         </Grid2>
-    //         <Grid2
+    //         </Grid>
+    //         <Grid
     //             size={{
     //                 xs: 8,
     //                 lg: 2
@@ -35,28 +35,28 @@ export default function Loading() {
     //                     <QuickLinksList />
     //                 </CardContent>
     //             </Card>
-    //         </Grid2>
-    //         <Grid2
+    //         </Grid>
+    //         <Grid
     //             size={{
     //                 xs: 8,
     //                 lg: 2
     //             }}>
     //             <Skeleton variant="rectangular" width="100%" height={600} />
-    //         </Grid2>
-    //         <Grid2
+    //         </Grid>
+    //         <Grid
     //             size={{
     //                 xs: 8,
     //                 lg: 4
     //             }}>
     //             <Skeleton variant="rectangular" width="100%" height={600} />
-    //         </Grid2>
-    //         <Grid2
+    //         </Grid>
+    //         <Grid
     //             size={{
     //                 xs: 8,
     //                 lg: 2
     //             }}>
     //             <Skeleton variant="rectangular" width="100%" height={600} />
-    //         </Grid2>
-    //     </Grid2>
+    //         </Grid>
+    //     </Grid>
     // );
 }

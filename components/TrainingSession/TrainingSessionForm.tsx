@@ -24,7 +24,7 @@ import {
     Chip,
     CircularProgress,
     FormControlLabel,
-    Grid2,
+    Grid,
     IconButton,
     Stack,
     Switch,
@@ -171,8 +171,8 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                 <TrainingSessionAfterSubmitDialogs onAllClose={redirect} release={afterRelease} otsRec={otsRec}
                                                    rosterChanges={afterRosterUpdates}/>}
             <form action={handleSubmit}>
-                <Grid2 container columns={2} spacing={2}>
-                    <Grid2 size={2}>
+                <Grid container columns={2} spacing={2}>
+                    <Grid size={2}>
                         <Autocomplete
                             disabled={!!trainingSession}
                             options={allUsers.sort((a, b) => {
@@ -195,24 +195,24 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                             }}
                             renderInput={(params) => <TextField {...params} label="Student"/>}
                         />
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
                         }}>
                         <DateTimePicker ampm={false} label="Start" value={dayjs.utc(start).tz(timeZone)}
                                         onChange={(d) => setStart(d?.toDate() || new Date())}/>
-                    </Grid2>
-                    <Grid2
+                    </Grid>
+                    <Grid
                         size={{
                             xs: 2,
                             md: 1
                         }}>
                         <DateTimePicker ampm={false} label="End" value={dayjs.utc(end).tz(timeZone)}
                                         onChange={(d) => setEnd(d?.toDate() || new Date())}/>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         {trainingTickets.length > 0 && <Card variant="outlined">
                             <CardContent>
                                 <Typography variant="h6" sx={{mb: 2,}}>Training Ticket(s)</Typography>
@@ -254,8 +254,8 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                 ))}
                             </CardContent>
                         </Card>}
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <Card variant="outlined">
                             <CardContent>
                                 <Typography variant="h6" sx={{mb: 2,}}>New Training Ticket</Typography>
@@ -280,8 +280,8 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                                     }}/>
                             </CardContent>
                         </Card>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <Accordion variant="outlined">
                             <AccordionSummary expandIcon={<ExpandMore/>}>
                                 <Typography variant="h6">Performance Indicator</Typography>
@@ -310,8 +310,8 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                                                              onChange={setPerformanceIndicator}/>}
                             </AccordionDetails>
                         </Accordion>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <Box sx={{}} data-color-mode={theme.palette.mode}>
                         <FormControlLabel control={<Switch onChange={()=>setEnableMarkdown(!enableMarkdown)}/>} label="Enable Markdown Editor" />
                             <Typography variant="subtitle1" sx={{mb: 1,}}>Additional Comments</Typography>
@@ -334,8 +334,8 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                 />
                             }
                         </Box>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <Box sx={{}} data-color-mode={theme.palette.mode}>
                             <Typography variant="subtitle1" sx={{mb: 1,}}>Trainer Comments</Typography>
                             {enableMarkdown ?
@@ -357,11 +357,11 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                 />
                             }
                         </Box>
-                    </Grid2>
-                    <Grid2 size={2}>
+                    </Grid>
+                    <Grid size={2}>
                         <FormSaveButton/>
-                    </Grid2>
-                </Grid2>
+                    </Grid>
+                </Grid>
             </form>
         </LocalizationProvider>)
     );

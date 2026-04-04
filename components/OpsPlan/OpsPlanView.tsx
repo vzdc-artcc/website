@@ -1,29 +1,29 @@
 import React from 'react';
-import { fetchFullEvent } from "@/actions/opsPlan";
+import {fetchFullEvent} from "@/actions/opsPlan";
 import {
     Box,
     Card,
     CardContent,
     Chip,
     Divider,
-    Grid2,
+    Grid,
     IconButton,
     Paper,
     Stack,
-    Tooltip,
-    Typography,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
-    TableRow
+    TableRow,
+    Tooltip,
+    Typography
 } from "@mui/material";
-import { eventGetDuration, formatZuluDate } from "@/lib/date";
-import { OpenInNew } from "@mui/icons-material";
+import {eventGetDuration, formatZuluDate} from "@/lib/date";
+import {OpenInNew} from "@mui/icons-material";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { classifyPosition } from "@/actions/classifyPosition";
+import {notFound} from "next/navigation";
+import {classifyPosition} from "@/actions/classifyPosition";
 import Markdown from "react-markdown";
 import OpsPlanTmiTable from "@/components/OpsPlan/OpsPlanTmiTable";
 
@@ -277,8 +277,8 @@ export default async function OpsPlanView({ eventId }: Props) {
 
 
     return (
-        <Grid2 container spacing={2} columns={12}>
-            <Grid2 size={12}>
+        <Grid container spacing={2} columns={12}>
+            <Grid size={12}>
                 <Box sx={{ flexGrow: 1 }}>
                     <Stack spacing={1} direction="row" alignItems="center" justifyContent="space-between">
                         <Box>
@@ -304,16 +304,16 @@ export default async function OpsPlanView({ eventId }: Props) {
                     </Stack>
                     <Divider sx={{ my: 2, }} />
                 </Box>
-            </Grid2>
+            </Grid>
 
-            <Grid2 size={12}>
-                <Grid2 container spacing={2}>
+            <Grid size={12}>
+                <Grid container spacing={2}>
                     {featured.length === 0 ? (
-                        <Grid2 size={12}>
+                        <Grid size={12}>
                             <Box sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
                                 <Typography variant="body1">No featured fields for this event.</Typography>
                             </Box>
-                        </Grid2>
+                        </Grid>
                     ) : (
                         featured.map((field) => {
                             const cfg = getConfigForField(field, configs);
@@ -321,22 +321,22 @@ export default async function OpsPlanView({ eventId }: Props) {
                                 typeof cfg === 'string' ? cfg : JSON.stringify(cfg, null, 2);
 
                             return (
-                                <Grid2 key={field} size={4}>
+                                <Grid key={field} size={4}>
                                     <Card>
                                         <CardContent>
                                             <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>{field}</Typography>
                                             <Typography variant="body2" sx={{ mb: 1 }}>{display}</Typography>
                                         </CardContent>
                                     </Card>
-                                </Grid2>
+                                </Grid>
                             )
                         })
                     )}
-                </Grid2>
+                </Grid>
 
                 <Divider sx={{ my: 2 }} />
 
-                <Grid2 size={12}>
+                <Grid size={12}>
                     <Box>
                         <Paper sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
                             <Typography variant="h6">Planned Staffing</Typography>
@@ -346,66 +346,66 @@ export default async function OpsPlanView({ eventId }: Props) {
                                     No preset positions defined for this event.
                                 </Typography>
                             ) : (
-                                <Grid2 container spacing={2} sx={{ mt: 1 }}>
-                                    <Grid2 size={4}>
+                                <Grid container spacing={2} sx={{mt: 1}}>
+                                    <Grid size={4}>
                                         <Typography variant="subtitle2" sx={{ mb: 1 }}>Local</Typography>
                                         <Box component="ul" sx={{ pl: 2, m: 0 }}>
                                             {grouped.Local.map((p, i) => (<li key={`local-${p}-${i}`}><Typography variant="body2">{p}</Typography></li>))}
                                         </Box>
-                                    </Grid2>
+                                    </Grid>
 
-                                    <Grid2 size={4}>
+                                    <Grid size={4}>
                                         <Typography variant="subtitle2" sx={{ mb: 1 }}>Terminal</Typography>
                                         <Box component="ul" sx={{ pl: 2, m: 0 }}>
                                             {grouped.Terminal.map((p, i) => (<li key={`term-${p}-${i}`}><Typography variant="body2">{p}</Typography></li>))}
                                         </Box>
-                                    </Grid2>
+                                    </Grid>
 
-                                    <Grid2 size={4}>
+                                    <Grid size={4}>
                                         <Typography variant="subtitle2" sx={{ mb: 1 }}>Enroute</Typography>
                                         <Box component="ul" sx={{ pl: 2, m: 0 }}>
                                             {grouped.Enroute.map((p, i) => (<li key={`enr-${p}-${i}`}><Typography variant="body2">{p}</Typography></li>))}
                                         </Box>
-                                    </Grid2>
-                                </Grid2>
+                                    </Grid>
+                                </Grid>
                             )}
                         </Paper>
                     </Box>
-                </Grid2>
+                </Grid>
 
                 <Divider sx={{ my: 2 }} />
 
-                <Grid2 size={12}>
+                <Grid size={12}>
                     <FinalPositionsTable title="Admin Positions" positions={adminFinalPositions} />
-                </Grid2>
+                </Grid>
 
                 <Divider sx={{ my: 2 }} />
 
                 {/* Final Positions Table */}
-                <Grid2 size={12}>
-                    <Grid2 container spacing={2}>
-                        <Grid2 size={12}>
+                <Grid size={12}>
+                    <Grid container spacing={2}>
+                        <Grid size={12}>
                             <FinalPositionsTable title="Local" positions={finalGrouped.Local} />
-                        </Grid2>
-                        <Grid2 size={12}>
+                        </Grid>
+                        <Grid size={12}>
                             <FinalPositionsTable title="Terminal" positions={finalGrouped.Terminal} />
-                        </Grid2>
-                        <Grid2 size={12}>
+                        </Grid>
+                        <Grid size={12}>
                             <FinalPositionsTable title="Enroute" positions={finalGrouped.Enroute} />
-                        </Grid2>
-                    </Grid2>
-                </Grid2>
+                        </Grid>
+                    </Grid>
+                </Grid>
 
                 <Divider sx={{ my: 2 }} />
 
-                <Grid2 size={12}>
+                <Grid size={12}>
                     <OpsPlanTmiTable tmis={tmisForDisplay} />
-                </Grid2>
+                </Grid>
 
                 {event.opsFreeText ? (
                     <>
                         <Divider sx={{ my: 2 }} />
-                        <Grid2 size={12}>
+                        <Grid size={12}>
                             <Paper sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                                     <Typography variant="h6">Other Notes</Typography>
@@ -430,10 +430,10 @@ export default async function OpsPlanView({ eventId }: Props) {
                                     </Box>
                                 )}
                             </Paper>
-                        </Grid2>
+                        </Grid>
                     </>
                 ) : null}
-            </Grid2>
-        </Grid2>
+            </Grid>
+        </Grid>
     );
 }

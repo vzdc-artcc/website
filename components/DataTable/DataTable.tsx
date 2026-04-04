@@ -1,17 +1,17 @@
 'use client';
 import React, {useCallback, useEffect, useState} from 'react';
 import {
-    DataGrid, getGridStringOperators,
+    DataGrid,
+    getGridStringOperators,
     GridColDef,
     GridFilterItem,
     GridFilterModel,
     GridPaginationModel,
     GridSortModel,
-    GridToolbar
 } from "@mui/x-data-grid";
 import {toast} from "react-toastify";
 import {Box} from "@mui/material";
-import {useSearchParams, useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 
 export const equalsOnlyFilterOperator = getGridStringOperators().filter((operator) => operator.value === 'equals');
 export const containsOnlyFilterOperator = getGridStringOperators().filter((operator) => operator.value === 'contains');
@@ -89,12 +89,31 @@ export default function DataTable<T>(
     }, [getData]);
 
     const handleFilterChange = (newFilters: GridFilterModel) => {
+        if (newFilters.quickFilterValues?.join(',')) {
+            const filterCol = columns.find((c) => c.filterable === true || c.filterable === undefined);
+            if (!filterCol) return;
+
+            setFilter({
+                field: filterCol.field,
+                operator: 'contains',
+                value: newFilters.quickFilterValues.join(','),
+            });
+
+            updateQueryParams({
+                filterField: columns[0].field,
+                filterValue: newFilters.quickFilterValues.join(','),
+                filterOperator: 'contains',
+            });
+
+            return;
+        }
+
         const newFilter = newFilters.items[0];
         setFilter(newFilter);
         updateQueryParams({
             filterField: newFilter?.field || '',
             filterValue: newFilter?.value?.toString() || '',
-            filterOperator: newFilter?.operator || ''
+            filterOperator: newFilter?.operator || '',
         });
     };
 
@@ -140,9 +159,7 @@ export default function DataTable<T>(
                 sortModel={sortModel}
                 onSortModelChange={handleSortChange}
                 pageSizeOptions={pageSizeOptions}
-                slots={{
-                    toolbar: GridToolbar,
-                }}
+                showToolbar
                 disableRowSelectionOnClick
             />
         </Box>

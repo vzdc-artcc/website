@@ -3,7 +3,7 @@ import {
     Card,
     CardContent,
     Chip,
-    Grid2,
+    Grid,
     Table,
     TableBody,
     TableCell,
@@ -31,8 +31,8 @@ export default async function Page() {
     const syncTimes = await prisma.syncTimes.findFirst();
 
     return (
-        (<Grid2 container columns={20} spacing={2}>
-            <Grid2
+        (<Grid container columns={20} spacing={2}>
+            <Grid
                 size={{
                     xs: 20,
                     md: 10,
@@ -45,8 +45,8 @@ export default async function Page() {
                               color={getChipColor(syncTimes?.roster)}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 20,
                     md: 10,
@@ -59,8 +59,8 @@ export default async function Page() {
                               color={getChipColor(syncTimes?.stats)}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 20,
                     md: 10,
@@ -73,8 +73,8 @@ export default async function Page() {
                               color={getChipColor(syncTimes?.soloCert)}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 20,
                     md: 10,
@@ -87,8 +87,8 @@ export default async function Page() {
                               color={getChipColor(syncTimes?.events)}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 20,
                     md: 10,
@@ -101,8 +101,8 @@ export default async function Page() {
                               color={getChipColor(syncTimes?.loas)}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={20}>
+            </Grid>
+            <Grid size={20}>
                 <Card>
                     <CardContent>
                         <Typography variant="h5">Recent Activity</Typography>
@@ -134,7 +134,7 @@ export default async function Page() {
 
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>)
+            </Grid>
+        </Grid>)
     );
 }

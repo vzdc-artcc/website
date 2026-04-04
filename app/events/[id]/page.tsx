@@ -7,7 +7,7 @@ import {
     Card,
     CardContent,
     Container,
-    Grid2,
+    Grid,
     Stack,
     Table,
     TableBody,
@@ -94,15 +94,15 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
             <Stack direction="column" spacing={2}>
                 <Card>
                     <CardContent>
-                        <Grid2 container columns={2} spacing={2}>
-                            <Grid2 size={2}>
+                        <Grid container columns={2} spacing={2}>
+                            <Grid size={2}>
                                 <Box sx={{position: 'relative', width: '100%', minHeight: 400,}}>
                                     <Image
                                         src={imageUrl || Placeholder}
                                         alt={event.name} priority fill style={{objectFit: 'contain'}}/>
                                 </Box>
-                            </Grid2>
-                            <Grid2 size={2}>
+                            </Grid>
+                            <Grid size={2}>
                                 <Stack direction="column" spacing={1} sx={{mb: 4,}}>
                                     <Typography variant="h5">{event.name}</Typography>
                                     {session?.user && <Typography variant="subtitle1">
@@ -117,8 +117,8 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                                         variant="subtitle2">{event.featuredFields.join(" • ") || 'No fields'}</Typography>
                                 </Stack>
                                 <Markdown>{event.description}</Markdown>
-                            </Grid2>
-                        </Grid2>
+                            </Grid>
+                        </Grid>
                     </CardContent>
                 </Card>
                 { session?.user && session.user.controllerStatus !== 'NONE' && !session.user.noEventSignup && !eventPosition?.published && <Card>

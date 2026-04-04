@@ -1,23 +1,23 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {useMemo, useState} from 'react';
 import {
     Avatar,
     Box,
     Button,
     Chip,
+    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     Divider,
-    Grid2,
+    Grid,
     Stack,
-    Typography,
-    CircularProgress,
-    Tooltip
+    Tooltip,
+    Typography
 } from '@mui/material';
-import { getRating } from '@/lib/vatsim';
+import {getRating} from '@/lib/vatsim';
 
 type UserShape = any;
 type SoloCertShape = { position: string; expires: string | Date } | null;
@@ -140,16 +140,16 @@ export default function ControllerChip({
                     ) : error ? (
                         <Typography color="error">{error}</Typography>
                     ) : (
-                        <Grid2 container spacing={2} columns={12}>
-                            <Grid2 size={6}>
+                        <Grid container spacing={2} columns={12}>
+                            <Grid size={6}>
                                 {renderSection('Controller status', <Typography color="text.secondary" variant="body2">{user?.controllerStatus ?? 'N/A'}</Typography>)}
                                 {renderSection('Solo cert', soloCert ? (
                                     <Typography variant="body2" color="text.secondary">{soloCert.position} - Expires: {new Date(soloCert.expires).toLocaleString()}</Typography>
                                 ) : <Typography variant="body2" color="text.secondary">None</Typography>)}
                                 {renderSection('Certifications', renderCertifications(displayEventInfo?.certifications ?? (user as any)?.certifications ?? []))}
-                            </Grid2>
+                            </Grid>
 
-                            <Grid2 size={6}>
+                            <Grid size={6}>
                                 {renderSection('Last controlled event', displayEventInfo?.lastControlledEvent ? (
                                     <Stack spacing={0.5}>
                                         <Typography variant="body2" color="text.secondary">Name - {displayEventInfo.lastControlledEvent.name}</Typography>
@@ -171,8 +171,8 @@ export default function ControllerChip({
                                 {renderSection('Notes for this event', <Typography color="text.secondary" variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{displayEventInfo?.eventNotes ?? 'None'}</Typography>)}
                                 {renderSection('Final position for this event', <Typography color="text.secondary" variant="body2">{displayEventInfo?.finalPosition ?? 'N/A'}</Typography>)}
                                 {renderSection('Final notes', <Typography color="text.secondary" variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{displayEventInfo?.finalNotes ?? 'None'}</Typography>)}
-                            </Grid2>
-                        </Grid2>
+                            </Grid>
+                        </Grid>
                     )}
                 </DialogContent>
 

@@ -1,12 +1,23 @@
 import prisma from "@/lib/db";
 import Link from "next/link";
 import {
-    Card, CardContent, Grid2, IconButton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Tooltip, Typography
+    Card,
+    CardContent,
+    Grid,
+    IconButton,
+    Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Tooltip,
+    Typography
 } from "@mui/material";
 import {Article, Checklist, Edit, Info} from "@mui/icons-material";
-import { eventGetDuration, getDuration, getTimeAgo } from "@/lib/date";
-import { EVENT_ONLY_LOG_MODELS } from "@/lib/log";
+import {eventGetDuration, getTimeAgo} from "@/lib/date";
+import {EVENT_ONLY_LOG_MODELS} from "@/lib/log";
 
 export default async function Page() {
 
@@ -39,16 +50,16 @@ export default async function Page() {
     });
 
     return (
-        <Grid2 container columns={2} spacing={2}>
-            <Grid2 size={{ xs: 2, md: 1, }}>
+        <Grid container columns={2} spacing={2}>
+            <Grid size={{xs: 2, md: 1,}}>
                 <Card sx={{ height: '100%', }}>
                     <CardContent>
                         <Typography>Upcoming Unarchived Events (30 days)</Typography>
                         <Typography variant="h4">{upcomingEvents.length}</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={{ xs: 2, md: 1, }}>
+            </Grid>
+            <Grid size={{xs: 2, md: 1,}}>
                 <Card sx={{ height: '100%', }}>
                     <CardContent>
                         <Typography>Next Event</Typography>
@@ -101,8 +112,8 @@ export default async function Page() {
                         { !upcomingEvents[0] && <Typography variant="h4">N/A</Typography> }
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={2}>
+            </Grid>
+            <Grid size={2}>
             <Card>
                     <CardContent>
                         <Typography variant="h5">Recent Events Activity</Typography>
@@ -133,7 +144,7 @@ export default async function Page() {
                         </TableContainer>}
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>
+            </Grid>
+        </Grid>
     )
 }

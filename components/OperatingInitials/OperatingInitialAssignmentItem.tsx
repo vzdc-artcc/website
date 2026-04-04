@@ -1,12 +1,21 @@
 'use client';
-import { updateOperatingInitials } from "@/actions/user";
-import { getRating } from "@/lib/vatsim";
-import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material";
-
-import { Grid2 } from "@mui/material";
-import { User } from "next-auth";
-import { useState } from "react";
-import { toast } from "react-toastify";
+import {updateOperatingInitials} from "@/actions/user";
+import {getRating} from "@/lib/vatsim";
+import {
+    Autocomplete,
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Grid,
+    TextField,
+    Typography
+} from "@mui/material";
+import {User} from "next-auth";
+import {useState} from "react";
+import {toast} from "react-toastify";
 
 export default function OperatingInitialAssignmentItem({ initials, allControllers, }: { initials: string, allControllers: User[], }) {
     
@@ -32,7 +41,7 @@ export default function OperatingInitialAssignmentItem({ initials, allController
 
     return (
         <>
-            <Grid2
+            <Grid
                 key={initials}
                 size={{
                     xs: 4,
@@ -45,7 +54,7 @@ export default function OperatingInitialAssignmentItem({ initials, allController
                         <Typography textAlign="center" variant="body2">{initials}</Typography>
                     </div>
                 </Box>
-            </Grid2>
+            </Grid>
             <Dialog open={open} onClose={() => setOpen(false)}>
                 <DialogTitle>Assign Operating Initials - {initials}</DialogTitle>
                 <DialogContent>

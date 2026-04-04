@@ -1,5 +1,5 @@
 'use client';
-import {Autocomplete, Button, Grid2, TextField, Typography} from "@mui/material";
+import {Autocomplete, Button, Grid, TextField, Typography} from "@mui/material";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
@@ -78,8 +78,8 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
            <Form action={handleSubmit}>
-                <Grid2 container columns={6} spacing={2}>
-                    { admin && <Grid2 size={6}>
+               <Grid container columns={6} spacing={2}>
+                   {admin && <Grid size={6}>
                     <Autocomplete
                             options={allUsers}
                             getOptionLabel={(option) => `${option.firstName} ${option.lastName} - ${getRating(option.rating)} (${option.cid})`}
@@ -89,8 +89,8 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
                             }}
                             renderInput={(params) => <TextField {...params} label="Controller"/>}
                         />
-                    </Grid2> }
-                    <Grid2 size={{xs: 6, sm: 3,}}>
+                   </Grid>}
+                   <Grid size={{xs: 6, sm: 3,}}>
                         <Autocomplete
                             disabled={!admin && (!!eventPosition || event.positionsLocked)}
                             freeSolo
@@ -100,8 +100,8 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
                             inputValue={position}
                             onInputChange={(e, value) => setPosition(value)}
                         />
-                    </Grid2>
-                    <Grid2 size={{xs: 6, sm: 3,}}>
+                   </Grid>
+                   <Grid size={{xs: 6, sm: 3,}}>
                         <Autocomplete
                             disabled={!admin && (!!eventPosition || event.positionsLocked)}
                             fullWidth
@@ -112,38 +112,38 @@ export default function EventPositionRequestForm({ admin, currentUser, event, ev
                             inputValue={secondaryPosition}
                             onInputChange={(e, value) => setSecondaryPosition(value)}
                         />
-                    </Grid2>
-                    <Grid2 size={{xs: 6, sm: 3,}}>
+                   </Grid>
+                   <Grid size={{xs: 6, sm: 3,}}>
                         <DateTimePicker sx={{width: '100%',}}
                                         disabled={!admin && (!!eventPosition || event.positionsLocked)} disablePast
                                         ampm={false} minDateTime={minDateAllowed}
                                         maxDateTime={maxDateAllowed} name="start"
                                         label={admin ? 'FINAL Start' : 'Requested Start'} value={start}
                                         onChange={setStart}/>
-                    </Grid2>
-                    <Grid2 size={{xs: 6, sm: 3,}}>
+                   </Grid>
+                   <Grid size={{xs: 6, sm: 3,}}>
                         <DateTimePicker sx={{width: '100%',}}
                                         disabled={!admin && (!!eventPosition || event.positionsLocked)} disablePast
                                         ampm={false} minDateTime={minDateAllowed} maxDateTime={maxDateAllowed}
                                         name="end" label={admin ? 'FINAL End' : 'Requested End'} value={end}
                                         onChange={setEnd}/>
-                    </Grid2>
-                    <Grid2 size={6}>
+                   </Grid>
+                   <Grid size={6}>
                         <TextField variant="filled" fullWidth multiline rows={4}
                                    disabled={!admin && (!!eventPosition || event.positionsLocked)} name="notes"
                                    label={admin ? 'FINAL Notes (optional)' : 'Notes (optional)'} value={notes}
                                    onChange={(e) => setNotes(e.target.value)}
                                    helperText="Mention anything that you would like the event staff to know, but be concise."/>
-                    </Grid2>
-                    <Grid2 size={6}>
+                   </Grid>
+                   <Grid size={6}>
                         { admin && <FormSaveButton text="Add" icon={<Add />} /> }
                         { !admin && !eventPosition && !event.positionsLocked && <FormSaveButton text="Request" icon={<Add />} /> }
                         { !admin && eventPosition && !event.positionsLocked && <Button type="button" variant="contained" color="error" startIcon={<Delete />} onClick={() => deleteEventPosition(event, eventPosition.id)}>Delete</Button> }
                         { !admin && event.positionsLocked && <Typography sx={{ mt: 2, }}>Positions are locked for this event.</Typography> }
                         { !admin && <Typography sx={{ mt: 2, }}>You will receive an email once your final position and time has been published.</Typography> }
                         { admin && <Typography variant="subtitle2" sx={{ mt: 1, }}>The position will be unpublished after being added.</Typography> }
-                    </Grid2>
-                </Grid2>
+                   </Grid>
+               </Grid>
             </Form> 
         </LocalizationProvider>
     )

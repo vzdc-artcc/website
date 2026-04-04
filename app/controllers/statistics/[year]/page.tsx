@@ -1,6 +1,6 @@
 import React from 'react';
 import prisma from "@/lib/db";
-import {Box, Card, CardContent, Grid2, IconButton, Stack, Tooltip, Typography} from "@mui/material";
+import {Box, Card, CardContent, Grid, IconButton, Stack, Tooltip, Typography} from "@mui/material";
 import Link from "next/link";
 import {StackedLineChart} from "@mui/icons-material";
 import {getRating} from "@/lib/vatsim";
@@ -61,15 +61,15 @@ export default async function Page(props: { params: Promise<{ year: string }> })
     const controllerLog = getControllerLog(logs);
 
     return (
-        (<Grid2 container columns={30} spacing={2}>
-            <Grid2 size={30}>
+        (<Grid container columns={30} spacing={2}>
+            <Grid size={30}>
                 <Card>
                     <CardContent>
                         <Typography variant="h4">{year} Statistics</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -81,8 +81,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         <Typography variant="h6">{totalHours.deliveryHours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -94,8 +94,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         <Typography variant="h6">{totalHours.groundHours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -107,8 +107,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         <Typography variant="h6">{totalHours.towerHours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -120,8 +120,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         <Typography variant="h6">{totalHours.approachHours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -133,8 +133,8 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         <Typography variant="h6">{totalHours.centerHours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2
+            </Grid>
+            <Grid
                 size={{
                     xs: 30,
                     sm: 15,
@@ -147,9 +147,9 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                             variant="h6">{(totalHours.deliveryHours + totalHours.groundHours + totalHours.towerHours + totalHours.approachHours + totalHours.centerHours).toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
-            </Grid2>
+            </Grid>
             {top3Controllers.map((controller, idx) => (
-                <Grid2
+                <Grid
                     key={controller.user.cid}
                     size={{
                         xs: 30,
@@ -177,24 +177,24 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                             <Typography variant="h6">{controller.hours.toPrecision(3)} hours</Typography>
                         </CardContent>
                     </Card>
-                </Grid2>
+                </Grid>
             ))}
-            <Grid2 size={30}>
+            <Grid size={30}>
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Monthly Totals</Typography>
                         <StatisticsTable heading="Month" logs={monthLog.filter((log) => !!log)}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-            <Grid2 size={30}>
+            </Grid>
+            <Grid size={30}>
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Controller Totals</Typography>
                         <StatisticsTable heading="Controller" logs={controllerLog.filter((log) => !!log)}/>
                     </CardContent>
                 </Card>
-            </Grid2>
-        </Grid2>)
+            </Grid>
+        </Grid>)
     );
 }
