@@ -110,6 +110,7 @@ model User {
   trainingSessions      TrainingSession[]   @relation("TrainingsStudent")
   incidentsReported     IncidentReport[]    @relation("IncidentReportReporter")
   incidentReports       IncidentReport[]    @relation("IncidentReportReportee")
+  opsPlannedEvents      Event[]
 
   trainingAssignmentStudent        TrainingAssignment?  @relation("TrainingAssignmentStudent")
   trainingAssignmentPrimaryTrainer TrainingAssignment[] @relation("TrainingAssignmentPrimaryTrainer")
@@ -699,6 +700,8 @@ model Event {
   opsFreeText          String?       @db.Text
   opsPlanPublished     Boolean       @default(false)
   opsPlanFiles         OpsPlanFile[]
+  opsPlannerId         String?
+  opsPlanner           User?         @relation(fields: [opsPlannerId], references: [id], onDelete: SetNull)
 }
 
 enum EventType {

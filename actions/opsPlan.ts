@@ -19,6 +19,8 @@ export const saveOpsPlan = async (event: Event, formData: FormData, admin?: bool
     }
 
     const raw = (formData.get('featuredFieldConfigs') as string) || '{}';
+    const rawPlannerId = String(formData.get('userId') || '').trim();
+
     let parsed: Record<string, any> = {};
     try {
         parsed = raw ? JSON.parse(raw) : {};
@@ -28,11 +30,14 @@ export const saveOpsPlan = async (event: Event, formData: FormData, admin?: bool
     }
 
     try {
+        const updateData: any = {
+            featuredFieldConfigs: parsed,
+        };
+        updateData.opsPlannerId = rawPlannerId || null;
+
         const updated = await prisma.event.update({
             where: { id: event.id },
-            data: {
-                featuredFieldConfigs: parsed,
-            },
+            data: updateData,
         });
 
         after(async () => {
@@ -42,6 +47,7 @@ export const saveOpsPlan = async (event: Event, formData: FormData, admin?: bool
         try {
             const { revalidatePath } = await import("next/cache");
             revalidatePath(`/events/admin/events/${event.id}/manager`);
+            revalidatePath(`/events/${event.id}/ops`);
         } catch (e) {
         }
 
@@ -52,28 +58,44 @@ export const saveOpsPlan = async (event: Event, formData: FormData, admin?: bool
     }
 }
 
+
 export const fetchFullEvent = async (eventId: string) => {
     if (!eventId) return null;
 
-    const event = await prisma.event.findUnique({
+    const fetchedEvent = await prisma.event.findUnique({
         where: { id: eventId },
-        select: {
-            id: true,
-            name: true,
-            host: true,
-            start: true,
-            end: true,
-            type: true,
-            hidden: true,
-            archived: true,
-            positionsLocked: true,
-            manualPositionsOpen: true,
-            featuredFields: true,
-            featuredFieldConfigs: true,
-            opsFreeText: true,
-            opsPlanPublished: true,
+        select: (() => {
+            const select: any = {};
 
-            positions: {
+            select.id = true;
+            select.name = true;
+            select.host = true;
+            select.start = true;
+            select.end = true;
+            select.type = true;
+            select.hidden = true;
+            select.archived = true;
+            select.positionsLocked = true;
+            select.manualPositionsOpen = true;
+            select.featuredFields = true;
+            select.featuredFieldConfigs = true;
+            select.opsFreeText = true;
+            select.opsPlanPublished = true;
+            select.opsPlannerId = true;
+
+            select.opsPlanner = {
+                select: {
+                    id: true,
+                    cid: true,
+                    operatingInitials: true,
+                    firstName: true,
+                    lastName: true,
+                    fullName: true,
+                    rating: true,
+                },
+            };
+
+            select.positions = {
                 orderBy: { requestedStartTime: 'asc' },
                 select: {
                     id: true,
@@ -129,9 +151,9 @@ export const fetchFullEvent = async (eventId: string) => {
                         },
                     },
                 },
-            },
+            };
 
-            eventTmis: {
+            select.eventTmis = {
                 orderBy: { createdAt: 'asc' },
                 select: {
                     id: true,
@@ -140,13 +162,15 @@ export const fetchFullEvent = async (eventId: string) => {
                     createdBy: true,
                     createdAt: true,
                 },
-            },
+            };
 
-            presetPositions: true,
-            tmis: true,
-        },
+            select.presetPositions = true;
+            select.tmis = true;
+
+            return select;
+        })(),
     });
 
-    return event;
+    return fetchedEvent;
 };
 

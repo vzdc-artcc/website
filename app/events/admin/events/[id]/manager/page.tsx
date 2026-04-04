@@ -7,7 +7,7 @@ import HiddenAlert from "@/components/EventManager/HiddenAlert";
 import EventPositionRequestForm from "@/components/EventPosition/EventPositionRequestForm";
 import prisma from "@/lib/db";
 import {ExpandMore} from "@mui/icons-material";
-import {Accordion, AccordionDetails, AccordionSummary, Box, Paper, Stack, Typography} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, Paper, Stack, Typography} from "@mui/material";
 import {EventPosition, SoloCertification, User} from "@prisma/client";
 import {getServerSession} from "next-auth";
 import {notFound} from "next/navigation";
@@ -26,20 +26,22 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
     const { id } = await params;
 
-    const event = await prisma.event.findUnique({
+    const eventInclude: any = {};
+    eventInclude.positions = {
+        include: {
+            user: true,
+        },
+        orderBy: {
+            submittedAt: 'asc',
+        },
+    };
+    eventInclude.opsPlanner = true;
+
+    const event: any = await prisma.event.findUnique({
         where: {
             id,
         },
-        include: {
-            positions: {
-                include: {
-                    user: true,
-                },
-                orderBy: {
-                    submittedAt: 'asc',
-                }
-            },
-        },
+        include: eventInclude,
     });
 
     if (!event) {
@@ -48,13 +50,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
     const session = await getServerSession(authOptions);
 
-    const positions: EventPositionWithSolo[] = (await Promise.all(event.positions.map(async (position) => {
+    const positions: EventPositionWithSolo[] = (await Promise.all(((event.positions || []) as any[]).map(async (position: any) => {
         if (!position.user) {
             return { ...position, soloCert: undefined, user: undefined };
         }
         const soloCert = await getSoloCertification(position.user);
         return { ...position, soloCert };
-    }))).sort((a, b) => (a.user?.lastName || '').localeCompare(b.user?.lastName || ''));
+    }))).sort((a: EventPositionWithSolo, b: EventPositionWithSolo) => (a.user?.lastName || '').localeCompare(b.user?.lastName || ''));
 
     return session?.user && (
         <Stack spacing={2}>
@@ -76,7 +78,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     <Typography variant="h6" gutterBottom>OPS Plan</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    <OpsPlanForm event={event} admin currentUser={session.user as User} />
+                    <OpsPlanForm event={event as any} admin currentUser={session.user as User} />
                 </AccordionDetails>
             </Accordion>
 
