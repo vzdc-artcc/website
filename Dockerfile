@@ -37,7 +37,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
 
-RUN npm i --no-save prisma dotenv
+RUN npm i --no-save prisma dotenv --legacy-peer-deps
 
 USER nextjs
 
