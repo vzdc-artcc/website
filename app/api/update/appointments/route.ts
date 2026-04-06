@@ -152,7 +152,7 @@ const sendTrainingAppointmentWarningEmails = async () => {
 
     await Promise.all(trainingAppointments.map(async (trainingAppointment) => {
         try {
-            await sendTrainingAppointmentWarningEmail(trainingAppointment, trainingAppointment.student as User, trainingAppointment.trainer as User);
+            sendTrainingAppointmentWarningEmail(trainingAppointment, trainingAppointment.student as User, trainingAppointment.trainer as User).then();
             await prisma.trainingAppointment.update({
                 where: {
                     id: trainingAppointment.id,
