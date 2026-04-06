@@ -7,7 +7,7 @@ import {NextRequest} from "next/server";
 
 const TRAINING_ENVIRONMENTS = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["ERR-CONFIG"];
 const BUFFER_TIME = Number(process.env.BUFFER_TIME) || 15; // in minutes
-const oneWeekInMS = 7 * 24 * 60 * 60 * 1000;
+// const oneWeekInMS = 7 * 24 * 60 * 60 * 1000;
 
 export async function GET(req: NextRequest) {
 
@@ -15,7 +15,15 @@ export async function GET(req: NextRequest) {
         return new Response('Unauthorized', {status: 401});
     }
 
+    const yesterday = new Date();
+    yesterday.setTime(yesterday.getTime() - (24 * 60 * 60 * 1000)); // 24 hours ago
+
     const appointments = await prisma.trainingAppointment.findMany({
+        where: {
+            start: {
+                gte: yesterday,
+            },
+        },
         include: {
             lessons: true,
         },

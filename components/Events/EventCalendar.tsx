@@ -5,10 +5,15 @@ import FullCalendar from "@fullcalendar/react";
 import {useRouter} from "next/navigation";
 import {EventType} from '@/generated/prisma/browser';
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import tz from "dayjs/plugin/timezone";
 
 export default function EventCalendar({events, timeZone}: { events: any[], timeZone: string, }) {
 
     const router = useRouter();
+
+    dayjs.extend(utc);
+    dayjs.extend(tz);
 
     return (
         <FullCalendar
