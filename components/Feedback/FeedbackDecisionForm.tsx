@@ -7,6 +7,7 @@ import {toast} from "react-toastify";
 import {releaseFeedback, stashFeedback} from "@/actions/feedback";
 
 export default function FeedbackDecisionForm({feedback}: { feedback: Feedback, }) {
+    const [staffComments, setStaffComments] = React.useState(feedback.staffComments || '');
 
     const handleRelease = async (formData: FormData) => {
         await releaseFeedback({...feedback, staffComments: formData.get("reason") as string});
@@ -14,7 +15,11 @@ export default function FeedbackDecisionForm({feedback}: { feedback: Feedback, }
     }
 
     const handleStash = async () => {
-        await stashFeedback(feedback);
+        if (!staffComments.trim()) {
+            toast("Staff comments are required when stashing feedback", {type: "error"});
+            return;
+        }
+        await stashFeedback({...feedback, staffComments});
         toast("Feedback stashed successfully!", {type: "success"});
     }
 
@@ -24,8 +29,9 @@ export default function FeedbackDecisionForm({feedback}: { feedback: Feedback, }
                 <form action={handleRelease}>
                     <Stack direction="row" spacing={1} alignItems="center">
                         <TextField variant="filled" rows={4} fullWidth multiline name="reason" label="Staff comments"
-                                   defaultValue={feedback.staffComments || ''}
-                                   helperText="Staff comments are not required, but are highly encouraged"/>
+                                   value={staffComments}
+                                   onChange={(e) => setStaffComments(e.target.value)}
+                                   helperText="Staff comments are required when stashing, optional when releasing"/>
                         <Box>
                             <Button type="submit" variant="contained" size="large" color="success"
                                     startIcon={<Send/>}>Release</Button>
