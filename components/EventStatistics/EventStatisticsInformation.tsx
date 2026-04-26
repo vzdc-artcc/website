@@ -212,10 +212,12 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                                 <Typography>All Published positions (from recent)</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                {eventPositions.map((ep) => (
-                                    <Typography key={ep.id} variant="caption"
-                                                gutterBottom>{ep.finalPosition} - {ep.event.name} - {formatZuluDate(ep.event.start)}</Typography>
-                                ))}
+                                <Box sx={{maxHeight: 200, overflowY: 'auto',}}>
+                                    {eventPositions.map((ep) => (
+                                        <Typography key={ep.id} variant="caption"
+                                                    gutterBottom>{ep.finalPosition} - {ep.event.name} - {formatZuluDate(ep.event.start)}</Typography>
+                                    ))}
+                                </Box>
                             </AccordionDetails>
                         </Accordion>
                     </CardContent>
