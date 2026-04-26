@@ -1,8 +1,5 @@
-import { Home, ListAlt, QuestionAnswer, RecentActors } from "@mui/icons-material";
-import { Badge, Card } from "@mui/material";
-
-import { CalendarMonth } from "@mui/icons-material";
-import { CardContent, Link, List, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import {CalendarMonth, Home, Insights, ListAlt, QuestionAnswer, RecentActors} from "@mui/icons-material";
+import {Badge, Link, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import prisma from "@/lib/db";
 import MenuWrapper from "./MenuWrapper";
 
@@ -48,6 +45,14 @@ export default async function EventMenu() {
                         <RecentActors/>
                     </ListItemIcon>
                     <ListItemText primary="Event Position Presets"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/events/admin/controller" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <Insights/>
+                    </ListItemIcon>
+                    <ListItemText primary="Controller Statistics"/>
                 </ListItemButton>
             </Link>
             <Link href="/events/admin/staffing-requests" style={{textDecoration: 'none', color: 'inherit',}}>

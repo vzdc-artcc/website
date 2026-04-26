@@ -26,7 +26,7 @@ export default function PerformanceIndicatorCommentDialog({criteria}: {
                     <Comment fontSize="small"/>
                 </IconButton>
             </Tooltip>
-            <Dialog open={open} onClose={() => setOpen(false)}>
+            <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
                 <DialogTitle>Comments - {criteria.name}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>{criteria.comments}</DialogContentText>
