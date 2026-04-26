@@ -264,7 +264,7 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
             <Grid size={{xs: 6, md: 3,}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
-                        <Typography variant="h6" gutterBottom>Online ATC Positions</Typography>
+                        <Typography variant="h6" gutterBottom>Past ATC Positions</Typography>
                         <EventStatisticsOnlinePositionTable allPositions={onlinePositions}/>
                     </CardContent>
                 </Card>
