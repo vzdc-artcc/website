@@ -18,6 +18,8 @@ import {
     Typography
 } from '@mui/material';
 import {getRating} from '@/lib/vatsim';
+import Link from "next/link";
+import {Insights, OpenInNew} from "@mui/icons-material";
 
 type UserShape = any;
 type SoloCertShape = { position: string; expires: string | Date } | null;
@@ -129,6 +131,11 @@ export default function ControllerChip({
                             <Typography variant="h6">{`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || 'Unknown'}</Typography>
                             <Typography variant="body2" color="text.secondary">{`CID: ${user?.cid ?? 'N/A'} • ${ratingLabel}`}</Typography>
                         </Box>
+                        <Link href={`/events/admin/controller/${user.cid}`} target="_blank"
+                              style={{textDecoration: 'none'}}>
+                            <Button variant="contained" color="info" startIcon={<Insights/>} endIcon={<OpenInNew/>}>Event
+                                Statistics</Button>
+                        </Link>
                     </Stack>
                 </DialogTitle>
 
