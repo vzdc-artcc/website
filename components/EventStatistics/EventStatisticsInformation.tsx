@@ -215,7 +215,7 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                                 <Box sx={{maxHeight: 200, overflowY: 'auto',}}>
                                     {eventPositions.map((ep) => (
                                         <Typography key={ep.id} variant="caption"
-                                                    gutterBottom>{ep.finalPosition} - {ep.event.name} - {formatZuluDate(ep.event.start)}</Typography>
+                                                    gutterBottom>{ep.finalPosition} - {ep.event.name} - {formatZuluDate(ep.event.start)}<br/></Typography>
                                     ))}
                                 </Box>
                             </AccordionDetails>
