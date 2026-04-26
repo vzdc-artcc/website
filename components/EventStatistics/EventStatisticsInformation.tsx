@@ -201,7 +201,7 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                         <Typography variant="h6" gutterBottom>Events</Typography>
                         <Typography>Published event hours:</Typography>
                         <Typography variant="subtitle2" gutterBottom>{eventHours.toFixed(3)}</Typography>
-                        <Typography>Published "big" event hours:</Typography>
+                        <Typography>Published big* event hours:</Typography>
                         <Typography variant="subtitle2" gutterBottom>{eventHoursBigEvents.toFixed(3)}</Typography>
                         <Typography>Published positions in last 60 days:</Typography>
                         <Typography variant="subtitle2" gutterBottom>{eventPositionLast60Days.length}</Typography>
@@ -220,6 +220,8 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                                 </Box>
                             </AccordionDetails>
                         </Accordion>
+                        <Typography variant="caption" fontSize={10}>*A big event is one of the
+                            following: {bigEventTypes.join(', ')}.</Typography>
                     </CardContent>
                 </Card>
             </Grid>
