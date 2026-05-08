@@ -578,6 +578,10 @@ const fetchAndUpdateReleaseRequest = async (student: User, passedLessons: Lesson
 }
 
 const sendInstructorEmails = async (student: User, trainer: User, trainingSession: TrainingSession, oldTickets: TrainingTicketWithLesson[], newTickets: TrainingTicketWithLesson[]) => {
+    if (student.controllerStatus !== 'HOME') {
+        return;
+    }
+
     for (const newTicket of newTickets) {
 
         if (!newTicket.lesson.notifyInstructorOnPass || !newTicket.passed) {
