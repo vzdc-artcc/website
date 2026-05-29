@@ -185,15 +185,15 @@ export default async function RosterTable({membership, search, includeVatusa,}: 
                                         <Link href={`/controllers/${user.user.cid}`}
                                               style={{color: 'inherit', textDecoration: 'none',}}>
                                             <Typography
-                                                variant="h6">{user.user.preferredName || `${user.user.firstName} ${user.user.lastName}`}
+                                                fontWeight="bold">{user.user.preferredName || `${user.user.firstName} ${user.user.lastName}`}
                                                 {approvedLoas.length > 0 &&
                                                     <Chip label="LOA" color="primary" size="small" sx={{ml: 1,}}/>}
                                             </Typography>
                                         </Link>
                                         <Typography
-                                            variant="body2">{user.user.preferredName && `${user.user.firstName} ${user.user.lastName}`}</Typography>
+                                            variant="caption">{user.user.preferredName && `AKA ${user.user.firstName} ${user.user.lastName}`}</Typography>
                                         <Typography
-                                            variant="body1">{getRating(user.user.rating)} • {user.user.cid}</Typography>
+                                            variant="body2">{getRating(user.user.rating)} • {user.user.cid}</Typography>
                                         {user.user.controllerStatus === "HOME" && getChips(user.user as User)}
                                         {user.user.controllerStatus === "VISITOR" &&
                                             <Typography>{user.user.artcc}</Typography>}
@@ -213,11 +213,11 @@ export default async function RosterTable({membership, search, includeVatusa,}: 
                                 <TableRow key={user.vatusa.cid}>
                                     <TableCell>
                                         <Typography
-                                            variant="h6">{user.vatusa.fname} {user.vatusa.lname}</Typography>
+                                            fontWeight="bold">{user.vatusa.fname} {user.vatusa.lname}</Typography>
                                         <Typography
-                                            variant="body1">{getRating(user.vatusa.rating)} • {user.vatusa.cid}</Typography>
+                                            variant="body2">{getRating(user.vatusa.rating)} • {user.vatusa.cid}</Typography>
                                         <Typography
-                                            variant="subtitle2">{user.vatusa.membership === 'home' ? 'Home Controller' : `Visiting Controller (${user.vatusa.facility})`}</Typography>
+                                            variant="subtitle2">{user.vatusa.membership === 'home' ? '' : `${user.vatusa.facility}`}</Typography>
                                     </TableCell>
                                     <TableCell>
                                         <Typography variant="h5">-</Typography>

@@ -2,11 +2,11 @@ import React from "react";
 import {
     Add,
     AddComment,
-    AirplanemodeActive, Article,
+    AirplanemodeActive,
+    Article,
     BarChart,
     CalendarMonth,
     Chat,
-    Description,
     Event,
     FileOpen,
     Forum,
@@ -15,7 +15,6 @@ import {
     PersonAdd,
     Radar,
     Radio,
-    Route,
     TurnSharpRight,
     Workspaces,
 } from "@mui/icons-material";
@@ -43,11 +42,6 @@ export const NAVIGATION: NavigationButton[] = [
         icon: <AirplanemodeActive/>,
         dropdown: {
             buttons: [
-                {
-                    label: 'Charts Database',
-                    link: '/charts',
-                    icon: <Description/>,
-                },
                 {
                     label: 'Airports',
                     link: '/airports',
@@ -90,11 +84,6 @@ export const NAVIGATION: NavigationButton[] = [
                     label: 'Statistics',
                     link: '/controllers/statistics',
                     icon: <BarChart/>,
-                },
-                {
-                    label: 'Preferred Routes Database',
-                    link: '/prd',
-                    icon: <Route/>,
                 },
                 {
                     label: 'Flight Plan Practice',
