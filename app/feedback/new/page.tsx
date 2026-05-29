@@ -30,6 +30,9 @@ export default async function Page() {
                 },
             ],
         },
+        orderBy: {
+            lastName: 'asc',
+        },
     });
 
     const session = await getServerSession(authOptions);

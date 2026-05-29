@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactNode} from 'react';
 import prisma from "@/lib/db";
 import {
     Card,
@@ -15,6 +15,8 @@ import {
 import {getRating} from "@/lib/vatsim";
 import {Metadata} from "next";
 import MatrixName from "@/components/Misc/MatrixName";
+import {User} from "next-auth";
+import {getChips} from "@/lib/staffPositions";
 
 export const metadata: Metadata = {
     title: 'Staff | vZDC',
@@ -139,6 +141,17 @@ export default async function Page() {
         },
     });
 
+    const fcs = await prisma.user.findMany({
+        where: {
+            staffPositions: {
+                has: 'FC',
+            },
+        },
+        orderBy: {
+            lastName: 'asc',
+        },
+    });
+
     return (
         (<Grid container columns={12} spacing={2}>
             <Grid size={12}>
@@ -187,24 +200,7 @@ export default async function Page() {
                         <Typography>ta@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Training Administrators
                             (ATAs)</Typography>
-                        <TableContainer sx={{maxHeight: 400}}>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Rating</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {atas.map(ata => (
-                                        <TableRow key={ata.id}>
-                                            <TableCell>{ata.firstName} {ata.lastName}</TableCell>
-                                            <TableCell>{getRating(ata.rating)}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        {getAssistantTable(atas as User[])}
                     </CardContent>
                 </Card>
             </Grid>
@@ -220,24 +216,7 @@ export default async function Page() {
                         <Typography variant="h4">{ec?.firstName} {ec?.lastName}</Typography>
                         <Typography>ec@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Event Coordinators (AECs)</Typography>
-                        <TableContainer sx={{maxHeight: 400}}>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Rating</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {aecs.map(aec => (
-                                        <TableRow key={aec.id}>
-                                            <TableCell>{aec.firstName} {aec.lastName}</TableCell>
-                                            <TableCell>{getRating(aec.rating)}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        {getAssistantTable(aecs as User[])}
                     </CardContent>
                 </Card>
             </Grid>
@@ -253,24 +232,7 @@ export default async function Page() {
                         <Typography variant="h4">{fe?.firstName} {fe?.lastName}</Typography>
                         <Typography>fe@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Facility Engineers (AFEs)</Typography>
-                        <TableContainer sx={{maxHeight: 400}}>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Rating</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {afes.map(afe => (
-                                        <TableRow key={afe.id}>
-                                            <TableCell>{afe.firstName} {afe.lastName}</TableCell>
-                                            <TableCell>{getRating(afe.rating)}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        {getAssistantTable(afes as User[])}
                     </CardContent>
                 </Card>
             </Grid>
@@ -286,24 +248,7 @@ export default async function Page() {
                         <MatrixName firstName={wm?.firstName ?? ''} lastName={wm?.lastName ?? ''}/>
                         <Typography>wm@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Webmasters (AWMs)</Typography>
-                        <TableContainer sx={{maxHeight: 400}}>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Rating</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {awms.map(awm => (
-                                        <TableRow key={awm.id}>
-                                            <TableCell>{awm.firstName} {awm.lastName}</TableCell>
-                                            <TableCell>{getRating(awm.rating)}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        {getAssistantTable(awms as User[])}
                     </CardContent>
                 </Card>
             </Grid>
@@ -312,27 +257,10 @@ export default async function Page() {
                     xs: 12,
                     md: 6
                 }}>
-                <Card>
+                <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="h6">Instructors</Typography>
-                        <TableContainer sx={{maxHeight: 600}}>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Rating</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {instructors.map(instructor => (
-                                        <TableRow key={instructor.id}>
-                                            <TableCell>{instructor.firstName} {instructor.lastName}</TableCell>
-                                            <TableCell>{getRating(instructor.rating)}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        {getAssistantTable(instructors as User[])}
                     </CardContent>
                 </Card>
             </Grid>
@@ -341,31 +269,50 @@ export default async function Page() {
                     xs: 12,
                     md: 6
                 }}>
-                <Card>
+                <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="h6">Mentors</Typography>
-                        <TableContainer sx={{maxHeight: 600}}>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Rating</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {mentors.map(mentor => (
-                                        <TableRow key={mentor.id}>
-                                            <TableCell>{mentor.firstName} {mentor.lastName}</TableCell>
-                                            <TableCell>{getRating(mentor.rating)}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        {getAssistantTable(mentors as User[])}
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid
+                size={{
+                    xs: 12,
+                }}>
+                <Card sx={{height: '100%',}}>
+                    <CardContent>
+                        <Typography variant="h6">Financial Committee</Typography>
+                        {getAssistantTable(fcs as User[], "Staff Position(s)", getChips)}
                     </CardContent>
                 </Card>
             </Grid>
         </Grid>)
     );
 
+}
+
+const getAssistantTable = (users: User[], extraColumnName?: string, extraColumn?: (user: User) => ReactNode) => {
+    return users.length > 0 ? (
+        <TableContainer sx={{maxHeight: 600}}>
+            <Table size="small">
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Rating</TableCell>
+                        {extraColumnName && <TableCell>{extraColumnName}</TableCell>}
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {users.map(user => (
+                        <TableRow key={user.id}>
+                            <TableCell>{user.firstName} {user.lastName}</TableCell>
+                            <TableCell>{getRating(user.rating)}</TableCell>
+                            {extraColumn && <TableCell>{extraColumn(user)}</TableCell>}
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
+    ) : (<Typography variant="caption">N/A</Typography>);
 }

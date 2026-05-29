@@ -13,8 +13,6 @@ import {
 } from "@mui/material";
 import prisma from "@/lib/db";
 import {notFound} from "next/navigation";
-import {fetchCharts} from "@/actions/charts";
-import ChartsList from "@/components/Charts/ChartsList";
 
 export default async function AirportInformation({icao}: { icao: string, },) {
     const airport = await prisma.airport.findUnique({
@@ -34,8 +32,6 @@ export default async function AirportInformation({icao}: { icao: string, },) {
         notFound();
     }
 
-    const charts = await fetchCharts(icao);
-
     return (
         (<Stack direction="column" spacing={2}>
             <Typography variant="h5" fontWeight={700} textAlign="center">{airport.name} ({airport.iata})</Typography>
@@ -43,18 +39,6 @@ export default async function AirportInformation({icao}: { icao: string, },) {
                 <Grid
                     size={{
                         xs: 2,
-                        md: 1
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <ChartsList icao={airport.icao} charts={charts}/>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 2,
-                        md: 1
                     }}>
                     <Card>
                         <CardContent>

@@ -55,24 +55,27 @@ export default async function AssignedTrainersCard({user}: { user: User, }) {
     return (
         <Card sx={{height: '100%',}}>
             <CardContent>
-                <Typography variant="h6">Assigned Trainers</Typography>
-                <Typography variant="subtitle2" sx={{mb: 2,}} fontWeight="regular">Training assignments are made by the
-                    Training Administrator.</Typography>
+                <Typography variant="h6" gutterBottom>Assigned Trainers</Typography>
                 {!trainingAssignment && trainingAssignmentRequest &&
                     <>
                         <Chip color="warning" label="REQUEST PENDING"/>
                         <Typography sx={{mt: 1,}} gutterBottom>Position: <b>{positionInQueue}</b></Typography>
                         <Typography gutterBottom>Estimated Wait Time: <b>{estimatedWaitTime}</b></Typography>
                         {user.controllerStatus === 'HOME' &&
-                            <Typography sx={{mb: 2, display: 'block'}} variant="caption"><b>Training wait time estimates
+                            <Typography sx={{display: 'block'}} variant="caption" gutterBottom><b>Training wait time
+                                estimates
                                 may not be fully accurate.</b> Estimates are calculated based on your position in
                                 the {user.controllerStatus} training queue and those at the front of the
                                 queue.</Typography>}
                         {user.controllerStatus === 'VISITOR' &&
-                            <Typography sx={{mb: 2, display: 'block'}} variant="caption"><b>Visiting controllers should
+                            <Typography sx={{display: 'block'}} variant="caption" gutterBottom><b>Visiting controllers
+                                should
                                 expect much longer wait times for training.</b> Home controllers are prioritized in the
                                 training assignment queue over visitors. Message the Training Administrator if you have
                                 any questions about visitor training assignments.</Typography>}
+                        <Typography sx={{mb: 2, display: 'block'}} variant="caption">You are strongly encouraged to look
+                            for impromptu training sessions that can be posted by a member of the training team.
+                            More information is available in the Training Order.</Typography>
                         <AssignedTrainerRequestCancelButton request={trainingAssignmentRequest}/>
                     </>
                 }

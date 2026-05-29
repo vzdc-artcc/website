@@ -236,6 +236,7 @@ enum StaffPosition {
   AFE
   INS
   MTR
+  FC
 }
 
 model DossierEntry {
