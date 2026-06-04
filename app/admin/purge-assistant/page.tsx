@@ -118,13 +118,15 @@ export default async function Page(
             homeController = true;
         }
 
+        const unreviewedChanges = [...controller.changesSeen, ...controller.changesUnseen].filter(change => change.timestamp.getFullYear() <= Number(year) && change.timestamp.getMonth() <= Number(endMonth));
+
         return {
             controller: controller as User,
             totalHours,
             totalTrainerHours,
             totalTrainingHours,
             homeController,
-            openBroadcasts: controller.changesSeen.length + controller.changesUnseen.length,
+            openBroadcasts: unreviewedChanges.length,
         };
     });
 
