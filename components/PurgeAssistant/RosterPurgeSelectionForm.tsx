@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import {usePathname, useRouter} from "next/navigation";
-import {Box, Button, FormControlLabel, MenuItem, Stack, Switch, TextField} from "@mui/material";
+import {Box, Button, FormControlLabel, MenuItem, Stack, Switch, TextField, Typography} from "@mui/material";
 import {Search} from "@mui/icons-material";
 import {z} from "zod";
 import {toast} from "react-toastify";
@@ -192,9 +192,14 @@ export default function RosterPurgeSelectionForm({
                 />
                 <FormControlLabel control={<Switch defaultChecked={includeLoas} name="includeLoas"/>}
                                   label="Include LOAs?"/>
-                <Box sx={{mt: 1,}}>
+                <Box sx={{my: 1,}}>
                     <Button type="submit" variant="contained" startIcon={<Search/>} size="large">Search</Button>
                 </Box>
+                <Typography variant="caption" gutterBottom>Controllers that are OBS rated with a training assignment
+                    request are hidden.</Typography>
+                <br/>
+                <Typography variant="caption">Controllers with an un-reviewed broadcast are shown regardless of
+                    hours.</Typography>
             </form>
         </Box>
     );
