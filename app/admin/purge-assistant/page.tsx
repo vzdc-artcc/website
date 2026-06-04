@@ -67,13 +67,23 @@ export default async function Page(
                     },
                 },
             },
+            trainingSessions: {
+                where: {
+                    start: {
+                        gte: new Date(Number(year), Number(startMonth), 1),
+                        lte: new Date(Number(year), Number(endMonth), 0),
+                    },
+                },
+            },
         },
     });
 
+    // do not show OBS with a training assignment request
     controllers = controllers.filter(controller => {
         return !(controller.rating === 1 && controller.trainingAssignmentRequestStudent);
     });
 
+    // constrict date bounds and calculate hours for controlling and training
     let condensedControllers = controllers.map((controller) => {
         const filteredMonths = controller.log?.months.filter(month => {
             const monthInBounds = month.month >= parseInt(startMonth) && month.month <= parseInt(endMonth);
@@ -84,7 +94,18 @@ export default async function Page(
         // Filter the training sessions where the person has been a trainer
         const trainerSessions = controller.trainingSessionsGiven?.filter(session => session.instructorId === controller.id);
 
-        // Sum up the durations of the training sessions
+        // Training sessions received
+        const trainingSession = controller.trainingSessions || [];
+
+        // Sum up the durations of the training sessions given
+        const totalTrainerHours = trainerSessions?.reduce((sum, session) => {
+            const startDate = new Date(session.start);
+            const endDate = new Date(session.end);
+            const duration = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60); // Convert milliseconds to hours
+            return sum + duration;
+        }, 0).toPrecision(3) || 'N/A';
+
+        // Sum up the durations of the training sessions received
         const totalTrainingHours = trainerSessions?.reduce((sum, session) => {
             const startDate = new Date(session.start);
             const endDate = new Date(session.end);
@@ -100,13 +121,15 @@ export default async function Page(
         return {
             controller: controller as User,
             totalHours,
+            totalTrainerHours,
             totalTrainingHours,
             homeController,
+            openBroadcasts: controller.changesSeen.length + controller.changesUnseen.length,
         };
     });
 
     condensedControllers = condensedControllers.filter(data => {
-        return data.totalHours + (Number(data.totalTrainingHours) || 0) < parseInt(maxHours);
+        return data.openBroadcasts > 0 || data.totalHours + (Number(data.totalTrainerHours) || 0) + (Number(data.totalTrainingHours) || 0) < parseInt(maxHours);
     });
 
     const session = await getServerSession(authOptions);

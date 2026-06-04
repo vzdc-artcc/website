@@ -9,7 +9,14 @@ import {purgeControllers} from "@/actions/controller";
 import {formatZuluDate} from "@/lib/date";
 
 export default function PurgeAssistantTable({controllers, user}: {
-    controllers: { controller: User, totalHours: number, totalTrainingHours: string, homeController: boolean }[],
+    controllers: {
+        controller: User,
+        totalHours: number,
+        totalTrainerHours: string,
+        totalTrainingHours: string,
+        homeController: boolean,
+        openBroadcasts: number,
+    }[],
     user: User,
 }) {
 
@@ -51,13 +58,14 @@ export default function PurgeAssistantTable({controllers, user}: {
         {field: 'cid', headerName: 'CID', flex: 1},
         {field: 'email', headerName: 'Email', flex:1},
         {field: 'rating', headerName: 'Rating', flex: 1},
-        {field: 'totalHours', headerName: 'Total Hours', flex: 1},
-        {field: 'totalTrainingHours', headerName: 'Total Training Hours', flex: 1},
-        {field: 'joinDate', headerName: 'Join Facility Date', flex: 1,},
-        {field: 'reviewBroadcasts', headerName: 'Open Broadcasts', flex: 1,},
+        {field: 'totalHours', headerName: 'C Hrs', flex: 1},
+        {field: 'totalTrainingHours', headerName: 'Training Hrs', flex: 1},
+        {field: 'totalTrainerHours', headerName: 'Trainer Hrs', flex: 1},
+        {field: 'joinDate', headerName: 'Joined', flex: 1,},
+        {field: 'openBroadcasts', headerName: 'Open Broadcasts', flex: 1,},
     ];
 
-    const rows = controllers.map(({controller, totalHours, totalTrainingHours}) => ({
+    const rows = controllers.map(({controller, totalHours, totalTrainingHours, openBroadcasts}) => ({
         id: controller.id,
         controller: `${controller.firstName} ${controller.lastName}`,
         cid: controller.cid,
@@ -65,8 +73,9 @@ export default function PurgeAssistantTable({controllers, user}: {
         rating: getRating(controller.rating),
         totalHours: totalHours.toPrecision(3),
         totalTrainingHours: totalTrainingHours,
+        totalTrainerHours: totalTrainingHours,
         joinDate: formatZuluDate(controller.joinDate),
-        reviewBroadcasts: `${(controller as any).changesUnseen.length + (controller as any).changesSeen.length}`,
+        openBroadcasts,
     }));
 
     return (
