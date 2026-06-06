@@ -65,7 +65,7 @@ export default function PurgeAssistantTable({controllers, user}: {
         {field: 'openBroadcasts', headerName: 'Open Broadcasts', flex: 1,},
     ];
 
-    const rows = controllers.map(({controller, totalHours, totalTrainingHours, openBroadcasts}) => ({
+    const rows = controllers.map(({controller, totalHours, totalTrainingHours, totalTrainerHours, openBroadcasts}) => ({
         id: controller.id,
         controller: `${controller.firstName} ${controller.lastName}`,
         cid: controller.cid,
@@ -73,7 +73,7 @@ export default function PurgeAssistantTable({controllers, user}: {
         rating: getRating(controller.rating),
         totalHours: totalHours.toPrecision(3),
         totalTrainingHours: totalTrainingHours,
-        totalTrainerHours: totalTrainingHours,
+        totalTrainerHours: totalTrainerHours,
         joinDate: formatZuluDate(controller.joinDate),
         openBroadcasts,
     }));
