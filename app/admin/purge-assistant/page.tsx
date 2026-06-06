@@ -22,10 +22,10 @@ export default async function Page(
 ) {
     const searchParams = await props.searchParams;
 
-    const {startMonth, endMonth, maxHours, maxTrainingHours, year, includeLoas,} = searchParams;
+    const {startMonth, endMonth, maxHours, year, includeLoas,} = searchParams;
 
-    if (!startMonth || !endMonth || !maxHours || !year || !maxTrainingHours) {
-        permanentRedirect(`/admin/purge-assistant?startMonth=0&endMonth=11&maxHours=3&maxTrainingHours=1&year=${new Date().getFullYear()}&includeLoas=false`);
+    if (!startMonth || !endMonth || !maxHours || !year) {
+        permanentRedirect(`/admin/purge-assistant?startMonth=0&endMonth=11&maxHours=3&year=${new Date().getFullYear()}&includeLoas=false`);
     }
     if (parseInt(startMonth) < 0 || parseInt(endMonth) > 12 || parseInt(startMonth) > parseInt(endMonth)) {
         return <ErrorCard heading="Roster Purge Assistant" message="Invalid bounds."/>
@@ -83,6 +83,10 @@ export default async function Page(
         return !(controller.rating === 1 && controller.trainingAssignmentRequestStudent);
     });
 
+    controllers = controllers.filter(controller => {
+        return controller.joinDate.getFullYear() <= Number(year) && controller.joinDate.getMonth() <= Number(endMonth);
+    })
+
     // constrict date bounds and calculate hours for controlling and training
     let condensedControllers = controllers.map((controller) => {
         const filteredMonths = controller.log?.months.filter(month => {
@@ -95,7 +99,7 @@ export default async function Page(
         const trainerSessions = controller.trainingSessionsGiven?.filter(session => session.instructorId === controller.id);
 
         // Training sessions received
-        const trainingSession = controller.trainingSessions || [];
+        const trainingSessions = controller.trainingSessions || [];
 
         // Sum up the durations of the training sessions given
         const totalTrainerHours = trainerSessions?.reduce((sum, session) => {
@@ -106,7 +110,7 @@ export default async function Page(
         }, 0).toPrecision(3) || 'N/A';
 
         // Sum up the durations of the training sessions received
-        const totalTrainingHours = trainerSessions?.reduce((sum, session) => {
+        const totalTrainingHours = trainingSessions?.reduce((sum, session) => {
             const startDate = new Date(session.start);
             const endDate = new Date(session.end);
             const duration = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60); // Convert milliseconds to hours
@@ -148,7 +152,6 @@ export default async function Page(
                     }}>Roster Purge Assistant</Typography>
                     <RosterPurgeSelectionForm startMonth={parseInt(startMonth)} endMonth={parseInt(endMonth)}
                                               maxHours={parseInt(maxHours)} year={parseInt(year)}
-                                              maxTrainingHours={parseInt(maxTrainingHours)}
                                               includeLoas={!!includeLoas}/>
                 </CardContent>
             </Card>
