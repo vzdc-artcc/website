@@ -74,7 +74,7 @@ export default function BroadcastTable() {
     ];
 
     return (
-        <DataTable columns={columns} initialSort={[{field: 'timestamp', sort: 'asc',}]}
+        <DataTable columns={columns} initialSort={[{field: 'timestamp', sort: 'desc',}]}
                    fetchData={async (pagination, sortModel, filter) => {
                        const broadcasts = await fetchBroadcasts(pagination, sortModel, filter);
                        return {
