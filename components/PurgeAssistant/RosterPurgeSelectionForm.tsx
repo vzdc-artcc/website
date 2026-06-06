@@ -61,14 +61,12 @@ export default function RosterPurgeSelectionForm({
                                                      startMonth,
                                                      endMonth,
                                                      maxHours,
-                                                     maxTrainingHours,
                                                      year,
                                                      includeLoas,
                                                  }: {
     startMonth: number,
     endMonth: number,
     maxHours: number,
-    maxTrainingHours: number,
     year: number,
     includeLoas: boolean,
 }) {
@@ -82,7 +80,6 @@ export default function RosterPurgeSelectionForm({
             startMonth: z.number().min(0, "Start month has to be bigger than 0").max(11, "Start month has to be smaller than 11"),
             endMonth: z.number().min(0, "End month has to be bigger than 0").max(11, "End month has to be smaller than 11"),
             maxHours: z.number(),
-            maxTrainingHours: z.number(),
             includeLoas: z.boolean(),
         });
 
@@ -91,7 +88,6 @@ export default function RosterPurgeSelectionForm({
             startMonth: parseInt(formData.get("startMonth") as string),
             endMonth: parseInt(formData.get("endMonth") as string),
             maxHours: parseInt(formData.get("maxHours") as string),
-            maxTrainingHours: parseInt(formData.get("maxTrainingHours") as string),
             includeLoas: formData.get("includeLoas") === "on",
         });
 
@@ -105,13 +101,12 @@ export default function RosterPurgeSelectionForm({
             return;
         }
 
-        const {year, startMonth, endMonth, maxHours, maxTrainingHours, includeLoas} = result.data;
+        const {year, startMonth, endMonth, maxHours, includeLoas} = result.data;
         const search = new URLSearchParams();
         search.set("year", year.toString());
         search.set("startMonth", startMonth.toString());
         search.set("endMonth", endMonth.toString());
         search.set("maxHours", maxHours.toString());
-        search.set("maxTrainingHours", maxTrainingHours.toString());
         search.set("includeLoas", includeLoas + '');
         router.push(`${pathname}?${search.toString()}`);
     }
@@ -176,19 +171,7 @@ export default function RosterPurgeSelectionForm({
                     variant="filled"
                     defaultValue={maxHours}
                     name="maxHours"
-                    helperText="This will show all controllers that have less than this amount of hours"
-                />
-                <TextField
-                    sx={{mt: 1,}}
-                    id="maxTrainingHours"
-                    required
-                    fullWidth
-                    type="number"
-                    label="Max Training Hours"
-                    variant="filled"
-                    defaultValue={maxTrainingHours}
-                    name="maxTrainingHours"
-                    helperText="This will show all controllers that have less than this amount of training hours"
+                    helperText="This will show all controllers that have less than this amount of hours (including training hours)"
                 />
                 <FormControlLabel control={<Switch defaultChecked={includeLoas} name="includeLoas"/>}
                                   label="Include LOAs?"/>
