@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/db";
 import {User} from "next-auth";
+import {revalidatePath} from "next/cache";
 
 export const handleSeenBroadcast = async (user: User, broadcastId: string) => {
     await prisma.changeBroadcast.update({
@@ -21,6 +22,8 @@ export const handleSeenBroadcast = async (user: User, broadcastId: string) => {
             }
         },
     });
+
+    revalidatePath('/', "layout");
 }
 
 export const handleAgreeBroadcast = async (user: User, broadcastId: string) => {
@@ -50,4 +53,6 @@ export const handleAgreeBroadcast = async (user: User, broadcastId: string) => {
             seenBy: true,
         },
     });
+
+    revalidatePath('/', "layout");
 }

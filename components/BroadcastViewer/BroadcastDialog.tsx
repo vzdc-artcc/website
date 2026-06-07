@@ -57,8 +57,8 @@ export default function BroadcastDialog({user, broadcasts, children}: {
             <Dialog open={open} fullScreen>
                 <DialogTitle>{broadcasts.length > 1 ? 'New Facility Broadcasts' : broadcasts[0].title}</DialogTitle>
                 <DialogContent>
-                    <Alert severity="info">Reviewing facility broadcasts is a <b>requirement</b> to maintain currency.
-                        Saving for later does <u>not</u> satisfy this requirement.</Alert>
+                    <Alert severity="info">Reviewing facility broadcasts is a <b>requirement</b> to maintain currency
+                        and is actively tracked.</Alert>
                     {children}
                 </DialogContent>
                 <DialogActions>
@@ -78,18 +78,17 @@ export default function BroadcastDialog({user, broadcasts, children}: {
                     <DialogContentText gutterBottom>
                         {confirmAction === 'later'
                             ? 'This will mark the broadcasts as seen for your account, but not reviewed. You will be able to see this broadcast along with others in your profile. Continue?'
-                            : 'This will mark the broadcasts as reviewed for your account. Continue?'
+                            : 'By clicking "Reviewed", you agree that you have fully reviewed and understood the contents of the broadcast(s).  This cannot be undone.'
                         }
                     </DialogContentText>
                     <Stack direction="column" spacing={2}>
                         {confirmAction === "later" && <Alert severity="warning">
-                            Reviewing and <u>understanding</u> all broadcasts is required for quarterly facility
-                            currency and is actively monitored in accordance with administrative policy.
+                            Fully reviewing all broadcasts is required for quarterly facility
+                            currency. Saving for later <b>does not satisfy this requirement</b>.
                         </Alert>}
                         {confirmAction === "reviewed" && <Alert severity="error">
                             <b>Not fully viewing a facility broadcast is against the GOAP.</b> Mark the broadcast as
-                            saved for later if you do not want to view it now. If you have any questions about the
-                            content of a broadcast, please reach out to a staff member.
+                            saved for later if you do not want to view it now.
                         </Alert>}
                     </Stack>
                 </DialogContent>
