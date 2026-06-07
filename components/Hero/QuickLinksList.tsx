@@ -1,19 +1,20 @@
 import React from 'react';
 import Link from "next/link";
 import {List, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
-import {AirplanemodeActive, BarChart, BugReport, ListAlt, OpenInNew, PersonAdd, Route} from "@mui/icons-material";
+import {
+    AddComment,
+    AirplanemodeActive,
+    BarChart,
+    CalendarMonth,
+    ListAlt,
+    OpenInNew,
+    PersonAdd
+} from "@mui/icons-material";
 
 export default function QuickLinksList() {
     return (
         <List>
-            <Link href="/airports" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <AirplanemodeActive/>
-                    </ListItemIcon>
-                    <ListItemText primary="Airport Database"/>
-                </ListItemButton>
-            </Link>
+
             <Link href="/controllers/roster/home" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
@@ -30,14 +31,6 @@ export default function QuickLinksList() {
                     <ListItemText primary="Visitor Application"/>
                 </ListItemButton>
             </Link>
-            <Link href="/prd" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Route/>
-                    </ListItemIcon>
-                    <ListItemText primary="Preferred Route Database"/>
-                </ListItemButton>
-            </Link>
             <Link href="/controllers/statistics" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
@@ -46,13 +39,28 @@ export default function QuickLinksList() {
                     <ListItemText primary="Statistics"/>
                 </ListItemButton>
             </Link>
-            <Link href="https://github.com/vZDC-ARTCC/website/issues" target="_blank"
-                  style={{textDecoration: 'none', color: 'inherit',}}>
+            <Link href="/airports" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
-                        <BugReport/>
+                        <AirplanemodeActive/>
                     </ListItemIcon>
-                    <ListItemText primary="Report a Bug"/>
+                    <ListItemText primary="Airport Database"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/sua/new" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <CalendarMonth/>
+                    </ListItemIcon>
+                    <ListItemText primary="vSOA Request"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/feedback/new" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <AddComment/>
+                    </ListItemIcon>
+                    <ListItemText primary="Give Feedback"/>
                 </ListItemButton>
             </Link>
             <Link href="https://www.vatusa.net" target="_blank"

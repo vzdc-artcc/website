@@ -165,7 +165,7 @@ export default async function RosterTable({membership, search, includeVatusa,}: 
                 <TableHead>
                     <TableRow>
                         <TableCell>Controller</TableCell>
-                        <TableCell>Operating Initials</TableCell>
+                        <TableCell>OI</TableCell>
                         {certificationTypes.map((certificationType) => (
                             <TableCell key={certificationType.id}>{certificationType.name}</TableCell>
                         ))}
