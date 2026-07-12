@@ -6,11 +6,12 @@ import {
     RubricCriteraScore,
     TrainerReleaseRequest,
     TrainingSession,
+    TrainingSessionAdditionalTrainer,
     TrainingSessionPerformanceIndicator,
     TrainingSessionPerformanceIndicatorCategory,
     TrainingSessionPerformanceIndicatorCriteria
 } from "@/generated/prisma/browser";
-import {getAllData, getTicketsForSession} from "@/actions/trainingSessionFormHelper";
+import {getAdditionalTrainersForSession, getAllData, getTicketsForSession} from "@/actions/trainingSessionFormHelper";
 import {
     Accordion,
     AccordionDetails,
@@ -23,6 +24,7 @@ import {
     CardContent,
     Chip,
     CircularProgress,
+    Divider,
     FormControlLabel,
     Grid,
     IconButton,
@@ -38,7 +40,7 @@ import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import TrainingTicketForm from "@/components/TrainingSession/TrainingTicketForm";
-import {Delete, ExpandMore} from "@mui/icons-material";
+import {Add, Delete, ExpandMore} from "@mui/icons-material";
 import {toast} from "react-toastify";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import FormSaveButton from "@/components/Form/FormSaveButton";
@@ -88,6 +90,9 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
         lesson: Lesson,
         scores: RubricCriteraScore[],
     }[]>([]);
+    const [additionalTrainers, setAdditionalTrainers] = useState<TrainingSessionAdditionalTrainer[]>([]);
+    const [additionalTrainerSelected, setAdditionalTrainerSelected] = useState<string>();
+    const [additionalTrainerDescription, setAdditionalTrainerDescription] = useState<string>();
     const [additionalNotes, setAdditionalNotes] = useState<string>(trainingSession?.additionalComments || '');
     const [trainerNotes, setTrainerNotes] = useState<string>(trainingSession?.trainerComments || '');
 
@@ -109,6 +114,8 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                     scores: ticket.scores,
                 }
             }));
+            const additionalTrainers = await getAdditionalTrainersForSession(trainingSession.id);
+            setAdditionalTrainers(additionalTrainers);
         }
     }, [trainingSession]);
 
@@ -124,6 +131,7 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
             start,
             end,
             trainingTickets,
+            additionalTrainers,
             additionalNotes,
             trainerNotes,
             enableMarkdown,
@@ -165,6 +173,33 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
     dayjs.extend(utc);
     dayjs.extend(timezone);
 
+    const isTrainer = (u: User) => {
+        return u.roles.includes("MENTOR") || u.roles.includes("INSTRUCTOR")
+            || u.roles.includes("STAFF");
+    }
+
+    const addAdditionalTrainer = () => {
+        if (!additionalTrainerSelected || !additionalTrainerDescription) {
+            toast.error("All fields are required.");
+            return;
+        }
+
+        setAdditionalTrainers((prev => [...prev, {
+            trainerId: additionalTrainerSelected,
+            description: additionalTrainerDescription.toUpperCase(),
+            sessionId: trainingSession?.id || '',
+            id: '',
+        }]));
+
+        setAdditionalTrainerSelected('');
+        setAdditionalTrainerDescription('');
+        toast.success("Additional Trainer added!");
+    }
+
+    const removeAdditionalTrainer = (trainerId: string) => {
+        setAdditionalTrainers((prev => prev.filter((t) => t.trainerId !== trainerId)));
+    }
+
     return (
         (<LocalizationProvider dateAdapter={AdapterDayjs}>
             {renderAfterDialogs &&
@@ -174,7 +209,6 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                 <Grid container columns={2} spacing={2}>
                     <Grid size={2}>
                         <Autocomplete
-                            disabled={!!trainingSession}
                             options={allUsers.sort((a, b) => {
                                 if (yourStudentIds.includes(a.id) && yourStudentIds.includes(b.id)) {
                                     return a.lastName.localeCompare(b.lastName);
@@ -211,6 +245,45 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                         }}>
                         <DateTimePicker ampm={false} label="End" value={dayjs.utc(end).tz(timeZone)}
                                         onChange={(d) => setEnd(d?.toDate() || new Date())}/>
+                    </Grid>
+                    <Grid size={2}>
+                        <Accordion variant="outlined">
+                            <AccordionSummary expandIcon={<ExpandMore/>}>
+                                <Typography variant="h6">Additional Trainers</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Typography variant="subtitle2" sx={{mb: 2,}}>Additional trainers will not receive hours
+                                    for this session. You will be considered the primary trainer for this training
+                                    session.</Typography>
+                                <Autocomplete
+                                    disabled={!!trainingSession}
+                                    options={allUsers.filter(isTrainer).filter((u => u.id !== student && !additionalTrainers.map((t) => t.trainerId).includes(u.id)))}
+                                    getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.operatingInitials})`}
+                                    value={allUsers.find((u) => u.id === additionalTrainerSelected)}
+                                    onChange={(_event, newValue) => {
+                                        setAdditionalTrainerSelected(newValue ? newValue.id : '');
+                                    }}
+                                    renderInput={(params) => <TextField {...params} label="Trainer"/>}
+                                />
+                                <TextField variant="outlined" fullWidth label="Desciption"
+                                           placeholder="What did this trainer do (commands, voices, mentor training, etc.)?"
+                                           value={additionalTrainerDescription} onChange={(e) => {
+                                    setAdditionalTrainerDescription(e.target.value || '');
+                                }} sx={{my: 2,}} slotProps={{
+                                    htmlInput: {maxLength: 100,},
+                                }}/>
+                                <Button variant="contained" size="small" onClick={addAdditionalTrainer}
+                                        startIcon={<Add/>}>Add</Button>
+                                <Divider sx={{my: 2,}}/>
+                                {additionalTrainers.length === 0 &&
+                                    <Typography>No additional trainers added.</Typography>}
+                                {additionalTrainers.map((at) =>
+                                    <Typography>{allUsers.find((u) => u.id === at.trainerId)?.fullName} - {at.description}
+                                        <IconButton size="small"
+                                                    onClick={() => removeAdditionalTrainer(at.trainerId)}><Delete
+                                            fontSize="inherit"/></IconButton></Typography>)}
+                            </AccordionDetails>
+                        </Accordion>
                     </Grid>
                     <Grid size={2}>
                         {trainingTickets.length > 0 && <Card variant="outlined">
@@ -282,15 +355,11 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                         </Card>
                     </Grid>
                     <Grid size={2}>
-                        <Accordion variant="outlined">
+                        <Accordion variant="outlined" defaultExpanded>
                             <AccordionSummary expandIcon={<ExpandMore/>}>
                                 <Typography variant="h6">Performance Indicator</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <Alert severity="info" sx={{mb: 2,}}>Performance indicators have no impact on the
-                                    outcome of each lesson. They&apos;re only purpose is for the trainee and
-                                    trainer&apos;s
-                                    reference. Comments should be short and concise.</Alert>
                                 {trainingSession && !agreeEditPerformanceIndicator &&
                                     <Alert severity="warning" sx={{mb: 2,}}
                                            action={

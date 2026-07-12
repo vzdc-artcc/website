@@ -15,6 +15,7 @@ import {
     RubricCriteraScore,
     TrainerReleaseRequest,
     TrainingSession,
+    TrainingSessionAdditionalTrainer,
     TrainingTicket
 } from "@/generated/prisma/client";
 import {getServerSession, User} from "next-auth";
@@ -74,6 +75,7 @@ export const createOrUpdateTrainingSession = async (
         scores: RubricCriteraScore[],
         passed: boolean,
     }[],
+    additionalTrainers: TrainingSessionAdditionalTrainer[],
     additionalComments: string,
     trainerComments: string,
     enableMarkdown: boolean,
@@ -103,6 +105,11 @@ export const createOrUpdateTrainingSession = async (
             })),
             passed: z.boolean(),
         })).nonempty("You must add at least one training ticket."),
+        additionalTrainers: z.array(z.object({
+            // sessionId: z.string().optional(),
+            trainerId: z.string().min(1, {message: "You must select an additional trainer."}),
+            description: z.string().min(1, {message: "You must provide a description for the additional trainer."}),
+        })),
         enableMarkdown: z.boolean().optional(),
     });
 
@@ -112,6 +119,7 @@ export const createOrUpdateTrainingSession = async (
         start,
         end,
         trainingTickets,
+        additionalTrainers,
         additionalComments,
         trainerComments,
         enableMarkdown,
@@ -133,6 +141,15 @@ export const createOrUpdateTrainingSession = async (
 
     const session = await getServerSession(authOptions);
 
+    const additionalIds = result.data.additionalTrainers.map((at) => at.trainerId);
+    if (additionalIds.includes(student) || additionalIds.includes(session?.user.id || '')) {
+        return {
+            errors: [{
+                message: "You cannot add the student or yourself as an additional trainer."
+            }]
+        };
+    }
+
     let res: {
         session?: TrainingSession & any;
         release?: TrainerReleaseRequest;
@@ -143,6 +160,12 @@ export const createOrUpdateTrainingSession = async (
     if (id && session) {
 
         const oldTickets = await removeOldTrainingTickets(id);
+
+        await prisma.trainingSessionAdditionalTrainer.deleteMany({
+            where: {
+                sessionId: id,
+            },
+        });
 
         const trainingSession = await prisma.trainingSession.update({
             where: {id},
@@ -167,6 +190,9 @@ export const createOrUpdateTrainingSession = async (
                         },
                         passed: t.passed,
                     })),
+                },
+                additionalTrainers: {
+                    create: result.data.additionalTrainers,
                 },
                 enableMarkdown: result.data.enableMarkdown,
             },
@@ -226,6 +252,9 @@ export const createOrUpdateTrainingSession = async (
                         },
                         passed: t.passed,
                     })),
+                },
+                additionalTrainers: {
+                    create: result.data.additionalTrainers,
                 },
                 enableMarkdown: result.data.enableMarkdown,
             },

@@ -37,6 +37,11 @@ export default async function TrainingSessionInformation({id, trainerView}: { id
                     scores: true,
                 }
             },
+            additionalTrainers: {
+                include: {
+                    trainer: true,
+                },
+            },
             performanceIndicator: {
                 include: {
                     categories: {
@@ -75,12 +80,21 @@ export default async function TrainingSessionInformation({id, trainerView}: { id
                 {trainerView && trainingSession.student.controllerStatus === 'NONE' &&
                     <Typography color="red">NOT ROSTERED</Typography>}
                 <Typography
-                    variant="subtitle1">Trainer: {trainingSession.instructor.firstName} {trainingSession.instructor.lastName} ({trainingSession.instructor.cid})</Typography>
+                    variant="subtitle1">Trainer{trainingSession.additionalTrainers.length > 0 ? 's' : ''}: {trainingSession.instructor.firstName} {trainingSession.instructor.lastName}{trainingSession.additionalTrainers.length > 0 ? `, ${trainingSession.additionalTrainers.map((at) => at.trainer.fullName).join(',')}` : ''}</Typography>
                 <Typography
                     variant="subtitle2">{formatZuluDate(trainingSession.start)} - {formatZuluDate(trainingSession.end).substring(9)}</Typography>
                 <Typography
                     variant="subtitle2">Duration: {getDuration(trainingSession.start, trainingSession.end)}</Typography>
             </Box>
+            {trainerView && trainingSession.additionalTrainers.length > 0 &&
+                <Card variant="outlined">
+                    <CardContent>
+                        <Typography variant="h6" sx={{mb: 1,}}>Additional Trainers</Typography>
+                        {trainingSession.additionalTrainers.map((at) =>
+                            <Typography>{at.trainer.fullName} - {at.description}</Typography>)}
+                    </CardContent>
+                </Card>
+            }
             <Card variant="outlined">
                 <CardContent>
                     <Typography variant="h6" sx={{mb: 1,}}>Lessons</Typography>
@@ -129,8 +143,9 @@ export default async function TrainingSessionInformation({id, trainerView}: { id
                 <Card variant="outlined">
                     <CardContent>
                         <Typography variant="h6" gutterBottom>Performance Indicator</Typography>
-                        <Alert severity="info" sx={{mb: 2}}>Performance indicators do not dictate the outcome of a
-                            lesson or session. They are only for reference and improvement.</Alert>
+                        {!trainerView &&
+                            <Alert severity="info" sx={{mb: 2}}>Performance indicators do not dictate the outcome of a
+                                lesson or session. They are only for reference and improvement.</Alert>}
                         <PerformanceIndicatorInformation performanceIndicator={trainingSession.performanceIndicator}/>
                     </CardContent>
                 </Card>}
