@@ -256,7 +256,6 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                     for this session. You will be considered the primary trainer for this training
                                     session.</Typography>
                                 <Autocomplete
-                                    disabled={!!trainingSession}
                                     options={allUsers.filter(isTrainer).filter((u => u.id !== student && !additionalTrainers.map((t) => t.trainerId).includes(u.id)))}
                                     getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.operatingInitials})`}
                                     value={allUsers.find((u) => u.id === additionalTrainerSelected)}
