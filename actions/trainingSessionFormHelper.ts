@@ -69,3 +69,11 @@ export const getTicketsForSession = async (trainingSessionId: string) => {
         },
     });
 }
+
+export const getAdditionalTrainersForSession = async (trainingSessionId: string) => {
+    return prisma.trainingSessionAdditionalTrainer.findMany({
+        where: {
+            sessionId: trainingSessionId,
+        }
+    });
+}

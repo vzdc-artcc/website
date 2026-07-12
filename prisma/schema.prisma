@@ -135,6 +135,8 @@ model User {
   studentOtsRec              OtsRecommendation[]   @relation("studentOtsRec")
   instructorOtsRec           OtsRecommendation[]   @relation("instructorOtsRec")
   DiscordOauthState          DiscordOauthState[]
+
+  trainingSessionAdditionalTrainers TrainingSessionAdditionalTrainer[]
 }
 
 model TrainingAssignment {
@@ -561,6 +563,22 @@ model TrainingSession {
   enableMarkdown     Boolean?         @default(false)
 
   performanceIndicator TrainingSessionPerformanceIndicator?
+
+  additionalTrainers TrainingSessionAdditionalTrainer[]
+}
+
+model TrainingSessionAdditionalTrainer {
+  id String @id @default(cuid())
+
+  session   TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId String
+
+  trainer   User   @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  trainerId String
+
+  description String
+
+  @@unique([sessionId, trainerId])
 }
 
 model TrainingTicket {
