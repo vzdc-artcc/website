@@ -154,6 +154,10 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
         return {errors: result.error.errors};
     }
 
+    if (result.data.additionalTrainers.map((t) => t.trainerId).includes(trainerId)) {
+        return {errors: [{message: 'You cannot add yourself as an additional trainer.'}]};
+    }
+
     let ta;
 
     if (result.data.id) {
