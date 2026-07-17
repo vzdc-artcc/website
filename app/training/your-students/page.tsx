@@ -244,6 +244,11 @@ export default async function Page() {
     const trainingAppointments = await prisma.trainingAppointment.findMany({
         where: {
             trainerId: session.user.id,
+            additionalTrainers: {
+                some: {
+                    trainerId: session.user.id,
+                },
+            },
             start: {
                 gte: nowMinus30Minutes,
             },

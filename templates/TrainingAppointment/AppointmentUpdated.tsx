@@ -21,7 +21,8 @@ export const appointmentUpdated = async (trainingAppointment: TrainingAppointmen
             <br/>
             <p>Please check <a href="https://vzdc.org/profile/overview">your profile</a> for more details.</p>
             <br/>
-            <p>A copy of this email has been sent to the trainers</p>
+            <p>A copy of this email has been sent to the trainers. You primary trainer will be the main point of contact
+                for this appointment.</p>
             <br/>
             <p>Regards,</p>
             <p>The vZDC Training Team</p>

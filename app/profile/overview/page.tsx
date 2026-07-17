@@ -94,8 +94,9 @@ export default async function Page() {
                                 <Chip key={lesson.id} size="small" label={lesson.identifier} sx={{mr: 1,}}/>
                             )
                         })}
-                        <Alert severity="info" sx={{mt: 2,}}>To reschedule this session or to cancel it, contact the
-                            trainer. Last minute changes might not be honored and may result in disciplinary
+                        <Alert severity="info" sx={{mt: 2,}}>To reschedule this session or to cancel it,
+                            contact <b>{trainingAppointment.trainer.fullName}</b>. Last minute changes might not be
+                            honored and may result in disciplinary
                             action.</Alert>
                     </CardContent>
                     <CardActions>
