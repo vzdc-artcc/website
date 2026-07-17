@@ -132,9 +132,8 @@ export default function TrainingAppointmentFormDialog({
                                 setLessons(newValue);
                             }}
                         />
-                        <TextField fullWidth variant="filled" label="Trainer Notes (optional)" value={notes}
-                                   onChange={(e) => setNotes(e.target.value.toUpperCase())}
-                                   helperText="Not shown to student."/>
+                        <TextField fullWidth variant="filled" label="Trainer only notes (optional)" value={notes}
+                                   onChange={(e) => setNotes(e.target.value.toUpperCase())}/>
                         <Divider/>
                         {additionalTrainers.map((at) => (<Typography
                             key={at.trainerId}>{allTrainers.find((t) => t.id === at.trainerId)?.fullName}: {at.description}
