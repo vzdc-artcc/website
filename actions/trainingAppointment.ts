@@ -16,6 +16,7 @@ import {
     sendTrainingAppointmentUpdatedEmail
 } from "@/actions/mail/trainingAppointment";
 import {createOrUpdateAtcBooking, deleteAtcBooking, fetchTrainingBooking} from "@/actions/atcBooking";
+import {TrainingAppointmentAdditionalTrainer} from "@/generated/prisma/browser";
 
 export const fetchTrainingAppointments = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {
     const orderBy: Prisma.TrainingAppointmentOrderByWithRelationInput = {};
@@ -34,6 +35,11 @@ export const fetchTrainingAppointments = async (pagination: GridPaginationModel,
                 student: true,
                 trainer: true,
                 lessons: true,
+                additionalTrainers: {
+                    include: {
+                        trainer: true,
+                    },
+                },
             },
             take: pagination.pageSize,
             skip: pagination.page * pagination.pageSize,
@@ -108,7 +114,7 @@ const getWhere = (filter?: GridFilterItem): Prisma.TrainingAppointmentWhereInput
     }
 }
 
-export const createOrUpdateTrainingAppointment = async (studentId: string, start: string, lessonIds: string[], id?: string) => {
+export const createOrUpdateTrainingAppointment = async (studentId: string, start: string, lessonIds: string[], notes: string, additionalTrainers: TrainingAppointmentAdditionalTrainer[], id?: string) => {
 
     const trainer = await getServerSession(authOptions);
     const trainerId = trainer?.user.id;
@@ -128,6 +134,11 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
         studentId: z.string().min(1, {message: "Student is required"}),
         start: z.date({required_error: 'Start date is required'}).refine(isAtLeastOneHourFromNow, {message: "Start date must be at least one hour from now"}),
         lessonIds: z.array(z.string()).min(1, {message: "At least one lesson is required"}).max(5, {message: "A maximum of 5 lessons is allowed"}),
+        notes: z.string().max(50, "Notes can only be 50 characters long").toUpperCase(),
+        additionalTrainers: z.array(z.object({
+            trainerId: z.string().min(1, {message: "Trainer is required"}),
+            description: z.string().min(1, {message: "Description is required"}).toUpperCase(),
+        })),
     });
 
     const result = trainingAppointmentZ.safeParse({
@@ -135,6 +146,8 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
         studentId,
         start: new Date(start),
         lessonIds,
+        notes,
+        additionalTrainers,
     });
 
     if (!result.success) {
@@ -161,6 +174,12 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
             return {errors: [{message: 'Training appointment not found'}]};
         }
 
+        await prisma.trainingAppointmentAdditionalTrainer.deleteMany({
+            where: {
+                appointmentId: result.data.id,
+            }
+        });
+
         ta = await prisma.trainingAppointment.update({
             data: {
                 start: result.data.start,
@@ -171,6 +190,10 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
                 preparationCompleted: (!oldTA.lessons.every((lesson) => result.data.lessonIds.includes(lesson.id)) || result.data.lessonIds.length !== oldTA.lessons.length) ? false : oldTA.preparationCompleted,
                 environment: null,
                 doubleBooking: false,
+                notes: result.data.notes,
+                additionalTrainers: {
+                    create: result.data.additionalTrainers,
+                },
             },
             where: {
                 id: result.data.id,
@@ -191,8 +214,12 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
                 trainerId,
                 studentId: result.data.studentId,
                 start: result.data.start,
+                notes: result.data.notes,
                 lessons: {
                     connect: result.data.lessonIds.map((lessonId) => ({id: lessonId})),
+                },
+                additionalTrainers: {
+                    create: result.data.additionalTrainers,
                 },
             },
             include: {

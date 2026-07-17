@@ -137,6 +137,8 @@ model User {
   DiscordOauthState          DiscordOauthState[]
 
   trainingSessionAdditionalTrainers TrainingSessionAdditionalTrainer[]
+
+  trainingAppointmentAdditionalTrainers TrainingAppointmentAdditionalTrainer[]
 }
 
 model TrainingAssignment {
@@ -880,6 +882,10 @@ model TrainingAppointment {
   trainer   User   @relation("TrainingAppointmentTrainer", fields: [trainerId], references: [id], onDelete: Cascade)
   trainerId String
 
+  notes String
+
+  additionalTrainers TrainingAppointmentAdditionalTrainer[]
+
   start DateTime
 
   environment   String?
@@ -890,6 +896,20 @@ model TrainingAppointment {
 
   atcBookingId String?
   lessons      Lesson[]
+}
+
+model TrainingAppointmentAdditionalTrainer {
+  id String @id @default(cuid())
+
+  appointment   TrainingAppointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  appointmentId String
+
+  trainer   User   @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  trainerId String
+
+  description String
+
+  @@unique([appointmentId, trainerId])
 }
 
 enum PerformanceIndicatorMarker {

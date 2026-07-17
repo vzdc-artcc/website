@@ -5,12 +5,12 @@ import Link from "next/link";
 import {Chip} from "@mui/material";
 import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
 import {formatTimezoneDate} from "@/lib/date";
-import {Lesson, StaffPosition} from "@/generated/prisma/browser";
 import {fetchTrainingAppointments} from "@/actions/trainingAppointment";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 import {User} from "next-auth";
 import TrainingAppointmentInformationDialog
     from "@/components/TrainingAppointment/TrainingAppointmentInformationDialog";
+import {Lesson} from "@/generated/prisma/browser";
 
 export default function TrainingAppointmentTable({sessionUser}: { sessionUser: User }) {
 
@@ -105,8 +105,8 @@ export default function TrainingAppointmentTable({sessionUser}: { sessionUser: U
             getActions: (params) => [
                 <TrainingAppointmentInformationDialog timeZone={sessionUser.timezone} trainingAppointment={params.row}
                                                       key={params.id}
-                                                      isTrainingStaff={["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as StaffPosition))}/>,
-                ["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as StaffPosition)) || sessionUser.cid == `${params.row.trainer.cid}` ?
+                                                      isTrainingStaff={["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as any))}/>,
+                ["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as any)) || sessionUser.cid == `${params.row.trainer.cid}` ?
                     <TrainingAppointmentDeleteButton trainingAppointment={params.row} fromAdmin/>
                     : <></>,
             ],

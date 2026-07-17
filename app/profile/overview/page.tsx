@@ -47,6 +47,15 @@ export default async function Page() {
             start: "asc",
         },
         include: {
+            additionalTrainers: {
+                include: {
+                    trainer: {
+                        select: {
+                            fullName: true,
+                        },
+                    },
+                },
+            },
             trainer: true,
             lessons: true,
         }
@@ -74,7 +83,7 @@ export default async function Page() {
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Training
-                            Appointment: {trainingAppointment.trainer.fullName}</Typography>
+                            Appointment: {[trainingAppointment.trainer, ...trainingAppointment.additionalTrainers.map((at) => at.trainer)].map((t) => t.fullName).join(", ")}</Typography>
                         <Typography
                             variant="subtitle2">{formatTimezoneDate(trainingAppointment.start, user.timezone)}
                             - {trainingAppointment.start.getTime() < (new Date()).getTime() ? 'NOW' : getTimeIn(trainingAppointment.start)}</Typography>

@@ -2,18 +2,22 @@
 import React, {useState} from 'react';
 import timezone from "dayjs/plugin/timezone";
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
     Autocomplete,
     Button,
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
+    Divider,
     IconButton,
     Stack,
-    TextField
+    TextField,
+    Typography
 } from "@mui/material";
-import {Add, Edit, Save} from "@mui/icons-material";
+import {Add, Delete, Edit, ExpandMore, Save} from "@mui/icons-material";
 import {Student} from "@/app/training/your-students/page";
 import {User} from "next-auth";
 import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
@@ -23,19 +27,30 @@ import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {Lesson} from "@/generated/prisma/browser";
 import {createOrUpdateTrainingAppointment} from "@/actions/trainingAppointment";
 import {toast} from "react-toastify";
-import {formatZuluDate} from "@/lib/date";
+import {TrainingAppointmentAdditionalTrainer} from "@/generated/prisma/client";
+import TrainingAppointmentAdditionalTrainerForm
+    from "@/components/TrainingAppointment/TrainingAppointmentAdditionalTrainerForm";
 
 export default function TrainingAppointmentFormDialog({
                                                           timeZone,
                                                           trainingAppointment,
                                                           assignedStudents,
                                                           allStudents,
+                                                          allTrainers,
                                                           allLessons
                                                       }: {
     timeZone: string,
-    trainingAppointment?: { id: string, studentId: string, start: Date, lessonIds: string[], },
+    trainingAppointment?: {
+        id: string,
+        studentId: string,
+        start: Date,
+        lessonIds: string[],
+        additionalTrainers: TrainingAppointmentAdditionalTrainer[],
+        notes?: string,
+    },
     assignedStudents: Student[],
     allStudents: User[],
+    allTrainers: User[],
     allLessons: Lesson[],
 }) {
 
@@ -44,13 +59,16 @@ export default function TrainingAppointmentFormDialog({
 
     const [open, setOpen] = useState(false);
     const [student, setStudent] = useState(trainingAppointment?.studentId || '');
-    const [start, setStart] = useState<Dayjs | null>(dayjs.utc(trainingAppointment?.start || new Date()).tz(timeZone));
+    const [start, setStart] = useState<Dayjs | null>(dayjs.utc(trainingAppointment?.start || new Date()).tz(timeZone).add(trainingAppointment ? 0 : 2, "hours"));
     const [lessons, setLessons] = useState<Lesson[]>(trainingAppointment?.lessonIds.map((id) => allLessons.find((l) => l.id === id)).filter((l) => l !== undefined) as Lesson[] || []);
+    const [notes, setNotes] = useState(trainingAppointment?.notes || '')
     const [loading, setLoading] = useState(false);
+
+    const [additionalTrainers, setAdditionalTrainers] = useState<TrainingAppointmentAdditionalTrainer[]>(trainingAppointment?.additionalTrainers || []);
 
     const handleCreate = async () => {
         setLoading(true);
-        const {errors} = await createOrUpdateTrainingAppointment(student, start?.utc().toISOString() || '', lessons.map((l) => l.id), trainingAppointment?.id);
+        const {errors} = await createOrUpdateTrainingAppointment(student, start?.utc().toISOString() || '', lessons.map((l) => l.id), notes, additionalTrainers, trainingAppointment?.id);
 
         if (errors) {
             toast.error(errors.map((e) => e.message).join(', '));
@@ -107,22 +125,46 @@ export default function TrainingAppointmentFormDialog({
                         <Autocomplete
                             options={allLessons}
                             multiple
-                            getOptionLabel={(option) => `${option.identifier} - ${option.name}`}
+                            getOptionLabel={(option) => `${option.identifier} - ${option.name} (${option.duration} mins)`}
                             renderInput={(params) => <TextField {...params} required label="Lesson(s)"/>}
                             value={lessons}
                             onChange={(event, newValue) => {
                                 setLessons(newValue);
                             }}
                         />
-                        <DialogContentText>Estimated session
-                            duration: {lessons.length === 0 ? 'N/A' : `${lessons.map((l) => l.duration).reduce((p, c, i) => {
-                                return i === 0 ? c : p + c;
-                            })} minutes`}</DialogContentText>
-                        <DialogContentText>Estimated end date and time: {start && lessons.length > 0 ?
-                            formatZuluDate(start.add(lessons.map((l) => l.duration).reduce((p, c, i) => {
-                                return i === 0 ? c : p + c;
-                            }), "minutes").toDate())
-                            : 'N/A'}</DialogContentText>
+                        <TextField fullWidth variant="filled" label="Trainer Notes (optional)" value={notes}
+                                   onChange={(e) => setNotes(e.target.value.toUpperCase())}
+                                   helperText="Not shown to student."/>
+                        <Divider/>
+                        {additionalTrainers.map((at) => (<Typography
+                            key={at.trainerId}>{allTrainers.find((t) => t.id === at.trainerId)?.fullName}: {at.description}
+                            <IconButton size="small" onClick={() => {
+                                setAdditionalTrainers((prev) => prev.filter((at) => at.trainerId !== at.trainerId));
+                                toast.success("Removed additional trainer.");
+                            }}><Delete fontSize="inherit"/></IconButton></Typography>))}
+                        {additionalTrainers.length > 0 && <Divider/>}
+                        <Accordion>
+                            <AccordionSummary expandIcon={<ExpandMore/>}>
+                                <Typography>Add Additional Trainer</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <TrainingAppointmentAdditionalTrainerForm allTrainers={allTrainers}
+                                                                          onSubmit={(trainerId, description) => {
+                                                                              if (additionalTrainers.map((at) => at.trainerId).includes(trainerId)) {
+                                                                                  toast.error("You cannot add the same additional trainer twice.");
+                                                                                  return;
+                                                                              }
+
+                                                                              setAdditionalTrainers((prev) => [...prev, {
+                                                                                  trainerId,
+                                                                                  description,
+                                                                                  id: '',
+                                                                                  appointmentId: trainingAppointment?.id || '',
+                                                                              }]);
+                                                                              toast.success("Additional trainer added successfully!");
+                                                                          }}/>
+                            </AccordionDetails>
+                        </Accordion>
                     </Stack>
                 </DialogContent>
                 <DialogActions>
