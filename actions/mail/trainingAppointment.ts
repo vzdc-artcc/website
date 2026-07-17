@@ -10,8 +10,8 @@ import {appointmentWarning} from "@/templates/TrainingAppointment/AppointmentWar
 import {appointmentCanceledTrainer} from "@/templates/TrainingAppointment/AppointmentCanceledTrainer";
 import {createEvent} from "ics";
 
-export const sendTrainingAppointmentScheduledEmail = async (trainingAppointment: TrainingAppointment, student: User, trainer: User, duration: number) => {
-    const {html} = await appointmentScheduled(trainingAppointment, student, trainer);
+export const sendTrainingAppointmentScheduledEmail = async (trainingAppointment: TrainingAppointment, student: User, trainer: User, duration: number, additionalTrainers: User[]) => {
+    const {html} = await appointmentScheduled(trainingAppointment, student, trainer, additionalTrainers);
 
     const event = {
         start: trainingAppointment.start.getTime(),
@@ -25,7 +25,7 @@ export const sendTrainingAppointmentScheduledEmail = async (trainingAppointment:
     await mailTransport.sendMail({
         from: FROM_EMAIL,
         to: FROM_EMAIL,
-        bcc: [student.email, trainer.email].join(','),
+        bcc: [student.email, trainer.email, ...additionalTrainers.map((t) => t.email)].join(','),
         subject: "Training Appointment Scheduled",
         html,
         attachments: [
@@ -49,8 +49,8 @@ export const sendTrainingAppointmentWarningEmail = async (trainingAppointment: T
     })
 }
 
-export const sendTrainingAppointmentUpdatedEmail = async (trainingAppointment: TrainingAppointment, student: User, trainer: User, duration: number) => {
-    const {html} = await appointmentUpdated(trainingAppointment, student, trainer);
+export const sendTrainingAppointmentUpdatedEmail = async (trainingAppointment: TrainingAppointment, student: User, trainer: User, duration: number, additionalTrainers: User[]) => {
+    const {html} = await appointmentUpdated(trainingAppointment, student, trainer, additionalTrainers);
 
     const event = {
         start: trainingAppointment.start.getTime(),
@@ -64,7 +64,7 @@ export const sendTrainingAppointmentUpdatedEmail = async (trainingAppointment: T
     await mailTransport.sendMail({
         from: FROM_EMAIL,
         to: FROM_EMAIL,
-        bcc: [student.email, trainer.email].join(','),
+        bcc: [student.email, trainer.email, ...additionalTrainers.map((t) => t.email)].join(','),
         subject: "Training Appointment Updated",
         html,
         attachments: [
@@ -88,12 +88,12 @@ export const sendTrainingAppointmentCanceledEmail = async (trainingAppointment: 
     })
 }
 
-export const sendTrainingAppointmentCancelledTrainerEmail = async (trainingAppointment: TrainingAppointment, student: User, trainer: User) => {
+export const sendTrainingAppointmentCancelledTrainerEmail = async (trainingAppointment: TrainingAppointment, student: User, trainer: User, additionalTrainers: User[]) => {
     const {html} = await appointmentCanceledTrainer(trainingAppointment, student, trainer);
 
     await mailTransport.sendMail({
         from: FROM_EMAIL,
-        to: trainer.email,
+        to: [trainer.email, ...additionalTrainers.map((t) => t.email)],
         subject: "Training Appointment Canceled",
         html,
     })

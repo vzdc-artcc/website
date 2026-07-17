@@ -12,6 +12,9 @@ type TrainingAppointmentWithAll = TrainingAppointment & {
     student: User,
     trainer: User,
     lessons: Lesson[],
+    additionalTrainers: {
+        trainer: User,
+    }[],
 }
 
 export default function TrainingAppointmentInformationDialog({
@@ -49,6 +52,8 @@ export default function TrainingAppointmentInformationDialog({
                 <DialogTitle>Training Appointment</DialogTitle>
                 <DialogContent>
                     <DialogContentText>Trainer: {trainingAppointment.trainer.fullName}</DialogContentText>
+                    <DialogContentText>Additional
+                        Trainer(s): {trainingAppointment.additionalTrainers.map((at) => at.trainer.fullName).join(', ')}</DialogContentText>
                     <DialogContentText>Student: {trainingAppointment.student.fullName}</DialogContentText>
                     <br/>
                     <DialogContentText

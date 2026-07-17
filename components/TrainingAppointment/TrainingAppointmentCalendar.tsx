@@ -16,6 +16,9 @@ export type TrainingAppointmentWithAll = TrainingAppointment & {
     student: User,
     trainer: User,
     lessons: Lesson[],
+    additionalTrainers: {
+        trainer: User,
+    }[],
 }
 
 export default function TrainingAppointmentCalendar({appointments, isTrainingStaff, timeZone}: {

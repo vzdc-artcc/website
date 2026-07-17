@@ -93,9 +93,14 @@ export default async function Page() {
             id: true,
             firstName: true,
             lastName: true,
+            fullName: true,
             cid: true,
+            roles: true,
+            operatingInitials: true,
         }
     });
+
+    const allTrainers = allUsers.filter((u) => u.roles.some((r) => ["MENTOR", "INSTRUCTOR"].includes(r)))
 
     const allLessons = await prisma.lesson.findMany({
         select: {
@@ -127,6 +132,7 @@ export default async function Page() {
                     }
                 },
                 include: {
+                    additionalTrainers: true,
                     trainer: {
                         select: {
                             fullName: true,
@@ -177,6 +183,7 @@ export default async function Page() {
                     }
                 },
                 include: {
+                    additionalTrainers: true,
                     trainer: {
                         select: {
                             fullName: true,
@@ -236,12 +243,33 @@ export default async function Page() {
 
     const trainingAppointments = await prisma.trainingAppointment.findMany({
         where: {
-            trainerId: session.user.id,
+            OR: [
+                {
+                    trainerId: session.user.id,
+                },
+                {
+                    additionalTrainers: {
+                        some: {
+                            trainerId: session.user.id,
+                        },
+                    },
+                }
+            ],
             start: {
                 gte: nowMinus30Minutes,
             },
         },
         include: {
+            additionalTrainers: {
+                include: {
+                    trainer: {
+                        select: {
+                            operatingInitials: true,
+                            fullName: true,
+                        }
+                    },
+                }
+            },
             student: true,
             lessons: true,
         },
@@ -269,6 +297,7 @@ export default async function Page() {
                     <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center" sx={{mb: 1,}}>
                         <Typography variant="h5">Your Upcoming Sessions</Typography>
                         <TrainingAppointmentFormDialog timeZone={session.user.timezone}
+                                                       allTrainers={allTrainers as User[]}
                                                        assignedStudents={[...primaryStudents, ...otherStudents, ...otsAssignments.map((oa) => ({
                                                            user: oa.student as User,
                                                            trainingAppointmentStudent: [],
@@ -285,11 +314,13 @@ export default async function Page() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Start</TableCell>
-                                    <TableCell>Duration (min)</TableCell>
+                                    <TableCell>Mins</TableCell>
                                     <TableCell>Student</TableCell>
-                                    <TableCell>Preparation Completed</TableCell>
-                                    <TableCell>Environment</TableCell>
+                                    <TableCell>Trainers</TableCell>
+                                    <TableCell>Prep?</TableCell>
+                                    <TableCell>Box</TableCell>
                                     <TableCell>Lesson(s)</TableCell>
+                                    <TableCell>Notes</TableCell>
                                     <TableCell>Actions</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -301,6 +332,12 @@ export default async function Page() {
                                             return p + c;
                                         }, 0)}</TableCell>
                                         <TableCell>{`${ta.student.fullName} - ${getRating(ta.student.rating)}`}</TableCell>
+                                        <TableCell>
+                                            <Tooltip
+                                                title={[{trainer: session.user,}, ...ta.additionalTrainers,].map((at) => at.trainer.fullName).join(', ')}>
+                                                <span>{[{trainer: session.user,}, ...ta.additionalTrainers,].map((at) => at.trainer.operatingInitials).join(', ')}</span>
+                                            </Tooltip>
+                                        </TableCell>
                                         <TableCell>{ta.preparationCompleted ? <Check color="success"/> :
                                             <Close color="error"/>}</TableCell>
                                         <TableCell>{ta.doubleBooking ?
@@ -320,6 +357,13 @@ export default async function Page() {
                                             />
                                         ))}</TableCell>
                                         <TableCell>
+                                            <Tooltip title={ta.notes || ''} arrow>
+                                                <Typography variant="caption">
+                                                    {ta.notes.length > 20 ? `${ta.notes.substring(0, 20)}...` : ta.notes || ''}
+                                                </Typography>
+                                            </Tooltip>
+                                        </TableCell>
+                                        <TableCell>
                                             <Link
                                                 href={createCalendarLink(
                                                     ta.start,
@@ -336,11 +380,14 @@ export default async function Page() {
                                                 </Tooltip>
                                             </Link>
                                             <TrainingAppointmentFormDialog timeZone={session.user.timezone}
+                                                                           allTrainers={allTrainers as User[]}
                                                                            trainingAppointment={{
                                                 id: ta.id,
                                                 studentId: ta.studentId,
                                                 start: ta.start,
                                                 lessonIds: ta.lessons.map(l => l.id),
+                                                                               additionalTrainers: ta.additionalTrainers,
+                                                                               notes: ta.notes || '',
                                             }} assignedStudents={[...primaryStudents, ...otherStudents]}
                                                                            allStudents={allUsers as User[]}
                                                                            allLessons={allLessons as Lesson[]}/>

@@ -2,10 +2,9 @@ import {TrainingAppointment} from "@/generated/prisma/client";
 import {User} from "next-auth";
 import {renderReactToMjml} from "@/actions/mjml";
 import {formatTimezoneDate} from "@/lib/date";
-import {getRating} from "@/lib/vatsim";
 import MultipleRecipientsEmailWrapper from "@/templates/Wrapper/MultipleRecipientsEmailWrapper";
 
-export const appointmentScheduled = async (trainingAppointment: TrainingAppointment, student: User, trainer: User) => {
+export const appointmentScheduled = async (trainingAppointment: TrainingAppointment, student: User, trainer: User, additionalTrainers: User[]) => {
     return renderReactToMjml(
         <MultipleRecipientsEmailWrapper headerText="Training Appointment Scheduled">
             <p>Dear Student and Trainer,</p>
@@ -13,6 +12,10 @@ export const appointmentScheduled = async (trainingAppointment: TrainingAppointm
             <p>A training appointment has been scheduled for you
                 on <b>{formatTimezoneDate(trainingAppointment.start, student.timezone)}</b> ({student.timezone}).
             </p>
+            <p>Trainer start
+                time: <b>{formatTimezoneDate(trainingAppointment.start, student.timezone)}</b> ({student.timezone})</p>
+            <p>Primary Trainer: <b>{trainer.fullName}</b></p>
+            <p>Additional Trainer(s): <b>{additionalTrainers.map((t) => t.fullName).join(", ")}</b></p>
             <p>The estimated duration for this appointment can be found on your profile.</p>
             <br/>
             <p><b>Ensure you have completed the preparation and read all supplemental materials prior to the start
@@ -26,7 +29,8 @@ export const appointmentScheduled = async (trainingAppointment: TrainingAppointm
             <p>Please check <a href="https://vzdc.org/profile/overview">your profile</a> for more details about your
                 appointment and to complete the trainee preparation.</p>
             <br/>
-            <p>A copy of this email has been sent to your trainer, {trainer.fullName} - {getRating(trainer.rating)}.</p>
+            <p>A copy of this email has been sent to the trainers. You primary trainer will be the main point of contact
+                for this appointment.</p>
             <br/>
             <p>Regards,</p>
             <p>The vZDC Training Team</p>
