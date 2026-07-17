@@ -313,11 +313,11 @@ export default async function Page() {
                         <Table size="small">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Start</TableCell>
+                                    <TableCell>Time</TableCell>
                                     <TableCell>Mins</TableCell>
                                     <TableCell>Student</TableCell>
-                                    <TableCell>Trainers</TableCell>
-                                    <TableCell>Prep?</TableCell>
+                                    <TableCell>Trainer(s)</TableCell>
+                                    <TableCell>Prep</TableCell>
                                     <TableCell>Box</TableCell>
                                     <TableCell>Lesson(s)</TableCell>
                                     <TableCell>Notes</TableCell>

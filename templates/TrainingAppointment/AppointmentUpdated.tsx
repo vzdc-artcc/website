@@ -16,7 +16,9 @@ export const appointmentUpdated = async (trainingAppointment: TrainingAppointmen
             <p>Trainer start
                 time: <b>{formatTimezoneDate(trainingAppointment.start, student.timezone)}</b> ({student.timezone})</p>
             <p>Primary Trainer: <b>{trainer.fullName}</b></p>
-            <p>Additional Trainer(s): <b>{additionalTrainers.map((t) => t.fullName).join(", ")}</b></p>
+            <p>Additional
+                Trainer(s): <b>{additionalTrainers.length > 0 ? additionalTrainers.map((t) => t.fullName).join(", ") : 'N/A'}</b>
+            </p>
             <p>Make sure you are familiar with the updates prior to the start time.</p>
             <br/>
             <p>Please check <a href="https://vzdc.org/profile/overview">your profile</a> for more details.</p>

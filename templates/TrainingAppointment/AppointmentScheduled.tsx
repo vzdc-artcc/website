@@ -15,7 +15,9 @@ export const appointmentScheduled = async (trainingAppointment: TrainingAppointm
             <p>Trainer start
                 time: <b>{formatTimezoneDate(trainingAppointment.start, student.timezone)}</b> ({student.timezone})</p>
             <p>Primary Trainer: <b>{trainer.fullName}</b></p>
-            <p>Additional Trainer(s): <b>{additionalTrainers.map((t) => t.fullName).join(", ")}</b></p>
+            <p>Additional
+                Trainer(s): <b>{additionalTrainers.length > 0 ? additionalTrainers.map((t) => t.fullName).join(", ") : 'N/A'}</b>
+            </p>
             <p>The estimated duration for this appointment can be found on your profile.</p>
             <br/>
             <p><b>Ensure you have completed the preparation and read all supplemental materials prior to the start

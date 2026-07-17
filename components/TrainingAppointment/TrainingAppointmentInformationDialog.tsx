@@ -53,7 +53,7 @@ export default function TrainingAppointmentInformationDialog({
                 <DialogContent>
                     <DialogContentText>Trainer: {trainingAppointment.trainer.fullName}</DialogContentText>
                     <DialogContentText>Additional
-                        Trainer(s): {trainingAppointment.additionalTrainers.map((at) => at.trainer.fullName).join(', ')}</DialogContentText>
+                        Trainer(s): {trainingAppointment.additionalTrainers.length > 0 ? trainingAppointment.additionalTrainers.map((at) => at.trainer.fullName).join(', ') : 'N/A'}</DialogContentText>
                     <DialogContentText>Student: {trainingAppointment.student.fullName}</DialogContentText>
                     <br/>
                     <DialogContentText
