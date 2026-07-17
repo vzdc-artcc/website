@@ -6,4 +6,6 @@
 */
 -- AlterTable
 ALTER TABLE "TrainingAppointment"
-    ALTER COLUMN "notes" SET NOT NULL;
+    ALTER COLUMN "notes" SET NOT NULL,
+ALTER
+COLUMN "notes" SET DEFAULT '';

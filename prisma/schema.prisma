@@ -882,7 +882,7 @@ model TrainingAppointment {
   trainer   User   @relation("TrainingAppointmentTrainer", fields: [trainerId], references: [id], onDelete: Cascade)
   trainerId String
 
-  notes String
+  notes String @default("")
 
   additionalTrainers TrainingAppointmentAdditionalTrainer[]
 
