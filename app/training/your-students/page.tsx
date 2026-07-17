@@ -243,12 +243,18 @@ export default async function Page() {
 
     const trainingAppointments = await prisma.trainingAppointment.findMany({
         where: {
-            trainerId: session.user.id,
-            additionalTrainers: {
-                some: {
+            OR: [
+                {
                     trainerId: session.user.id,
                 },
-            },
+                {
+                    additionalTrainers: {
+                        some: {
+                            trainerId: session.user.id,
+                        },
+                    },
+                }
+            ],
             start: {
                 gte: nowMinus30Minutes,
             },
@@ -312,7 +318,7 @@ export default async function Page() {
                                     <TableCell>Student</TableCell>
                                     <TableCell>Trainers</TableCell>
                                     <TableCell>Prep?</TableCell>
-                                    <TableCell>SBX</TableCell>
+                                    <TableCell>Box</TableCell>
                                     <TableCell>Lesson(s)</TableCell>
                                     <TableCell>Notes</TableCell>
                                     <TableCell>Actions</TableCell>
