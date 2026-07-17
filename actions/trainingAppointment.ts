@@ -202,12 +202,17 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
                 student: true,
                 trainer: true,
                 lessons: true,
+                additionalTrainers: {
+                    include: {
+                        trainer: true,
+                    },
+                },
             },
         });
 
         await log("UPDATE", "TRAINING_APPOINTMENT", `Updated training appointment with ${ta.student.fullName} on ${formatZuluDate(ta.start)}`);
 
-        sendTrainingAppointmentUpdatedEmail(ta, ta.student as User, trainer.user, ta.lessons.map(l => l.duration).reduce((a, c) => a + c, 0)).then();
+        sendTrainingAppointmentUpdatedEmail(ta, ta.student as User, trainer.user, ta.lessons.map(l => l.duration).reduce((a, c) => a + c, 0), ta.additionalTrainers.map((at) => at.trainer) as User[]).then();
     } else {
         ta = await prisma.trainingAppointment.create({
             data: {
@@ -226,12 +231,17 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
                 student: true,
                 trainer: true,
                 lessons: true,
+                additionalTrainers: {
+                    include: {
+                        trainer: true,
+                    },
+                },
             },
         });
 
         await log("CREATE", "TRAINING_APPOINTMENT", `Created training appointment with ${ta.student.fullName} on ${formatZuluDate(ta.start)}`);
 
-        sendTrainingAppointmentScheduledEmail(ta, ta.student as User, trainer.user, ta.lessons.map(l => l.duration).reduce((a, c) => a + c, 0)).then();
+        sendTrainingAppointmentScheduledEmail(ta, ta.student as User, trainer.user, ta.lessons.map(l => l.duration).reduce((a, c) => a + c, 0), ta.additionalTrainers.map((at) => at.trainer) as User[]).then();
     }
 
     const liveLesson = ta.lessons.find((l => l.location === 1));
@@ -284,6 +294,11 @@ export const deleteTrainingAppointment = async (id: string, fromAdmin?: boolean)
             student: true,
             trainer: true,
             lessons: true,
+            additionalTrainers: {
+                include: {
+                    trainer: true,
+                },
+            },
         },
     });
 
@@ -301,7 +316,7 @@ export const deleteTrainingAppointment = async (id: string, fromAdmin?: boolean)
 
     sendTrainingAppointmentCanceledEmail(ta, ta.student as User, ta.trainer as User).then();
     if (fromAdmin) {
-        sendTrainingAppointmentCancelledTrainerEmail(ta, ta.student as User, ta.trainer as User).then();
+        sendTrainingAppointmentCancelledTrainerEmail(ta, ta.student as User, ta.trainer as User, ta.additionalTrainers.map((at) => at.trainer) as User[]).then();
     }
 }
 
