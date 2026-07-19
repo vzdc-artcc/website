@@ -334,8 +334,14 @@ export default async function Page() {
                                         <TableCell>{`${ta.student.fullName} - ${getRating(ta.student.rating)}`}</TableCell>
                                         <TableCell>
                                             <Tooltip
-                                                title={[{trainer: session.user,}, ...ta.additionalTrainers,].map((at) => at.trainer.fullName).join(', ')}>
-                                                <span>{[{trainer: session.user,}, ...ta.additionalTrainers,].map((at) => at.trainer.operatingInitials).join(', ')}</span>
+                                                title={[{
+                                                    trainer: session.user,
+                                                    description: null,
+                                                }, ...ta.additionalTrainers,].map((at) => `${at.trainer.fullName} ${at.description ? `(${at.description})` : ''}`).join(', ')}>
+                                                <span>{[{
+                                                    trainer: session.user,
+                                                    description: null,
+                                                }, ...ta.additionalTrainers,].map((at) => `${at.trainer.operatingInitials} ${at.description ? `(${at.description})` : ''}`).join(', ')}</span>
                                             </Tooltip>
                                         </TableCell>
                                         <TableCell>{ta.preparationCompleted ? <Check color="success"/> :
@@ -379,7 +385,8 @@ export default async function Page() {
                                                     </IconButton>
                                                 </Tooltip>
                                             </Link>
-                                            <TrainingAppointmentFormDialog timeZone={session.user.timezone}
+                                            {ta.trainerId === session.user.id &&
+                                                <TrainingAppointmentFormDialog timeZone={session.user.timezone}
                                                                            allTrainers={allTrainers as User[]}
                                                                            trainingAppointment={{
                                                 id: ta.id,
@@ -390,8 +397,9 @@ export default async function Page() {
                                                                                notes: ta.notes || '',
                                             }} assignedStudents={[...primaryStudents, ...otherStudents]}
                                                                            allStudents={allUsers as User[]}
-                                                                           allLessons={allLessons as Lesson[]}/>
-                                            <TrainingAppointmentDeleteButton trainingAppointment={ta}/>
+                                                                               allLessons={allLessons as Lesson[]}/>}
+                                            {ta.trainerId === session.user.id &&
+                                                <TrainingAppointmentDeleteButton trainingAppointment={ta}/>}
                                         </TableCell>
                                     </TableRow>
                                 ))}
