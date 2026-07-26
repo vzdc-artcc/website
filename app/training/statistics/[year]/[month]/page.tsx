@@ -7,6 +7,7 @@ import {useParams} from "next/navigation";
 import {calculatePassRate} from "@/lib/trainingStats";
 import {useTrainingStats} from "@/lib/osmium/hooks/training";
 import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
+import PassFailGraph from "@/components/TrainingStatistics/PassFailGraph";
 
 
 export default function Page() {
@@ -155,7 +156,7 @@ export default function Page() {
                         <CardContent>
                             <Box sx={{ mb: 2 }}>
                                 <Typography
-                                    variant="h5">{idx + 1} - {trainer.preferred_name || `${trainer.first_name ?? ''} ${trainer.last_name ?? ''}`}
+                                    variant="h5">{idx + 1} - {trainer.preferred_name?.trim() || `${trainer.first_name ?? ''} ${trainer.last_name ?? ''}`.trim() || trainer.display_name || trainer.cid}
                                 </Typography>
                                 <Typography variant="body1">{trainer.cid}</Typography>
                             </Box>
@@ -164,7 +165,16 @@ export default function Page() {
                     </Card>
                 </Grid>
             ))}
-            <Grid size={30}>
+            {(stats.passed > 0 || stats.failed > 0) && (
+                <Grid size={{xs: 30, md: 12}}>
+                    <Card>
+                        <CardContent>
+                            <PassFailGraph passed={stats.passed} failed={stats.failed} />
+                        </CardContent>
+                    </Card>
+                </Grid>
+            )}
+            <Grid size={{xs: 30, md: (stats.passed > 0 || stats.failed > 0) ? 18 : 30}}>
                 <Card>
                     <CardContent>
                         {stats.lesson_distribution.length > 0 ? (

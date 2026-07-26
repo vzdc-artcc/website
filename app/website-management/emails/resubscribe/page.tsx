@@ -32,7 +32,7 @@ export default function Page() {
     return (
         <Card>
             <CardContent>
-                <Typography variant="h5" sx={{mb: 1,}}>Resubscribe</Typography>
+                <Typography variant="h5" fontWeight={700} sx={{mb: 1,}}>Resubscribe</Typography>
                 <Typography variant="body2" color="text.secondary" sx={{mb: 2,}}>
                     Lift a suppression so a previously-unsubscribed address receives a non-transactional
                     category again.

@@ -37,7 +37,8 @@ export default function Page() {
         <Stack direction="column" spacing={2}>
             <Card>
                 <CardContent>
-                    <Typography variant="h5" sx={{mb: 2,}}>Access Control</Typography>
+                    <Typography variant="h5" fontWeight={700}>Access Control</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{mb: 2,}}>Look up a controller to view and manage their roles and permissions.</Typography>
                     <form action={handleSearch}>
                         <Stack direction="row" spacing={2}>
                             <TextField fullWidth variant="filled" label="Controller CID" value={cid}

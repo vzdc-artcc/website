@@ -23,7 +23,8 @@ export default function Page() {
     return (
         <Card>
             <CardContent>
-                <Typography variant="h5" sx={{mb: 2,}}>Email Templates</Typography>
+                <Typography variant="h5" fontWeight={700}>Email Templates</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{mb: 2,}}>The transactional email templates osmium can send.</Typography>
                 {isLoading && <CircularProgress/>}
                 {isError && <Alert severity="error">Failed to load templates.</Alert>}
                 {templates && (

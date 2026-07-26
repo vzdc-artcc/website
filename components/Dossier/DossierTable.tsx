@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
+import {Chip, CircularProgress, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
 import {useDossier} from "@/lib/osmium/hooks/training";
 
 function DossierTable({cid}: { cid: number }) {
@@ -33,7 +33,13 @@ function DossierTable({cid}: { cid: number }) {
                         <TableRow key={entry.id}>
                             <TableCell>{new Date(entry.timestamp).toDateString()}</TableCell>
                             <TableCell>{entry.writer_name ?? 'Unknown'}{entry.writer_cid ? ` (${entry.writer_cid})` : ''}</TableCell>
-                            <TableCell>{entry.is_confidential ? `CONFIDENTIAL -> ${entry.message}` : entry.message}</TableCell>
+                            <TableCell>
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    {entry.is_confidential &&
+                                        <Chip size="small" color="error" label="Confidential"/>}
+                                    <span>{entry.message}</span>
+                                </Stack>
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

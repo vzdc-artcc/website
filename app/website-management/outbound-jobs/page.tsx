@@ -51,7 +51,8 @@ export default function Page() {
             <Card>
                 <CardContent>
                     <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
-                        <Typography variant="h5">Outbound Jobs</Typography>
+                        <Typography variant="h5" fontWeight={700}>Outbound Jobs</Typography>
+                        <Typography variant="body2" color="text.secondary">Queued outbound integration jobs and their status.</Typography>
                         <Stack direction="row" spacing={2} alignItems="center">
                             <TextField variant="filled" size="small" label="Status" value={status}
                                        onChange={(e) => {

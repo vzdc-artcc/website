@@ -9,12 +9,9 @@ import {
     TableHead,
     TableRow,
 } from "@mui/material";
-import {formatZuluDate} from "@/lib/date";
-
 interface TmiLike {
     id: string;
     tmi_type: string;
-    start_time: string;
     notes?: string | null;
 }
 
@@ -33,15 +30,13 @@ export default function OpsPlanTmiTable({tmis}: { tmis: TmiLike[] }) {
                         <TableHead>
                             <TableRow>
                                 <TableCell>Type</TableCell>
-                                <TableCell>Start (UTC)</TableCell>
-                                <TableCell>Notes</TableCell>
+                                <TableCell>Traffic Management Initiative</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {tmis.map((tmi) => (
                                 <TableRow key={tmi.id}>
                                     <TableCell>{tmi.tmi_type}</TableCell>
-                                    <TableCell>{formatZuluDate(new Date(tmi.start_time))}</TableCell>
                                     <TableCell sx={{whiteSpace: 'pre-wrap'}}>{tmi.notes || '-'}</TableCell>
                                 </TableRow>
                             ))}

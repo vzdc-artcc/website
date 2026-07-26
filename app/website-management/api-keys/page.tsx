@@ -29,7 +29,8 @@ export default function Page() {
             <Card>
                 <CardContent>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography variant="h5">API Keys</Typography>
+                        <Typography variant="h5" fontWeight={700}>API Keys</Typography>
+                        <Typography variant="body2" color="text.secondary">Service-account keys for programmatic access to osmium.</Typography>
                         <Link href="/website-management/api-keys/new" style={{textDecoration: 'none',}}>
                             <Button variant="contained" startIcon={<Add/>}>New API Key</Button>
                         </Link>

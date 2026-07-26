@@ -337,7 +337,7 @@ export function useEventTmis(eventId: string | undefined) {
 export function useCreateEventTmi(eventId: string) {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async (body: { tmi_type: string; start_time: string; notes?: string | null }) => {
+        mutationFn: async (body: { tmi_type: string; start_time?: string | null; notes?: string | null }) => {
             const { data, error } = await osmium.POST("/api/v1/events/{event_id}/tmis", {
                 params: { path: { event_id: eventId } },
                 body,

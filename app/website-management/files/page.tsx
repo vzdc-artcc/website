@@ -1,24 +1,24 @@
 import React from 'react';
 import {Grid, Typography} from "@mui/material";
 import {Metadata} from "next";
-import RosterDataExportCard from "@/components/Admin/RosterDataExportCard";
+import FileManager from "@/components/Admin/FileManager";
 
 export const metadata: Metadata = {
-    title: 'Data Export | vZDC',
-    description: 'vZDC roster data export',
+    title: 'Files | vZDC',
+    description: 'vZDC CDN file manager',
 };
 
 export default function Page() {
     return (
         <Grid container columns={12} spacing={2}>
             <Grid size={12}>
-                <Typography variant="h5" fontWeight={700}>Data Export</Typography>
+                <Typography variant="h5" fontWeight={700}>Files</Typography>
                 <Typography color="text.secondary">
-                    Bulk export of on-roster controllers&apos; personal data for compliance.
+                    Upload, browse, and manage files served from the vZDC CDN.
                 </Typography>
             </Grid>
             <Grid size={12}>
-                <RosterDataExportCard/>
+                <FileManager/>
             </Grid>
         </Grid>
     );

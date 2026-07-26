@@ -38,7 +38,8 @@ export default function Page() {
             <Card>
                 <CardContent>
                     <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
-                        <Typography variant="h5">Email Outbox</Typography>
+                        <Typography variant="h5" fontWeight={700}>Email Outbox</Typography>
+                        <Typography variant="body2" color="text.secondary">Sent and queued emails, with delivery status.</Typography>
                         <TextField variant="filled" size="small" label="Status" value={status}
                                    onChange={(e) => {
                                        setStatus(e.target.value);

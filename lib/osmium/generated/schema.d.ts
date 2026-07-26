@@ -3451,8 +3451,11 @@ export interface components {
         };
         CreateEventTmiRequest: {
             notes?: string | null;
-            /** Format: date-time */
-            start_time: string;
+            /**
+             * Format: date-time
+             * @description Optional legacy scheduled start; omitted for the simplified type+text TMIs.
+             */
+            start_time?: string | null;
             tmi_type: string;
         };
         CreateFeedbackRequest: {
@@ -4130,7 +4133,7 @@ export interface components {
             id: string;
             notes?: string | null;
             /** Format: date-time */
-            start_time: string;
+            start_time?: string | null;
             tmi_type: string;
             /** Format: date-time */
             updated_at: string;
@@ -5348,6 +5351,7 @@ export interface components {
         TrainingStatsTopTrainer: {
             /** Format: int64 */
             cid?: number | null;
+            display_name?: string | null;
             first_name?: string | null;
             /** Format: double */
             hours: number;

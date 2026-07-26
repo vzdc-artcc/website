@@ -8,21 +8,24 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    FormControl,
     Grid,
+    InputLabel,
+    MenuItem,
+    Select,
     TextField,
     Typography
 } from "@mui/material";
-import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
-import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import {toast} from "react-toastify";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import TmiDeleteButton from "@/components/EventManager/TmiDeleteButton";
-import dayjs, {Dayjs} from "dayjs";
-import {formatZuluDate} from "@/lib/date";
 import {useCreateEventTmi, useDeleteEventTmi, useEventTmis, useUpdateEventTmi} from "@/lib/osmium/hooks/events";
+
+// Selectable Traffic Management Initiative types.
+const TMI_TYPES = ["Local", "Terminal", "Enroute"] as const;
 
 export default function TmiForm({event}: { event: { id: string } }) {
     const {data, isLoading} = useEventTmis(event.id);
@@ -32,16 +35,14 @@ export default function TmiForm({event}: { event: { id: string } }) {
     const rows = data?.items ?? [];
 
     const [newType, setNewType] = useState("");
-    const [newStart, setNewStart] = useState<Dayjs | null>(dayjs());
     const [newText, setNewText] = useState("");
 
     const [editOpen, setEditOpen] = useState(false);
-    const [editRow, setEditRow] = useState<{ id: string; tmi_type: string; start_time: string; notes?: string | null } | null>(null);
+    const [editRow, setEditRow] = useState<{ id: string; tmi_type: string; notes?: string | null } | null>(null);
 
     const columns = useMemo<GridColDef[]>(() => [
         {field: "tmi_type", headerName: "Type", width: 140},
-        {field: "start_time", headerName: "Start (UTC)", width: 180, renderCell: (params) => formatZuluDate(new Date(params.row.start_time))},
-        {field: "notes", headerName: "Notes", flex: 1, minWidth: 300},
+        {field: "notes", headerName: "Traffic Management Initiative", flex: 1, minWidth: 300},
         {
             field: "actions",
             type: "actions",
@@ -70,12 +71,12 @@ export default function TmiForm({event}: { event: { id: string } }) {
     ], [deleteTmi]);
 
     const handleAdd = async () => {
-        if (!newType.trim() || !newStart) {
-            toast.error('Please fill out all required fields.');
+        if (!newType.trim() || !newText.trim()) {
+            toast.error('Please select a type and enter the initiative.');
             return;
         }
         try {
-            await createTmi.mutateAsync({tmi_type: newType, start_time: newStart.toISOString(), notes: newText || undefined});
+            await createTmi.mutateAsync({tmi_type: newType, notes: newText.trim()});
             setNewType("");
             setNewText("");
             toast.success("TMI added");
@@ -89,7 +90,7 @@ export default function TmiForm({event}: { event: { id: string } }) {
         try {
             await updateTmi.mutateAsync({
                 tmiId: editRow.id,
-                body: {tmi_type: editRow.tmi_type, start_time: editRow.start_time, notes: editRow.notes},
+                body: {tmi_type: editRow.tmi_type, notes: editRow.notes},
             });
             toast.success("TMI updated");
             setEditOpen(false);
@@ -100,7 +101,7 @@ export default function TmiForm({event}: { event: { id: string } }) {
     };
 
     return (
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <>
             {rows.length === 0 && !isLoading ? (
                 <Box sx={{p: 1, borderRadius: 1, bgcolor: "background.paper", boxShadow: 1}}>
                     <Typography variant="h6">No Traffic Management Initiatives</Typography>
@@ -123,21 +124,26 @@ export default function TmiForm({event}: { event: { id: string } }) {
                 </Box>
             )}
             <form action={handleAdd}>
-                <Grid container spacing={2} sx={{mt: 2}}>
-                    <Grid size={{xs: 12, sm: 4}}>
-                        <TextField fullWidth label="TMI Type" placeholder="e.g. MIT" value={newType}
-                                   onChange={(e) => setNewType(e.target.value)}/>
+                <Grid container spacing={2} sx={{mt: 2}} alignItems="center">
+                    <Grid size={{xs: 12, sm: 3}}>
+                        <FormControl fullWidth>
+                            <InputLabel id="tmi-type-label">TMI Type</InputLabel>
+                            <Select
+                                labelId="tmi-type-label"
+                                label="TMI Type"
+                                value={newType}
+                                onChange={(e) => setNewType(e.target.value)}
+                            >
+                                {TMI_TYPES.map((t) => (
+                                    <MenuItem key={t} value={t}>{t}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </Grid>
-                    <Grid size={{xs: 12, sm: 4}}>
-                        <DateTimePicker sx={{width: '100%'}} label="Start" ampm={false} value={newStart}
-                                        onChange={setNewStart}/>
-                    </Grid>
-                    <Grid size={{xs: 12, sm: 4}}>
+                    <Grid size={{xs: 12, sm: 9}}>
                         <TextField
                             fullWidth
-                            multiline
-                            minRows={1}
-                            placeholder="Notes (optional)"
+                            placeholder="Traffic Management Initiative"
                             value={newText}
                             onChange={(e) => setNewText(e.target.value)}
                         />
@@ -151,27 +157,24 @@ export default function TmiForm({event}: { event: { id: string } }) {
             <Dialog open={editOpen} onClose={() => setEditOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle>Edit TMI</DialogTitle>
                 <DialogContent>
+                    <FormControl fullWidth sx={{mb: 2, mt: 1}}>
+                        <InputLabel id="edit-tmi-type-label">Type</InputLabel>
+                        <Select
+                            labelId="edit-tmi-type-label"
+                            label="Type"
+                            value={editRow?.tmi_type || ""}
+                            onChange={(e) => setEditRow((r) => (r ? {...r, tmi_type: e.target.value} : r))}
+                        >
+                            {TMI_TYPES.map((t) => (
+                                <MenuItem key={t} value={t}>{t}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     <TextField
                         fullWidth
-                        label="Type"
-                        value={editRow?.tmi_type || ""}
-                        onChange={(e) => setEditRow((r) => (r ? {...r, tmi_type: e.target.value} : r))}
-                        sx={{mb: 2, mt: 1}}
-                    />
-                    <DateTimePicker
-                        sx={{width: '100%', mb: 2}}
-                        label="Start"
-                        ampm={false}
-                        value={editRow ? dayjs(editRow.start_time) : null}
-                        onChange={(v) => setEditRow((r) => (r && v ? {...r, start_time: v.toISOString()} : r))}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Notes"
+                        placeholder="Traffic Management Initiative"
                         value={editRow?.notes || ""}
                         onChange={(e) => setEditRow((r) => (r ? {...r, notes: e.target.value} : r))}
-                        multiline
-                        minRows={3}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -182,6 +185,6 @@ export default function TmiForm({event}: { event: { id: string } }) {
                     <Button onClick={handleEditSave} variant="contained" startIcon={<SaveIcon/>}>Save</Button>
                 </DialogActions>
             </Dialog>
-        </LocalizationProvider>
+        </>
     );
 }

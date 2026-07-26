@@ -1,24 +1,29 @@
 'use client';
 import React from 'react';
-import {Alert, CircularProgress, Grid, Typography} from "@mui/material";
+import {Alert, Card, CardContent, CircularProgress, Divider, Stack, Typography} from "@mui/material";
 import {useJobs} from "@/lib/osmium/hooks/jobs";
-import JobStatusCard from "@/components/Admin/JobStatusCard";
+import JobStatusRow from "@/components/Admin/JobStatusRow";
 
 export default function Page() {
     const {data: jobs, isLoading, isError} = useJobs();
 
     return (
-        <Grid container columns={12} spacing={2}>
-            <Grid size={12}>
-                <Typography variant="h5">Background Jobs</Typography>
-            </Grid>
-            {isLoading && <Grid size={12}><CircularProgress/></Grid>}
-            {isError && <Grid size={12}><Alert severity="error">Failed to load job statuses.</Alert></Grid>}
-            {jobs?.map((job) => (
-                <Grid key={job.job_name} size={{xs: 12, md: 6, lg: 4}}>
-                    <JobStatusCard job={job} linkToDetail/>
-                </Grid>
-            ))}
-        </Grid>
+        <Stack direction="column" spacing={2}>
+            <Typography variant="h5" fontWeight={700}>Background Jobs</Typography>
+            {isLoading && <CircularProgress/>}
+            {isError && <Alert severity="error">Failed to load job statuses.</Alert>}
+            {jobs && (
+                <Card>
+                    <CardContent>
+                        {jobs.map((job, idx) => (
+                            <React.Fragment key={job.job_name}>
+                                {idx > 0 && <Divider/>}
+                                <JobStatusRow job={job}/>
+                            </React.Fragment>
+                        ))}
+                    </CardContent>
+                </Card>
+            )}
+        </Stack>
     );
 }

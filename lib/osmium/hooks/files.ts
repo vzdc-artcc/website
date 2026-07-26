@@ -1,5 +1,38 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { osmium, osmiumBaseUrl } from "@/lib/osmium/client";
+
+/**
+ * Paginated list of file assets the caller can see (`GET /api/v1/files`).
+ * Backs the Website Management file manager. `page` is 1-based.
+ */
+export function useFiles(page: number, pageSize: number) {
+    return useQuery({
+        queryKey: ["osmium", "files", { page, pageSize }],
+        queryFn: async () => {
+            const { data, error } = await osmium.GET("/api/v1/files", {
+                params: { query: { page, page_size: pageSize } },
+            });
+            if (error) throw error;
+            return data;
+        },
+    });
+}
+
+export function useDeleteFile() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (fileId: string) => {
+            const { data, error } = await osmium.DELETE("/api/v1/files/{file_id}", {
+                params: { path: { file_id: fileId } },
+            });
+            if (error) throw error;
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["osmium", "files"] });
+        },
+    });
+}
 
 interface UploadFileInput {
     file: File;

@@ -36,7 +36,8 @@ export default function Page() {
         <Stack direction="column" spacing={2}>
             <Card>
                 <CardContent>
-                    <Typography variant="h5">Discord Configs</Typography>
+                    <Typography variant="h5" fontWeight={700}>Discord Configs</Typography>
+                    <Typography variant="body2" color="text.secondary">Discord server integrations — configs, channels, roles, and categories.</Typography>
                 </CardContent>
             </Card>
             <Card>

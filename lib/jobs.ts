@@ -5,6 +5,7 @@ export const JOB_LABELS: Record<string, string> = {
     solo_expiration: "Solo Endorsement Expiration",
     event_automation: "Event Automation",
     appointments_sync: "Training Appointments Sync",
+    faa_preferred_routes: "FAA Preferred Routes",
 };
 
 // stats_sync and roster_sync run continuously in the background and reject
