@@ -1,26 +1,30 @@
+'use client';
 import React from 'react';
-import prisma from "@/lib/db";
-import {Card, CardContent, Typography} from "@mui/material";
-import OrderList from "@/components/Order/OrderList";
-import {updateCertificationTypeOrder} from "@/actions/certificationTypes";
+import {Card, CardContent, Skeleton, Typography} from "@mui/material";
+import OrderList, {OrderItem} from "@/components/Order/OrderList";
+import {useCertificationTypes, useReorderCertificationTypes} from "@/lib/osmium/hooks/certifications";
 
-export default async function Page() {
+export default function Page() {
 
-    const certificationTypes = await prisma.certificationType.findMany({
-        orderBy: {
-            order: 'asc',
-        },
-    });
+    const {data, isLoading} = useCertificationTypes();
+    const reorder = useReorderCertificationTypes();
+    const certificationTypes = data?.items ?? [];
+
+    const handleSubmit = (items: OrderItem[]) => {
+        reorder.mutate(items.map((item) => ({id: item.id, order: item.order})));
+    };
 
     return (
         <Card>
             <CardContent>
                 <Typography variant="h5" gutterBottom>Certification Types Order</Typography>
-                <OrderList items={certificationTypes.map((ct) => ({
-                    id: ct.id,
-                    name: ct.name,
-                    order: ct.order,
-                }))} onSubmit={updateCertificationTypeOrder}/>
+                {isLoading ? <Skeleton height={200}/> : (
+                    <OrderList items={certificationTypes.map((ct) => ({
+                        id: ct.id,
+                        name: ct.name,
+                        order: ct.sort_order,
+                    }))} onSubmit={handleSubmit}/>
+                )}
             </CardContent>
         </Card>
     );

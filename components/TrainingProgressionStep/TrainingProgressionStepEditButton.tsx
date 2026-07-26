@@ -1,17 +1,13 @@
 'use client';
 import React, {useState} from 'react';
-import {Lesson, TrainingProgression} from "@/generated/prisma/browser";
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {Edit} from "@mui/icons-material";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip} from "@mui/material";
-import TrainingProgressionStepForm, {
-    TrainingProgressionStepWithLesson
-} from "@/components/TrainingProgressionStep/TrainingProgressionStepForm";
+import TrainingProgressionStepForm from "@/components/TrainingProgressionStep/TrainingProgressionStepForm";
 
-export default function TrainingProgressionStepEditButton({trainingProgression, trainingProgressionStep, allLessons}: {
-    trainingProgression: TrainingProgression,
-    trainingProgressionStep: TrainingProgressionStepWithLesson,
-    allLessons: Lesson[],
+export default function TrainingProgressionStepEditButton({trainingProgression, trainingProgressionStep}: {
+    trainingProgression: { id: string },
+    trainingProgressionStep: { id: string, lesson_id: string, sort_order: number, optional: boolean },
 }) {
 
     const [open, setOpen] = useState(false);
@@ -31,7 +27,7 @@ export default function TrainingProgressionStepEditButton({trainingProgression, 
                     <DialogContentText gutterBottom>
                         Lesson has to be unique to the training progression.
                     </DialogContentText>
-                    <TrainingProgressionStepForm allLessons={allLessons} trainingProgression={trainingProgression}
+                    <TrainingProgressionStepForm trainingProgression={trainingProgression}
                                                  trainingProgressionStep={trainingProgressionStep}
                                                  onSubmit={() => setOpen(false)}/>
                 </DialogContent>

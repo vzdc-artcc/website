@@ -4,20 +4,16 @@ import ColorModeSwitcher from "@/components/Navbar/ColorModeSwitcher";
 import Logo from "@/components/Logo/Logo";
 import NavButtons from "@/components/Navbar/NavButtons";
 import LoginButton from "@/components/Navbar/LoginButton";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
 import RootSidebar from "@/components/Sidebar/RootSidebar";
 import AppPickerMenu from "@/components/AppPicker/AppPickerMenu";
 
-export default async function Navbar() {
-
-    const session = await getServerSession(authOptions);
+export default function Navbar() {
 
     return (
         <AppBar position="sticky" sx={{backgroundColor: '#f5f5f5', color: 'black',}}>
             <Toolbar>
                 <Stack direction="row" spacing={3} alignItems="center">
-                    <RootSidebar session={session}/>
+                    <RootSidebar/>
                     <Logo/>
                     <Box sx={{display: {xs: 'none', xl: 'flex',},}}>
                         <NavButtons/>
@@ -28,7 +24,7 @@ export default async function Navbar() {
                     <ColorModeSwitcher/>
                     <AppPickerMenu/>
                     <Box sx={{display: {xs: 'none', sm: 'inline-block',},}}>
-                        <LoginButton session={session}/>
+                        <LoginButton/>
                     </Box>
                 </Box>
             </Toolbar>

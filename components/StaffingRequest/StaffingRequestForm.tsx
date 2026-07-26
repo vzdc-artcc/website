@@ -1,27 +1,38 @@
 'use client';
 import React from 'react';
-import {User} from "next-auth";
 import {useGoogleReCaptcha} from "react-google-recaptcha-v3";
 import {Grid, TextField} from "@mui/material";
 import RequestSubmitButton from "@/components/StaffingRequest/RequestSubmitButton";
 import {toast} from "react-toastify";
-import {createStaffingRequest} from "@/actions/staffingRequest";
+import {useCreateStaffingRequest} from "@/lib/osmium/hooks/staffing";
 import {useRouter} from "next/navigation";
 import {checkCaptcha} from "@/lib/captcha";
+import {useMe} from "@/lib/osmium/hooks/me";
 
-export default function StaffingRequestForm({user}: { user: User, }) {
+export default function StaffingRequestForm() {
+
+    const {data: me} = useMe();
 
     const router = useRouter();
     const {executeRecaptcha} = useGoogleReCaptcha();
+    const createStaffingRequest = useCreateStaffingRequest();
 
     const handleSubmit = async (formData: FormData) => {
 
         const recaptchaToken = await executeRecaptcha?.('submit_feedback');
         await checkCaptcha(recaptchaToken);
 
-        const {errors} = await createStaffingRequest(formData);
-        if (errors) {
-            toast(errors.map((e) => e.message).join(".  "), {type: 'error'});
+        const name = formData.get('name') as string;
+        const description = formData.get('description') as string;
+        if (!name || !description) {
+            toast('Event name and description are required.', {type: 'error'});
+            return;
+        }
+
+        try {
+            await createStaffingRequest.mutateAsync({name, description});
+        } catch {
+            toast('Failed to submit staffing request.', {type: 'error'});
             return;
         }
         router.push(`/staffing/success`);
@@ -29,7 +40,6 @@ export default function StaffingRequestForm({user}: { user: User, }) {
 
     return (
         (<form action={handleSubmit}>
-            <input type="hidden" name="userId" value={user.id}/>
             <Grid container columns={2} spacing={2}>
                 <Grid
                     size={{
@@ -37,7 +47,7 @@ export default function StaffingRequestForm({user}: { user: User, }) {
                         sm: 1
                     }}>
                     <TextField fullWidth variant="filled" name="pilotName" label="Your Name"
-                               defaultValue={user.fullName} disabled/>
+                               defaultValue={me?.display_name} disabled/>
                 </Grid>
                 <Grid
                     size={{
@@ -45,7 +55,7 @@ export default function StaffingRequestForm({user}: { user: User, }) {
                         sm: 1
                     }}>
                     <TextField fullWidth variant="filled" name="pilotEmail" label="Your Email"
-                               defaultValue={user.email} disabled/>
+                               defaultValue={me?.email} disabled/>
                 </Grid>
                 <Grid
                     size={{
@@ -53,7 +63,7 @@ export default function StaffingRequestForm({user}: { user: User, }) {
                         sm: 1
                     }}>
                     <TextField fullWidth variant="filled" name="pilotCid" label="Your VATSIM CID"
-                               defaultValue={user.cid} disabled/>
+                               defaultValue={me?.cid} disabled/>
                 </Grid>
                 <Grid
                     size={{

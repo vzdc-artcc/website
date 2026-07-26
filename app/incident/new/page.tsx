@@ -1,28 +1,18 @@
 import React from 'react';
 import {Card, CardContent, Typography} from "@mui/material";
 import IncidentReportForm from "@/components/Incident/IncidentReportForm";
-import prisma from "@/lib/db";
-import {User} from "next-auth";
+import RequireAuth from "@/components/Access/RequireAuth";
 
-export default async function Page() {
-
-    const allUsers = await prisma.user.findMany({
-        where: {
-            controllerStatus: {
-                not: "NONE",
-            },
-        },
-        orderBy: {
-            lastName: 'asc',
-        },
-    });
+export default function Page() {
 
     return (
-        <Card>
-            <CardContent>
-                <Typography variant="h5" sx={{mb: 2,}}>New Incident Report</Typography>
-                <IncidentReportForm allUsers={allUsers as User[]}/>
-            </CardContent>
-        </Card>
+        <RequireAuth>
+            <Card>
+                <CardContent>
+                    <Typography variant="h5" sx={{mb: 2,}}>New Incident Report</Typography>
+                    <IncidentReportForm/>
+                </CardContent>
+            </Card>
+        </RequireAuth>
     );
 }

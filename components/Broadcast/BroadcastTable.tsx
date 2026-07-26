@@ -2,15 +2,12 @@
 import React from 'react';
 import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
-import Link from "next/link";
+import {osmium} from "@/lib/osmium/client";
 import {Tooltip} from "@mui/material";
 import {Edit} from "@mui/icons-material";
 import {useRouter} from "next/navigation";
 import BroadcastDeleteButton from "@/components/Broadcast/BroadcastDeleteButton";
-import {fetchBroadcasts} from "@/actions/broadcast";
-import BroadcastNotAgreedViewerButton from "@/components/Broadcast/BroadcastNotAgreedViewerButton";
 import {formatZuluDate} from "@/lib/date";
-import BroadcastAgreedViewerButton from "@/components/Broadcast/BroadcastAgreedViewerButton";
 
 export default function BroadcastTable() {
 
@@ -30,26 +27,24 @@ export default function BroadcastTable() {
             renderCell: (params) => formatZuluDate(params.row.timestamp),
         },
         {
-            field: 'file',
+            field: 'file_filename',
             headerName: 'File',
+            filterable: false,
             flex: 1,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
-            renderCell: (params) => params.row.file ?
-                <Link href={`/publications/${params.row.file.id}`} style={{color: 'inherit',}}
-                      target="_blank">{params.row.file.name}</Link> : '',
+            renderCell: (params) => params.row.file_filename || '',
         },
         {
-            field: 'exemptStaff',
+            field: 'exempt_staff',
             type: 'boolean',
             headerName: 'Exempt Staff',
             flex: 1,
         },
         {
-            field: 'agreed',
-            type: 'number',
+            field: 'reviewed',
             headerName: 'Reviewed',
             flex: 1,
-            renderCell: (params) => `${params.row.agreedBy.length}/${params.row.seenBy.length + params.row.unseenBy.length + params.row.agreedBy.length}`,
+            sortable: false,
+            renderCell: (params) => `${params.row.agreed_count} reviewed / ${params.row.seen_count} seen`,
         },
         {
             field: 'actions',
@@ -57,14 +52,10 @@ export default function BroadcastTable() {
             headerName: 'Actions',
             flex: 1,
             getActions: (params) => [
-                <BroadcastAgreedViewerButton agreedBy={params.row.agreedBy}
-                                             key={`agreed-${params.row.id}`} broadcast={params.row}/>,
-                <BroadcastNotAgreedViewerButton notAgreedBy={[...params.row.unseenBy, ...params.row.seenBy]}
-                                                key={`notagreed-${params.row.id}`} broadcast={params.row}/>,
-                <Tooltip title="Edit Broadcast" key={`edit-${params.row.id}`}>
+                <Tooltip title="View / Edit Broadcast" key={`edit-${params.row.id}`}>
                     <GridActionsCellItem
                         icon={<Edit/>}
-                        label="Edit Broadcast"
+                        label="View / Edit Broadcast"
                         onClick={() => router.push(`/admin/broadcasts/${params.row.id}`)}
                     />
                 </Tooltip>,
@@ -76,10 +67,30 @@ export default function BroadcastTable() {
     return (
         <DataTable columns={columns} initialSort={[{field: 'timestamp', sort: 'desc',}]}
                    fetchData={async (pagination, sortModel, filter) => {
-                       const broadcasts = await fetchBroadcasts(pagination, sortModel, filter);
+                       let title: string | undefined;
+                       let exemptStaff: boolean | undefined;
+
+                       if (filter && filter.value !== undefined && filter.value !== '') {
+                           const value = filter.value as string;
+                           if (filter.field === 'title') title = value;
+                           if (filter.field === 'exempt_staff') exemptStaff = value === 'true';
+                       }
+
+                       const {data, error} = await osmium.GET("/api/v1/admin/broadcasts", {
+                           params: {
+                               query: {
+                                   page: pagination.page + 1,
+                                   page_size: pagination.pageSize,
+                                   title,
+                                   exempt_staff: exemptStaff,
+                               },
+                           },
+                       });
+                       if (error) throw error;
+
                        return {
-                           data: broadcasts[1],
-                           rowCount: broadcasts[0],
+                           data: data?.items ?? [],
+                           rowCount: data?.total ?? 0,
                        };
                    }}/>
     );

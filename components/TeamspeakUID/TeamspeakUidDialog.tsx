@@ -1,17 +1,37 @@
 'use client';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField} from "@mui/material";
 import {Save} from "@mui/icons-material";
 import {toast} from "react-toastify";
-import {User} from "next-auth";
-import {updateTeamspeakUid} from "@/actions/profile";
+import {useMe} from "@/lib/osmium/hooks/me";
+import {useCreateMyTeamspeakUid, useDeleteMyTeamspeakUid} from "@/lib/osmium/hooks/me";
 
-export default function TeamspeakUidDialog({user, open, onClose}: { user: User, open: boolean, onClose: () => void }) {
+export default function TeamspeakUidDialog({open, onClose}: { open: boolean, onClose: () => void }) {
 
-    const [uid, setUid] = useState(user.teamspeakUid || '');
+    const {data: me} = useMe({enabled: open});
+    const createUid = useCreateMyTeamspeakUid();
+    const deleteUid = useDeleteMyTeamspeakUid();
+
+    const existing = me?.teamspeak_uids[0];
+    const [uid, setUid] = useState('');
+
+    useEffect(() => {
+        setUid(existing?.uid || '');
+    }, [existing?.uid]);
 
     const handleSave = async () => {
-        await updateTeamspeakUid(user, uid);
+        try {
+            if (existing) {
+                await deleteUid.mutateAsync(existing.id);
+            }
+            if (uid.length > 0) {
+                await createUid.mutateAsync(uid);
+            }
+        } catch {
+            toast.error('Failed to save TeamSpeak I.D.');
+            return;
+        }
+
         if (uid.length < 1) {
             toast.success('Teamspeak I.D. removed successfully!  Please wait a few minutes for the change to take effect.');
         } else {

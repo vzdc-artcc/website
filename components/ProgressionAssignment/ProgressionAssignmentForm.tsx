@@ -1,23 +1,43 @@
 'use client';
-import React, {useState} from 'react';
-import {User} from "next-auth";
-import {TrainingProgression} from "@/generated/prisma/browser";
+import React, {useEffect, useState} from 'react';
 import Form from "next/form";
 import {Autocomplete, Box, Stack, TextField} from "@mui/material";
 import FormSaveButton from '@/components/Form/FormSaveButton';
-import {setProgressionAssignment} from "@/actions/progressionAssignment";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
+import {useCreateProgressionAssignment, useTrainingProgressions} from "@/lib/osmium/hooks/training";
+import {useRosterControllers} from "@/lib/osmium/hooks/users";
 
-export default function ProgressionAssignmentForm({allUsers, allProgressions, currentAssignment,}: {
-    allUsers: User[],
-    allProgressions: TrainingProgression[],
-    currentAssignment?: { progression: TrainingProgression, user: User },
+interface ProgressionOption {
+    id: string;
+    name: string;
+}
+
+export default function ProgressionAssignmentForm({currentAssignment}: {
+    currentAssignment?: { userId: string, cid: number, displayName: string, progressionId: string },
 }) {
 
     const router = useRouter();
-    const [student, setStudent] = useState<string>(currentAssignment?.user.id || '');
-    const [progression, setProgression] = useState<TrainingProgression | null>(currentAssignment?.progression || null);
+    const {data: rosterData} = useRosterControllers();
+    const {data: progressionsData} = useTrainingProgressions();
+    const createAssignment = useCreateProgressionAssignment();
+
+    const allStudents = (rosterData?.items ?? [])
+        .filter((u) => !!u.full)
+        .map((u) => ({id: u.full!.id, cid: u.basic.cid, name: `${u.full!.first_name ?? ''} ${u.full!.last_name ?? ''}`.trim() || u.basic.name}));
+    const allProgressions: ProgressionOption[] = progressionsData?.items ?? [];
+
+    const [student, setStudent] = useState<string>(currentAssignment?.userId || '');
+    const [progression, setProgression] = useState<ProgressionOption | null>(
+        allProgressions.find((p) => p.id === currentAssignment?.progressionId) || null
+    );
+
+    useEffect(() => {
+        if (currentAssignment) {
+            setProgression(allProgressions.find((p) => p.id === currentAssignment.progressionId) || null);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [progressionsData, currentAssignment?.progressionId]);
 
     return (
         <Form action={async () => {
@@ -29,21 +49,29 @@ export default function ProgressionAssignmentForm({allUsers, allProgressions, cu
                 toast.error('Please select a progression.');
                 return;
             }
-            await setProgressionAssignment(currentAssignment ? currentAssignment.user.id : student, progression.id);
-            toast.success('Progression assignment saved successfully!');
 
-            if (!currentAssignment) {
-                setStudent('');
-                setProgression(null);
-                router.push('/training/progressions/assignments');
+            try {
+                await createAssignment.mutateAsync({user_id: student, progression_id: progression.id});
+                toast.success('Progression assignment saved successfully!');
+
+                if (!currentAssignment) {
+                    setStudent('');
+                    setProgression(null);
+                    router.push('/training/progressions/assignments');
+                }
+            } catch {
+                toast.error('Failed to save progression assignment.');
             }
         }}>
             <Stack direction="column" spacing={2}>
                 <Autocomplete
                     disabled={!!currentAssignment}
-                    options={allUsers}
-                    getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.cid})`}
-                    value={allUsers.find((u) => u.id === student) || null}
+                    options={allStudents}
+                    getOptionLabel={(option) => `${option.name} (${option.cid})`}
+                    isOptionEqualToValue={(a, b) => a.id === b.id}
+                    value={currentAssignment
+                        ? {id: currentAssignment.userId, cid: currentAssignment.cid, name: currentAssignment.displayName}
+                        : allStudents.find((u) => u.id === student) || null}
                     onChange={(event, newValue) => {
                         setStudent(newValue ? newValue.id : '');
                     }}
@@ -52,6 +80,7 @@ export default function ProgressionAssignmentForm({allUsers, allProgressions, cu
                 <Autocomplete
                     options={allProgressions}
                     getOptionLabel={(option) => option.name}
+                    isOptionEqualToValue={(a, b) => a.id === b.id}
                     value={progression}
                     onChange={(event, newValue) => {
                         setProgression(newValue);

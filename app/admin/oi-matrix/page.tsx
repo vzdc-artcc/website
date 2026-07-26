@@ -1,31 +1,25 @@
+'use client';
 import React from 'react';
-import prisma from "@/lib/db";
-import {Box, Card, CardContent, Grid, Stack, Tooltip, Typography} from "@mui/material";
+import {Box, Card, CardContent, Grid, Skeleton, Stack, Tooltip, Typography} from "@mui/material";
 import Link from "next/link";
-import OperatingInitialAssignmentItem from '@/components/OperatingInitials/OperatingInitialAssignmentItem';
-import {User} from 'next-auth';
+import OperatingInitialAssignmentItem, {OiController} from '@/components/OperatingInitials/OperatingInitialAssignmentItem';
+import {useRosterControllers} from "@/lib/osmium/hooks/users";
 
-export default async function Page() {
+export default function Page() {
 
-    const allControllers = await prisma.user.findMany({
-        where: {
-            controllerStatus: {
-                not: 'NONE',
-            },
-        },
-        select: {
-            operatingInitials: true,
-            id: true,
-            cid: true,
-            firstName: true,
-            lastName: true,
-            controllerStatus: true,
-            rating: true,
-        },
-    });
+    const {data, isLoading} = useRosterControllers();
 
-    const inUseOperatingInitials = allControllers
-        .filter((c) => c.operatingInitials);
+    const allControllers: OiController[] = (data?.items ?? []).map((u) => ({
+        id: u.full?.id ?? String(u.basic.cid),
+        cid: u.basic.cid,
+        firstName: u.full?.first_name,
+        lastName: u.full?.last_name,
+        rating: u.basic.rating,
+        operatingInitials: u.full?.operating_initials,
+        controllerStatus: u.full?.controller_status,
+    }));
+
+    const inUseOperatingInitials = allControllers.filter((c) => c.operatingInitials);
 
     const allPossibleOperatingInitials = Array.from({length: 26 * 26}, (_, i) => {
         const first = String.fromCharCode(65 + Math.floor(i / 26));
@@ -53,39 +47,33 @@ export default async function Page() {
             </Card>
             <Card>
                 <CardContent>
-                    <Grid container columns={26} spacing={1}>
-                        {allPossibleOperatingInitials.map((initials) => {
-                            const inUse = inUseOperatingInitials.find((oi) => oi.operatingInitials === initials);
-                            return inUse ? (
-                                <Grid
-                                    key={initials}
-                                    size={{
-                                        xs: 4,
-                                        sm: 3,
-                                        md: 2,
-                                        lg: 1
-                                    }}>
-                                    <Tooltip title={`${inUse.firstName} ${inUse.lastName} - ${inUse.cid}`}>
-                                        <Link href={`/admin/controller/${inUse.cid}`} target="_blank"
-                                              style={{textDecoration: 'none',}}>
-                                            <Box sx={{
-                                                border: 2,
-                                                borderRadius: 2,
-                                                color: inUse.controllerStatus === "HOME" ? 'cyan' : 'purple',
-                                            }}>
-                                                <Typography textAlign="center" variant="body2">{initials}</Typography>
-                                            </Box>
-                                        </Link>
-                                    </Tooltip>
-                                </Grid>
-                            ) : (
-                                <OperatingInitialAssignmentItem allControllers={allControllers as User[]} initials={initials} key={initials} />
-                            );
-                        })}
-                    </Grid>
+                    {isLoading ? <Skeleton height={300}/> : (
+                        <Grid container columns={26} spacing={1}>
+                            {allPossibleOperatingInitials.map((initials) => {
+                                const inUse = inUseOperatingInitials.find((oi) => oi.operatingInitials === initials);
+                                return inUse ? (
+                                    <Grid key={initials} size={{xs: 4, sm: 3, md: 2, lg: 1}}>
+                                        <Tooltip title={`${inUse.firstName} ${inUse.lastName} - ${inUse.cid}`}>
+                                            <Link href={`/admin/controller/${inUse.cid}`} target="_blank"
+                                                  style={{textDecoration: 'none',}}>
+                                                <Box sx={{
+                                                    border: 2,
+                                                    borderRadius: 2,
+                                                    color: inUse.controllerStatus === "HOME" ? 'cyan' : 'purple',
+                                                }}>
+                                                    <Typography textAlign="center" variant="body2">{initials}</Typography>
+                                                </Box>
+                                            </Link>
+                                        </Tooltip>
+                                    </Grid>
+                                ) : (
+                                    <OperatingInitialAssignmentItem allControllers={allControllers} initials={initials} key={initials}/>
+                                );
+                            })}
+                        </Grid>
+                    )}
                 </CardContent>
             </Card>
         </Stack>)
     );
-
 }

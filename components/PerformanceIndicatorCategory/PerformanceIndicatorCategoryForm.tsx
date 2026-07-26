@@ -1,38 +1,48 @@
 'use client';
 import React from 'react';
-import {PerformanceIndicatorCriteriaCategory, PerformanceIndicatorTemplate} from "@/generated/prisma/browser";
 import Form from "next/form";
 import {TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {createOrUpdatePerformanceIndicatorCategory} from "@/actions/performanceIndicatorCategory";
 import {toast} from "react-toastify";
+import {
+    useCreatePerformanceIndicatorCategory,
+    usePerformanceIndicatorCategories,
+    useUpdatePerformanceIndicatorCategory
+} from "@/lib/osmium/hooks/training";
 
 export default function PerformanceIndicatorCategoryForm({template, category, onUpdate}: {
-    template: PerformanceIndicatorTemplate,
-    category?: PerformanceIndicatorCriteriaCategory,
+    template: { id: string },
+    category?: { id: string, name: string, sort_order: number },
     onUpdate?: () => void
 }) {
 
+    const {data} = usePerformanceIndicatorCategories();
+    const createCategory = useCreatePerformanceIndicatorCategory();
+    const updateCategory = useUpdatePerformanceIndicatorCategory();
+
     const handleSubmit = async (formData: FormData) => {
-        const {errors, pic} = await createOrUpdatePerformanceIndicatorCategory(formData);
+        const name = formData.get('name') as string;
 
-        if (errors) {
-            toast.error(errors.map(e => e.message).join('. '));
-            return;
-        }
-
-        if (category) {
-            toast.success(`Category ${pic.name} updated`);
-            onUpdate && onUpdate();
-        } else {
-            toast.success(`Category ${pic.name} created`);
+        try {
+            if (category) {
+                await updateCategory.mutateAsync({categoryId: category.id, body: {name}});
+                toast.success(`Category ${name} updated`);
+                onUpdate && onUpdate();
+            } else {
+                const existingForTemplate = (data?.items ?? []).filter((c) => c.template_id === template.id);
+                const nextOrder = existingForTemplate.length > 0
+                    ? Math.max(...existingForTemplate.map((c) => c.sort_order)) + 1
+                    : 1;
+                await createCategory.mutateAsync({template_id: template.id, name, sort_order: nextOrder});
+                toast.success(`Category ${name} created`);
+            }
+        } catch {
+            toast.error("Failed to save category.");
         }
     }
 
     return (
         <Form action={handleSubmit}>
-            <input type="hidden" name="templateId" value={template.id}/>
-            <input type="hidden" name="id" value={category?.id}/>
             <TextField fullWidth variant="filled" name="name" label="Name" defaultValue={category?.name || ''}
                        sx={{mb: 2,}}/>
             <FormSaveButton/>

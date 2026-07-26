@@ -1,25 +1,20 @@
+'use client';
 import React from 'react';
-import prisma from "@/lib/db";
-import {notFound} from "next/navigation";
+import {useParams} from 'next/navigation';
+import {Box, CircularProgress, Typography} from "@mui/material";
 import FeedbackCard from "@/components/Feedback/FeedbackCard";
+import {useFeedbackItem} from "@/lib/osmium/hooks/feedback";
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-    const params = await props.params;
+export default function Page() {
+    const params = useParams<{ id: string }>();
+    const {data: feedback, isLoading, isError} = useFeedbackItem(params.id);
 
-    const {id} = params;
+    if (isLoading) {
+        return <Box sx={{display: 'flex', justifyContent: 'center', my: 4}}><CircularProgress/></Box>;
+    }
 
-    const feedback = await prisma.feedback.findUnique({
-        where: {
-            id,
-        },
-        include: {
-            controller: true,
-            pilot: true,
-        },
-    });
-
-    if (!feedback) {
-        notFound();
+    if (isError || !feedback) {
+        return <Typography>Feedback not found.</Typography>;
     }
 
     return (

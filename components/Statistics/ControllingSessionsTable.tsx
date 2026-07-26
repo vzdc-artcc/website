@@ -1,9 +1,11 @@
 import React from 'react';
-import {ControllerPosition} from "@/generated/prisma/browser";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
 import {formatZuluDate, getDuration} from "@/lib/date";
+import {components} from "@/lib/osmium/generated/schema";
 
-export default function ControllingSessionsTable({positions}: { positions: ControllerPosition[], }) {
+type ControllerPositionItem = components["schemas"]["ControllerPositionItem"];
+
+export default function ControllingSessionsTable({positions}: { positions: ControllerPositionItem[], }) {
 
     if (positions.length === 0) {
         return <Typography>No controlling sessions during this time frame.</Typography>
@@ -23,10 +25,10 @@ export default function ControllingSessionsTable({positions}: { positions: Contr
                 <TableBody>
                     {positions.map((position, index) => (
                         <TableRow key={index}>
-                            <TableCell>{position.position}</TableCell>
-                            <TableCell>{formatZuluDate(position.start)}</TableCell>
-                            <TableCell>{position.end ? formatZuluDate(position.end) : 'ACTIVE'}</TableCell>
-                            <TableCell>{getDuration(position.start, position.end || new Date())}</TableCell>
+                            <TableCell>{position.position_name}</TableCell>
+                            <TableCell>{formatZuluDate(new Date(position.started_at))}</TableCell>
+                            <TableCell>{position.ended_at ? formatZuluDate(new Date(position.ended_at)) : 'ACTIVE'}</TableCell>
+                            <TableCell>{getDuration(new Date(position.started_at), position.ended_at ? new Date(position.ended_at) : new Date())}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

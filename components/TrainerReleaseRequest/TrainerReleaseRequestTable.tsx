@@ -1,65 +1,71 @@
 'use client';
 import React from 'react';
-import {GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
+import {Box, Chip, Tooltip} from "@mui/material";
+import {DataGrid, GridColDef} from "@mui/x-data-grid";
 import {formatZuluDate} from "@/lib/date";
-import {fetchTrainerReleases} from "@/actions/trainingAssignmentRelease";
 import TrainerReleaseRequestApproveButton from "@/components/TrainerReleaseRequest/TrainerReleaseRequestApproveButton";
 import TrainerReleaseDeleteButton from "@/components/TrainerReleaseRequest/TrainerReleaseDeleteButton";
-import {Chip, Tooltip} from "@mui/material";
 import Link from "next/link";
+import {useTrainerReleaseRequests} from "@/lib/osmium/hooks/training";
+import {useHasStaffPosition} from "@/lib/osmium/hooks/staff-positions";
 
-export default function TrainerReleaseRequestTable({manageMode}: { manageMode: boolean }) {
+export default function TrainerReleaseRequestTable() {
+
+    const {has: manageMode} = useHasStaffPosition(['TA', 'ATA', 'WM']);
+    const {data, isLoading} = useTrainerReleaseRequests();
+    const rows = data?.items ?? [];
 
     const columns: GridColDef[] = [
         {
             field: 'student',
             flex: 1,
             headerName: 'Student',
-            renderCell: (params) => {
-                const color = params.row.student.controllerStatus === "HOME" ? 'default' : 'secondary';
-
-                return (
-                    <Tooltip title={`${params.row.student.controllerStatus}`}>
-                        <Link href={`/admin/controller/${params.row.student.cid}`} target="_blank"
-                              style={{textDecoration: 'none',}}>
-                            <Chip
-                                key={params.row.student.id}
-                                label={`${params.row.student.firstName} ${params.row.student.lastName}` || 'Unknown'}
-                                size="small"
-                                color={color}
-                            />
-                        </Link>
-                    </Tooltip>
-                )
-            },
+            renderCell: (params) => (
+                <Tooltip title={params.row.student_controller_status}>
+                    <Link href={`/training/controller/${params.row.student_cid}`} target="_blank"
+                          style={{textDecoration: 'none',}}>
+                        <Chip label={params.row.student_name} size="small"/>
+                    </Link>
+                </Tooltip>
+            ),
             sortable: false,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
         {
-            field: 'submittedAt',
+            field: 'submitted_at',
             flex: 1,
             headerName: 'Submitted At',
-            renderCell: (params) => formatZuluDate(params.row.submittedAt),
-            filterable: false,
+            valueFormatter: (value) => formatZuluDate(new Date(value)),
+        },
+        {
+            field: 'status',
+            flex: 1,
+            headerName: 'Status',
         },
         {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',
             getActions: (params) => manageMode ? [
-                <TrainerReleaseRequestApproveButton key={params.row.id} studentId={params.row.student.id}/>,
-                <TrainerReleaseDeleteButton key={params.row.id} studentId={params.row.student.id}/>,
+                <TrainerReleaseRequestApproveButton key={`approve-${params.row.id}`} requestId={params.row.id}/>,
+                <TrainerReleaseDeleteButton key={`delete-${params.row.id}`} requestId={params.row.id}/>,
             ] : [],
             flex: 1,
-        }
+        },
     ];
 
     return (
-        <DataTable columns={columns} initialSort={[{field: 'submittedAt', sort: 'asc',}]}
-                   fetchData={async (pagination, sortModel, filter) => {
-                       const releases = await fetchTrainerReleases(pagination, sortModel, filter);
-                       return {data: releases[1], rowCount: releases[0]};
-                   }}/>
+        <Box sx={{boxSizing: 'border-box', width: '100%'}}>
+            <DataGrid
+                loading={isLoading}
+                columns={columns}
+                rows={rows}
+                initialState={{
+                    sorting: {sortModel: [{field: 'submitted_at', sort: 'asc'}]},
+                    pagination: {paginationModel: {pageSize: 25}},
+                }}
+                pageSizeOptions={[10, 25, 50]}
+                autoHeight
+            />
+        </Box>
     );
 }

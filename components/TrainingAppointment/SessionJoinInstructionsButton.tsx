@@ -1,27 +1,26 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingAppointment} from "@/generated/prisma/browser";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider} from "@mui/material";
 import {formatZuluDate} from "@/lib/date";
 import {Start} from "@mui/icons-material";
 import Link from "next/link";
 
 export default function SessionJoinInstructionsButton({trainingAppointment}: {
-    trainingAppointment: TrainingAppointment,
+    trainingAppointment: { preparation_completed: boolean, start: string },
 }) {
 
     const [open, setOpen] = useState(false);
 
     return (
         <>
-            {trainingAppointment.preparationCompleted &&
-                <Button variant="contained" disabled={!trainingAppointment.preparationCompleted}
+            {trainingAppointment.preparation_completed &&
+                <Button variant="contained" disabled={!trainingAppointment.preparation_completed}
                         onClick={() => setOpen(true)} startIcon={<Start/>}>Join Session</Button>}
             <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle>Session Join Instructions</DialogTitle>
                 <DialogContent>
                     <DialogContentText gutterBottom>Join the vZDC TeamSpeak server prior to the session start
-                        time: <b>{formatZuluDate(trainingAppointment.start)}</b>.</DialogContentText>
+                        time: <b>{formatZuluDate(new Date(trainingAppointment.start))}</b>.</DialogContentText>
                     <DialogContentText gutterBottom>Once you are in the server, change your nickname to your <b>real
                         name</b> and set your TeamSpeak UID on this website. You will receive instructions in a DM from
                         our bot if you did not set your UID.</DialogContentText>

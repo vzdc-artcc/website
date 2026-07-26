@@ -1,25 +1,13 @@
-import {CalendarMonth, Home, Insights, ListAlt, QuestionAnswer, RecentActors} from "@mui/icons-material";
-import {Badge, Link, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
-import prisma from "@/lib/db";
+'use client';
+import {CalendarMonth, Home, Insights, ListAlt, RecentActors} from "@mui/icons-material";
+import {Link, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import MenuWrapper from "./MenuWrapper";
+import EventsMenuStaffingBadge from "./EventsMenuStaffingBadge";
+import {useStaffPositionHolderName} from "@/lib/osmium/hooks/staff-positions";
 
-export default async function EventMenu() {
+export default function EventMenu() {
 
-    const staffingRequests = await prisma.staffingRequest.count();
-
-    const ec = await prisma.user.findFirst({
-        where: {
-            staffPositions: {
-                has: "EC"
-            },
-        },
-        select: {
-            firstName: true,
-            lastName: true
-        }
-    });
-
-    const ecName = ec ? `${ec.firstName} ${ec.lastName || 'N/A'}` : 'N/A';
+    const ecName = useStaffPositionHolderName("EC");
 
     return (
         <MenuWrapper title="Events Administration" subheadings={[`EC: ${ecName}`]}>
@@ -55,16 +43,7 @@ export default async function EventMenu() {
                     <ListItemText primary="Controller Statistics"/>
                 </ListItemButton>
             </Link>
-            <Link href="/events/admin/staffing-requests" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Badge color="primary" badgeContent={staffingRequests}>
-                            <QuestionAnswer/>
-                        </Badge>
-                    </ListItemIcon>
-                    <ListItemText primary="Staffing Requests"/>
-                </ListItemButton>
-            </Link>
+            <EventsMenuStaffingBadge/>
             <Link href="/events/admin/logs" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>

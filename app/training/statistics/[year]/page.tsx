@@ -1,27 +1,22 @@
+'use client';
+
 import React from 'react';
+import {useParams} from "next/navigation";
 import {Box, Card, CardContent, Chip, Grid, Typography} from "@mui/material";
-import {
-    calculatePassRate,
-    endOfYearUTC,
-    getAllSessionsInYear,
-    getFailedSessionsCountInYear,
-    getLessonDistributionData,
-    getMonthlySessionCountsForYear,
-    getMostRunLesson,
-    getPassedSessionsCountInYear,
-    getTopTrainingStaffByHours,
-    startOfYearUTC,
-} from "@/actions/trainingStats";
+import {calculatePassRate} from "@/lib/trainingStats";
+import {useTrainingStats} from "@/lib/osmium/hooks/training";
 import TrainingSessionsByMonthGraph from "@/components/TrainingStatistics/TrainingSessionsByMonthGraph";
 import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
 
 
-export default async function Page(props: { params: Promise<{ year: string }> }) {
-    const params = await props.params;
+export default function Page() {
+    const params = useParams();
+    const year = Array.isArray(params.year) ? params.year[0] : params.year;
+    const numYear = parseInt(year ?? '');
 
-    const {year} = params;
-
-    const numYear = parseInt(year);
+    const {data: stats, isLoading} = useTrainingStats({
+        year: Number.isNaN(numYear) ? undefined : numYear,
+    });
 
     if (isNaN(numYear) || numYear < 2000 || numYear > new Date().getFullYear()) {
         return (
@@ -34,25 +29,12 @@ export default async function Page(props: { params: Promise<{ year: string }> })
         );
     }
 
-    const sessionsInYear = await getAllSessionsInYear(numYear);
-    const totalHoursInYear = sessionsInYear.reduce((sum, session) => {
-        const duration = (session.end.getTime() - session.start.getTime()) / (1000 * 60 * 60);
-        return sum + duration;
-    }, 0).toFixed(3);
-    const passedSessionsInYear = await getPassedSessionsCountInYear(numYear);
-    const failedSessionsInYear = await getFailedSessionsCountInYear(numYear);
+    if (isLoading || !stats) {
+        return <Typography>Loading statistics…</Typography>;
+    }
 
-    const yearPassRate = calculatePassRate(passedSessionsInYear, failedSessionsInYear);
-
-    const yearStart = startOfYearUTC(numYear);
-    const yearEnd = endOfYearUTC(numYear);
-    const top3TrainersYearly = await getTopTrainingStaffByHours(3, yearStart, yearEnd);
-
-    const mostRunLessonYearly = await getMostRunLesson(yearStart, yearEnd);
-
-    const monthlyGraphData = await getMonthlySessionCountsForYear(numYear);
-
-    const lessonDistributionYearly = await getLessonDistributionData(yearStart, yearEnd);
+    const totalHoursInYear = stats.total_hours.toFixed(3);
+    const yearPassRate = calculatePassRate(stats.passed, stats.failed);
 
     return (
         <Grid container columns={30} spacing={2}>
@@ -72,7 +54,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography>Sessions</Typography>
-                        <Typography variant="h4">{sessionsInYear.length}</Typography>
+                        <Typography variant="h4">{stats.sessions}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -98,7 +80,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography>Sessions Passed</Typography>
-                        <Typography variant="h4">{passedSessionsInYear}</Typography>
+                        <Typography variant="h4">{stats.passed}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -111,7 +93,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography>Sessions Failed</Typography>
-                        <Typography variant="h4">{failedSessionsInYear}</Typography>
+                        <Typography variant="h4">{stats.failed}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -142,9 +124,9 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography gutterBottom>Most Run Session</Typography>
-                        {mostRunLessonYearly.lessonIdentifier ? (
+                        {stats.most_run_lesson.identifier ? (
                             <Chip
-                                label={`${mostRunLessonYearly.lessonIdentifier} (${mostRunLessonYearly.count} times)`}
+                                label={`${stats.most_run_lesson.identifier} (${stats.most_run_lesson.count} times)`}
                                 color="info"
                                 variant="filled"
                                 size="medium"
@@ -155,9 +137,9 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                     </CardContent>
                 </Card>
             </Grid>
-            {top3TrainersYearly.map((trainer, idx) => (
+            {stats.top_trainers.map((trainer, idx) => (
                 <Grid
-                    key={trainer.user.id}
+                    key={trainer.id}
                     size={{
                         xs: 30,
                         md: 10
@@ -166,9 +148,9 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         <CardContent>
                             <Box sx={{ mb: 2 }}>
                                     <Typography
-                                        variant="h5">{idx + 1} - {trainer.user.preferredName || `${trainer.user.firstName} ${trainer.user.lastName}`}
+                                        variant="h5">{idx + 1} - {trainer.preferred_name || `${trainer.first_name ?? ''} ${trainer.last_name ?? ''}`}
                                     </Typography>
-                                <Typography variant="body1">{trainer.user.cid}</Typography>
+                                <Typography variant="body1">{trainer.cid}</Typography>
                             </Box>
                             <Typography variant="h6">{trainer.hours.toPrecision(3)} hours</Typography>
                         </CardContent>
@@ -178,15 +160,15 @@ export default async function Page(props: { params: Promise<{ year: string }> })
             <Grid size={30}>
                 <Card>
                     <CardContent>
-                        <TrainingSessionsByMonthGraph data={monthlyGraphData} />
+                        <TrainingSessionsByMonthGraph data={stats.monthly_sessions} />
                     </CardContent>
                 </Card>
             </Grid>
             <Grid size={30}>
                 <Card>
                     <CardContent>
-                        {lessonDistributionYearly.length > 0 ? (
-                            <LessonDistributionGraph data={lessonDistributionYearly} />
+                        {stats.lesson_distribution.length > 0 ? (
+                            <LessonDistributionGraph data={stats.lesson_distribution} />
                         ) : (
                             <Typography variant="body2" sx={{ mt: 2 }}>No lesson data available for this year.</Typography>
                         )}

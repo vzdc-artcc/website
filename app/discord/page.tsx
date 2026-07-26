@@ -1,12 +1,12 @@
+'use client';
 import {Button, Card, CardContent, Stack, Typography} from '@mui/material';
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
+import {useMe} from "@/lib/osmium/hooks/me";
 import {Error} from "@mui/icons-material";
 
 
-export default async function Page() {
+export default function Page() {
 
-    const session = await getServerSession(authOptions);
+    const {data: me} = useMe();
 
     return (
         <Stack direction="column" spacing={2}>
@@ -20,9 +20,9 @@ export default async function Page() {
                     <Typography variant="h6">Our Discord Server is open to all VATSIM members.</Typography>
                     <Typography variant="body1" sx={{my: 1,}}>Join our Discord server to get the latest information on
                         events, training, and more!</Typography>
-                    {session && <Button variant="contained" size="large" href='https://discord.com/invite/me9zury'>Join
+                    {me && <Button variant="contained" size="large" href='https://discord.com/invite/me9zury'>Join
                         Discord</Button>}
-                    {!session &&
+                    {!me &&
                         <Typography sx={{display: 'flex', alignItems: 'center', gap: 1,}}><Error color="error"/> Login
                             to access Discord</Typography>}
                 </CardContent>

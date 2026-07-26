@@ -1,33 +1,40 @@
 'use client';
-import React, {useRef} from 'react';
-import {Stack, TextField} from "@mui/material";
-import {z} from "zod";
+import React, {useRef, useState} from 'react';
+import {Checkbox, FormControlLabel, Stack, TextField} from "@mui/material";
 import {toast} from "react-toastify";
-import {writeDossier} from "@/actions/dossier";
 import FormSaveButton from "@/components/Form/FormSaveButton";
+import {useCreateDossierEntry} from "@/lib/osmium/hooks/training";
 
-export default function DossierForm({cid}: { cid: string, }) {
+export default function DossierForm({cid}: { cid: number }) {
 
     const formRef = useRef<HTMLFormElement>(null);
+    const [confidential, setConfidential] = useState(false);
+    const createEntry = useCreateDossierEntry(cid);
 
     const handleSubmit = async (formData: FormData) => {
-        const messageZ = z.string().min(1, 'Message must be at least 1 character long');
-        const message = messageZ.safeParse(formData.get('message') as string);
-        if (!message.success) {
-            toast(message.error.message, {type: 'error'});
+        const message = ((formData.get('message') as string) || '').trim();
+        if (!message) {
+            toast('Message must be at least 1 character long', {type: 'error'});
             return;
         }
-        await writeDossier(message.data, cid);
-        toast('Dossier entry added', {type: 'success'});
-        formRef.current?.reset();
+        try {
+            await createEntry.mutateAsync({message, confidential});
+            toast('Dossier entry added', {type: 'success'});
+            formRef.current?.reset();
+            setConfidential(false);
+        } catch {
+            toast('Failed to add dossier entry', {type: 'error'});
+        }
     }
 
     return (
         <form ref={formRef} action={handleSubmit}>
-            <Stack direction="row" spacing={1}>
-                <TextField variant="filled" fullWidth name="message" label="Message*"
-                           helperText="If confidential, start message with a '^'"/>
-                <FormSaveButton />
+            <Stack direction="row" spacing={1} alignItems="center">
+                <TextField variant="filled" fullWidth name="message" label="Message*"/>
+                <FormControlLabel control={<Checkbox checked={confidential}
+                                                      onChange={(e) => setConfidential(e.target.checked)}/>}
+                                   label="Confidential"/>
+                <FormSaveButton/>
             </Stack>
         </form>
     );

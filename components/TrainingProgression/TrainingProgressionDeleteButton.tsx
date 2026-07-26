@@ -1,20 +1,20 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingProgression} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
 import {Tooltip} from "@mui/material";
 import {Delete} from "@mui/icons-material";
 import {GridActionsCellItem} from "@mui/x-data-grid";
-import {deleteTrainingProgression} from "@/actions/trainingProgression";
+import {useDeleteTrainingProgression} from "@/lib/osmium/hooks/training";
 
 export default function TrainingProgressionDeleteButton({trainingProgression}: {
-    trainingProgression: TrainingProgression,
+    trainingProgression: { id: string },
 }) {
     const [clicked, setClicked] = useState(false);
+    const deleteProgression = useDeleteTrainingProgression();
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteTrainingProgression(trainingProgression.id);
+            await deleteProgression.mutateAsync(trainingProgression.id);
             toast(`Training progression deleted successfully!`, {type: 'success'});
         } else {
             toast(`Deleting this remove it from all students and delete all the steps.  Click again to confirm.`, {type: 'warning'});

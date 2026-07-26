@@ -4,7 +4,7 @@ import {useParams, useRouter} from "next/navigation";
 import {Autocomplete, Box, Button, Card, CardContent, MenuItem, Stack, TextField} from "@mui/material";
 import {z} from "zod";
 import {toast} from "react-toastify";
-import {User} from "next-auth";
+import {TrainingStaffOption} from "@/lib/osmium/hooks/users";
 
 const months = [
     {
@@ -61,7 +61,7 @@ const months = [
     },
 ]
 
-export default function TrainingStatsTimeSelector({trainingStaff}: { trainingStaff: User[], }) {
+export default function TrainingStatsTimeSelector({trainingStaff}: { trainingStaff: TrainingStaffOption[], }) {
 
     const params = useParams();
     const router = useRouter();

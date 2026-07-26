@@ -1,11 +1,11 @@
+'use client';
 import {Box, Button, Card, CardContent, Link, Stack, Typography} from "@mui/material";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
+import {useMe} from "@/lib/osmium/hooks/me";
 import {Error} from "@mui/icons-material";
 
-export default async function Home() {
+export default function Home() {
 
-    const session = await getServerSession(authOptions);
+    const {data: me} = useMe();
 
     return (
         <Stack direction="column" spacing={2}>
@@ -62,7 +62,7 @@ export default async function Home() {
 
                 </CardContent>
             </Card>
-            {!session && <Card>
+            {!me && <Card>
                 <CardContent>
                     <Stack direction="row" spacing={1} alignItems="center">
                         <Error color="error"/>
@@ -70,7 +70,7 @@ export default async function Home() {
                     </Stack>
                 </CardContent>
             </Card>}
-            {session && <Card>
+            {me && <Card>
                 <CardContent>
                     <Stack direction="column" spacing={1}>
                         <Typography variant="h6">TeamSpeak Connection Information</Typography>

@@ -1,46 +1,63 @@
 'use client';
 import React, {useState} from 'react';
-import {CertificationOption, CertificationType} from "@/generated/prisma/browser";
 import {useRouter} from "next/navigation";
 import {toast} from "react-toastify";
-import {createOrUpdateCertificationType} from "@/actions/certificationTypes";
 import {Autocomplete, FormControlLabel, Stack, Switch, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
+import {CERTIFICATION_OPTIONS, useUpsertCertificationType} from "@/lib/osmium/hooks/certifications";
 
-export default function CertificationTypeForm({certificationType}: { certificationType?: CertificationType }) {
+export type CertificationTypeFormData = {
+    id: string;
+    name: string;
+    can_solo_cert: boolean;
+    auto_assign_unrestricted: boolean;
+    certification_options: string[];
+};
 
-    const [availableOptions, setAvailableOptions] = useState<CertificationOption[]>(certificationType?.certificationOptions.filter((co) => !['NONE', 'SOLO'].includes(co)) || []);
+const SELECTABLE_OPTIONS = CERTIFICATION_OPTIONS.filter((co) => !['NONE', 'SOLO'].includes(co));
+
+export default function CertificationTypeForm({certificationType}: { certificationType?: CertificationTypeFormData }) {
+
+    const [availableOptions, setAvailableOptions] = useState<string[]>(
+        certificationType?.certification_options.filter((co) => !['NONE', 'SOLO'].includes(co)) || []
+    );
+    const [name, setName] = useState(certificationType?.name || '');
+    const [canSoloCert, setCanSoloCert] = useState(certificationType?.can_solo_cert ?? false);
+    const [autoAssignUnrestricted, setAutoAssignUnrestricted] = useState(certificationType?.auto_assign_unrestricted ?? false);
     const router = useRouter();
+    const upsert = useUpsertCertificationType();
 
-    const handleSubmit = async (formData: FormData) => {
-
-        formData.set('certificationOptions', ["NONE", ...availableOptions] as any);
-
-        const {certificationType, errors} = await createOrUpdateCertificationType(formData);
-
-        if (errors) {
-            toast(errors.map((e) => e.message).join(".  "), {type: 'error'});
-            return;
+    const handleSubmit = async () => {
+        try {
+            const saved = await upsert.mutateAsync({
+                id: certificationType?.id,
+                name,
+                can_solo_cert: canSoloCert,
+                auto_assign_unrestricted: autoAssignUnrestricted,
+                certification_options: ["NONE", ...availableOptions],
+            });
+            router.push('/admin/certification-types');
+            toast(`Certification type '${saved?.name}' saved successfully!`, {type: 'success'});
+        } catch (e) {
+            const status = (e as { status?: number })?.status;
+            toast(
+                status === 409
+                    ? "Cannot remove an option that a lesson still grants. Fix those lessons first."
+                    : "Failed to save certification type. Name must be 1–20 characters.",
+                {type: 'error'}
+            );
         }
-
-        router.push('/admin/certification-types');
-        toast(`Certification type '${certificationType.name}' saved successfully!`, {type: 'success'})
     }
-
-
 
     return (
         <form action={handleSubmit}>
-            <input type="hidden" name="id" value={certificationType?.id}/>
             <Stack direction="column" spacing={2}>
-                <TextField variant="filled" name="name" label="Name" defaultValue={certificationType?.name || ''}/>
-                {/*<TextField variant="filled" type="number" name="order" label="Order"*/}
-                {/*           defaultValue={certificationType?.order || 0}*/}
-                {/*           helperText="Lower number will put this certification higher in lists or first in table columns."/>*/}
+                <TextField variant="filled" name="name" label="Name" value={name}
+                           onChange={(e) => setName(e.target.value)}/>
                 <Autocomplete
                     multiple
                     disableCloseOnSelect
-                    options={Object.keys(CertificationOption).filter((co) => !['NONE', 'SOLO'].includes(co)) as CertificationOption[]}
+                    options={SELECTABLE_OPTIONS}
                     value={availableOptions}
                     onChange={(event, newValue) => {
                         setAvailableOptions(newValue);
@@ -55,12 +72,14 @@ export default function CertificationTypeForm({certificationType}: { certificati
                     )}>
                 </Autocomplete>
                 <FormControlLabel name="canSoloCert"
-                                  control={<Switch defaultChecked={certificationType?.canSoloCert}/>}
+                                  control={<Switch checked={canSoloCert}
+                                                   onChange={(e) => setCanSoloCert(e.target.checked)}/>}
                                   label="Can get solo certified?"/>
                 <FormControlLabel name="autoAssignUnrestricted"
-                                  control={<Switch defaultChecked={certificationType?.autoAssignUnrestricted}/>}
+                                  control={<Switch checked={autoAssignUnrestricted}
+                                                   onChange={(e) => setAutoAssignUnrestricted(e.target.checked)}/>}
                                   label="Auto certify for rating?"/>
-                <FormSaveButton />
+                <FormSaveButton/>
             </Stack>
         </form>
     );

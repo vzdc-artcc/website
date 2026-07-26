@@ -1,5 +1,5 @@
+'use client';
 import React, {ReactNode} from 'react';
-import prisma from "@/lib/db";
 import {
     Card,
     CardContent,
@@ -12,287 +12,134 @@ import {
     TableRow,
     Typography
 } from "@mui/material";
-import {getRating} from "@/lib/vatsim";
-import {Metadata} from "next";
 import MatrixName from "@/components/Misc/MatrixName";
-import {User} from "next-auth";
-import {getChips} from "@/lib/staffPositions";
+import UserStaffPositionChips from "@/components/StaffPositions/UserStaffPositionChips";
+import {useStaffPositionHolders} from "@/lib/osmium/hooks/staff-positions";
+import {useUsersByRole} from "@/lib/osmium/hooks/users";
 
-export const metadata: Metadata = {
-    title: 'Staff | vZDC',
-    description: 'vZDC staff page, get to know vZDC Staff!',
-};
+const VATUSA_FACILITY = process.env.NEXT_PUBLIC_VATUSA_FACILITY ?? 'vZDC';
 
-const VATUSA_FACILITY = process.env.VATUSA_FACILITY;
+type StaffMember = { cid: number; name: string; rating?: string | null };
 
-export default async function Page() {
+export default function Page() {
 
-    const atm = await prisma.user.findFirst({
-        where: {
-            staffPositions: {
-                has: 'ATM',
-            },
-        },
-    });
+    const useHolders = (position: string): StaffMember[] =>
+        (useStaffPositionHolders(position).data?.holders ?? [])
+            .map((h) => ({cid: h.cid, name: h.display_name, rating: h.rating}));
+    const useRoleUsers = (role: string): StaffMember[] =>
+        (useUsersByRole(role).data?.items ?? [])
+            .map((u) => ({cid: u.basic.cid, name: u.basic.name, rating: u.basic.rating}));
 
-    const datm = await prisma.user.findFirst({
-        where: {
-            staffPositions: {
-                has: 'DATM',
-            },
-        },
-    });
-
-    const ta = await prisma.user.findFirst({
-        where: {
-            staffPositions: {
-                has: 'TA',
-            },
-        },
-    });
-
-    const fe = await prisma.user.findFirst({
-        where: {
-            staffPositions: {
-                has: 'FE',
-            },
-        },
-    });
-
-    const wm = await prisma.user.findFirst({
-        where: {
-            staffPositions: {
-                has: 'WM',
-            },
-        },
-    });
-
-    const ec = await prisma.user.findFirst({
-        where: {
-            staffPositions: {
-                has: 'EC',
-            },
-        },
-    });
-
-    const atas = await prisma.user.findMany({
-        where: {
-            staffPositions: {
-                has: 'ATA',
-            },
-        },
-        orderBy: {
-            lastName: 'asc',
-        },
-    });
-
-    const awms = await prisma.user.findMany({
-        where: {
-            staffPositions: {
-                has: 'AWM',
-            },
-        },
-        orderBy: {
-            lastName: 'asc',
-        },
-    });
-
-    const afes = await prisma.user.findMany({
-        where: {
-            staffPositions: {
-                has: 'AFE',
-            },
-        },
-        orderBy: {
-            lastName: 'asc',
-        },
-    });
-
-    const aecs = await prisma.user.findMany({
-        where: {
-            staffPositions: {
-                has: 'AEC',
-            },
-        },
-        orderBy: {
-            lastName: 'asc',
-        },
-    });
-
-    const instructors = await prisma.user.findMany({
-        where: {
-            roles: {
-                has: 'INSTRUCTOR',
-            },
-        },
-        orderBy: {
-            lastName: 'asc',
-        },
-    });
-
-    const mentors = await prisma.user.findMany({
-        where: {
-            roles: {
-                has: 'MENTOR',
-            },
-        },
-        orderBy: {
-            lastName: 'asc',
-        },
-    });
-
-    const fcs = await prisma.user.findMany({
-        where: {
-            staffPositions: {
-                has: 'FC',
-            },
-        },
-        orderBy: {
-            lastName: 'asc',
-        },
-    });
+    const atm = useHolders('ATM')[0];
+    const datm = useHolders('DATM')[0];
+    const ta = useHolders('TA')[0];
+    const fe = useHolders('FE')[0];
+    const wm = useHolders('WM')[0];
+    const ec = useHolders('EC')[0];
+    const atas = useHolders('ATA');
+    const awms = useHolders('AWM');
+    const afes = useHolders('AFE');
+    const aecs = useHolders('AEC');
+    const fcs = useHolders('FC');
+    const instructors = useRoleUsers('INS');
+    const mentors = useRoleUsers('MTR');
 
     return (
         (<Grid container columns={12} spacing={2}>
             <Grid size={12}>
-                <Card>
-                    <CardContent>
-                        <Typography variant="h6">{VATUSA_FACILITY} Staff</Typography>
-                    </CardContent>
-                </Card>
+                <Card><CardContent><Typography variant="h6">{VATUSA_FACILITY} Staff</Typography></CardContent></Card>
             </Grid>
-            <Grid
-                size={{
-                    xs: 12,
-                    md: 6
-                }}>
+            <Grid size={{xs: 12, md: 6}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Air Traffic Manager (ATM)</Typography>
-                        <Typography variant="h3">{atm?.firstName} {atm?.lastName}</Typography>
+                        <Typography variant="h3">{atm?.name}</Typography>
                         <Typography>atm@vzdc.org</Typography>
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid
-                size={{
-                    xs: 12,
-                    md: 6
-                }}>
+            <Grid size={{xs: 12, md: 6}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Deputy Air Traffic Manager (DATM)</Typography>
-                        <Typography variant="h3">{datm?.firstName} {datm?.lastName}</Typography>
+                        <Typography variant="h3">{datm?.name}</Typography>
                         <Typography>datm@vzdc.org</Typography>
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid
-                size={{
-                    xs: 12,
-                    md: 6,
-                    lg: 3
-                }}>
+            <Grid size={{xs: 12, md: 6, lg: 3}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Training Administrator (TA)</Typography>
-                        <Typography variant="h4">{ta?.firstName} {ta?.lastName}</Typography>
+                        <Typography variant="h4">{ta?.name}</Typography>
                         <Typography>ta@vzdc.org</Typography>
-                        <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Training Administrators
-                            (ATAs)</Typography>
-                        {getAssistantTable(atas as User[])}
+                        <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Training Administrators (ATAs)</Typography>
+                        {getAssistantTable(atas)}
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid
-                size={{
-                    xs: 12,
-                    md: 6,
-                    lg: 3
-                }}>
+            <Grid size={{xs: 12, md: 6, lg: 3}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Event Coordinator (EC)</Typography>
-                        <Typography variant="h4">{ec?.firstName} {ec?.lastName}</Typography>
+                        <Typography variant="h4">{ec?.name}</Typography>
                         <Typography>ec@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Event Coordinators (AECs)</Typography>
-                        {getAssistantTable(aecs as User[])}
+                        {getAssistantTable(aecs)}
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid
-                size={{
-                    xs: 12,
-                    md: 6,
-                    lg: 3
-                }}>
+            <Grid size={{xs: 12, md: 6, lg: 3}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Facility Engineer (FE)</Typography>
-                        <Typography variant="h4">{fe?.firstName} {fe?.lastName}</Typography>
+                        <Typography variant="h4">{fe?.name}</Typography>
                         <Typography>fe@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Facility Engineers (AFEs)</Typography>
-                        {getAssistantTable(afes as User[])}
+                        {getAssistantTable(afes)}
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid
-                size={{
-                    xs: 12,
-                    md: 6,
-                    lg: 3
-                }}>
+            <Grid size={{xs: 12, md: 6, lg: 3}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Webmaster (WM)</Typography>
-                        <MatrixName firstName={wm?.firstName ?? ''} lastName={wm?.lastName ?? ''}/>
+                        <MatrixName firstName={wm?.name ?? ''} lastName={''}/>
                         <Typography>wm@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Webmasters (AWMs)</Typography>
-                        {getAssistantTable(awms as User[])}
+                        {getAssistantTable(awms)}
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid
-                size={{
-                    xs: 12,
-                    md: 6
-                }}>
+            <Grid size={{xs: 12, md: 6}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="h6">Instructors</Typography>
-                        {getAssistantTable(instructors as User[])}
+                        {getAssistantTable(instructors)}
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid
-                size={{
-                    xs: 12,
-                    md: 6
-                }}>
+            <Grid size={{xs: 12, md: 6}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="h6">Mentors</Typography>
-                        {getAssistantTable(mentors as User[])}
+                        {getAssistantTable(mentors)}
                     </CardContent>
                 </Card>
             </Grid>
-            <Grid
-                size={{
-                    xs: 12,
-                }}>
+            <Grid size={{xs: 12,}}>
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="h6">Financial Committee</Typography>
-                        {getAssistantTable(fcs as User[], "Staff Position(s)", getChips)}
+                        {getAssistantTable(fcs, "Staff Position(s)", (u) => <UserStaffPositionChips cid={u.cid}/>)}
                     </CardContent>
                 </Card>
             </Grid>
         </Grid>)
     );
-
 }
 
-const getAssistantTable = (users: User[], extraColumnName?: string, extraColumn?: (user: User) => ReactNode) => {
+const getAssistantTable = (users: StaffMember[], extraColumnName?: string, extraColumn?: (user: StaffMember) => ReactNode) => {
     return users.length > 0 ? (
         <TableContainer sx={{maxHeight: 600}}>
             <Table size="small">
@@ -305,9 +152,9 @@ const getAssistantTable = (users: User[], extraColumnName?: string, extraColumn?
                 </TableHead>
                 <TableBody>
                     {users.map(user => (
-                        <TableRow key={user.id}>
-                            <TableCell>{user.firstName} {user.lastName}</TableCell>
-                            <TableCell>{getRating(user.rating)}</TableCell>
+                        <TableRow key={user.cid}>
+                            <TableCell>{user.name}</TableCell>
+                            <TableCell>{user.rating ?? ''}</TableCell>
                             {extraColumn && <TableCell>{extraColumn(user)}</TableCell>}
                         </TableRow>
                     ))}

@@ -1,24 +1,29 @@
 'use client';
 import React from 'react';
-import {LOA} from "@/generated/prisma/browser";
 import {Button, Stack} from "@mui/material";
 import {Check, Close} from "@mui/icons-material";
-import {approveLoa, denyLoa} from "@/actions/loa";
+import {useDecideLoa} from "@/lib/osmium/hooks/loa";
 import {toast} from "react-toastify";
 
-export default function LoaDecisionForm({loa}: { loa: LOA, }) {
+export default function LoaDecisionForm({loa}: { loa: {id: string}, }) {
+
+    const decideLoa = useDecideLoa();
 
     const handleApprove = async () => {
-        const result = await approveLoa(loa.id);
-        if (result.loa) {
+        try {
+            await decideLoa.mutateAsync({loaId: loa.id, status: 'APPROVED'});
             toast("LOA Approved", {type: "success"});
+        } catch {
+            toast("Failed to approve LOA.", {type: "error"});
         }
     }
 
     const handleDeny = async () => {
-        const result = await denyLoa(loa.id);
-        if (result.loa) {
+        try {
+            await decideLoa.mutateAsync({loaId: loa.id, status: 'DENIED'});
             toast("LOA Denied", {type: "success"});
+        } catch {
+            toast("Failed to deny LOA.", {type: "error"});
         }
     }
 

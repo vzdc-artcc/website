@@ -1,13 +1,12 @@
+'use client';
 import React from 'react';
 import {Badge, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import Link from "next/link";
 import {
     Assignment,
-    BorderColor,
     CalendarMonth,
     Checklist,
     Class,
-    Clear,
     Home,
     ListAlt,
     LocalActivity,
@@ -21,38 +20,17 @@ import {
     ViewWeek,
     WorkspacePremium,
 } from "@mui/icons-material";
-import prisma from "@/lib/db";
 import MenuWrapper from './MenuWrapper';
+import TrainingMenuLiveBadges from './TrainingMenuLiveBadges';
+import {useStaffPositionHolderName} from "@/lib/osmium/hooks/staff-positions";
+import {useAdminSoloCertifications} from "@/lib/osmium/hooks/certifications";
 
-export default async function TrainingMenu() {
+export default function TrainingMenu() {
 
-    const soloCertifications = await prisma.soloCertification.count();
+    const {data: soloData} = useAdminSoloCertifications();
+    const soloCertifications = soloData?.items?.length ?? 0;
 
-    const homeTrainingRequests = await prisma.trainingAssignmentRequest.count({
-        where: { student: { controllerStatus: "HOME" } },
-    });
-
-    const visitorTrainingRequests = await prisma.trainingAssignmentRequest.count({
-        where: { student: { controllerStatus: "VISITOR" } },
-    });
-
-    const trainingReleaseRequests = await prisma.trainerReleaseRequest.count();
-
-    const ta = await prisma.user.findFirst({
-        where: {
-            staffPositions: {
-                has: "TA",
-            },
-        },
-    });
-
-    const pendingOtsRecs = await prisma.otsRecommendation.count({
-        where: {
-            assignedInstructorId: null,
-        },
-    });
-
-    const taName = ta ? `${ta.firstName} ${ta.lastName || 'N/A'}` : 'N/A';
+    const taName = useStaffPositionHolderName("TA");
 
     return (
         <MenuWrapper title="Training Administration" subheadings={[`TA: ${taName}`]}>
@@ -104,16 +82,7 @@ export default async function TrainingMenu() {
                     <ListItemText primary="Training Appointments"/>
                 </ListItemButton>
             </Link>
-            <Link href="/training/ots" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Badge color="primary" badgeContent={pendingOtsRecs}>
-                            <BorderColor/>
-                        </Badge>
-                    </ListItemIcon>
-                    <ListItemText primary="OTS Recommendations"/>
-                </ListItemButton>
-            </Link>
+            <TrainingMenuLiveBadges/>
             <Link href="/training/assignments" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
@@ -128,36 +97,6 @@ export default async function TrainingMenu() {
                         <PersonAdd/>
                     </ListItemIcon>
                     <ListItemText primary="Manual Trainer Request"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/requests/home" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Badge color="primary" badgeContent={homeTrainingRequests}>
-                            <PersonAdd/>
-                        </Badge>
-                    </ListItemIcon>
-                    <ListItemText primary="Home Requests"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/requests/visit" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Badge color="primary" badgeContent={visitorTrainingRequests}>
-                            <PersonAdd/>
-                        </Badge>
-                    </ListItemIcon>
-                    <ListItemText primary="Visitor Requests"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/releases" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Badge color="primary" badgeContent={trainingReleaseRequests}>
-                            <Clear/>
-                        </Badge>
-                    </ListItemIcon>
-                    <ListItemText primary="Trainer Release Requests"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/controller" style={{textDecoration: 'none', color: 'inherit',}}>

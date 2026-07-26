@@ -1,55 +1,63 @@
-import React from 'react';
-import {User} from "next-auth";
-import {Box, Card, CardActions, CardContent, Chip, Stack, Typography} from "@mui/material";
-import prisma from "@/lib/db";
-import {getRating} from "@/lib/vatsim";
+'use client';
+import React, {useMemo} from 'react';
+import {Box, Card, CardActions, CardContent, Chip, CircularProgress, Stack, Typography} from "@mui/material";
 import AssignedTrainerRequestButton from "@/components/Profile/AssignedTrainerRequestButton";
 import AssignedTrainerRequestCancelButton from "@/components/Profile/AssignedTrainerRequestCancelButton";
 import AssignedTrainerReleaseButton from "@/components/Profile/AssignedTrainerReleaseButton";
 import AssignedTrainerReleaseCancelButton from "@/components/Profile/AssignedTrainerReleaseCancelButton";
+import {useMe} from "@/lib/osmium/hooks/me";
+import {
+    useTrainerReleaseRequests,
+    useTrainingAssignmentRequests,
+    useTrainingAssignments,
+} from "@/lib/osmium/hooks/training";
 
-export default async function AssignedTrainersCard({user}: { user: User, }) {
+export default function AssignedTrainersCard({controllerStatus, disableRequest, disableRelease}: {
+    controllerStatus?: string,
+    disableRequest?: boolean,
+    disableRelease?: boolean,
+}) {
 
-    const trainingAssignment = await prisma.trainingAssignment.findUnique({
-        where: {
-            studentId: user.id,
-        },
-        include: {
-            primaryTrainer: true,
-            otherTrainers: true,
-        },
-    });
+    const {data: me, isLoading: meLoading} = useMe();
+    const {data: assignmentsData, isLoading: assignmentsLoading} = useTrainingAssignments();
+    const {data: releasesData, isLoading: releasesLoading} = useTrainerReleaseRequests();
+    const {data: requestsData, isLoading: requestsLoading} = useTrainingAssignmentRequests();
 
-    const release = await prisma.trainerReleaseRequest.findUnique({
-        where: {
-            studentId: user.id,
-        },
-    });
-    const requests = await prisma.trainingAssignmentRequest.findMany({
-        orderBy: { submittedAt: 'asc' },
-        include: {
-            student: {
-                select: {
-                    id: true,
-                    controllerStatus: true,
-                },
-            },
-        },
-    });
+    const myId = me?.id;
 
-    const trainingAssignmentRequest = requests.find(request => request.studentId === user.id);
+    const trainingAssignment = useMemo(() => {
+        if (!myId) return undefined;
+        return (assignmentsData?.items ?? []).find((a) => a.student_id === myId);
+    }, [assignmentsData, myId]);
 
-    const filterStatus = user.controllerStatus; // ensure the user's controllerStatus is available
-    const filteredRequests = filterStatus
-        ? requests.filter(r => r.student?.controllerStatus === filterStatus)
-        : requests;
+    const release = useMemo(() => {
+        if (!myId) return undefined;
+        return (releasesData?.items ?? []).find((r) => r.student_id === myId);
+    }, [releasesData, myId]);
 
-    const positionInQueue = filteredRequests.findIndex(request => request.studentId === user.id) + 1;
+    const filteredRequests = useMemo(() => {
+        const requests = (requestsData?.items ?? []).slice()
+            .sort((a, b) => new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime());
+        return controllerStatus ? requests.filter((r) => r.student_controller_status === controllerStatus) : requests;
+    }, [requestsData, controllerStatus]);
 
-    let estimatedWaitTime = positionInQueue > 3 && trainingAssignmentRequest ? `${Math.max(1, Math.ceil(differenceDays(trainingAssignmentRequest.submittedAt, filteredRequests[2].submittedAt) / 30))} months` : `Less than 1 month`;
+    const trainingAssignmentRequest = useMemo(() => {
+        if (!myId) return undefined;
+        return (requestsData?.items ?? []).find((r) => r.student_id === myId);
+    }, [requestsData, myId]);
 
-    if (user.controllerStatus === 'VISITOR') {
+    const positionInQueue = filteredRequests.findIndex((r) => r.student_id === myId) + 1;
+
+    let estimatedWaitTime = positionInQueue > 3 && trainingAssignmentRequest
+        ? `${Math.max(1, Math.ceil(differenceDays(new Date(trainingAssignmentRequest.submitted_at), new Date(filteredRequests[2].submitted_at)) / 30))} months`
+        : `Less than 1 month`;
+
+    if (controllerStatus === 'VISITOR') {
         estimatedWaitTime = 'N/A for Visiting Controllers';
+    }
+
+    if (meLoading || assignmentsLoading || releasesLoading || requestsLoading) {
+        return <CircularProgress/>;
     }
 
     return (
@@ -61,13 +69,13 @@ export default async function AssignedTrainersCard({user}: { user: User, }) {
                         <Chip color="warning" label="REQUEST PENDING"/>
                         <Typography sx={{mt: 1,}} gutterBottom>Position: <b>{positionInQueue}</b></Typography>
                         <Typography gutterBottom>Estimated Wait Time: <b>{estimatedWaitTime}</b></Typography>
-                        {user.controllerStatus === 'HOME' &&
+                        {controllerStatus === 'HOME' &&
                             <Typography sx={{display: 'block'}} variant="caption" gutterBottom><b>Training wait time
                                 estimates
                                 may not be fully accurate.</b> Estimates are calculated based on your position in
-                                the {user.controllerStatus} training queue and those at the front of the
+                                the {controllerStatus} training queue and those at the front of the
                                 queue.</Typography>}
-                        {user.controllerStatus === 'VISITOR' &&
+                        {controllerStatus === 'VISITOR' &&
                             <Typography sx={{display: 'block'}} variant="caption" gutterBottom><b>Visiting controllers
                                 should
                                 expect much longer wait times for training.</b> Home controllers are prioritized in the
@@ -76,7 +84,7 @@ export default async function AssignedTrainersCard({user}: { user: User, }) {
                         <Typography sx={{mb: 2, display: 'block'}} variant="caption">You are strongly encouraged to look
                             for impromptu training sessions that can be posted by a member of the training team.
                             More information is available in the Training Order.</Typography>
-                        <AssignedTrainerRequestCancelButton request={trainingAssignmentRequest}/>
+                        <AssignedTrainerRequestCancelButton requestId={trainingAssignmentRequest.id}/>
                     </>
                 }
                 {!trainingAssignment && !trainingAssignmentRequest &&
@@ -85,27 +93,27 @@ export default async function AssignedTrainersCard({user}: { user: User, }) {
                     <Stack direction="column" spacing={1}>
                         <Box>
                             <Typography variant="subtitle2">Primary Trainer</Typography>
-                            <Typography
-                                variant="body2">{trainingAssignment.primaryTrainer.firstName} {trainingAssignment.primaryTrainer.lastName} - {getRating(trainingAssignment.primaryTrainer.rating)}</Typography>
+                            <Typography variant="body2">{trainingAssignment.primary_trainer_name}</Typography>
                         </Box>
                         <Box>
                             <Typography variant="subtitle2">Other Trainers</Typography>
-                            {trainingAssignment.otherTrainers.map(trainer => (
-                                <Typography key={trainer.id}
-                                            variant="body2">{trainer.firstName} {trainer.lastName} - {getRating(trainer.rating)}</Typography>
+                            {trainingAssignment.other_trainers.length === 0 &&
+                                <Typography variant="body2">None</Typography>}
+                            {trainingAssignment.other_trainers.map(trainer => (
+                                <Typography key={trainer.id} variant="body2">{trainer.name}</Typography>
                             ))}
                         </Box>
                     </Stack>
                 )}
             </CardContent>
             <CardActions>
-                {!trainingAssignment && !trainingAssignmentRequest && !user.noRequestTrainingAssignments &&
+                {!trainingAssignment && !trainingAssignmentRequest && !disableRequest &&
                     <AssignedTrainerRequestButton/>
                 }
-                {trainingAssignment && !release && !user.noRequestTrainerRelease &&
+                {trainingAssignment && !release && !disableRelease &&
                     <AssignedTrainerReleaseButton/>
                 }
-                {trainingAssignment && release && <AssignedTrainerReleaseCancelButton release={release}/>}
+                {trainingAssignment && release && <AssignedTrainerReleaseCancelButton releaseId={release.id}/>}
             </CardActions>
 
         </Card>

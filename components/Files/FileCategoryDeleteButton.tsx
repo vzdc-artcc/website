@@ -1,23 +1,27 @@
 'use client';
 import React, {useState} from 'react';
-import {FileCategory} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
 import {IconButton} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-import {deleteFileCategory} from "@/actions/files";
+import {useDeletePublicationCategory} from "@/lib/osmium/hooks/publications";
 
-export default function FileCategoryDeleteButton({fileCategory}: { fileCategory: FileCategory }) {
+export default function FileCategoryDeleteButton({fileCategory}: { fileCategory: { id: string; name: string } }) {
     const [clicked, setClicked] = useState(false);
+    const deleteCategory = useDeletePublicationCategory();
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteFileCategory(fileCategory.id);
-            toast(`'${fileCategory.name}' deleted successfully!`, {type: 'success'});
+            try {
+                await deleteCategory.mutateAsync(fileCategory.id);
+                toast(`'${fileCategory.name}' deleted successfully!`, {type: 'success'});
+            } catch {
+                toast.error(`Failed to delete '${fileCategory.name}' (it may still contain files).`);
+            }
+            setClicked(false);
         } else {
             toast(`This will delete all the files in this category.  Click again to confirm.`, {type: 'warning'});
             setClicked(true);
         }
-
     }
 
     return (

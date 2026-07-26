@@ -1,6 +1,5 @@
 'use client';
-import React, {useState} from 'react';
-import {ControllerPosition} from "@/generated/prisma/browser";
+import React, {useMemo, useState} from 'react';
 import {
     Box,
     Table,
@@ -14,54 +13,57 @@ import {
 } from "@mui/material";
 import {formatZuluDate} from "@/lib/date";
 
-export default function EventStatisticsOnlinePositionTable({allPositions,}: { allPositions: ControllerPosition[], }) {
+export interface OnlinePositionRow {
+    position: string;
+    started_at: string;
+    ended_at?: string | null;
+}
 
-    const [filteredPositions, setFilteredPositions] = useState<ControllerPosition[]>(allPositions);
+// osmium's controller-position list exposes the ARTCC facility_name and the
+// position callsign, but not the numeric DEL/GND/TWR/APP/CTR facility type the
+// old Prisma column carried. Derive a display label from the callsign suffix.
+const facilityFromPosition = (position: string): string => {
+    const suffix = position.toUpperCase().split('_').pop() ?? '';
+    switch (suffix) {
+        case 'DEL':
+            return 'DEL';
+        case 'GND':
+            return 'GND';
+        case 'TWR':
+            return 'TWR';
+        case 'APP':
+        case 'DEP':
+            return 'APP';
+        case 'CTR':
+            return 'CTR';
+        case 'FSS':
+            return 'FSS';
+        default:
+            return suffix || 'UNKNOWN';
+    }
+};
+
+const durationHours = (position: OnlinePositionRow): number => {
+    const start = new Date(position.started_at);
+    const end = position.ended_at ? new Date(position.ended_at) : new Date();
+    return (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+};
+
+export default function EventStatisticsOnlinePositionTable({allPositions,}: { allPositions: OnlinePositionRow[], }) {
+
     const [filterInput, setFilterInput] = useState<string>('');
 
-    const getFacility = (facility: number) => {
-        switch (facility) {
-            case 0:
-                return 'OBS';
-            case 1:
-                return 'FSS';
-            case 2:
-                return 'DEL';
-            case 3:
-                return 'GND';
-            case 4:
-                return 'TWR';
-            case 5:
-                return 'APP';
-            case 6:
-                return 'CTR';
-            default:
-                return 'UNKNOWN';
-        }
-    }
-
-    const getDurationHours = (position: ControllerPosition) => {
-        const start = new Date(position.start);
-        const end = position.end ? new Date(position.end) : new Date();
-        const durationMs = end.getTime() - start.getTime();
-        return (durationMs / (1000 * 60 * 60));
-    }
-
-    const setFilterValues = (value: string) => {
-        setFilterInput(value.toUpperCase());
-        const newFilters = value.toUpperCase().split(',').map(v => v.trim().toUpperCase()).filter(v => v.length > 0);
-        if (newFilters.length === 0) {
-            setFilteredPositions(allPositions);
-        } else {
-            setFilteredPositions(allPositions.filter(position => newFilters.some(filter => position.position.toUpperCase().includes(filter))));
-        }
-    }
+    const filteredPositions = useMemo(() => {
+        const filters = filterInput.toUpperCase().split(',').map(v => v.trim()).filter(v => v.length > 0);
+        if (filters.length === 0) return allPositions;
+        return allPositions.filter(position => filters.some(filter => position.position.toUpperCase().includes(filter)));
+    }, [allPositions, filterInput]);
 
     return (
         <Box>
             <TextField fullWidth size="small" variant="outlined" label="Filter values by position" value={filterInput}
                        placeholder="Ex. _TWR, DCA_, etc." helperText="Seperate with commas. NOT case sensitive."
-                       onChange={(e) => setFilterValues(e.target.value)}/>
+                       onChange={(e) => setFilterInput(e.target.value)}/>
             {filteredPositions.length === 0 && <Typography sx={{mt: 2, mb: 1,}}>No positions found.</Typography>}
             {filteredPositions.length > 0 &&
                 <TableContainer sx={{maxHeight: 250, mb: 2, mt: 1,}}>
@@ -77,17 +79,17 @@ export default function EventStatisticsOnlinePositionTable({allPositions,}: { al
                         <TableBody>
                             {filteredPositions.map((position, index) => (
                                 <TableRow key={index}>
-                                    <TableCell>{getFacility(position.facility || -1)}</TableCell>
+                                    <TableCell>{facilityFromPosition(position.position)}</TableCell>
                                     <TableCell>{position.position}</TableCell>
-                                    <TableCell>{formatZuluDate(position.start)}</TableCell>
-                                    <TableCell>{getDurationHours(position).toFixed(3)}</TableCell>
+                                    <TableCell>{formatZuluDate(new Date(position.started_at))}</TableCell>
+                                    <TableCell>{durationHours(position).toFixed(3)}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </TableContainer>}
             {filteredPositions.length > 0 && <Typography>Total
-                Hours: {filteredPositions.reduce((sum, position) => sum + getDurationHours(position), 0).toFixed(3)}</Typography>}
+                Hours: {filteredPositions.reduce((sum, position) => sum + durationHours(position), 0).toFixed(3)}</Typography>}
         </Box>
     );
 }

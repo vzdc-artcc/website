@@ -1,23 +1,30 @@
 'use client';
-import React, {useState} from 'react';
-import {WelcomeMessages} from "@/generated/prisma/browser";
-import {User} from "next-auth";
+import React, {useEffect, useState} from 'react';
 import {Box, Button, Dialog, DialogActions, DialogContent, Typography} from "@mui/material";
 import Markdown from "react-markdown";
 import {Check} from "@mui/icons-material";
-import {acknowledgeWelcomeMessage} from "@/actions/welcome-messages";
+import {useAcknowledgeWelcomeMessage, useMyWelcomeMessage} from "@/lib/osmium/hooks/welcome-messages";
 import Logo from "@/components/Logo/Logo";
 
-export default function WelcomeMessageDialog({user, welcomeMessages}: {
-    user: User,
-    welcomeMessages: WelcomeMessages
-}) {
+export default function WelcomeMessageDialog() {
 
-    const [open, setOpen] = useState(user.showWelcomeMessage);
+    const {data} = useMyWelcomeMessage();
+    const acknowledgeWelcomeMessage = useAcknowledgeWelcomeMessage();
+    const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        if (data?.show && data?.text) {
+            setOpen(true);
+        }
+    }, [data]);
 
     const onClose = async () => {
         setOpen(false);
-        await acknowledgeWelcomeMessage(user.id);
+        await acknowledgeWelcomeMessage.mutateAsync();
+    }
+
+    if (!data?.show || !data?.text) {
+        return null;
     }
 
     return (
@@ -28,8 +35,7 @@ export default function WelcomeMessageDialog({user, welcomeMessages}: {
                 </Box>
                 <Typography textAlign="center" variant="h5" gutterBottom>Welcome to the Virtual Washington
                     ARTCC!</Typography>
-                {user.controllerStatus === 'HOME' ? <Markdown>{welcomeMessages.homeText}</Markdown> : <></>}
-                {user.controllerStatus === 'VISITOR' ? <Markdown>{welcomeMessages.visitorText}</Markdown> : <></>}
+                <Markdown>{data.text}</Markdown>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} variant="contained" size="small" startIcon={<Check/>}>Get Started</Button>

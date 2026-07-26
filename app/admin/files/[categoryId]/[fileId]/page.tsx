@@ -1,44 +1,34 @@
-import React from 'react';
-import prisma from "@/lib/db";
+'use client';
+import React, {use} from 'react';
 import {notFound} from "next/navigation";
-import {Card, CardContent, Stack, Typography} from "@mui/material";
+import {Card, CardContent, Skeleton, Stack, Typography} from "@mui/material";
 import FileForm from "@/components/Files/FileForm";
-import {UTApi} from "uploadthing/server";
 import Link from "next/link";
 import {OpenInNew} from "@mui/icons-material";
+import {usePublication} from "@/lib/osmium/hooks/publications";
 
-const ut = new UTApi();
+export default function Page(props: { params: Promise<{ categoryId: string, fileId: string }> }) {
+    const {categoryId, fileId} = use(props.params);
 
-export default async function Page(props: { params: Promise<{ categoryId: string, fileId: string, }> }) {
-    const params = await props.params;
+    const {data: file, isLoading, error} = usePublication(fileId);
 
-    const {fileId} = params;
-
-    const file = await prisma.file.findUnique({
-        where: {
-            id: fileId,
-        },
-        include: {
-            category: true,
-        },
-    });
-
-    if (!file) {
+    if (isLoading) {
+        return <Card><CardContent><Skeleton height={300}/></CardContent></Card>;
+    }
+    if (error || !file) {
         notFound();
     }
-
-    const url = (await ut.getFileUrls([file.key])).data[0].url;
 
     return (
         <Card>
             <CardContent>
-                <Link href={url} target="_blank" style={{color: file.highlightColor || 'inherit',}}>
+                <Link href={file.cdn_url} target="_blank" style={{color: 'inherit',}}>
                     <Stack direction="row" spacing={1} alignItems="center" sx={{mb: 2,}}>
-                        <Typography variant="h5" sx={{mb: 2,}}>File - {file.name}</Typography>
+                        <Typography variant="h5">File - {file.title}</Typography>
                         <OpenInNew fontSize="large"/>
                     </Stack>
                 </Link>
-                <FileForm file={file} category={file.category}/>
+                <FileForm categoryId={categoryId} publication={file}/>
             </CardContent>
         </Card>
     );

@@ -1,36 +1,23 @@
-import React from 'react';
+'use client';
+import React, {use} from 'react';
 import {Card, CardContent} from "@mui/material";
 import TrainingSessionInformation from "@/components/TrainingSession/TrainingSessionInformation";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
-import prisma from "@/lib/db";
-import {notFound} from "next/navigation";
+import RequireAuth from "@/components/Access/RequireAuth";
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-    const params = await props.params;
+export default function Page(props: { params: Promise<{ id: string }> }) {
+    const {id} = use(props.params);
 
-    const {id} = params;
-
-    const session = await getServerSession(authOptions);
-
-    const trainingSession = await prisma.trainingSession.findUnique({
-        where: {
-            id: id,
-        },
-        include: {
-            student: true,
-        },
-    });
-
-    if (!trainingSession || trainingSession.student.id !== session?.user.id) {
-        notFound();
-    }
-
+    // Access control is enforced by osmium: GET /training/sessions/{id} is
+    // readable by the session's own student (auth.profile.read) or staff
+    // (training.sessions.read); a non-owner non-staff caller gets a 403, which
+    // TrainingSessionInformation surfaces as not-found.
     return (
-        <Card>
-            <CardContent>
-                <TrainingSessionInformation id={id}/>
-            </CardContent>
-        </Card>
+        <RequireAuth>
+            <Card>
+                <CardContent>
+                    <TrainingSessionInformation id={id}/>
+                </CardContent>
+            </Card>
+        </RequireAuth>
     );
 }

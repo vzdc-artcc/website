@@ -1,38 +1,42 @@
 'use client';
 import React from 'react';
-import {Lesson, LessonRubricCell, LessonRubricCriteria} from "@/generated/prisma/browser";
 import {Grid, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {createOrUpdateLessonCriteriaCell} from "@/actions/lessonCriteriaCell";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
+import {useCreateLessonRubricCell, useUpdateLessonRubricCell} from "@/lib/osmium/hooks/training";
 
 export default function LessonCriteriaCellForm({lesson, criteria, cell}: {
-    lesson: Lesson,
-    criteria: LessonRubricCriteria,
-    cell?: LessonRubricCell
+    lesson: { id: string },
+    criteria: { id: string, max_points: number },
+    cell?: { id: string, points: number, description: string }
 }) {
 
     const router = useRouter();
+    const createCell = useCreateLessonRubricCell(lesson.id);
+    const updateCell = useUpdateLessonRubricCell(lesson.id);
 
     const handleSubmit = async (formData: FormData) => {
-        const {errors} = await createOrUpdateLessonCriteriaCell(formData);
+        const body = {
+            points: Number(formData.get('points')),
+            description: formData.get('description') as string,
+        };
 
-        if (errors) {
-            toast(errors.map((e) => e.message).join(".  "), {type: 'error'});
-            return;
+        try {
+            if (cell) {
+                await updateCell.mutateAsync({criteriaId: criteria.id, cellId: cell.id, body});
+            } else {
+                await createCell.mutateAsync({criteriaId: criteria.id, body});
+            }
+            router.replace(`/training/lessons/${lesson.id}/edit/${criteria.id}`);
+            toast("Criteria cell saved successfully!", {type: 'success'});
+        } catch {
+            toast("Failed to save criteria cell.", {type: 'error'});
         }
-
-        router.replace(`/training/lessons/${lesson.id}/edit/${criteria.id}`);
-        toast("Criteria cell saved successfully!", {type: 'success'});
     }
 
     return (
         (<form action={handleSubmit}>
-            <input type="hidden" name="lessonId" value={lesson.id}/>
-            <input type="hidden" name="criteriaId" value={criteria.id}/>
-            <input type="hidden" name="cellId" value={cell?.id || ''}/>
-            <input type="hidden" name="maxPoints" value={criteria.maxPoints}/>
             <Grid container columns={2} spacing={2}>
                 <Grid
                     size={{
@@ -40,7 +44,7 @@ export default function LessonCriteriaCellForm({lesson, criteria, cell}: {
                         md: 1
                     }}>
                     <TextField fullWidth variant="filled" type="number" required name="points" label="Points"
-                               helperText={`Points must be less than or equal to the maximum points in this criteria: ${criteria.maxPoints}`}
+                               helperText={`Points must be less than or equal to the maximum points in this criteria: ${criteria.max_points}`}
                                defaultValue={cell?.points || 0}/>
                 </Grid>
                 <Grid

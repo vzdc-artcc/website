@@ -1,19 +1,15 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, CircularProgress } from "@mui/material";
-import { toast } from "react-toastify";
+import React, {useEffect, useState} from "react";
+import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@mui/material";
+import {toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {useMyDiscordLink, useStartDiscordLink, useUnlinkDiscord} from "@/lib/osmium/hooks/discord-link";
 
-export default function DiscordLinkButton({
-                                              linked,
-                                              discordUid,
-                                          }: {
-    linked?: boolean;
-    discordUid?: string | null;
-}) {
-    const [isLinked, setIsLinked] = useState<boolean>(!!(linked && discordUid));
-    const [loading, setLoading] = useState(false);
+export default function DiscordLinkButton() {
+    const {data: link, isLoading} = useMyDiscordLink();
+    const startLink = useStartDiscordLink();
+    const unlinkDiscord = useUnlinkDiscord();
     const [confirmOpen, setConfirmOpen] = useState(false);
 
     useEffect(() => {
@@ -25,7 +21,6 @@ export default function DiscordLinkButton({
         if (linkedParam) {
             const msg = usernameParam ? `Discord linked as ${usernameParam}` : "Discord account linked.";
             toast.success(msg);
-            setIsLinked(true);
             params.delete("discord_linked");
             params.delete("discord_username");
         } else if (errParam) {
@@ -43,33 +38,35 @@ export default function DiscordLinkButton({
     const closeConfirm = () => setConfirmOpen(false);
 
     const doUnlink = async () => {
-        setLoading(true);
         try {
-            const res = await fetch("/api/discord/unlink", { method: "POST" });
-            setLoading(false);
+            await unlinkDiscord.mutateAsync();
             setConfirmOpen(false);
-            if (res.ok) {
-                setIsLinked(false);
-                toast.success("Discord account unlinked.");
-            } else {
-                const data = await res.json().catch(() => ({}));
-                toast.error("Failed to unlink: " + (data?.error ?? res.statusText));
-            }
+            toast.success("Discord account unlinked.");
         } catch {
-            setLoading(false);
             setConfirmOpen(false);
-            toast.error("Network error while unlinking.");
+            toast.error("Failed to unlink Discord account.");
         }
     };
 
-    const handlePrimary = () => {
-        if (isLinked) {
+    const handlePrimary = async () => {
+        if (link?.linked) {
             openConfirm();
-        } else {
-            // full navigation required to start OAuth reliably
-            window.location.href = "/api/discord/link";
+            return;
+        }
+        try {
+            const result = await startLink.mutateAsync(`${window.location.origin}/api/discord/callback`);
+            if (result?.auth_url) {
+                window.location.href = result.auth_url;
+            } else {
+                toast.error("Discord linking isn't configured on the server yet.");
+            }
+        } catch {
+            toast.error("Failed to start Discord linking.");
         }
     };
+
+    const loading = isLoading || startLink.isPending || unlinkDiscord.isPending;
+    const isLinked = !!link?.linked;
 
     return (
         <>
@@ -78,6 +75,7 @@ export default function DiscordLinkButton({
                 color={isLinked ? "error" : "primary"}
                 onClick={handlePrimary}
                 disabled={loading}
+                startIcon={loading ? <CircularProgress size={16}/> : null}
             >
                 {isLinked ? "Unlink" : "Link Discord"}
             </Button>
@@ -86,17 +84,18 @@ export default function DiscordLinkButton({
                 <DialogTitle>Unlink Discord</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        Are you sure you want to unlink your Discord account? This will cause many vZDC Discord features to stop working.
+                        Are you sure you want to unlink your Discord account? This will cause many vZDC Discord
+                        features to stop working.
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={closeConfirm} disabled={loading}>Cancel</Button>
+                    <Button onClick={closeConfirm} disabled={unlinkDiscord.isPending}>Cancel</Button>
                     <Button
                         onClick={doUnlink}
                         color="error"
                         variant="contained"
-                        disabled={loading}
-                        startIcon={loading ? <CircularProgress size={16} /> : null}
+                        disabled={unlinkDiscord.isPending}
+                        startIcon={unlinkDiscord.isPending ? <CircularProgress size={16}/> : null}
                     >
                         Unlink
                     </Button>

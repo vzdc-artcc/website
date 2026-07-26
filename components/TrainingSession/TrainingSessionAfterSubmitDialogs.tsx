@@ -1,22 +1,26 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {
-    CertificationType,
-    LessonRosterChange,
-    OtsRecommendation,
-    TrainerReleaseRequest
-} from "@/generated/prisma/browser";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack} from "@mui/material";
 import {ArrowForward} from "@mui/icons-material";
 
-export type RosterChangeWithAll = LessonRosterChange & {
-    certificationType: CertificationType,
+interface RosterChangeLike {
+    id: string;
+    dossier_text: string;
+    certification_option: string;
+}
+
+interface ReleaseLike {
+    id: string;
+}
+
+interface OtsRecLike {
+    id: string;
 }
 
 export default function TrainingSessionAfterSubmitDialogs({release, rosterChanges, otsRec, onAllClose}: {
-    release?: TrainerReleaseRequest,
-    rosterChanges?: RosterChangeWithAll[],
-    otsRec?: OtsRecommendation,
+    release?: ReleaseLike | null,
+    rosterChanges?: RosterChangeLike[],
+    otsRec?: OtsRecLike | null,
     onAllClose: () => void
 }) {
 
@@ -69,10 +73,10 @@ export default function TrainingSessionAfterSubmitDialogs({release, rosterChange
                             <li key={update.id}>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <DialogContentText
-                                        color="textPrimary">{update.certificationType.name}</DialogContentText>
+                                        color="textPrimary">{update.dossier_text}</DialogContentText>
                                     <ArrowForward/>
                                     <DialogContentText
-                                        color="textPrimary">{update.certificationOption}</DialogContentText>
+                                        color="textPrimary">{update.certification_option}</DialogContentText>
                                 </Stack>
                             </li>
                         ))}

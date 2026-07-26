@@ -1,22 +1,21 @@
-import React from 'react';
-import {CertificationType} from "@/generated/prisma/client";
-import prisma from "@/lib/db";
-import {Box, Card, CardContent, IconButton, Stack, Tooltip, Typography} from "@mui/material";
+'use client';
+import React, {use} from 'react';
+import {Box, Card, CardContent, IconButton, Skeleton, Stack, Tooltip, Typography} from "@mui/material";
 import Link from "next/link";
 import {ArrowBack} from "@mui/icons-material";
 import CertificationTypeForm from "@/components/CertificationTypes/CertificationTypeForm";
+import {useCertificationTypes} from "@/lib/osmium/hooks/certifications";
+import {notFound} from "next/navigation";
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-    const params = await props.params;
+export default function Page(props: { params: Promise<{ id: string }> }) {
+    const {id} = use(props.params);
 
-    const {id} = params;
+    const {data, isLoading} = useCertificationTypes();
+    const certificationType = data?.items.find((ct) => ct.id === id);
 
-    const certificationType: CertificationType | undefined = (await prisma.certificationType.findUnique({
-        where: {
-            id,
-        },
-    })) || undefined;
-
+    if (!isLoading && data && !certificationType) {
+        notFound();
+    }
 
     return (
         <Card>
@@ -32,7 +31,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                     <Typography variant="h5">Edit Certification Type</Typography>
                 </Stack>
                 <Box sx={{mt: 1,}}>
-                    <CertificationTypeForm certificationType={certificationType}/>
+                    {isLoading || !certificationType
+                        ? <Skeleton height={300}/>
+                        : <CertificationTypeForm certificationType={certificationType}/>}
                 </Box>
             </CardContent>
         </Card>

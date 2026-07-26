@@ -1,22 +1,36 @@
 'use client';
-import React, {useState} from 'react';
-import {WelcomeMessages} from "@/generated/prisma/browser";
+import React, {useEffect, useState} from 'react';
 import Form from "next/form";
 import {Box, Stack, Typography, useTheme} from "@mui/material";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {updateWelcomeMessages} from "@/actions/welcome-messages";
+import {useUpdateWelcomeMessageContent, useWelcomeMessageContent} from "@/lib/osmium/hooks/welcome-messages";
 import {toast} from "react-toastify";
 
-export default function WelcomeMessagesForm({existing}: { existing?: WelcomeMessages }) {
+export default function WelcomeMessagesForm() {
 
     const theme = useTheme();
-    const [homeText, setHomeText] = useState(existing?.homeText || '');
-    const [visitorText, setVisitorText] = useState(existing?.visitorText || '');
+    const {data} = useWelcomeMessageContent();
+    const updateWelcomeMessageContent = useUpdateWelcomeMessageContent();
+    const [homeText, setHomeText] = useState('');
+    const [visitorText, setVisitorText] = useState('');
+    const [initialized, setInitialized] = useState(false);
+
+    useEffect(() => {
+        if (data && !initialized) {
+            setHomeText(data.home_text);
+            setVisitorText(data.visitor_text);
+            setInitialized(true);
+        }
+    }, [data, initialized]);
 
     const handleSubmit = async () => {
-        await updateWelcomeMessages(homeText, visitorText);
-        toast.success("Welcome messages updated successfully!");
+        try {
+            await updateWelcomeMessageContent.mutateAsync({home_text: homeText, visitor_text: visitorText});
+            toast.success("Welcome messages updated successfully!");
+        } catch {
+            toast('Failed to update welcome messages', {type: 'error'});
+        }
     }
 
     return (

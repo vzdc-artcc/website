@@ -1,8 +1,11 @@
 'use client';
 import React from 'react';
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
-import {LOAStatus} from "@/generated/prisma/browser";
 import {Tab, Tabs} from "@mui/material";
+
+// Local string-literal union replacing the legacy Prisma `LOAStatus` enum
+// (this component does no Prisma queries — it only types the status tab value).
+type LOAStatus = "PENDING" | "APPROVED" | "DENIED" | "INACTIVE";
 
 export default function LoaTabs() {
     const searchParams = useSearchParams();

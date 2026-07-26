@@ -1,27 +1,27 @@
+'use client';
 import EventPositionPresetForm from "@/components/EventPositionPreset/EventPositionPresetForm";
-import prisma from "@/lib/db";
-import { Card, CardContent, Typography } from "@mui/material";
-import { notFound } from "next/navigation";
+import {Box, Card, CardContent, CircularProgress, Typography} from "@mui/material";
+import {useParams} from "next/navigation";
+import {useEventPositionPreset} from "@/lib/osmium/hooks/events";
 
-export default async function Page({ params }: { params: Promise<{ id: string, }>}) {
+export default function Page() {
 
-    const { id } = await params;
+    const params = useParams<{ id: string }>();
+    const {data: positionPreset, isLoading} = useEventPositionPreset(params.id);
 
-    const positionPreset = await prisma.eventPositionPreset.findUnique({
-        where: {
-            id,
-        },
-    });
+    if (isLoading) {
+        return <Box sx={{display: 'flex', justifyContent: 'center', my: 4}}><CircularProgress/></Box>;
+    }
 
     if (!positionPreset) {
-        notFound();
+        return <Typography textAlign="center" variant="h5">Preset not found.</Typography>;
     }
 
     return (
         <Card>
             <CardContent>
                 <Typography variant="h5" gutterBottom>Edit - {positionPreset.name}</Typography>
-                <EventPositionPresetForm positionPreset={positionPreset} />
+                <EventPositionPresetForm positionPreset={positionPreset}/>
             </CardContent>
         </Card>
     );

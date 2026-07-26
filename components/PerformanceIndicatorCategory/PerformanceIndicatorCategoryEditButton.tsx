@@ -1,14 +1,13 @@
 'use client';
 import React, {useState} from 'react';
-import {PerformanceIndicatorCriteriaCategory, PerformanceIndicatorTemplate} from "@/generated/prisma/browser";
 import {Dialog, DialogContent, DialogTitle, IconButton} from "@mui/material";
 import {Edit} from "@mui/icons-material";
 import PerformanceIndicatorCategoryForm
     from "@/components/PerformanceIndicatorCategory/PerformanceIndicatorCategoryForm";
 
 export default function PerformanceIndicatorCategoryEditButton({template, category,}: {
-    template: PerformanceIndicatorTemplate,
-    category: PerformanceIndicatorCriteriaCategory
+    template: { id: string },
+    category: { id: string, name: string, sort_order: number }
 }) {
 
     const [open, setOpen] = useState(false);

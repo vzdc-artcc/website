@@ -1,53 +1,74 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingProgression} from "@/generated/prisma/browser";
 import Form from "next/form";
 import {Autocomplete, Box, FormControlLabel, Stack, Switch, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {createOrUpdateTrainingProgression} from "@/actions/trainingProgression";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
+import {
+    useCreateTrainingProgression,
+    useTrainingProgressions,
+    useUpdateTrainingProgression
+} from "@/lib/osmium/hooks/training";
 
-export default function TrainingProgressionForm({trainingProgression, allProgressions}: {
-    trainingProgression?: TrainingProgression,
-    allProgressions: TrainingProgression[]
+interface ProgressionLike {
+    id: string;
+    name: string;
+    next_progression_id?: string | null;
+    auto_assign_new_home_obs: boolean;
+    auto_assign_new_visitor: boolean;
+}
+
+export default function TrainingProgressionForm({trainingProgression}: {
+    trainingProgression?: ProgressionLike,
 }) {
 
     const router = useRouter();
-    const [nextProgression, setNextProgression] = useState<TrainingProgression | null>(allProgressions.find(p => p.id === trainingProgression?.nextProgressionId) || null);
+    const {data} = useTrainingProgressions();
+    const allProgressions = data?.items ?? [];
+    const createProgression = useCreateTrainingProgression();
+    const updateProgression = useUpdateTrainingProgression();
+    const [nextProgression, setNextProgression] = useState<ProgressionLike | null>(
+        allProgressions.find(p => p.id === trainingProgression?.next_progression_id) || null
+    );
 
     const handleSubmit = async (formData: FormData) => {
+        const body = {
+            name: formData.get('name') as string,
+            next_progression_id: nextProgression?.id || null,
+            auto_assign_new_home_obs: formData.get('autoAssignNewHomeObs') === 'on',
+            auto_assign_new_visitor: formData.get('autoAssignNewVisitor') === 'on',
+        };
 
-        formData.set('nextProgressionId', nextProgression?.id || '');
-
-        const {trainingProgression: newTp, errors} = await createOrUpdateTrainingProgression(formData);
-
-        if (errors) {
-            toast.error(errors.map(e => e.message).join('. '));
-            return;
-        }
-
-        toast.success(trainingProgression?.id ? "Training progression updated!" : "Training progression created!");
-        if (!trainingProgression?.id) {
-            router.push(`/training/progressions/${newTp.id}/edit/steps`);
+        try {
+            if (trainingProgression) {
+                await updateProgression.mutateAsync({progressionId: trainingProgression.id, body});
+                toast.success("Training progression updated!");
+            } else {
+                const created = await createProgression.mutateAsync(body);
+                toast.success("Training progression created!");
+                router.push(`/training/progressions/${created!.id}/edit/steps`);
+            }
+        } catch {
+            toast.error("Failed to save training progression.");
         }
     }
 
     return (
         <Form action={handleSubmit}>
             <Stack direction="column" spacing={2}>
-                <input type="hidden" name="id" defaultValue={trainingProgression?.id || ''}/>
                 <TextField variant="filled" label="Name" name="name" fullWidth required
                            defaultValue={trainingProgression?.name || ''}/>
                 <FormControlLabel name="autoAssignNewHomeObs"
-                                  control={<Switch defaultChecked={trainingProgression?.autoAssignNewHomeObs}/>}
+                                  control={<Switch defaultChecked={trainingProgression?.auto_assign_new_home_obs}/>}
                                   label="Auto assign to NEW HOME OBS?"/>
                 <FormControlLabel name="autoAssignNewVisitor"
-                                  control={<Switch defaultChecked={trainingProgression?.autoAssignNewVisitor}/>}
+                                  control={<Switch defaultChecked={trainingProgression?.auto_assign_new_visitor}/>}
                                   label="Auto assign to NEW VISITOR?"/>
                 <Autocomplete
                     options={allProgressions.filter(p => p.id !== trainingProgression?.id)}
                     getOptionLabel={(option) => option.name}
+                    isOptionEqualToValue={(a, b) => a.id === b.id}
                     value={nextProgression}
                     onChange={(event, newValue) => {
                         setNextProgression(newValue);
@@ -64,4 +85,3 @@ export default function TrainingProgressionForm({trainingProgression, allProgres
         </Form>
     );
 }
-

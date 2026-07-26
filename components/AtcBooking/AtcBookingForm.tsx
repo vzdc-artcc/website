@@ -2,27 +2,26 @@
 import React, {useState} from 'react';
 import Form from "next/form";
 import {Grid, TextField} from "@mui/material";
-import {AtcBooking} from "@/lib/atcBooking";
 import dayjs, {Dayjs} from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import {LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import {DateTimePicker} from "@mui/x-date-pickers/DateTimePicker";
-import {User} from "next-auth";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {createOrUpdateAtcBooking} from "@/actions/atcBooking";
+import {AtcBookingItem, useCreateOrUpdateAtcBooking} from "@/lib/osmium/hooks/bookings";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
 
-export default function AtcBookingForm({ booking, user }: { booking?: AtcBooking, user: User, }) {
+export default function AtcBookingForm({ booking, cid, timezone: tz }: { booking?: AtcBookingItem, cid: number, timezone: string, }) {
 
     dayjs.extend(utc);
     dayjs.extend(timezone);
 
-    const [start, setStart] = useState<Dayjs | null>(dayjs.utc(booking?.start || new Date()).tz(user.timezone));
-    const [end, setEnd] = useState<Dayjs | null>(dayjs.utc(booking?.end || new Date()).tz(user.timezone));
+    const [start, setStart] = useState<Dayjs | null>(dayjs.utc(booking?.start || new Date()).tz(tz));
+    const [end, setEnd] = useState<Dayjs | null>(dayjs.utc(booking?.end || new Date()).tz(tz));
     const router = useRouter();
+    const save = useCreateOrUpdateAtcBooking();
 
     const handleSubmit = async (formData: FormData) => {
         if (!end || !start) {
@@ -36,16 +35,16 @@ export default function AtcBookingForm({ booking, user }: { booking?: AtcBooking
             return;
         }
 
-        const res = await createOrUpdateAtcBooking({
-            id: booking?.id,
-            callsign: formData.get('position') as string,
-            start: start.utc().format('YYYY-MM-DD HH:mm:ss'),
-            end: end.utc().format('YYYY-MM-DD HH:mm:ss'),
-            cid: Number(user.cid),
-        });
-
-        if (typeof res === 'string') {
-            toast.error(res);
+        try {
+            await save.mutateAsync({
+                id: booking?.id,
+                callsign: formData.get('position') as string,
+                start: start.utc().format('YYYY-MM-DD HH:mm:ss'),
+                end: end.utc().format('YYYY-MM-DD HH:mm:ss'),
+                cid: Number(cid),
+            });
+        } catch (e) {
+            toast.error((e as Error).message);
             return;
         }
 
@@ -64,8 +63,8 @@ export default function AtcBookingForm({ booking, user }: { booking?: AtcBooking
                         <DateTimePicker
                             sx={{width: '100%'}}
                             disablePast
-                            minDateTime={dayjs().tz(user.timezone).add(2, 'hour')}
-                            maxDateTime={dayjs().tz(user.timezone).add(72, 'hour').add(1, 'minute')}
+                            minDateTime={dayjs().tz(tz).add(2, 'hour')}
+                            maxDateTime={dayjs().tz(tz).add(72, 'hour').add(1, 'minute')}
                             ampm={false}
                             name="start"
                             label="Start Time"
@@ -78,7 +77,7 @@ export default function AtcBookingForm({ booking, user }: { booking?: AtcBooking
                             sx={{width: '100%'}}
                             disablePast
                             minDateTime={start ? start.add(1, 'hour') : undefined}
-                            maxDateTime={start ? start.add(2, 'hour') : dayjs().tz(user.timezone).add(2, 'hour').add(1, 'minute')}
+                            maxDateTime={start ? start.add(2, 'hour') : dayjs().tz(tz).add(2, 'hour').add(1, 'minute')}
                             ampm={false}
                             name="end"
                             label="End Time"

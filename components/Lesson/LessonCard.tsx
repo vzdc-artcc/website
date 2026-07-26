@@ -1,33 +1,29 @@
+'use client';
 import React from 'react';
-import {Card, CardContent, IconButton, Stack, Tooltip, Typography} from "@mui/material";
+import {Card, CardContent, CircularProgress, IconButton, Stack, Tooltip, Typography} from "@mui/material";
 import Markdown from "react-markdown";
-import prisma from "@/lib/db";
-import {notFound} from "next/navigation";
 import LessonRubricGrid from "@/components/Lesson/LessonRubricGrid";
 import Link from "next/link";
 import {ArrowBack} from "@mui/icons-material";
+import {useTrainingLessons} from "@/lib/osmium/hooks/training";
 
-export default async function LessonCard({lessonId}: { lessonId: string }) {
+export default function LessonCard({lessonId}: { lessonId: string }) {
 
-    const lesson = await prisma.lesson.findUnique({
-        where: {
-            id: lessonId,
-        },
-        include: {
-            rubric: {
-                include: {
-                    items: {
-                        include: {
-                            cells: true,
-                        },
-                    },
-                },
-            },
-        },
-    });
+    const {data, isLoading} = useTrainingLessons();
+    const lesson = data?.items.find((l) => l.id === lessonId);
+
+    if (isLoading) {
+        return <CircularProgress/>;
+    }
 
     if (!lesson) {
-        notFound();
+        return (
+            <Card>
+                <CardContent>
+                    <Typography variant="h5">Lesson not found.</Typography>
+                </CardContent>
+            </Card>
+        );
     }
 
     return (

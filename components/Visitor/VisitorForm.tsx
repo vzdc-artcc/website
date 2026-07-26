@@ -2,22 +2,46 @@
 import React from 'react';
 import {Checkbox, FormControlLabel, Grid, Stack, TextField, Typography} from "@mui/material";
 import {toast} from "react-toastify";
-import {addVisitingApplication} from "@/actions/visitor";
+import {useCreateVisitorApplication} from "@/lib/osmium/hooks/visitor";
 import {useRouter} from "next/navigation";
-import {User} from "next-auth";
-import {getRating} from "@/lib/vatsim";
+import {useMe} from "@/lib/osmium/hooks/me";
 import VisitorFormSubmitButton from "@/components/Visitor/VisitorFormSubmitButton";
 
-export default function VisitorForm({user}: { user: User, }) {
+export default function VisitorForm() {
 
     const router = useRouter();
+    const {data: me} = useMe();
+    const createVisitorApplication = useCreateVisitorApplication();
 
     const handleSubmit = async (formData: FormData) => {
 
-        const {errors} = await addVisitingApplication(formData);
+        const homeFacility = (formData.get("homeFacility") as string || '').trim();
+        const whyVisit = (formData.get("whyVisit") as string || '').trim();
 
-        if (errors) {
-            toast(errors.map((e) => e.message).join(".  "), {type: "error"});
+        if (!homeFacility) {
+            toast("Home ARTCC is required", {type: "error"});
+            return;
+        }
+        if (!whyVisit) {
+            toast("Reason for visiting is required", {type: "error"});
+            return;
+        }
+        for (const [field, message] of [
+            ["meetUsaReqs", "You must meet the VATUSA visiting requirements"],
+            ["meetZdcReqs", "You must agree to our visiting policy"],
+            ["goodStanding", "You must be in good standing with your home ARTCC"],
+            ["notRealWorld", "You must understand that we are not the real world FAA nor do we have any affiliation with them"],
+        ]) {
+            if (formData.get(field) !== 'on') {
+                toast(message, {type: "error"});
+                return;
+            }
+        }
+
+        try {
+            await createVisitorApplication.mutateAsync({home_facility: homeFacility, why_visit: whyVisit});
+        } catch {
+            toast("Failed to submit visitor application.", {type: "error"});
             return;
         }
 
@@ -26,14 +50,13 @@ export default function VisitorForm({user}: { user: User, }) {
 
     return (
         (<form action={handleSubmit}>
-            <input type="hidden" name="userId" value={user.id}/>
             <Grid container spacing={2} rowSpacing={4} columns={2}>
                 <Grid
                     size={{
                         xs: 2,
                         lg: 1
                     }}>
-                    <TextField variant="filled" fullWidth name="name" label="Full Name" defaultValue={user.fullName}
+                    <TextField variant="filled" fullWidth name="name" label="Full Name" defaultValue={me?.display_name}
                                disabled/>
                 </Grid>
                 <Grid
@@ -41,7 +64,7 @@ export default function VisitorForm({user}: { user: User, }) {
                         xs: 2,
                         lg: 1
                     }}>
-                    <TextField variant="filled" fullWidth name="cid" label="VATSIM CID" defaultValue={user.cid}
+                    <TextField variant="filled" fullWidth name="cid" label="VATSIM CID" defaultValue={me?.cid}
                                disabled/>
                 </Grid>
                 <Grid
@@ -50,14 +73,14 @@ export default function VisitorForm({user}: { user: User, }) {
                         lg: 1
                     }}>
                     <TextField variant="filled" fullWidth name="rating" label="Rating"
-                               defaultValue={getRating(user.rating)} disabled/>
+                               defaultValue={me?.rating ?? ""} disabled/>
                 </Grid>
                 <Grid
                     size={{
                         xs: 2,
                         lg: 1
                     }}>
-                    <TextField variant="filled" fullWidth name="email" label="Email" defaultValue={user.email}
+                    <TextField variant="filled" fullWidth name="email" label="Email" defaultValue={me?.email}
                                disabled/>
                 </Grid>
                 <Grid

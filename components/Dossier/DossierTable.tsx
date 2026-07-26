@@ -1,11 +1,17 @@
+'use client';
 import React from 'react';
-import {DossierEntry} from "@/generated/prisma/browser";
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
+import {useDossier} from "@/lib/osmium/hooks/training";
 
-function DossierTable({dossier, ableToViewConfidential,}: {
-    dossier: DossierEntry[],
-    ableToViewConfidential?: boolean
-}) {
+function DossierTable({cid}: { cid: number }) {
+
+    const {data, isLoading} = useDossier(cid);
+    const entries = data?.items ?? [];
+
+    if (isLoading) {
+        return <CircularProgress/>;
+    }
+
     return (
         <TableContainer>
             <Table size="small">
@@ -17,15 +23,17 @@ function DossierTable({dossier, ableToViewConfidential,}: {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {dossier.map((entry) => (
+                    {entries.length === 0 &&
+                        <TableRow>
+                            <TableCell colSpan={3}>
+                                <Typography>No dossier entries.</Typography>
+                            </TableCell>
+                        </TableRow>}
+                    {entries.map((entry) => (
                         <TableRow key={entry.id}>
-                            <TableCell>{entry.timestamp.toDateString()}</TableCell>
-                            <TableCell>{(entry as any).writer.firstName} {(entry as any).writer.lastName} ({(entry as any).writer.cid})</TableCell>
-                            <TableCell>{
-                                entry.message.startsWith('^') ?
-                                    ableToViewConfidential ? 'CONFIDENTIAL -> ' + entry.message.substring(1) : "CONFIDENTIAL"
-                                    : entry.message
-                            }</TableCell>
+                            <TableCell>{new Date(entry.timestamp).toDateString()}</TableCell>
+                            <TableCell>{entry.writer_name ?? 'Unknown'}{entry.writer_cid ? ` (${entry.writer_cid})` : ''}</TableCell>
+                            <TableCell>{entry.is_confidential ? `CONFIDENTIAL -> ${entry.message}` : entry.message}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

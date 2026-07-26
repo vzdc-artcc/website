@@ -1,9 +1,10 @@
+'use client';
 import React from 'react';
-import {User} from "next-auth";
 import {
     Button,
     Card,
     CardContent,
+    CircularProgress,
     IconButton,
     Stack,
     Table,
@@ -14,30 +15,19 @@ import {
     TableRow,
     Typography
 } from "@mui/material";
-import prisma from '@/lib/db';
 import {formatTimezoneDate} from '@/lib/date';
 import Link from 'next/link';
-import {Check, Close, Edit, KeyboardArrowRight, Visibility} from '@mui/icons-material';
+import {KeyboardArrowRight, Visibility} from '@mui/icons-material';
+import {useUserEventPositions} from "@/lib/osmium/hooks/events";
 
-export default async function EventsCard({user}: { user: User, }) {
+export default function EventsCard({cid, timezone}: { cid: number, timezone: string, }) {
 
-    const positions = await prisma.eventPosition.findMany({
-        where: {
-            userId: user.id,
-            event: {
-                archived: null,
-                hidden: false,
-            },
-        },
-        include: {
-            event: true,
-        },
-        orderBy: {
-            event: {
-                start: 'asc',
-            },
-        },
-    });
+    const {data, isLoading} = useUserEventPositions(cid);
+    const positions = data?.items ?? [];
+
+    if (isLoading) {
+        return <CircularProgress/>;
+    }
 
     return (
         <Card sx={{height: '100%',}}>
@@ -50,7 +40,6 @@ export default async function EventsCard({user}: { user: User, }) {
                             <TableRow>
                                 <TableCell>Event</TableCell>
                                 <TableCell>Position</TableCell>
-                                <TableCell>Final?</TableCell>
                                 <TableCell>Start</TableCell>
                                 <TableCell>Actions</TableCell>
                             </TableRow>
@@ -58,14 +47,13 @@ export default async function EventsCard({user}: { user: User, }) {
                         <TableBody>
                             {positions.map((position) => (
                                 <TableRow key={position.id}>
-                                    <TableCell>{position.event.name}</TableCell>
-                                    <TableCell>{position.published ? position.finalPosition : position.requestedPosition}</TableCell>
-                                    <TableCell>{position.published ? <Check /> : <Close />}</TableCell>
-                                    <TableCell>{formatTimezoneDate(position.published ? position.finalStartTime || new Date() : position.event.start, user.timezone)}</TableCell>
+                                    <TableCell>{position.event_title}</TableCell>
+                                    <TableCell>{position.final_position || 'Pending'}</TableCell>
+                                    <TableCell>{formatTimezoneDate(new Date(position.final_start_time || position.event_starts_at), timezone)}</TableCell>
                                     <TableCell>
-                                        <Link href={`/events/${position.eventId}`}>
+                                        <Link href={`/events/${position.event_id}`}>
                                             <IconButton>
-                                                { position.published ? <Visibility /> : <Edit /> }
+                                                <Visibility/>
                                             </IconButton>
                                         </Link>
                                     </TableCell>

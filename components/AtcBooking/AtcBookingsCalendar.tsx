@@ -1,13 +1,13 @@
 'use client';
 import React from 'react';
-import {AtcBooking} from "@/lib/atcBooking";
+import {AtcBookingItem} from "@/lib/osmium/hooks/bookings";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 
-export default function AtcBookingsCalendar({bookings, timeZone}: { bookings: AtcBooking[], timeZone: string }) {
+export default function AtcBookingsCalendar({bookings, timeZone}: { bookings: AtcBookingItem[], timeZone: string }) {
 
     dayjs.extend(utc)
     dayjs.extend(timezone)

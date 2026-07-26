@@ -1,21 +1,25 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingAppointment} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
 import {IconButton, Tooltip} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-import {deleteTrainingAppointment} from "@/actions/trainingAppointment";
+import {useDeleteTrainingAppointment} from "@/lib/osmium/hooks/training";
+import {deleteAppointmentAtcBooking} from "@/lib/osmium/atcBookingSync";
 
 export default function TrainingAppointmentDeleteButton({trainingAppointment, fromAdmin, onDelete}: {
-    trainingAppointment: TrainingAppointment,
+    trainingAppointment: { id: string, start: string | Date, atc_booking_id?: string | null },
     fromAdmin?: boolean,
     onDelete?: () => void,
 }) {
     const [clicked, setClicked] = useState(false);
+    const deleteAppointment = useDeleteTrainingAppointment();
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteTrainingAppointment(trainingAppointment.id, fromAdmin);
+            await deleteAppointment.mutateAsync(trainingAppointment.id);
+            if (trainingAppointment.atc_booking_id) {
+                await deleteAppointmentAtcBooking(trainingAppointment.atc_booking_id);
+            }
             toast(`Appointment deleted successfully!`, {type: 'success'});
             onDelete && onDelete();
             setClicked(false);
@@ -29,7 +33,7 @@ export default function TrainingAppointmentDeleteButton({trainingAppointment, fr
     return (
         <Tooltip title="Delete Appointment">
             <IconButton size="small" onClick={handleClick}
-                        disabled={!fromAdmin && (new Date()).getTime() > trainingAppointment.start.getTime()}>
+                        disabled={!fromAdmin && (new Date()).getTime() > new Date(trainingAppointment.start).getTime()}>
                 <Delete fontSize="small" color={clicked ? "warning" : "inherit"}/>
             </IconButton>
         </Tooltip>

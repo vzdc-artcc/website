@@ -1,14 +1,20 @@
 'use client';
 import React, {useState} from 'react';
-import {User} from "next-auth";
 import Form from "next/form";
 import {Autocomplete, Box, Stack, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {Add} from "@mui/icons-material";
 import {toast} from "react-toastify";
 
+interface TrainerLike {
+    id: string;
+    cid: number;
+    name: string;
+    initials?: string | null;
+}
+
 export default function TrainingAppointmentAdditionalTrainerForm({allTrainers, onSubmit}: {
-    allTrainers: User[],
+    allTrainers: TrainerLike[],
     onSubmit: (trainerId: string, description: string,) => void,
 }) {
 
@@ -31,7 +37,8 @@ export default function TrainingAppointmentAdditionalTrainerForm({allTrainers, o
                 <Autocomplete
                     fullWidth
                     options={allTrainers}
-                    getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.operatingInitials})`}
+                    isOptionEqualToValue={(a, b) => a.id === b.id}
+                    getOptionLabel={(option) => `${option.name} (${option.initials || option.cid})`}
                     value={allTrainers.find((t) => t.id === trainerId) || null}
                     onChange={(_e, value) => {
                         setTrainerId(value?.id);

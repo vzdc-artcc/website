@@ -3,15 +3,18 @@ import React, {useState} from 'react';
 import {toast} from "react-toastify";
 import {IconButton} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-import {LessonRubricCriteria} from "@/generated/prisma/browser";
-import {deleteLessonRubricCriteria} from "@/actions/lessonRubricCriteria";
+import {useDeleteLessonRubricCriteria} from "@/lib/osmium/hooks/training";
 
-export default function LessonRubricCriteriaDeleteButton({rubricCriteria}: { rubricCriteria: LessonRubricCriteria, }) {
+export default function LessonRubricCriteriaDeleteButton({lessonId, rubricCriteria}: {
+    lessonId: string,
+    rubricCriteria: { id: string },
+}) {
     const [clicked, setClicked] = useState(false);
+    const deleteCriteria = useDeleteLessonRubricCriteria(lessonId);
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteLessonRubricCriteria(rubricCriteria.id);
+            await deleteCriteria.mutateAsync(rubricCriteria.id);
             toast(`Criteria deleted successfully!`, {type: 'success'});
         } else {
             toast(`Deleting this criteria will remove it from all training tickets.  Click again to confirm.`, {type: 'warning'});

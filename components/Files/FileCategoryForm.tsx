@@ -1,32 +1,49 @@
 'use client';
 import React from 'react';
-import {FileCategory} from "@/generated/prisma/browser";
 import {TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {toast} from "react-toastify";
-import {createOrUpdateFileCategory} from "@/actions/files";
+import {
+    PublicationCategory,
+    useCreatePublicationCategory,
+    useUpdatePublicationCategory,
+} from "@/lib/osmium/hooks/publications";
 
-export default function FileCategoryForm({fileCategory}: { fileCategory?: FileCategory }) {
+const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-    const handleSubmit = async (formData: FormData) => {
+export default function FileCategoryForm({fileCategory}: { fileCategory?: PublicationCategory }) {
 
-        const {fileCategory, errors} = await createOrUpdateFileCategory(formData);
+    const create = useCreatePublicationCategory();
+    const update = useUpdatePublicationCategory();
+    const [name, setName] = React.useState(fileCategory?.name ?? '');
+    const [key, setKey] = React.useState(fileCategory?.key ?? '');
 
-        if (errors) {
-            toast(errors.map((e) => e.message).join(".  "), {type: 'error'})
-            return;
+    const handleSubmit = async () => {
+        if (!name.trim()) { toast.error('Name is required.'); return; }
+        const finalKey = slugify(key || name);
+        try {
+            if (fileCategory) {
+                await update.mutateAsync({
+                    categoryId: fileCategory.id,
+                    body: {key: finalKey, name, description: fileCategory.description ?? null, sort_order: fileCategory.sort_order},
+                });
+            } else {
+                await create.mutateAsync({key: finalKey, name});
+            }
+            toast(`File category ${name} saved successfully!`, {type: 'success'});
+        } catch {
+            toast.error('Failed to save category (the key may already be in use).');
         }
-
-        toast(`File category ${fileCategory.name} saved successfully!`, {type: 'success'});
     }
 
     return (
         <form action={handleSubmit}>
-            <input type="hidden" name="id" value={fileCategory?.id || ''}/>
-            <TextField fullWidth required variant="filled" name="name" label="Name"
-                       defaultValue={fileCategory?.name || ''} sx={{mb: 1,}}/>
+            <TextField fullWidth required variant="filled" label="Name" value={name}
+                       onChange={(e) => setName(e.target.value)} sx={{mb: 1,}}/>
+            <TextField fullWidth variant="filled" label="Key (URL slug)" value={key}
+                       onChange={(e) => setKey(e.target.value)} sx={{mb: 1,}}
+                       helperText="Unique identifier; auto-derived from the name if left blank."/>
             <FormSaveButton/>
         </form>
     );
-
 }

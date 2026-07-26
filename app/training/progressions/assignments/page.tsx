@@ -2,13 +2,10 @@ import React from 'react';
 import {Button, Card, CardContent, Stack, Typography} from "@mui/material";
 import Link from "next/link";
 import {Add} from "@mui/icons-material";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
 import ProgressionAssignmentsTable from "@/components/ProgressionAssignment/ProgressionAssignmentsTable";
+import RoleOnly from "@/components/Access/RoleOnly";
 
-export default async function Page() {
-
-    const session = await getServerSession(authOptions);
+export default function Page() {
 
     return (
         <Card>
@@ -17,11 +14,13 @@ export default async function Page() {
                     <Stack direction="column" spacing={1}>
                         <Typography variant="h5">Progression Assignments</Typography>
                     </Stack>
-                    {session?.user.roles.includes("STAFF") && <Link href="/training/progressions/assignments/new">
-                        <Button variant="contained" size="large" startIcon={<Add/>}>Assign Progression</Button>
-                    </Link>}
+                    <RoleOnly check="isStaff">
+                        <Link href="/training/progressions/assignments/new">
+                            <Button variant="contained" size="large" startIcon={<Add/>}>Assign Progression</Button>
+                        </Link>
+                    </RoleOnly>
                 </Stack>
-                <ProgressionAssignmentsTable allowEdit={!!session?.user.roles.includes("STAFF")}/>
+                <ProgressionAssignmentsTable/>
             </CardContent>
         </Card>
     );

@@ -1,41 +1,49 @@
 'use client';
 import {Autocomplete, Box, Chip, Stack, TextField} from "@mui/material";
-import {EventPositionPreset} from "@/generated/prisma/browser";
-import Form from "next/form";
 import {useState} from "react";
 import FormSaveButton from "../Form/FormSaveButton";
-import {createOrUpdateEventPreset} from "@/actions/eventPreset";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
+import {useCreateEventPositionPreset, useUpdateEventPositionPreset} from "@/lib/osmium/hooks/events";
 
-export default function EventPositionPresetForm({ positionPreset }: { positionPreset?: EventPositionPreset }) {
-    
+interface PresetLike {
+    id: string;
+    name: string;
+    positions: string[];
+}
+
+export default function EventPositionPresetForm({positionPreset}: { positionPreset?: PresetLike }) {
+
     const router = useRouter();
+    const createPreset = useCreateEventPositionPreset();
+    const updatePreset = useUpdateEventPositionPreset();
+    const [name, setName] = useState(positionPreset?.name || '');
     const [positions, setPositions] = useState<string[]>(positionPreset?.positions || []);
 
-    const handleSubmit = async (formData: FormData) => {
-        formData.set('positions', positions.join(','));
-
-        const {errors} = await createOrUpdateEventPreset(formData);
-
-        if (errors) {
-            toast.error(errors.map((e) => e.message).join('. '));
+    const handleSubmit = async () => {
+        if (!name.trim()) {
+            toast.error('Please enter a name.');
             return;
         }
 
-        if (!positionPreset) {
-            toast.success('Event position preset created successfully!');
-            router.push('/events/admin/event-presets');
-        } else {
-            toast.success('Event position preset updated successfully!');
+        try {
+            if (positionPreset) {
+                await updatePreset.mutateAsync({presetId: positionPreset.id, body: {name, positions}});
+                toast.success('Event position preset updated successfully!');
+            } else {
+                await createPreset.mutateAsync({name, positions});
+                toast.success('Event position preset created successfully!');
+                router.push('/events/admin/event-presets');
+            }
+        } catch {
+            toast.error('Failed to save event position preset.');
         }
     }
 
     return (
-        <Form action={handleSubmit}>
-            <input type="hidden" name="id" value={positionPreset?.id || ''} />
+        <form action={handleSubmit}>
             <Stack direction="column" spacing={2}>
-                <TextField name="name" label="Name" defaultValue={positionPreset?.name || ''} required fullWidth/>
+                <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} required fullWidth/>
                 <Autocomplete
                     multiple
                     options={[]}
@@ -55,7 +63,6 @@ export default function EventPositionPresetForm({ positionPreset }: { positionPr
                     renderInput={(params) => (
                         <TextField
                             {...params}
-                            name="positions"
                             variant="filled"
                             label="Positions"
                             placeholder="Positions (type and press ENTER after each one)"
@@ -63,9 +70,9 @@ export default function EventPositionPresetForm({ positionPreset }: { positionPr
                     )}
                 />
                 <Box>
-                    <FormSaveButton />
+                    <FormSaveButton/>
                 </Box>
             </Stack>
-        </Form>
+        </form>
     );
 }

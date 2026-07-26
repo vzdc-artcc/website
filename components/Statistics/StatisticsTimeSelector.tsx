@@ -4,7 +4,11 @@ import {useParams, useRouter} from "next/navigation";
 import {Autocomplete, Box, Button, Card, CardContent, MenuItem, Stack, TextField} from "@mui/material";
 import {z} from "zod";
 import {toast} from "react-toastify";
-import {User} from "next-auth";
+
+interface ControllerOption {
+    cid: number;
+    name: string;
+}
 
 const months = [
     {
@@ -61,7 +65,7 @@ const months = [
     },
 ]
 
-export default function StatisticsTimeSelector({controllers}: { controllers: User[], }) {
+export default function StatisticsTimeSelector({controllers}: { controllers: ControllerOption[], }) {
 
     const params = useParams();
     const router = useRouter();
@@ -70,7 +74,7 @@ export default function StatisticsTimeSelector({controllers}: { controllers: Use
     const year = params.year as string | undefined;
     const cid = params.cid as string | undefined;
 
-    const [controller, setController] = useState(cid);
+    const [controller, setController] = useState(cid ? Number(cid) : undefined);
 
     const onSubmit = (formData: FormData) => {
 
@@ -88,7 +92,7 @@ export default function StatisticsTimeSelector({controllers}: { controllers: Use
         const timeframe = timeframeZ.safeParse({
             month: Number(formData.get('month') as string),
             year: Number(formData.get('year') as string),
-            cid: Number(controller || undefined) || undefined,
+            cid: controller,
         });
 
         if (!timeframe.success) {
@@ -133,10 +137,10 @@ export default function StatisticsTimeSelector({controllers}: { controllers: Use
                         <Autocomplete
                             fullWidth
                             options={controllers}
-                            getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.cid})`}
+                            getOptionLabel={(option) => `${option.name} (${option.cid})`}
                             value={controllers.find((u) => u.cid === controller) || null}
                             onChange={(event, newValue) => {
-                                setController(newValue ? newValue.cid : '');
+                                setController(newValue ? newValue.cid : undefined);
                             }}
                             renderInput={(params) => <TextField {...params} label="Controller"/>}
                         />

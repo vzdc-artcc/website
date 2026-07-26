@@ -1,9 +1,9 @@
+'use client';
 import React from 'react';
-import {User} from "next-auth";
-import prisma from "@/lib/db";
 import {
     Box,
     Chip,
+    CircularProgress,
     IconButton,
     Stack,
     Table,
@@ -16,29 +16,25 @@ import {
 import {formatTimezoneDate, getDuration} from "@/lib/date";
 import Link from "next/link";
 import {Visibility} from "@mui/icons-material";
+import {useUserByCid} from "@/lib/osmium/hooks/users";
+import {useTrainingSessions} from "@/lib/osmium/hooks/training";
 
-export default async function TrainingSessionStudentTable({user, take}: { user: User, take?: number }) {
-    const trainingSessions = await prisma.trainingSession.findMany({
-        where: {
-            student: {
-                id: user.id,
-            },
-        },
-        include: {
-            student: true,
-            instructor: true,
-            tickets: {
-                include: {
-                    lesson: true,
-                    mistakes: true,
-                }
-            },
-        },
-        orderBy: {
-            start: 'desc',
-        },
-        take,
+export default function TrainingSessionStudentTable({cid, timezone, take}: { cid: number, timezone: string, take?: number }) {
+    const {data: resolvedUser, isLoading: userLoading} = useUserByCid(cid || undefined);
+    const studentId = resolvedUser?.full?.profile.id;
+
+    const {data: sessionsData, isLoading: sessionsLoading} = useTrainingSessions({
+        studentId,
+        pageSize: take,
+        sortField: 'start',
+        sortOrder: 'desc',
     });
+
+    if (userLoading || sessionsLoading) {
+        return <CircularProgress/>;
+    }
+
+    const sessions = sessionsData?.items ?? [];
 
     return (
         <TableContainer>
@@ -50,28 +46,26 @@ export default async function TrainingSessionStudentTable({user, take}: { user: 
                         <TableCell>End</TableCell>
                         <TableCell>Duration</TableCell>
                         <TableCell>Lessons</TableCell>
-                        <TableCell>Mistakes</TableCell>
                         <TableCell>Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {trainingSessions.map((trainingSession) => (
+                    {sessions.map((trainingSession) => (
                         <TableRow key={trainingSession.id}>
-                            <TableCell>{trainingSession.student.firstName} {trainingSession.student.lastName} ({trainingSession.student.cid})</TableCell>
-                            <TableCell>{formatTimezoneDate(trainingSession.start, user.timezone)}</TableCell>
-                            <TableCell>{formatTimezoneDate(trainingSession.end, user.timezone)}</TableCell>
-                            <TableCell>{getDuration(trainingSession.start, trainingSession.end)}</TableCell>
+                            <TableCell>{trainingSession.instructor_name}</TableCell>
+                            <TableCell>{formatTimezoneDate(new Date(trainingSession.start), timezone)}</TableCell>
+                            <TableCell>{formatTimezoneDate(new Date(trainingSession.end), timezone)}</TableCell>
+                            <TableCell>{getDuration(new Date(trainingSession.start), new Date(trainingSession.end))}</TableCell>
                             <TableCell>
                                 <Stack direction="column" spacing={1}>
                                     {trainingSession.tickets.map((tt) => (
                                         <Box key={tt.id}>
-                                            <Chip size="small" label={tt.lesson.identifier}
+                                            <Chip size="small" label={tt.lesson_identifier}
                                                   color={tt.passed ? 'success' : 'error'}/>
                                         </Box>
                                     ))}
                                 </Stack>
                             </TableCell>
-                            <TableCell>{trainingSession.tickets.reduce((acc, ticket) => acc + ticket.mistakes.length, 0)}</TableCell>
                             <TableCell>
                                 <Link href={`/profile/training/${trainingSession.id}`} passHref>
                                     <IconButton size="small">

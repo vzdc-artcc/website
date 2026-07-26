@@ -1,15 +1,16 @@
 // components/Feedback/FeedbackForm.tsx
 "use client";
 import React, {useState} from 'react';
-import {User} from "next-auth";
 import {Autocomplete, Box, Grid, Rating, TextField, Typography} from "@mui/material";
 import {toast} from "react-toastify";
-import {submitFeedback} from "@/actions/feedback";
 import {useRouter} from "next/navigation";
 import {useGoogleReCaptcha} from "react-google-recaptcha-v3";
 import FeedbackFormSubmitButton from "@/components/Feedback/FeedbackFormSubmitButton";
 import {checkCaptcha} from "@/lib/captcha";
 import Form from "next/form";
+import {useRosterControllers} from "@/lib/osmium/hooks/users";
+import {useCreateFeedback} from "@/lib/osmium/hooks/feedback";
+import {useMe} from "@/lib/osmium/hooks/me";
 
 const groupedPositions = [
     {
@@ -69,32 +70,66 @@ const groupedPositions = [
     },
 ];
 
-export default function FeedbackForm({controllers, user}: { controllers: User[], user: User }) {
+export default function FeedbackForm() {
 
     const router = useRouter();
+    const {data: me} = useMe();
     const {executeRecaptcha,} = useGoogleReCaptcha();
-    const [controller, setController] = useState('');
+    const {data: controllersData} = useRosterControllers();
+    const createFeedback = useCreateFeedback();
+    const [controllerCid, setControllerCid] = useState<number | null>(null);
     const [controllerPosition, setControllerPosition] = useState('');
+
+    const controllers = (controllersData?.items ?? [])
+        .filter((item) => item.basic.cid !== me?.cid)
+        .sort((a, b) => a.basic.name.localeCompare(b.basic.name));
 
     const handleSubmit = async (formData: FormData) => {
 
         const recaptchaToken = await executeRecaptcha?.('submit_feedback');
         await checkCaptcha(recaptchaToken);
 
-        const {errors} = await submitFeedback(formData);
-        if (errors) {
-            toast(errors.map((e) => e.message).join('.  '), {type: 'error'});
+        if (!controllerCid) {
+            toast('Please select a controller.', {type: 'error'});
             return;
         }
+        if (!controllerPosition) {
+            toast('Please select or enter a position.', {type: 'error'});
+            return;
+        }
+
+        const pilotCallsign = (formData.get('pilotCallsign') as string || '').trim();
+        const rating = parseInt(formData.get('rating') as string);
+        const comments = (formData.get('comments') as string || '').trim();
+
+        if (!pilotCallsign) {
+            toast('Please enter your callsign.', {type: 'error'});
+            return;
+        }
+        if (!rating) {
+            toast('Please select a rating.', {type: 'error'});
+            return;
+        }
+
+        try {
+            await createFeedback.mutateAsync({
+                target_cid: controllerCid,
+                pilot_callsign: pilotCallsign,
+                controller_position: controllerPosition,
+                rating,
+                comments: comments || null,
+            });
+        } catch {
+            toast('Failed to submit feedback.', {type: 'error'});
+            return;
+        }
+
         router.push('/feedback/success');
     }
 
     return (
         (<Box sx={{mt: 2,}}>
             <Form action={handleSubmit}>
-                <input type="hidden" name="pilotId" value={user.id}/>
-                <input type="hidden" name="controllerId" value={controller}/>
-                <input type="hidden" name="controllerPosition" value={controllerPosition}/>
                 <Grid container columns={2} spacing={2}>
                     <Grid
                         size={{
@@ -102,7 +137,7 @@ export default function FeedbackForm({controllers, user}: { controllers: User[],
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotName" label="Your Name"
-                                   defaultValue={user.fullName} disabled/>
+                                   defaultValue={me?.display_name} disabled/>
                     </Grid>
                     <Grid
                         size={{
@@ -110,7 +145,7 @@ export default function FeedbackForm({controllers, user}: { controllers: User[],
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotEmail" label="Your Email"
-                                   defaultValue={user.email} disabled/>
+                                   defaultValue={me?.email} disabled/>
                     </Grid>
                     <Grid
                         size={{
@@ -118,7 +153,7 @@ export default function FeedbackForm({controllers, user}: { controllers: User[],
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotCid" label="Your VATSIM CID"
-                                   defaultValue={user.cid} disabled/>
+                                   defaultValue={me?.cid} disabled/>
                     </Grid>
                     <Grid
                         size={{
@@ -135,10 +170,10 @@ export default function FeedbackForm({controllers, user}: { controllers: User[],
                         <Autocomplete
                             fullWidth
                             options={controllers}
-                            getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.cid})`}
-                            value={controllers.find((u) => u.id === controller) || null}
+                            getOptionLabel={(option) => `${option.basic.name} (${option.basic.cid})`}
+                            value={controllers.find((c) => c.basic.cid === controllerCid) || null}
                             onChange={(event, newValue) => {
-                                setController(newValue ? newValue.id : '');
+                                setControllerCid(newValue ? newValue.basic.cid : null);
                             }}
                             renderInput={(params) => <TextField {...params} required label="Controller"/>}
                         />

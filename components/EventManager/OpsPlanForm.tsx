@@ -1,121 +1,103 @@
-"use client";
+'use client';
 
 import React, {useEffect, useState} from "react";
-import {Autocomplete, Box, Button, Divider, Grid, TextField, Typography} from "@mui/material";
-import {getRating} from "@/lib/vatsim";
-import {fetchAllUsers} from "@/actions/eventPosition";
-import {User} from "@/generated/prisma/browser";
-import Form from "next/form";
-import {toast} from "react-toastify";
+import {Autocomplete, Box, Chip, Divider, Grid, TextField, Typography} from "@mui/material";
 import FormSaveButton from "../Form/FormSaveButton";
-import {saveOpsPlan} from "@/actions/opsPlan";
+import {toast} from "react-toastify";
+import {useEventOpsPlan, useUpdateEventOpsPlan} from "@/lib/osmium/hooks/events";
+import {useRosterControllers} from "@/lib/osmium/hooks/users";
 
+export default function OpsPlanForm({event}: { event: { id: string } }) {
+    const {data: opsPlan} = useEventOpsPlan(event.id);
+    const updateOpsPlan = useUpdateEventOpsPlan(event.id);
+    const {data: controllersData} = useRosterControllers();
+    const controllers = controllersData?.items ?? [];
 
-export default function OpsPlanForm({ admin, currentUser, event, eventPosition }: any) {
-    const [allUsers, setAllUsers] = useState<User[]>([]);
-    const [user, setUser] = useState<string>(event.opsPlannerId ?? event.opsPlanner?.id ?? currentUser.id ?? '');
+    const [plannerId, setPlannerId] = useState<string | null>(null);
+    const [featuredFields, setFeaturedFields] = useState<string[]>([]);
     const [fieldConfigs, setFieldConfigs] = useState<Record<string, string>>({});
-    const [saving, setSaving] = useState<boolean>(false);
+    const [initialized, setInitialized] = useState(false);
 
-    const featuredFields: string[] = Array.isArray(event?.featuredFields) ? event.featuredFields : [];
     const hasFeaturedFields = featuredFields.length > 0;
 
     useEffect(() => {
+        if (!opsPlan || initialized) return;
+
+        const configs = (opsPlan.featured_field_configs && typeof opsPlan.featured_field_configs === 'object')
+            ? opsPlan.featured_field_configs as Record<string, unknown>
+            : {};
+        const fields = opsPlan.featured_fields ?? [];
         const initial: Record<string, string> = {};
-
-        const configs = (event as any)?.featuredFieldConfigs || {};
-
-        featuredFields.forEach((f: string) => {
-            const keyUpper = (f || '').toString().toUpperCase();
-
-            let value: any = undefined;
-            if (configs && typeof configs === 'object') {
-                if (Object.prototype.hasOwnProperty.call(configs, keyUpper)) {
-                    value = configs[keyUpper];
-                } else if (Object.prototype.hasOwnProperty.call(configs, f)) {
-                    value = configs[f];
-                }
-            }
-
-            if (value === undefined || value === null) {
-                initial[f] = '';
-            } else if (typeof value === 'string') {
-                initial[f] = value;
-            } else {
-                try {
-                    initial[f] = JSON.stringify(value);
-                } catch {
-                    initial[f] = String(value);
-                }
-            }
+        fields.forEach((f) => {
+            const value = configs[f.toUpperCase()] ?? configs[f];
+            if (value == null) initial[f] = '';
+            else if (typeof value === 'string') initial[f] = value;
+            else initial[f] = JSON.stringify(value);
         });
-
+        setFeaturedFields(fields);
         setFieldConfigs(initial);
-    }, [event?.id, event?.featuredFields, (event as any)?.featuredFieldConfigs]);
+        setPlannerId(opsPlan.ops_planner_id ?? null);
+        setInitialized(true);
+    }, [opsPlan, initialized]);
 
-    useEffect(() => {
-        setUser(event.opsPlannerId ?? event.opsPlanner?.id ?? currentUser.id ?? '');
-    }, [event?.id, event?.opsPlannerId, event?.opsPlanner?.id, currentUser.id]);
-
-
-    useEffect(() => {
-        if (admin) {
-            fetchAllUsers().then((users) => setAllUsers(users as User[]));
-        }
-    }, [admin]);
-
-    const handleSubmit = async (formData: FormData) => {
-        if (!admin && (eventPosition || event.positionsLocked)) return;
-
-        setSaving(true);
+    const handleSubmit = async () => {
         try {
-            formData.set('userId', user);
-            formData.set('eventId', event.id);
-            formData.set('featuredFieldConfigs', JSON.stringify(fieldConfigs));
-
-            const { errors } = await saveOpsPlan(event, formData, admin);
-
-            if (errors) {
-                toast.error(errors.map((error) => error.message).join('.  '));
-                return;
-            }
-
+            await updateOpsPlan.mutateAsync({
+                ops_planner_id: plannerId,
+                featured_fields: featuredFields,
+                featured_field_configs: fieldConfigs,
+            });
             toast.success('OPS Plan saved successfully.');
-        } catch (err) {
-            console.error(err);
+        } catch {
             toast.error('An unexpected error occurred while saving.');
-        } finally {
-            setSaving(false);
         }
     };
 
-    const saveDisabled = saving || (!admin && (eventPosition || event.positionsLocked));
-
     return (
-        <Form action={handleSubmit}>
+        <form action={handleSubmit}>
             <Grid container columns={6} spacing={2}>
-                { admin && (
+                <Grid size={6}>
+                    <Autocomplete
+                        options={controllers}
+                        getOptionLabel={(option) => `${option.basic.name} (${option.basic.cid})`}
+                        value={controllers.find((c) => c.full?.id === plannerId) || null}
+                        onChange={(e, newValue) => setPlannerId(newValue?.full?.id ?? null)}
+                        renderInput={(params) => <TextField {...params} label="Event Planner"/>}
+                    />
+                </Grid>
+
+                <Grid size={6}>
+                    <Autocomplete
+                        multiple
+                        options={[]}
+                        value={featuredFields}
+                        freeSolo
+                        renderTags={(value: readonly string[], getTagProps) =>
+                            value.map((option: string, index: number) => {
+                                const {key, ...tagProps} = getTagProps({index});
+                                return <Chip variant="filled" label={option} key={key} {...tagProps} />;
+                            })
+                        }
+                        onChange={(e, value) => setFeaturedFields(value.map((v) => v.toUpperCase()))}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                variant="filled"
+                                label="Featured Fields"
+                                helperText="Airports/fields featured on the public event page (type and press ENTER after each one)"
+                            />
+                        )}
+                    />
+                </Grid>
+
+                {hasFeaturedFields && (
                     <Grid size={6}>
-                        <Autocomplete
-                            options={allUsers}
-                            getOptionLabel={(option) => `${option.firstName} ${option.lastName} - ${getRating(option.rating)} (${option.cid})`}
-                            value={allUsers.find((u) => u.id === user) || null}
-                            onChange={(event, newValue) => {
-                                setUser(newValue ? newValue.id : '');
-                            }}
-                            renderInput={(params) => <TextField {...params} label="Event Planner" />}
-                        />
+                        <Divider/>
                     </Grid>
                 )}
 
-                { hasFeaturedFields && (
-                    <Grid size={6}>
-                        <Divider />
-                    </Grid>
-                ) }
-
-                { hasFeaturedFields ? (
-                    featuredFields.map((field: string) => (
+                {hasFeaturedFields ? (
+                    featuredFields.map((field) => (
                         <Grid size={2} key={field}>
                             <TextField
                                 fullWidth
@@ -123,7 +105,7 @@ export default function OpsPlanForm({ admin, currentUser, event, eventPosition }
                                 label={`${field} configuration`}
                                 value={fieldConfigs[field] ?? ''}
                                 onChange={(e) =>
-                                    setFieldConfigs((prev) => ({ ...prev, [field]: e.target.value }))
+                                    setFieldConfigs((prev) => ({...prev, [field]: e.target.value}))
                                 }
                                 helperText={`Enter configuration for featured field "${field}"`}
                             />
@@ -131,25 +113,19 @@ export default function OpsPlanForm({ admin, currentUser, event, eventPosition }
                     ))
                 ) : (
                     <Grid size={6}>
-                        <Box sx={{ p: 2, borderRadius: 1, bgcolor: "background.paper", boxShadow: 1 }}>
+                        <Box sx={{p: 2, borderRadius: 1, bgcolor: "background.paper", boxShadow: 1}}>
                             <Typography variant="h6">No featured fields</Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                                This event does not have any featured fields configured. Add featured fields on the event configuration page to display per-field options here.
+                            <Typography variant="body2" color="text.secondary" sx={{mt: 1}}>
+                                This event does not have any featured fields configured yet.
                             </Typography>
                         </Box>
                     </Grid>
                 )}
 
                 <Grid size={6} sx={{display: 'flex', justifyContent: 'flex-start', mt: 2}}>
-                    { saveDisabled ? (
-                        <Button variant="contained" disabled>
-                            Save
-                        </Button>
-                    ) : (
-                        <FormSaveButton text="Save" />
-                    )}
+                    <FormSaveButton text="Save"/>
                 </Grid>
             </Grid>
-        </Form>
+        </form>
     );
 }

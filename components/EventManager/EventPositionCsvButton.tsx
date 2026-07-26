@@ -1,46 +1,49 @@
 'use client';
 import React from 'react';
-import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
-import {Event} from "@/generated/prisma/browser";
 import {IconButton, Tooltip} from "@mui/material";
 import {Download} from "@mui/icons-material";
 import {formatZuluDate} from "@/lib/date";
 import {toast} from "react-toastify";
 import {stringify} from "csv-stringify";
 
-export default function EventPositionCsvButton({event, positions}: {
-    event: Event,
-    positions: EventPositionWithSolo[]
+interface PositionLike {
+    user_name?: string | null;
+    user_cid?: number | null;
+    requested_position?: string | null;
+    requested_start_time?: string | null;
+    requested_end_time?: string | null;
+    notes?: string | null;
+    final_position?: string | null;
+    final_start_time?: string | null;
+    final_end_time?: string | null;
+    final_notes?: string | null;
+}
+
+export default function EventPositionCsvButton({eventTitle, positions}: {
+    eventTitle: string,
+    positions: PositionLike[]
 }) {
 
     const onClick = async () => {
+        const columns = ['Controller', 'CID', 'Requested Position', 'Requested Start Time', 'Requested End Time', 'Notes', 'Final Position', 'Final Start Time', 'Final End Time', 'Final Notes'];
         const csvRows = [
-            ['First Name', 'Last Name', 'Rating', 'CID', 'Solo Position', 'Requested Position', 'Requested Start Time', 'Requested End Time', 'Notes', 'Final Position', 'Final Start Time', 'Final End Time', 'Final Notes'],
+            columns,
             ...positions.map(position => [
-                position.user?.firstName,
-                position.user?.lastName,
-                position.user?.rating,
-                position.user?.cid,
-                position.soloCert ? position.soloCert.position : '',
-                position.requestedPosition,
-                formatZuluDate(position.requestedStartTime),
-                formatZuluDate(position.requestedEndTime),
-                position.notes,
-                position.finalPosition || '',
-                formatZuluDate(position.finalStartTime || position.requestedStartTime),
-                formatZuluDate(position.finalEndTime || position.requestedEndTime),
-                position.finalNotes || ''
+                position.user_name || '',
+                position.user_cid ? String(position.user_cid) : '',
+                position.requested_position || '',
+                position.requested_start_time ? formatZuluDate(new Date(position.requested_start_time)) : '',
+                position.requested_end_time ? formatZuluDate(new Date(position.requested_end_time)) : '',
+                position.notes || '',
+                position.final_position || '',
+                formatZuluDate(new Date(position.final_start_time || position.requested_start_time || new Date())),
+                formatZuluDate(new Date(position.final_end_time || position.requested_end_time || new Date())),
+                position.final_notes || ''
             ])
         ];
 
         const csvContent = await new Promise<string>((resolve, reject) => {
-            stringify(csvRows, {
-                columns: [
-                    'First Name', 'Last Name', 'Rating', 'CID', 'Solo Position', 'Requested Position',
-                    'Requested Start Time', 'Requested End Time', 'Notes', 'Final Position',
-                    'Final Start Time', 'Final End Time', 'Final Notes',
-                ],
-            }, (err, output) => {
+            stringify(csvRows, {columns}, (err, output) => {
                 if (err) reject(err);
                 else resolve(output);
             });
@@ -49,7 +52,7 @@ export default function EventPositionCsvButton({event, positions}: {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `event_positions_${event.name.toLowerCase().replaceAll(' ', '_')}_${new Date().toISOString()}.csv`);
+        link.setAttribute('download', `event_positions_${eventTitle.toLowerCase().replaceAll(' ', '_')}_${new Date().toISOString()}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

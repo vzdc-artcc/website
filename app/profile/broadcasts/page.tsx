@@ -1,62 +1,16 @@
+'use client';
 import React from 'react';
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
-import {notFound} from "next/navigation";
-import prisma from "@/lib/db";
-import {Box, Button, Card, CardContent, Grid, Stack, Typography} from "@mui/material";
+import {Box, Button, Card, CardContent, CircularProgress, Grid, Stack, Typography} from "@mui/material";
 import Link from "next/link";
 import {FileOpen, KeyboardArrowLeft} from "@mui/icons-material";
 import Markdown from "react-markdown";
 import {formatZuluDate} from "@/lib/date";
+import {useMyBroadcasts} from "@/lib/osmium/hooks/broadcasts";
 
-export default async function Page() {
+export default function Page() {
 
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user) {
-        notFound();
-    }
-
-    const broadcasts = await prisma.changeBroadcast.findMany({
-        where: {
-            OR: [
-                {
-                    agreedBy: {
-                        some: {
-                            id: session.user.id,
-                        },
-                    },
-                },
-                {
-                    seenBy: {
-                        some: {
-                            id: session.user.id,
-                        },
-                    },
-                },
-                {
-                    unseenBy: {
-                        some: {
-                            id: session.user.id,
-                        },
-                    },
-                },
-            ],
-        },
-        include: {
-            file: true,
-            agreedBy: {
-                select: {
-                    id: true,
-                },
-            },
-        },
-        orderBy: {
-            timestamp: 'desc',
-        },
-    })
-
-    console.log(broadcasts[1].agreedBy);
+    const {data, isLoading} = useMyBroadcasts();
+    const broadcasts = data?.items ?? [];
 
     return (
         <Box>
@@ -65,28 +19,27 @@ export default async function Page() {
             </Link>
             <Card>
                 <CardContent>
-                    <Typography variant="h5">Facility Broadcasts</Typography>
-                    <Typography variant="caption" gutterBottom>Facility broadcasts are automatically deleted a few
-                        months after they are published.</Typography>
+                    <Typography variant="h5" gutterBottom>Facility Broadcasts</Typography>
+                    {isLoading && <Box sx={{display: 'flex', justifyContent: 'center', my: 4}}><CircularProgress/></Box>}
                     <Grid container columns={4} spacing={2} sx={{mt: 2,}}>
                         {broadcasts.map((broadcast) => (
                             <Grid key={broadcast.id} size={{xs: 4, md: 2, xl: 1}}>
                                 <Card variant="outlined" sx={{
                                     height: '100%',
-                                    borderColor: broadcast.agreedBy.map((b) => b.id).includes(session.user.id) ? undefined : 'red',
+                                    borderColor: broadcast.agreed_at ? undefined : 'red',
                                 }}>
                                     <CardContent sx={{maxHeight: 300, overflow: 'auto',}}>
-                                        <Typography variant="caption">{formatZuluDate(broadcast.timestamp)}</Typography>
+                                        <Typography variant="caption">{formatZuluDate(new Date(broadcast.timestamp))}</Typography>
                                         <Typography variant="h6" gutterBottom>{broadcast.title}</Typography>
                                         <Markdown>{broadcast.description}</Markdown>
-                                        {broadcast.file && (
+                                        {broadcast.file_id && (
                                             <Box sx={{mt: 2,}}>
-                                                <Link href={`/publications/${broadcast.file.id}`} target="_blank"
+                                                <Link href={`/publications/${broadcast.file_id}`} target="_blank"
                                                       style={{color: 'inherit',}}>
                                                     <Stack direction="row" alignItems="center" spacing={1}>
                                                         <FileOpen/>
                                                         <Typography variant="subtitle2">
-                                                            {broadcast.file.name}
+                                                            {broadcast.file_filename}
                                                         </Typography>
                                                     </Stack>
                                                 </Link>

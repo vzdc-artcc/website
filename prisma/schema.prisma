@@ -173,11 +173,6 @@ model TrainerReleaseRequest {
   submittedAt DateTime
 }
 
-model VatsimUpdateMetadata {
-  id        String   @id @default(cuid())
-  timestamp DateTime
-}
-
 model ControllerLog {
   id        String               @id @default(cuid())
   user      User                 @relation(fields: [userId], references: [id])

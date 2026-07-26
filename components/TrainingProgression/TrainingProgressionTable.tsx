@@ -1,45 +1,54 @@
 'use client';
 import React from 'react';
 import {useRouter} from "next/navigation";
-import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
+import {Box, Chip, Tooltip} from "@mui/material";
+import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import {Edit, Layers, Visibility} from "@mui/icons-material";
 import TrainingProgressionDeleteButton from "@/components/TrainingProgression/TrainingProgressionDeleteButton";
-import {fetchTrainingProgressions} from "@/actions/trainingProgression";
-import {Chip, Tooltip} from "@mui/material";
+import {useProgressionAssignments, useTrainingProgressionSteps, useTrainingProgressions} from "@/lib/osmium/hooks/training";
+import {useCoarseRoles} from "@/lib/osmium/coarseRoles";
 
-export default function TrainingProgressionTable({ allowEdit = false }: { allowEdit?: boolean }) {
+export default function TrainingProgressionTable() {
 
+    const {isStaff: allowEdit} = useCoarseRoles();
     const router = useRouter();
+    const {data, isLoading} = useTrainingProgressions();
+    const {data: stepsData} = useTrainingProgressionSteps();
+    const {data: assignmentsData} = useProgressionAssignments();
+
+    const progressions = data?.items ?? [];
+    const steps = stepsData?.items ?? [];
+    const assignments = assignmentsData?.items ?? [];
+
+    const rows = progressions.map((p) => ({
+        ...p,
+        stepCount: steps.filter((s) => s.progression_id === p.id).length,
+        studentCount: assignments.filter((a) => a.progression_id === p.id).length,
+        nextProgression: progressions.find((np) => np.id === p.next_progression_id) || null,
+    }));
 
     const columns: GridColDef[] = [
         {
             field: 'name',
             flex: 1,
             headerName: 'Name',
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
         {
-            field: 'steps',
+            field: 'stepCount',
             type: 'number',
             flex: 1,
             headerName: 'Steps',
-            renderCell: (params) => params.row.steps.length,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
         {
-            field: 'students',
+            field: 'studentCount',
             type: 'number',
             flex: 1,
             headerName: 'Students',
-            renderCell: (params) => params.row.students.length,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
         {
             field: 'nextProgression',
             flex: 1,
             headerName: 'Next Progression',
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
             renderCell: (params) => {
                 return params.row.nextProgression ? (
                     <Chip
@@ -51,13 +60,13 @@ export default function TrainingProgressionTable({ allowEdit = false }: { allowE
             },
         },
         {
-            field: 'autoAssignNewHomeObs',
+            field: 'auto_assign_new_home_obs',
             flex: 1,
             headerName: 'Auto Assign New Home OBS',
             type: 'boolean',
         },
         {
-            field: 'autoAssignNewVisitor',
+            field: 'auto_assign_new_visitor',
             flex: 1,
             headerName: 'Auto Assign New Visitor',
             type: 'boolean',
@@ -70,8 +79,7 @@ export default function TrainingProgressionTable({ allowEdit = false }: { allowE
             getActions: (params) => [
                 <Tooltip title="View Training Progression" key={`${params.row.id}-view`}>
                     <GridActionsCellItem
-                        key={params.row.id}
-                        icon={<Visibility />}
+                        icon={<Visibility/>}
                         label="View Training Progression"
                         onClick={() => router.push(`/training/progressions/${params.row.id}`)}
                     />
@@ -79,7 +87,7 @@ export default function TrainingProgressionTable({ allowEdit = false }: { allowE
                 allowEdit ? (
                     <Tooltip title="Progression Steps" key={`${params.row.id}-steps`}>
                         <GridActionsCellItem
-                            icon={<Layers />}
+                            icon={<Layers/>}
                             label="Progression Steps"
                             onClick={() => router.push(`/training/progressions/${params.row.id}/edit/steps`)}
                         />
@@ -88,7 +96,7 @@ export default function TrainingProgressionTable({ allowEdit = false }: { allowE
                 allowEdit ? (
                     <Tooltip title="Edit" key={`${params.row.id}-edit`}>
                         <GridActionsCellItem
-                            icon={<Edit />}
+                            icon={<Edit/>}
                             label="Edit"
                             onClick={() => router.push(`/training/progressions/${params.row.id}/edit`)}
                         />
@@ -101,14 +109,19 @@ export default function TrainingProgressionTable({ allowEdit = false }: { allowE
     ];
 
     return (
-        <DataTable
-            columns={columns}
-            initialSort={[{ field: 'name', sort: 'asc' }]}
-            fetchData={async (pagination, sortModel, filter) => {
-                const fetchedProgressions = await fetchTrainingProgressions(pagination, sortModel, filter);
-                return { data: fetchedProgressions[1], rowCount: fetchedProgressions[0] };
-            }}
-        />
+        <Box sx={{boxSizing: 'border-box', width: '100%'}}>
+            <DataGrid
+                loading={isLoading}
+                columns={columns}
+                rows={rows}
+                initialState={{
+                    sorting: {sortModel: [{field: 'name', sort: 'asc'}]},
+                    pagination: {paginationModel: {pageSize: 25}},
+                }}
+                pageSizeOptions={[10, 25, 50]}
+                autoHeight
+            />
+        </Box>
     );
 
 }

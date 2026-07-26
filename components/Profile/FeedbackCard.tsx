@@ -1,8 +1,10 @@
+'use client';
 import React from 'react';
 import {
     Button,
     Card,
     CardContent,
+    CircularProgress,
     IconButton,
     Rating,
     Stack,
@@ -15,38 +17,20 @@ import {
     Tooltip,
     Typography
 } from "@mui/material";
-import prisma from "@/lib/db";
-import {User} from "next-auth";
 import {getTimeAgo} from "@/lib/date";
 import Link from "next/link";
 import {KeyboardArrowRight, Visibility} from "@mui/icons-material";
+import {useReceivedFeedback} from "@/lib/osmium/hooks/feedback";
 
-export default async function FeedbackCard({user}: { user: User, }) {
+export default function FeedbackCard({cid}: { cid: number, }) {
 
-    const recentFeedback = await prisma.feedback.findMany({
-        take: 3,
-        where: {
-            controller: {
-                id: user.id,
-            },
-            status: "RELEASED",
-        },
-        orderBy: {
-            decidedAt: 'desc',
-        },
-        include: {
-            controller: true,
-        },
-    });
+    const {data, isLoading} = useReceivedFeedback(cid, {status: 'RELEASED', pageSize: 3});
+    const recentFeedback = data?.items ?? [];
+    const feedbackCount = data?.total ?? 0;
 
-    const feedbackCount = await prisma.feedback.count({
-        where: {
-            controller: {
-                id: user.id,
-            },
-            status: "RELEASED",
-        },
-    });
+    if (isLoading) {
+        return <CircularProgress/>;
+    }
 
     return (
         <Card sx={{height: '100%',}}>
@@ -66,8 +50,8 @@ export default async function FeedbackCard({user}: { user: User, }) {
                         <TableBody>
                             {recentFeedback.map(feedback => (
                                 <TableRow key={feedback.id}>
-                                    <TableCell>{getTimeAgo(feedback.submittedAt || new Date())}</TableCell>
-                                    <TableCell>{feedback.controllerPosition}</TableCell>
+                                    <TableCell>{getTimeAgo(new Date(feedback.submitted_at))}</TableCell>
+                                    <TableCell>{feedback.controller_position}</TableCell>
                                     <TableCell><Rating readOnly value={feedback.rating}/></TableCell>
                                     <TableCell>
                                         <Tooltip title="View Feedback">

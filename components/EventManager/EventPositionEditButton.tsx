@@ -1,6 +1,4 @@
 'use client';
-import {adminSaveEventPosition, publishEventPosition} from "@/actions/eventPosition";
-import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
 import {formatZuluDate} from "@/lib/date";
 import {Edit} from "@mui/icons-material";
 import {
@@ -25,134 +23,129 @@ import {
 } from "@mui/material";
 import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import {Event} from "@/generated/prisma/browser";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import {useState} from "react";
 import {toast} from "react-toastify";
+import {useUpdateEventPosition} from "@/lib/osmium/hooks/events";
 
-export default function EventPositionEditButton({
-                                                    event,
-                                                    position,
-                                                }: {
-    event: Event;
-    position: EventPositionWithSolo;
-}) {
+interface EventLike {
+    id: string;
+    preset_positions: string[];
+    enable_buffer_times: boolean;
+    starts_at: string;
+    ends_at: string;
+}
+
+interface PositionLike {
+    id: string;
+    user_name?: string | null;
+    requested_position?: string | null;
+    requested_start_time?: string | null;
+    requested_end_time?: string | null;
+    notes?: string | null;
+    final_position?: string | null;
+    final_start_time?: string | null;
+    final_end_time?: string | null;
+    final_notes?: string | null;
+    controlling_category?: string | null;
+    is_instructor: boolean;
+    is_solo: boolean;
+    is_ots: boolean;
+    is_tmu: boolean;
+    is_cic: boolean;
+    published: boolean;
+}
+
+export default function EventPositionEditButton({event, position}: { event: EventLike; position: PositionLike; }) {
 
     dayjs.extend(utc);
 
-    const eventStart = dayjs.utc(event.start);
-    const eventEnd = dayjs.utc(event.end);
+    const updatePosition = useUpdateEventPosition(event.id);
 
-    const reqStart = dayjs.utc(position.requestedStartTime);
-    const reqEnd = dayjs.utc(position.requestedEndTime);
-
-    const finalStart = position.finalStartTime ? dayjs.utc(position.finalStartTime) : reqStart;
-    const finalEnd = position.finalEndTime ? dayjs.utc(position.finalEndTime) : reqEnd;
+    const eventStart = dayjs.utc(event.starts_at);
+    const eventEnd = dayjs.utc(event.ends_at);
+    const reqStart = position.requested_start_time ? dayjs.utc(position.requested_start_time) : eventStart;
+    const reqEnd = position.requested_end_time ? dayjs.utc(position.requested_end_time) : eventEnd;
+    const finalStart = position.final_start_time ? dayjs.utc(position.final_start_time) : reqStart;
+    const finalEnd = position.final_end_time ? dayjs.utc(position.final_end_time) : reqEnd;
 
     const [open, setOpen] = useState(false);
-    const [finalPosition, setFinalPosition] = useState<string>(position.finalPosition || (event.presetPositions.includes(position.requestedPosition) ? position.requestedPosition : ''));
+    const [finalPosition, setFinalPosition] = useState<string>(position.final_position || (event.preset_positions.includes(position.requested_position || '') ? position.requested_position! : ''));
     const [finalStartTime, setFinalStartTime] = useState<dayjs.Dayjs | null>(finalStart);
     const [finalEndTime, setFinalEndTime] = useState<dayjs.Dayjs | null>(finalEnd);
-    const [finalNotes, setFinalNotes] = useState<string>(position.finalNotes || '');
+    const [finalNotes, setFinalNotes] = useState<string>(position.final_notes || '');
+    const [controllingCategory, setControllingCategory] = useState<string>((position.controlling_category || 'LOCAL').toUpperCase());
+    const [isInstructor, setIsInstructor] = useState(position.is_instructor);
+    const [isSolo, setIsSolo] = useState(position.is_solo);
+    const [isOts, setIsOts] = useState(position.is_ots);
+    const [isTmu, setIsTmu] = useState(position.is_tmu);
+    const [isCic, setIsCic] = useState(position.is_cic);
 
-    // NEW: controlling category and toggles
-    const initialControllingCategory = (position as any)?.controllingCategory || (position as any)?.finalControllingCategory || "LOCAL";
-    const [controllingCategory, setControllingCategory] = useState<string>(String(initialControllingCategory).toUpperCase());
-
-    const [isInstructor, setIsInstructor] = useState<boolean>(Boolean((position as any)?.isInstructor));
-    const [isSolo, setIsSolo] = useState<boolean>(Boolean((position as any)?.isSolo));
-    const [isOts, setIsOts] = useState<boolean>(Boolean((position as any)?.isOts));
-    const [isTmu, setIsTmu] = useState<boolean>(Boolean((position as any)?.isTmu));
-    const [isCic, setIsCic] = useState<boolean>(Boolean((position as any)?.isCic));
-
-    const minDateAllowed = event.enableBufferTimes ?
-        dayjs.utc(event.start).subtract(2, 'hour') :
-        dayjs.utc(event.start);
-
-    const maxDateAllowed = event.enableBufferTimes ?
-        dayjs.utc(event.end).add(2, 'hour') :
-        dayjs.utc(event.end);
-
-    const handleClick = () => {
-        setOpen(true);
-    }
+    const minDateAllowed = event.enable_buffer_times ? eventStart.subtract(2, 'hour') : eventStart;
+    const maxDateAllowed = event.enable_buffer_times ? eventEnd.add(2, 'hour') : eventEnd;
 
     const save = async (publish?: boolean) => {
-
-        const formData = new FormData();
-        formData.set('requestedPosition', position.requestedPosition);
-        formData.set('finalPosition', finalPosition);
-        formData.set('finalStartTime', finalStartTime!.toISOString());
-        formData.set('finalEndTime', finalEndTime!.toISOString());
-        formData.set('finalNotes', finalNotes);
-
-        formData.set('controllingCategory', controllingCategory ?? "");
-        formData.set('isInstructor', String(Boolean(isInstructor)));
-        formData.set('isSolo', String(Boolean(isSolo)));
-        formData.set('isOts', String(Boolean(isOts)));
-        formData.set('isTmu', String(Boolean(isTmu)));
-        formData.set('isCic', String(Boolean(isCic)));
-
-        const { eventPosition, errors } = await adminSaveEventPosition(event, position, formData);
-
-        if (errors) {
-            toast.error(errors.map((error) => error.message).join('.  '));
-            return;
+        try {
+            await updatePosition.mutateAsync({
+                positionId: position.id,
+                body: {
+                    final_position: finalPosition,
+                    final_start_time: finalStartTime?.toISOString(),
+                    final_end_time: finalEndTime?.toISOString(),
+                    final_notes: finalNotes,
+                    controlling_category: controllingCategory,
+                    is_instructor: isInstructor,
+                    is_solo: isSolo,
+                    is_ots: isOts,
+                    is_tmu: isTmu,
+                    is_cic: isCic,
+                    published: publish ? true : undefined,
+                },
+            });
+            toast.success(publish ? 'Position saved and published successfully!' : 'Position saved successfully!');
+            setOpen(false);
+        } catch {
+            toast.error('Failed to save position.');
         }
-
-        toast.success('Position saved successfully!');
-
-        if (publish) {
-            const { error } = await publishEventPosition(event, eventPosition);
-
-            if (error) {
-                toast.error(error.errors.map((error) => error.message).join('.  '));
-                return;
-            }
-
-            toast.success('Position published successfully!');
-        }
-
-        setOpen(false);
     }
 
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
             <Tooltip title="Edit Position">
-                <IconButton onClick={handleClick}>
-                    <Edit />
+                <IconButton onClick={() => setOpen(true)}>
+                    <Edit/>
                 </IconButton>
             </Tooltip>
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>Position -  {position.user?.firstName} {position.user?.lastName}</DialogTitle>
+                <DialogTitle>Position - {position.user_name}</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>REQUESTED &apos;{position.requestedPosition}&apos;</DialogContentText>
-                    <DialogContentText>{eventStart.isSame(reqStart) && eventEnd.isSame(reqEnd) ? 'FULL EVENT' : `${formatZuluDate(position.requestedStartTime)} - ${formatZuluDate(position.requestedEndTime)}`}</DialogContentText>
-                    <br />
+                    <DialogContentText>REQUESTED &apos;{position.requested_position}&apos;</DialogContentText>
+                    <DialogContentText>{eventStart.isSame(reqStart) && eventEnd.isSame(reqEnd) ? 'FULL EVENT' : `${formatZuluDate(reqStart.toDate())} - ${formatZuluDate(reqEnd.toDate())}`}</DialogContentText>
+                    <br/>
                     <DialogContentText>Notes:</DialogContentText>
                     <DialogContentText>{position.notes}</DialogContentText>
-                    <br />
+                    <br/>
 
-                    <Box sx={{ mb: 2 }}>
+                    <Box sx={{mb: 2}}>
                         <FormGroup row>
-                            <FormControlLabel control={<Switch checked={isInstructor} onChange={(e) => setIsInstructor(e.target.checked)} />} label="Is Instructor" />
-                            <FormControlLabel control={<Switch checked={isSolo} onChange={(e) => setIsSolo(e.target.checked)} />} label="Is Solo" />
-                            <FormControlLabel control={<Switch checked={isOts} onChange={(e) => setIsOts(e.target.checked)} />} label="Is OTS" />
-                            <FormControlLabel control={<Switch checked={isTmu} onChange={(e) => setIsTmu(e.target.checked)} />} label="Is TMU" />
-                            <FormControlLabel control={<Switch checked={isCic} onChange={(e) => setIsCic(e.target.checked)} />} label="Is CIC" />
+                            <FormControlLabel control={<Switch checked={isInstructor} onChange={(e) => setIsInstructor(e.target.checked)}/>} label="Is Instructor"/>
+                            <FormControlLabel control={<Switch checked={isSolo} onChange={(e) => setIsSolo(e.target.checked)}/>} label="Is Solo"/>
+                            <FormControlLabel control={<Switch checked={isOts} onChange={(e) => setIsOts(e.target.checked)}/>} label="Is OTS"/>
+                            <FormControlLabel control={<Switch checked={isTmu} onChange={(e) => setIsTmu(e.target.checked)}/>} label="Is TMU"/>
+                            <FormControlLabel control={<Switch checked={isCic} onChange={(e) => setIsCic(e.target.checked)}/>} label="Is CIC"/>
                         </FormGroup>
                     </Box>
 
                     <Stack direction="column" spacing={2}>
-                        <TextField fullWidth variant="filled" label="Final Position" value={finalPosition} onChange={(e) => setFinalPosition(e.target.value)} />
-                        <DateTimePicker sx={{ width: '100%', }} disablePast ampm={false} minDateTime={minDateAllowed}
-                                        maxDateTime={maxDateAllowed} name="start" label="Final Start"
-                                        value={finalStartTime} onChange={setFinalStartTime} />
-                        <DateTimePicker sx={{ width: '100%', }} disablePast ampm={false} minDateTime={minDateAllowed}
-                                        maxDateTime={maxDateAllowed} name="end" label="Final End" value={finalEndTime}
-                                        onChange={setFinalEndTime} />
-                        <TextField fullWidth variant="filled" multiline rows={4} name="finalNotes" label="Final Notes (optional)" value={finalNotes} onChange={(e) => setFinalNotes(e.target.value)} />
+                        <TextField fullWidth variant="filled" label="Final Position" value={finalPosition} onChange={(e) => setFinalPosition(e.target.value)}/>
+                        <DateTimePicker sx={{width: '100%',}} disablePast ampm={false} minDateTime={minDateAllowed}
+                                        maxDateTime={maxDateAllowed} label="Final Start"
+                                        value={finalStartTime} onChange={setFinalStartTime}/>
+                        <DateTimePicker sx={{width: '100%',}} disablePast ampm={false} minDateTime={minDateAllowed}
+                                        maxDateTime={maxDateAllowed} label="Final End" value={finalEndTime}
+                                        onChange={setFinalEndTime}/>
+                        <TextField fullWidth variant="filled" multiline rows={4} label="Final Notes (optional)" value={finalNotes} onChange={(e) => setFinalNotes(e.target.value)}/>
 
                         <FormControl fullWidth>
                             <InputLabel id="controlling-category-label">Controlling Category</InputLabel>

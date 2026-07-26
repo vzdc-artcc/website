@@ -1,7 +1,9 @@
+'use client';
 import React from 'react';
 import {
     Card,
     CardContent,
+    Skeleton,
     Table,
     TableBody,
     TableCell,
@@ -10,40 +12,19 @@ import {
     TableRow,
     Typography
 } from "@mui/material";
-import prisma from "@/lib/db";
-import {notFound} from "next/navigation";
 import {getIconForCertificationOption} from "@/lib/certification";
+import {useMe} from "@/lib/osmium/hooks/me";
+import {useUserCertifications, useUserSoloCertifications} from "@/lib/osmium/hooks/certifications";
 
-export default async function CertificationsCard({cid}: { cid: string, }) {
+export default function CertificationsCard() {
 
-    const controller = await prisma.user.findUnique({
-        where: {
-            cid,
-        },
-        include: {
-            certifications: {
-                include: {
-                    certificationType: true,
-                },
-            },
-            soloCertifications: {
-                include: {
-                    certificationType: true,
-                },
-            },
-        },
-    });
+    const {data: me} = useMe();
+    const cid = me?.cid;
+    const {data: certsData, isLoading} = useUserCertifications(cid);
+    const {data: soloData} = useUserSoloCertifications(cid);
 
-    if (!controller) {
-        notFound();
-    }
-
-    const certificationTypes = await prisma.certificationType.findMany({
-        orderBy: {
-            order: 'asc',
-        },
-    });
-
+    const certifications = certsData?.items ?? [];
+    const solos = soloData?.items ?? [];
 
     return (
         <Card sx={{height: '100%',}}>
@@ -58,15 +39,23 @@ export default async function CertificationsCard({cid}: { cid: string, }) {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {certificationTypes.map((certificationType) => (
-                                <TableRow key={certificationType.id}>
-                                    <TableCell>{certificationType.name}</TableCell>
-                                    <TableCell>
-                                        {getIconForCertificationOption(controller.certifications.find((certification) => certification.certificationType.id === certificationType.id)?.certificationOption || "NONE", controller.soloCertifications.find((soloCertification) => soloCertification.certificationType.id === certificationType.id))}
-                                    </TableCell>
+                            {isLoading && (
+                                <TableRow>
+                                    <TableCell colSpan={2}><Skeleton height={30}/></TableCell>
                                 </TableRow>
-                            ))}
-
+                            )}
+                            {certifications.map((certification) => {
+                                const solo = solos.find((s) => s.certification_type_id === certification.certification_type_id);
+                                const option = solo ? 'SOLO' : certification.certification_option;
+                                return (
+                                    <TableRow key={certification.certification_type_id}>
+                                        <TableCell>{certification.certification_type_name}</TableCell>
+                                        <TableCell>
+                                            {getIconForCertificationOption(option, solo ?? undefined)}
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
                         </TableBody>
                     </Table>
                 </TableContainer>

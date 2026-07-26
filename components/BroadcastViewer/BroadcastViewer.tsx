@@ -1,58 +1,38 @@
+'use client';
 import React from 'react';
-import {User} from "next-auth";
-import prisma from "@/lib/db";
 import {Accordion, AccordionDetails, AccordionSummary, Box, Stack, Typography} from "@mui/material";
 import BroadcastDialog from "@/components/BroadcastViewer/BroadcastDialog";
 import Link from "next/link";
 import {ExpandMore, FileOpen} from "@mui/icons-material";
 import Markdown from "react-markdown";
+import {useMyBroadcasts} from "@/lib/osmium/hooks/broadcasts";
 
-export default async function BroadcastViewer({user, includeSeen}: { user: User, includeSeen?: boolean }) {
+export default function BroadcastViewer({includeSeen}: { includeSeen?: boolean }) {
 
-    const unseenBroadcasts = await prisma.changeBroadcast.findMany({
-        where: {
-            OR: [
-                {
-                    unseenBy: {
-                        some: {
-                            id: user.id,
-                        },
-                    },
-                },
-                {
-                    ...(includeSeen && {
-                        seenBy: {
-                            some: {
-                                id: user.id,
-                            },
-                        },
-                    }),
-                },
-            ],
-        },
-        orderBy: {
-            timestamp: 'asc',
-        },
-        include: {
-            file: true,
-        }
-    });
+    const {data} = useMyBroadcasts();
+    const items = data?.items ?? [];
 
-    return unseenBroadcasts.length > 0 && (
-        <BroadcastDialog broadcasts={unseenBroadcasts} user={user}>
-            {unseenBroadcasts.length === 1 && (
+    const pendingBroadcasts = items.filter((b) => !b.agreed_at && (includeSeen || !b.seen_at));
+
+    if (pendingBroadcasts.length === 0) {
+        return null;
+    }
+
+    return (
+        <BroadcastDialog broadcasts={pendingBroadcasts}>
+            {pendingBroadcasts.length === 1 && (
                 <>
                     <Markdown>
-                        {unseenBroadcasts[0].description}
+                        {pendingBroadcasts[0].description}
                     </Markdown>
-                    {unseenBroadcasts[0].file && (
+                    {pendingBroadcasts[0].file_id && (
                         <Box sx={{mt: 2,}}>
-                            <Link href={`/publications/${unseenBroadcasts[0].file.id}`} target="_blank"
+                            <Link href={`/publications/${pendingBroadcasts[0].file_id}`} target="_blank"
                                   style={{color: 'inherit',}}>
                                 <Stack direction="row" alignItems="center" spacing={1}>
                                     <FileOpen/>
                                     <Typography variant="subtitle2">
-                                        {unseenBroadcasts[0].file.name}
+                                        {pendingBroadcasts[0].file_filename}
                                     </Typography>
                                 </Stack>
                             </Link>
@@ -60,7 +40,7 @@ export default async function BroadcastViewer({user, includeSeen}: { user: User,
                     )}
                 </>
             )}
-            {unseenBroadcasts.length > 1 && unseenBroadcasts.map(broadcast => (
+            {pendingBroadcasts.length > 1 && pendingBroadcasts.map(broadcast => (
                 <Accordion key={broadcast.id}>
                     <AccordionSummary expandIcon={<ExpandMore/>}>
                         <Typography>{broadcast.title}</Typography>
@@ -69,14 +49,14 @@ export default async function BroadcastViewer({user, includeSeen}: { user: User,
                         <Markdown>
                             {broadcast.description}
                         </Markdown>
-                        {broadcast.file && (
+                        {broadcast.file_id && (
                             <Box sx={{mt: 2,}}>
-                                <Link href={`/publications/${broadcast.file.id}`} target="_blank"
+                                <Link href={`/publications/${broadcast.file_id}`} target="_blank"
                                       style={{color: 'inherit',}}>
                                     <Stack direction="row" alignItems="center" spacing={1}>
                                         <FileOpen/>
                                         <Typography variant="subtitle2">
-                                            {broadcast.file.name}
+                                            {broadcast.file_filename}
                                         </Typography>
                                     </Stack>
                                 </Link>

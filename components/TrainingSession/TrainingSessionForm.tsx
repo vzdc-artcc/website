@@ -1,17 +1,5 @@
 'use client';
-import React, {useCallback, useEffect, useState} from 'react';
-import {
-    Lesson,
-    OtsRecommendation,
-    RubricCriteraScore,
-    TrainerReleaseRequest,
-    TrainingSession,
-    TrainingSessionAdditionalTrainer,
-    TrainingSessionPerformanceIndicator,
-    TrainingSessionPerformanceIndicatorCategory,
-    TrainingSessionPerformanceIndicatorCriteria
-} from "@/generated/prisma/browser";
-import {getAdditionalTrainersForSession, getAllData, getTicketsForSession} from "@/actions/trainingSessionFormHelper";
+import React, {useEffect, useMemo, useState} from 'react';
 import {
     Accordion,
     AccordionDetails,
@@ -34,8 +22,7 @@ import {
     Typography,
     useTheme
 } from "@mui/material";
-import {useRouter, useSearchParams} from "next/navigation";
-import {User} from "next-auth";
+import {notFound, useRouter, useSearchParams} from "next/navigation";
 import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
@@ -44,127 +31,262 @@ import {Add, Delete, ExpandMore} from "@mui/icons-material";
 import {toast} from "react-toastify";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {createOrUpdateTrainingSession} from "@/actions/trainingSession"
 import utc from "dayjs/plugin/utc";
-import TrainingSessionPerformanceIndicatorForm
-    from "@/components/TrainingSession/TrainingSessionPerformanceIndicatorForm";
 import timezone from "dayjs/plugin/timezone";
-import TrainingSessionAfterSubmitDialogs, {
-    RosterChangeWithAll
-} from "@/components/TrainingSession/TrainingSessionAfterSubmitDialogs";
+import TrainingSessionPerformanceIndicatorForm, {
+    PiFormState
+} from "@/components/TrainingSession/TrainingSessionPerformanceIndicatorForm";
+import TrainingSessionAfterSubmitDialogs from "@/components/TrainingSession/TrainingSessionAfterSubmitDialogs";
+import {
+    useCreateTrainingSession,
+    useTrainingAssignments,
+    useTrainingLessons,
+    useTrainingSession,
+    useUpdateTrainingSession,
+} from "@/lib/osmium/hooks/training";
+import {useRosterControllers, useUsersByRole} from "@/lib/osmium/hooks/users";
+import {useMe} from "@/lib/osmium/hooks/me";
 
-export type TrainingSessionIndicatorCategoryWithAll = TrainingSessionPerformanceIndicatorCategory & {
-    criteria: TrainingSessionPerformanceIndicatorCriteria[],
+interface LessonLike {
+    id: string;
+    identifier: string;
+    name: string;
+    performance_indicator_template_id?: string | null;
 }
 
-export type TrainingSessionIndicatorWithAll = TrainingSessionPerformanceIndicator & {
-    categories: TrainingSessionIndicatorCategoryWithAll[],
+interface ScoreLike {
+    criteria_id: string;
+    cell_id: string;
+    passed: boolean;
 }
 
-export default function TrainingSessionForm({timeZone, trainingSession,}: {
-    timeZone: string,
-    trainingSession?: TrainingSession,
+interface TicketState {
+    passed: boolean;
+    lesson: LessonLike;
+    scores: ScoreLike[];
+}
+
+interface AdditionalTrainerState {
+    trainerId: string;
+    description: string;
+    name: string;
+}
+
+interface AfterSubmitState {
+    release?: { id: string } | null;
+    rosterChanges?: { id: string, dossier_text: string, certification_option: string }[];
+    otsRec?: { id: string } | null;
+}
+
+export default function TrainingSessionForm({sessionId}: {
+    sessionId?: string,
 }) {
 
     const router = useRouter();
     const theme = useTheme();
     const searchParams = useSearchParams();
 
-    const [afterRelease, setAfterRelease] = useState<TrainerReleaseRequest>();
-    const [afterRosterUpdates, setAfterRosterUpdates] = useState<RosterChangeWithAll[]>();
-    const [otsRec, setOtsRec] = useState<OtsRecommendation>();
-    const renderAfterDialogs = !!afterRelease || !!afterRosterUpdates || !!otsRec;
+    // Identity from osmium's /me (Phase 6). mentorOwnerOnly preserves the
+    // legacy 3-tier `MENTOR && !INSTRUCTOR && !STAFF` restriction on raw
+    // role names — a plain mentor may only edit sessions they ran.
+    const {data: me} = useMe();
+    const timeZone = me?.profile.timezone ?? 'America/New_York';
+    const currentUserCid = me ? String(me.cid) : undefined;
+    const mentorOwnerOnly = !!me && me.role_names.includes("MTR")
+        && !me.role_names.includes("INS") && !me.role_names.includes("STAFF");
 
-    const [allLessons, setAllLessons] = useState<Lesson[]>([]);
-    const [allUsers, setAllUsers] = useState<User[]>([]);
-    const [yourStudentIds, setYourStudentIds] = useState<string[]>([]);
-    const [allLoading, setAllLoading] = useState<boolean>(true);
+    const {data: existingSession, isLoading: sessionLoading} = useTrainingSession(sessionId);
+    const {data: lessonsData, isLoading: lessonsLoading} = useTrainingLessons();
+    const {data: rosterData, isLoading: rosterLoading} = useRosterControllers();
+    const {data: instructorsData, isLoading: instructorsLoading} = useUsersByRole('INS');
+    const {data: mentorsData, isLoading: mentorsLoading} = useUsersByRole('MTR');
+    const {data: staffData, isLoading: staffLoading} = useUsersByRole('STAFF');
+    const {data: assignmentsData} = useTrainingAssignments();
+    const createSession = useCreateTrainingSession();
+    const updateSession = useUpdateTrainingSession();
 
-    const [student, setStudent] = useState<string>(trainingSession?.studentId || searchParams.get('student') || '');
-    const [start, setStart] = useState<Date | string>(trainingSession?.start || new Date());
-    const [end, setEnd] = useState<Date | string>(trainingSession?.end || new Date());
-    const [performanceIndicator, setPerformanceIndicator] = useState<TrainingSessionIndicatorWithAll>();
+    const [afterSubmit, setAfterSubmit] = useState<AfterSubmitState>();
+    const renderAfterDialogs = !!afterSubmit && (!!afterSubmit.release ||
+        (!!afterSubmit.rosterChanges && afterSubmit.rosterChanges.length > 0) || !!afterSubmit.otsRec);
+
+    const [hydrated, setHydrated] = useState(false);
+    const [student, setStudent] = useState<string>(searchParams.get('student') || '');
+    const [start, setStart] = useState<Date>(new Date());
+    const [end, setEnd] = useState<Date>(new Date());
+    const [performanceIndicator, setPerformanceIndicator] = useState<PiFormState>();
     const [agreeEditPerformanceIndicator, setAgreeEditPerformanceIndicator] = useState(false);
-    const [trainingTickets, setTrainingTickets] = useState<{
-        passed: boolean,
-        lesson: Lesson,
-        scores: RubricCriteraScore[],
-    }[]>([]);
-    const [additionalTrainers, setAdditionalTrainers] = useState<TrainingSessionAdditionalTrainer[]>([]);
+    const [trainingTickets, setTrainingTickets] = useState<TicketState[]>([]);
+    const [additionalTrainers, setAdditionalTrainers] = useState<AdditionalTrainerState[]>([]);
     const [additionalTrainerSelected, setAdditionalTrainerSelected] = useState<string>();
     const [additionalTrainerDescription, setAdditionalTrainerDescription] = useState<string>();
-    const [additionalNotes, setAdditionalNotes] = useState<string>(trainingSession?.additionalComments || '');
-    const [trainerNotes, setTrainerNotes] = useState<string>(trainingSession?.trainerComments || '');
-
+    const [additionalNotes, setAdditionalNotes] = useState<string>('');
+    const [trainerNotes, setTrainerNotes] = useState<string>('');
     const [enableMarkdown, setEnableMarkdown] = useState<boolean>(false);
 
-    const getInitialData = useCallback(async () => {
-        setAllLoading(true);
-        const {lessons, users, yourStudentIds} = await getAllData();
-        setAllLessons(lessons.sort(({identifier:a},{identifier:b})=>a.localeCompare(b)));
-        setAllUsers(users as User[]);
-        setYourStudentIds(yourStudentIds);
-        setAllLoading(false);
-        if (trainingSession) {
-            const tickets = await getTicketsForSession(trainingSession.id);
-            setTrainingTickets(tickets.map((ticket) => {
-                return {
-                    passed: ticket.scores.every((score) => score.passed),
-                    lesson: ticket.lesson,
-                    scores: ticket.scores,
-                }
-            }));
-            const additionalTrainers = await getAdditionalTrainersForSession(trainingSession.id);
-            setAdditionalTrainers(additionalTrainers);
+    const allLessons: LessonLike[] = lessonsData?.items ?? [];
+
+    useEffect(() => {
+        if (hydrated || !existingSession || lessonsLoading) return;
+
+        setStudent(existingSession.student_id);
+        setStart(new Date(existingSession.start));
+        setEnd(new Date(existingSession.end));
+        setAdditionalNotes(existingSession.additional_comments || '');
+        setTrainerNotes(existingSession.trainer_comments || '');
+        setEnableMarkdown(existingSession.enable_markdown);
+        setTrainingTickets(existingSession.tickets.map((ticket) => {
+            const lesson = allLessons.find((l) => l.id === ticket.lesson_id) || {
+                id: ticket.lesson_id,
+                identifier: '',
+                name: '',
+            };
+            return {
+                passed: ticket.passed,
+                lesson,
+                scores: ticket.scores.map((s) => ({criteria_id: s.criteria_id, cell_id: s.cell_id, passed: s.passed})),
+            };
+        }));
+        setAdditionalTrainers(existingSession.additional_trainers.map((t) => ({
+            trainerId: t.trainer_id,
+            description: t.description,
+            name: t.trainer_name,
+        })));
+        if (existingSession.performance_indicator) {
+            setPerformanceIndicator({
+                categories: existingSession.performance_indicator.categories.map((c) => ({
+                    id: c.id,
+                    name: c.name,
+                    order: c.order,
+                    criteria: c.criteria.map((cr) => ({
+                        id: cr.id,
+                        name: cr.name,
+                        order: cr.order,
+                        marker: (cr.marker as 'OBSERVED' | 'NOT_OBSERVED' | null) ?? null,
+                        comments: cr.comments ?? null,
+                    })),
+                })),
+            });
         }
-    }, [trainingSession]);
+        setHydrated(true);
+    }, [existingSession, lessonsLoading, allLessons, hydrated]);
 
-    const handleSubmit = async () => {
-
-        const {
-            release,
-            rosterUpdates,
-            otsRec,
-            errors
-        } = await createOrUpdateTrainingSession(
-            student,
-            start,
-            end,
-            trainingTickets,
-            additionalTrainers,
-            additionalNotes,
-            trainerNotes,
-            enableMarkdown,
-            trainingSession ? (agreeEditPerformanceIndicator ? performanceIndicator : undefined) : performanceIndicator,
-            trainingSession?.id);
-
-        if (errors) {
-            toast(errors.map((e) => e.message).join(".  "), {type: 'error'});
-            return;
+    useEffect(() => {
+        if (!mentorOwnerOnly || !existingSession) return;
+        if (String(existingSession.instructor_cid) !== currentUserCid) {
+            router.replace(`/training/sessions/${existingSession.id}`);
         }
+    }, [mentorOwnerOnly, existingSession, currentUserCid, router]);
 
-        toast("Training session saved successfully!", {type: 'success'});
+    const students = (rosterData?.items ?? [])
+        .filter((u) => !!u.full)
+        .map((u) => ({
+            id: u.full!.id,
+            cid: u.basic.cid,
+            name: `${u.full!.first_name ?? ''} ${u.full!.last_name ?? ''}`.trim() || u.basic.name,
+        }));
 
-        if (release || rosterUpdates || otsRec) {
-            setAfterRelease(release || undefined);
-            setAfterRosterUpdates(rosterUpdates);
-            setOtsRec(otsRec)
-        } else {
-            redirect();
+    const trainers = useMemo(() => {
+        const merged = new Map<string, { id: string, cid: number, name: string, initials?: string | null }>();
+        for (const item of [...(instructorsData?.items ?? []), ...(mentorsData?.items ?? []), ...(staffData?.items ?? [])]) {
+            if (!item.full) continue;
+            merged.set(item.full.id, {
+                id: item.full.id,
+                cid: item.basic.cid,
+                name: `${item.full.first_name ?? ''} ${item.full.last_name ?? ''}`.trim() || item.basic.name,
+                initials: item.full.operating_initials,
+            });
         }
+        return Array.from(merged.values());
+    }, [instructorsData, mentorsData, staffData]);
+
+    const myOsmiumId = useMemo(() => {
+        const myCid = currentUserCid ? Number(currentUserCid) : undefined;
+        if (!myCid) return undefined;
+        const pool = [...(rosterData?.items ?? []), ...(instructorsData?.items ?? []), ...(mentorsData?.items ?? []), ...(staffData?.items ?? [])];
+        return pool.find((u) => u.basic.cid === myCid && !!u.full)?.full?.id;
+    }, [currentUserCid, rosterData, instructorsData, mentorsData, staffData]);
+
+    const yourStudentIds = useMemo(() => {
+        if (!myOsmiumId) return [] as string[];
+        return (assignmentsData?.items ?? [])
+            .filter((a) => a.primary_trainer_id === myOsmiumId || a.other_trainer_ids.includes(myOsmiumId))
+            .map((a) => a.student_id);
+    }, [assignmentsData, myOsmiumId]);
+
+    if (sessionId && !sessionLoading && !existingSession) {
+        notFound();
     }
 
-    const redirect = () => {
-        if (trainingSession) {
-            router.replace(`/training/sessions/${trainingSession.id}`);
+    const allLoading = sessionLoading || lessonsLoading || rosterLoading || instructorsLoading || mentorsLoading
+        || staffLoading || (!!sessionId && !hydrated);
+
+    const redirect = (id?: string) => {
+        const targetId = id || existingSession?.id;
+        if (targetId) {
+            router.replace(`/training/sessions/${targetId}`);
         } else {
             router.replace(`/training/sessions`);
         }
     }
 
-    useEffect(() => {
-        getInitialData().then();
-    }, [getInitialData])
+    const handleSubmit = async () => {
+        if (!student) {
+            toast.error('Student is required.');
+            return;
+        }
+
+        const body = {
+            student_id: student,
+            start: start.toISOString(),
+            end: end.toISOString(),
+            additional_comments: additionalNotes || undefined,
+            trainer_comments: trainerNotes || undefined,
+            enable_markdown: enableMarkdown,
+            tickets: trainingTickets.map((t) => ({
+                lesson_id: t.lesson.id,
+                passed: t.passed,
+                scores: t.scores.map((s) => ({criteria_id: s.criteria_id, cell_id: s.cell_id, passed: s.passed})),
+            })),
+            performance_indicator: performanceIndicator ? {
+                categories: performanceIndicator.categories.map((c) => ({
+                    name: c.name,
+                    order: c.order,
+                    criteria: c.criteria.map((cr) => ({
+                        name: cr.name,
+                        order: cr.order,
+                        marker: cr.marker ?? '',
+                        comments: cr.comments ?? undefined,
+                    })),
+                })),
+            } : undefined,
+            additional_trainers: additionalTrainers.map((t) => ({trainer_id: t.trainerId, description: t.description})),
+        };
+
+        try {
+            const result = existingSession
+                ? await updateSession.mutateAsync({sessionId: existingSession.id, body})
+                : await createSession.mutateAsync(body);
+
+            toast.success('Training session saved successfully!');
+
+            if (result && (result.release || (result.roster_updates && result.roster_updates.length > 0) || result.ots_recommendation)) {
+                setAfterSubmit({
+                    release: result.release,
+                    rosterChanges: result.roster_updates,
+                    otsRec: result.ots_recommendation,
+                });
+            } else {
+                redirect(result?.session?.id);
+            }
+        } catch (err) {
+            const errors = (err as { errors?: { message: string }[] })?.errors;
+            if (errors && errors.length > 0) {
+                toast(errors.map((e) => e.message).join(".  "), {type: 'error'});
+            } else {
+                toast.error('Failed to save training session.');
+            }
+        }
+    }
 
     if (allLoading) {
         return <CircularProgress/>;
@@ -173,23 +295,20 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
     dayjs.extend(utc);
     dayjs.extend(timezone);
 
-    const isTrainer = (u: User) => {
-        return u.roles.includes("MENTOR") || u.roles.includes("INSTRUCTOR")
-            || u.roles.includes("STAFF");
-    }
-
     const addAdditionalTrainer = () => {
         if (!additionalTrainerSelected || !additionalTrainerDescription) {
             toast.error("All fields are required.");
             return;
         }
 
-        setAdditionalTrainers((prev => [...prev, {
-            trainerId: additionalTrainerSelected,
+        const trainer = trainers.find((t) => t.id === additionalTrainerSelected);
+        if (!trainer) return;
+
+        setAdditionalTrainers((prev) => [...prev, {
+            trainerId: trainer.id,
             description: additionalTrainerDescription.toUpperCase(),
-            sessionId: trainingSession?.id || '',
-            id: '',
-        }]));
+            name: trainer.name,
+        }]);
 
         setAdditionalTrainerSelected('');
         setAdditionalTrainerDescription('');
@@ -203,15 +322,15 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
     return (
         (<LocalizationProvider dateAdapter={AdapterDayjs}>
             {renderAfterDialogs &&
-                <TrainingSessionAfterSubmitDialogs onAllClose={redirect} release={afterRelease} otsRec={otsRec}
-                                                   rosterChanges={afterRosterUpdates}/>}
+                <TrainingSessionAfterSubmitDialogs onAllClose={() => redirect()} release={afterSubmit?.release}
+                                                   otsRec={afterSubmit?.otsRec} rosterChanges={afterSubmit?.rosterChanges}/>}
             <form action={handleSubmit}>
                 <Grid container columns={2} spacing={2}>
                     <Grid size={2}>
                         <Autocomplete
-                            options={allUsers.sort((a, b) => {
+                            options={students.slice().sort((a, b) => {
                                 if (yourStudentIds.includes(a.id) && yourStudentIds.includes(b.id)) {
-                                    return a.lastName.localeCompare(b.lastName);
+                                    return a.name.localeCompare(b.name);
                                 } else if (yourStudentIds.includes(a.id)) {
                                     return -1;
                                 } else if (yourStudentIds.includes(b.id)) {
@@ -222,8 +341,9 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                             groupBy={(option) =>
                                 yourStudentIds.includes(option.id) ? 'Your Students' : 'All Students'
                             }
-                            getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.cid})`}
-                            value={allUsers.find((u) => u.id === student) || null}
+                            getOptionLabel={(option) => `${option.name} (${option.cid})`}
+                            isOptionEqualToValue={(a, b) => a.id === b.id}
+                            value={students.find((u) => u.id === student) || null}
                             onChange={(event, newValue) => {
                                 setStudent(newValue ? newValue.id : '');
                             }}
@@ -256,9 +376,10 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                     for this session. You will be considered the primary trainer for this training
                                     session.</Typography>
                                 <Autocomplete
-                                    options={allUsers.filter(isTrainer).filter((u => u.id !== student && !additionalTrainers.map((t) => t.trainerId).includes(u.id)))}
-                                    getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.operatingInitials})`}
-                                    value={allUsers.find((u) => u.id === additionalTrainerSelected)}
+                                    options={trainers.filter((t) => t.id !== student && !additionalTrainers.map((at) => at.trainerId).includes(t.id))}
+                                    getOptionLabel={(option) => `${option.name} (${option.initials || option.cid})`}
+                                    isOptionEqualToValue={(a, b) => a.id === b.id}
+                                    value={trainers.find((t) => t.id === additionalTrainerSelected) || null}
                                     onChange={(_event, newValue) => {
                                         setAdditionalTrainerSelected(newValue ? newValue.id : '');
                                     }}
@@ -277,7 +398,7 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                 {additionalTrainers.length === 0 &&
                                     <Typography>No additional trainers added.</Typography>}
                                 {additionalTrainers.map((at) =>
-                                    <Typography>{allUsers.find((u) => u.id === at.trainerId)?.fullName} - {at.description}
+                                    <Typography key={at.trainerId}>{at.name} - {at.description}
                                         <IconButton size="small"
                                                     onClick={() => removeAdditionalTrainer(at.trainerId)}><Delete
                                             fontSize="inherit"/></IconButton></Typography>)}
@@ -294,7 +415,11 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                             <Stack direction="row" spacing={1} alignItems="center">
                                                 <Typography>{ticket.lesson.identifier} - {ticket.lesson.name}</Typography>
                                                 <IconButton
-                                                    onClick={() => setTrainingTickets(trainingTickets.filter((tt, i) => i !== index))}>
+                                                    component="span"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setTrainingTickets(trainingTickets.filter((tt, i) => i !== index));
+                                                    }}>
                                                     <Delete/>
                                                 </IconButton>
                                                 <Chip label={ticket.passed ? 'PASS' : 'FAIL'}
@@ -302,8 +427,7 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                             </Stack>
                                         </AccordionSummary>
                                         <AccordionDetails>
-                                            <TrainingTicketForm allLessons={allLessons}
-                                                                lesson={ticket.lesson}
+                                            <TrainingTicketForm lesson={ticket.lesson}
                                                                 scores={ticket.scores}
                                                                 onSubmit={(lesson, scores) => {
                                                                     setTrainingTickets((prev) => {
@@ -331,25 +455,24 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                         <Card variant="outlined">
                             <CardContent>
                                 <Typography variant="h6" sx={{mb: 2,}}>New Training Ticket</Typography>
-                                <TrainingTicketForm allLessons={allLessons}
-                                                    onSubmit={(lesson, scores) => {
-                                                        if (trainingTickets.map((t) => t.lesson.id).flat().includes(lesson.id)) {
-                                                            toast('Lesson already added', {type: 'error'});
-                                                            return false;
-                                                        }
-                                                        setTrainingTickets((prev) => {
-                                                            return [
-                                                                ...prev,
-                                                                {
-                                                                    passed: scores.every((score) => score.passed),
-                                                                    lesson,
-                                                                    scores,
-                                                                },
-                                                            ];
-                                                        });
-                                                        toast('Ticket saved', {type: 'success'});
-                                                        return true;
-                                                    }}/>
+                                <TrainingTicketForm onSubmit={(lesson, scores) => {
+                                    if (trainingTickets.map((t) => t.lesson.id).flat().includes(lesson.id)) {
+                                        toast('Lesson already added', {type: 'error'});
+                                        return false;
+                                    }
+                                    setTrainingTickets((prev) => {
+                                        return [
+                                            ...prev,
+                                            {
+                                                passed: scores.every((score) => score.passed),
+                                                lesson,
+                                                scores,
+                                            },
+                                        ];
+                                    });
+                                    toast('Ticket saved', {type: 'success'});
+                                    return true;
+                                }}/>
                             </CardContent>
                         </Card>
                     </Grid>
@@ -359,7 +482,7 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                 <Typography variant="h6">Performance Indicator</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                {trainingSession && !agreeEditPerformanceIndicator &&
+                                {existingSession && !agreeEditPerformanceIndicator &&
                                     <Alert severity="warning" sx={{mb: 2,}}
                                            action={
                                                <Button color="inherit" size="small"
@@ -373,7 +496,7 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                         indicator?</Alert>}
                                 {trainingTickets.length === 0 &&
                                     <Typography>You must add at least one training ticket first.</Typography>}
-                                {trainingTickets.length > 0 && (!trainingSession || agreeEditPerformanceIndicator) &&
+                                {trainingTickets.length > 0 && (!existingSession || agreeEditPerformanceIndicator) &&
                                     <TrainingSessionPerformanceIndicatorForm lesson={trainingTickets[0].lesson}
                                                                              onChange={setPerformanceIndicator}/>}
                             </AccordionDetails>
@@ -383,7 +506,7 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                         <Box sx={{}} data-color-mode={theme.palette.mode}>
                         <FormControlLabel control={<Switch onChange={()=>setEnableMarkdown(!enableMarkdown)}/>} label="Enable Markdown Editor" />
                             <Typography variant="subtitle1" sx={{mb: 1,}}>Additional Comments</Typography>
-                            {enableMarkdown ? 
+                            {enableMarkdown ?
                                 <MarkdownEditor
                                     enableScroll={false}
                                     minHeight="200px"

@@ -11,7 +11,8 @@
     "dev": "next dev --turbopack",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "codegen:osmium": "openapi-typescript \"${OSMIUM_OPENAPI_URL:-http://127.0.0.1:3000/docs/api/v1/openapi.json}\" -o lib/osmium/generated/schema.d.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.4",
@@ -33,6 +34,7 @@
     "@next/third-parties": "^16.2.2",
     "@prisma/adapter-pg": "^7.6.0",
     "@prisma/client": "^7.6.0",
+    "@tanstack/react-query": "^5.101.2",
     "@types/mjml": "^4.7.4",
     "@uiw/react-markdown-editor": "^6.1.2",
     "ag-charts-community": "^12.1.1",
@@ -41,12 +43,13 @@
     "csv-stringify": "^6.7.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.20",
+    "dotenv": "^17.2.3",
     "ics": "^3.8.1",
     "mjml": "^4.18.0",
     "next": "^16.2.2",
     "next-auth": "^4.24.13",
     "nodemailer": "^8.0.4",
-    "dotenv": "^17.2.3",
+    "openapi-fetch": "^0.17.0",
     "pg": "^8.18.0",
     "prisma": "^7.6.0",
     "react": "^19.2.4",
@@ -70,6 +73,7 @@
     "dotenv-cli": "^11.0.0",
     "eslint": "9.26.0",
     "eslint-config-next": "^16.2.1",
+    "openapi-typescript": "^7.13.0",
     "typescript": "^5"
   }
 }

@@ -1,10 +1,13 @@
 import {ReactNode} from "react";
-import {CertificationOption, SoloCertification} from "@/generated/prisma/browser";
 import {Check, Circle, Clear, Timer} from "@mui/icons-material";
 import {Tooltip} from "@mui/material";
 import {getDaysLeft} from "@/lib/date";
 
-export const getIconForCertificationOption = (certificationOption: CertificationOption, soloCertification?: SoloCertification): ReactNode => {
+// Structural solo-cert shape so this helper works with both the legacy Prisma
+// `SoloCertification` and osmium's `SoloCertificationItem` (position + expires).
+type SoloCertificationLike = { position?: string | null; expires?: string | Date | null };
+
+export const getIconForCertificationOption = (certificationOption: string, soloCertification?: SoloCertificationLike): ReactNode => {
     switch (certificationOption) {
         case "NONE":
             return <Tooltip title="Not Certified"><Clear fontSize="large" color="error"/></Tooltip>;
@@ -26,7 +29,7 @@ export const getIconForCertificationOption = (certificationOption: Certification
             return <Tooltip title="Center Certified"><Check fontSize="large" color="success"/></Tooltip>;
         case "SOLO":
             return <Tooltip
-                title={soloCertification ? `${soloCertification?.position} - ${getDaysLeft(soloCertification?.expires || new Date())}` : 'Solo Endorsed'}><Timer
+                title={soloCertification ? `${soloCertification?.position} - ${getDaysLeft(new Date(soloCertification?.expires || new Date()))}` : 'Solo Endorsed'}><Timer
                 fontSize="large" color="info"/></Tooltip>;
         default:
             return <Clear fontSize="large" color="error"/>;

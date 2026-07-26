@@ -1,6 +1,5 @@
 'use client';
-import {updateOperatingInitials} from "@/actions/user";
-import {getRating} from "@/lib/vatsim";
+import {useReassignOperatingInitials} from "@/lib/osmium/hooks/users";
 import {
     Autocomplete,
     Box,
@@ -13,14 +12,24 @@ import {
     TextField,
     Typography
 } from "@mui/material";
-import {User} from "next-auth";
 import {useState} from "react";
 import {toast} from "react-toastify";
 
-export default function OperatingInitialAssignmentItem({ initials, allControllers, }: { initials: string, allControllers: User[], }) {
+export type OiController = {
+    id: string;
+    cid: number;
+    firstName?: string | null;
+    lastName?: string | null;
+    rating?: string | null;
+    operatingInitials?: string | null;
+    controllerStatus?: string | null;
+};
+
+export default function OperatingInitialAssignmentItem({ initials, allControllers, }: { initials: string, allControllers: OiController[], }) {
     
     const [open, setOpen] = useState(false);
     const [user, setUser] = useState<string>('');
+    const reassign = useReassignOperatingInitials();
 
     const handleSubmit = async () => {
 
@@ -28,10 +37,10 @@ export default function OperatingInitialAssignmentItem({ initials, allController
 
         if (!u) return;
 
-        const error = await updateOperatingInitials(u, initials);
-
-        if (error) {
-            toast.error(error);
+        try {
+            await reassign.mutateAsync({cid: Number(u.cid), operatingInitials: initials});
+        } catch {
+            toast.error('These operating initials are already in use.');
             return;
         }
 
@@ -60,7 +69,7 @@ export default function OperatingInitialAssignmentItem({ initials, allController
                 <DialogContent>
                     <Autocomplete
                         options={allControllers}
-                        getOptionLabel={(option) => `${option.firstName} ${option.lastName} - ${getRating(option.rating)} (${option.cid})`}
+                        getOptionLabel={(option) => `${option.firstName} ${option.lastName} - ${option.rating ?? ''} (${option.cid})`}
                         value={allControllers.find((u) => u.id === user) || null}
                         onChange={(event, newValue) => {
                             setUser(newValue ? newValue.id : '');

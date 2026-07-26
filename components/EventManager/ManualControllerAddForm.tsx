@@ -1,17 +1,25 @@
 import {Accordion, AccordionDetails, AccordionSummary, Typography} from "@mui/material";
-import {Event, User} from "@/generated/prisma/browser";
 import EventPositionRequestForm from "../EventPosition/EventPositionRequestForm";
 import {ExpandMore} from "@mui/icons-material";
 
-export default function ManualControllerAddForm({ event, user }: { event: Event, user: User}) {
+interface EventLike {
+    id: string;
+    preset_positions: string[];
+    enable_buffer_times: boolean;
+    starts_at: string;
+    ends_at: string;
+    positions_locked: boolean;
+}
+
+export default function ManualControllerAddForm({event, timezone}: { event: EventLike, timezone: string }) {
 
     return (
         <Accordion>
-            <AccordionSummary expandIcon={<ExpandMore />}>
+            <AccordionSummary expandIcon={<ExpandMore/>}>
                 <Typography variant="h6" gutterBottom>Manually Assign Controller</Typography>
             </AccordionSummary>
             <AccordionDetails>
-                <EventPositionRequestForm event={event} admin currentUser={user} />
+                <EventPositionRequestForm event={event} admin currentUserTimezone={timezone}/>
             </AccordionDetails>
         </Accordion>
     )

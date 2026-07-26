@@ -1,291 +1,33 @@
 import React from 'react';
-import {
-    Card,
-    CardContent,
-    Chip,
-    Grid,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Tooltip,
-    Typography
-} from "@mui/material";
-import {getChipColor, getMinutesAgo, getMonth, getTimeAgo, getTimeIn} from "@/lib/date";
-import prisma from "@/lib/db";
-import {TRAINING_ONLY_LOG_MODELS} from "@/lib/log";
-import {Lesson} from "@/generated/prisma/client";
-import {Info, PendingOutlined} from "@mui/icons-material";
+import {Grid} from "@mui/material";
+import SyncStatusChip from "@/components/Admin/SyncStatusChip";
+import TrainingOverviewStats from "@/components/Training/TrainingOverviewStats";
+import UpcomingAppointmentsCard from "@/components/Training/UpcomingAppointmentsCard";
+import EnvironmentStatusCard from "@/components/Training/EnvironmentStatusCard";
+import TrainingStaffCounts from "@/components/Training/TrainingStaffCounts";
+import RecentTrainingActivity from "@/components/Training/RecentTrainingActivity";
 
 const TRAINING_ENVIRONMENTS = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["ERR-CONFIG"];
 
-export default async function Page() {
-
-    const now = new Date();
-    const users = await prisma.user.findMany();
-
-    const mentors = users.filter(user => user.roles.includes('MENTOR'));
-    const instructors = users.filter(user => user.roles.includes('INSTRUCTOR'));
-
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    const sessions = await prisma.trainingSession.findMany({
-        where: {
-            start: {
-                gte: startOfMonth,
-                lte: endOfMonth
-            }
-        }
-    });
-
-    const totalHours = sessions.reduce((sum, session) => {
-        const duration = (session.end.getTime() - session.start.getTime()) / (1000 * 60 * 60); // convert milliseconds to hours
-        return sum + duration;
-    }, 0).toFixed(3);
-
-    const recentLogs = await prisma.log.findMany({
-        take: 10,
-        where: {
-            model: {
-                in: TRAINING_ONLY_LOG_MODELS,
-            }
-        },
-        orderBy: {
-            timestamp: 'desc'
-        },
-        include: {
-            user: true
-        },
-    });
-
-    const upcomingAppointments = await prisma.trainingAppointment.findMany({
-        where: {
-            start: {
-                gte: now
-            }
-        },
-        orderBy: {
-            start: 'asc'
-        },
-        take: 5,
-        include: {
-            student: true,
-            trainer: true,
-            lessons: true,
-        },
-    });
-
-    const syncTimes = await prisma.syncTimes.findFirst();
-
-    const nextAppointmentForEnvironments: {
-        name: string,
-        start?: Date,
-    }[] = await Promise.all(TRAINING_ENVIRONMENTS.map(async (env) => {
-        const nextSessions = await prisma.trainingAppointment.findMany({
-            where: {
-                environment: env,
-            },
-            orderBy: {
-                start: 'asc'
-            },
-            include: {
-                lessons: true,
-            },
-        });
-
-        const nextSession = nextSessions.find(session => {
-            const end = new Date(session.start.getTime() + session.lessons.reduce((acc, lesson) => acc + lesson.duration * 60 * 1000, 0));
-            return session.start > now || end > now;
-        });
-
-        return {
-            name: env,
-            start: nextSession?.start,
-        };
-    }));
-
+export default function Page() {
     return (
         (<Grid container columns={4} spacing={2}>
-            <Grid
-                size={{
-                    xs: 4,
-                    md: 2,
-                    lg: 1
-                }}>
-                <Card>
-                    <CardContent>
-                        <Typography>Mentors</Typography>
-                        <Typography variant="h4">{mentors.length}</Typography>
-                    </CardContent>
-                </Card>
-            </Grid>
-            <Grid
-                size={{
-                    xs: 4,
-                    md: 2,
-                    lg: 1
-                }}>
-                <Card>
-                    <CardContent>
-                        <Typography>Instructors</Typography>
-                        <Typography variant="h4">{instructors.length}</Typography>
-                    </CardContent>
-                </Card>
-            </Grid>
-            <Grid
-                size={{
-                    xs: 4,
-                    md: 2,
-                    lg: 1
-                }}>
-                <Card>
-                    <CardContent>
-                        <Typography>{getMonth(now.getMonth())} Sessions</Typography>
-                        <Typography variant="h4">{sessions.length}</Typography>
-                    </CardContent>
-                </Card>
-            </Grid>
-            <Grid
-                size={{
-                    xs: 4,
-                    md: 2,
-                    lg: 1
-                }}>
-                <Card>
-                    <CardContent>
-                        <Typography>{getMonth(now.getMonth())} Training Hours</Typography>
-                        <Typography variant="h4">{totalHours}</Typography>
-                    </CardContent>
-                </Card>
+            <TrainingStaffCounts/>
+            <TrainingOverviewStats/>
+            <Grid size={{xs: 4, md: 2,}}>
+                <SyncStatusChip jobName="appointments_sync" label="Appointments Sync"/>
             </Grid>
             <Grid size={{xs: 4, md: 2,}}>
-                <Card sx={{height: '100%',}}>
-                    <CardContent>
-                        <Typography sx={{mb: 1,}}>Appointments Sync</Typography>
-                        <Chip
-                            label={syncTimes?.appointments ? `${getMinutesAgo(syncTimes.appointments)}m ago` : 'NEVER'}
-                            color={getChipColor(syncTimes?.appointments)}/>
-                    </CardContent>
-                </Card>
-            </Grid>
-            <Grid size={{xs: 4, md: 2,}}>
-                <Card sx={{height: '100%',}}>
-                    <CardContent>
-                        <Typography sx={{mb: 1,}}>Environment Status</Typography>
-                        {nextAppointmentForEnvironments.map((env, idx) => {
-                            return (
-                                <Typography key={idx} variant="subtitle2" gutterBottom>
-                                    <Chip
-                                        size="small"
-                                        label={env.name}
-                                    /> {env?.start && env.start <= new Date() ? 'In Use'.toUpperCase() : 'Available'} {env.start && env.start > new Date() ? getTimeIn(env.start).toLowerCase().replace('in', 'for') : ''}
-                                </Typography>
-                            )
-                        })}
-                    </CardContent>
-                </Card>
+                <EnvironmentStatusCard environments={TRAINING_ENVIRONMENTS}/>
             </Grid>
             <Grid
                 size={{
                     xs: 4,
                 }}>
-                <Card>
-                    <CardContent>
-                        <Typography variant="h5" gutterBottom>Upcoming Sessions</Typography>
-                        {upcomingAppointments.length === 0 &&
-                            <Typography>No upcoming training appointments.</Typography>}
-                        {upcomingAppointments.length > 0 &&
-                            <TableContainer>
-                                <Table size="small">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Trainer</TableCell>
-                                            <TableCell>Student</TableCell>
-                                            <TableCell>Start</TableCell>
-                                            <TableCell>Duration</TableCell>
-                                            <TableCell>Environment</TableCell>
-                                            <TableCell>Lesson(s)</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {upcomingAppointments.map((appointment) => (
-                                            <TableRow key={appointment.id}>
-                                                <TableCell>
-                                                    <Chip
-                                                        label={`${appointment.trainer.firstName} ${appointment.trainer.lastName}` || 'Unknown'}
-                                                        size="small"
-                                                    />
-                                                </TableCell>
-                                                <TableCell>
-                                                    <Chip
-                                                        label={`${appointment.student.firstName} ${appointment.student.lastName}` || 'Unknown'}
-                                                        size="small"
-                                                    />
-                                                </TableCell>
-                                                <TableCell>{getTimeIn(appointment.start)}</TableCell>
-                                                <TableCell>{appointment.lessons.map((l: Lesson) => l.duration)
-                                                    .reduce((acc: number, curr: number) => acc + curr, 0)}</TableCell>
-                                                <TableCell>{appointment.doubleBooking ?
-                                                    <Tooltip title="Double Booking.  Check calendar for specifics.">
-                                                        <Info color="error"/>
-                                                    </Tooltip>
-                                                    : appointment.environment ||
-                                                    <PendingOutlined color="warning"/>}</TableCell>
-                                                <TableCell>
-                                                    {appointment.lessons.map((lesson: Lesson) => {
-                                                        return (
-                                                            <Chip
-                                                                key={`${appointment.id}-${lesson.id}`}
-                                                                label={lesson.identifier}
-                                                                size="small"
-                                                                color="info"
-                                                                style={{margin: '2px'}}
-                                                            />
-                                                        )
-                                                    })}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>}
-                    </CardContent>
-                </Card>
+                <UpcomingAppointmentsCard/>
             </Grid>
             <Grid size={4}>
-                <Card>
-                    <CardContent>
-                        <Typography variant="h5">Recent Training Activity</Typography>
-                        {recentLogs.length === 0 && <Typography sx={{mt: 1,}}>No recent training activity</Typography>}
-                        {recentLogs.length > 0 && <TableContainer>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Time</TableCell>
-                                        <TableCell>User</TableCell>
-                                        <TableCell>Type</TableCell>
-                                        <TableCell>Model</TableCell>
-                                        <TableCell>Message</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {recentLogs.map((log) => (
-                                        <TableRow key={log.id}>
-                                            <TableCell>{getTimeAgo(log.timestamp)}</TableCell>
-                                            <TableCell>{log.user.cid} ({log.user.fullName})</TableCell>
-                                            <TableCell>{log.type}</TableCell>
-                                            <TableCell>{log.model}</TableCell>
-                                            <TableCell>{log.message}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>}
-                    </CardContent>
-                </Card>
+                <RecentTrainingActivity/>
             </Grid>
         </Grid>)
     );

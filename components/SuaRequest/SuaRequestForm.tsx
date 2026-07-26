@@ -1,6 +1,5 @@
 'use client';
 import React, {useState} from 'react';
-import {User} from "next-auth";
 import {
     Grid,
     Table,
@@ -18,29 +17,55 @@ import {DateTimePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import {createSuaRequest} from "@/actions/sua";
+import {useCreateSuaRequest} from "@/lib/osmium/hooks/sua";
+import {useMe} from "@/lib/osmium/hooks/me";
 import {toast} from "react-toastify";
 
-export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: string[] }) {
+export default function SuaRequestForm({allSuas}: { allSuas: string[] }) {
+
+    const {data: me} = useMe();
 
     const router = useRouter();
     const [start, setStart] = useState<Date | string>(new Date());
     const [end, setEnd] = useState<Date | string>(new Date());
+    const createSuaRequest = useCreateSuaRequest();
 
     const handleSubmit = async (formData: FormData) => {
 
-        formData.set('start', dayjs.utc(start).toISOString());
-        formData.set('end', dayjs.utc(end).toISOString());
+        const afiliation = formData.get('afiliation') as string;
+        const details = formData.get('details') as string;
 
-        const {mission, errors} = await createSuaRequest(formData);
+        const airspaceBySua: { [key: string]: { top?: string, bottom?: string } } = {};
+        for (const sua of allSuas) {
+            const bottom = (formData.get(`airspace.${sua}.bottom`) as string || '').trim();
+            const top = (formData.get(`airspace.${sua}.top`) as string || '').trim();
+            if (bottom && top) {
+                airspaceBySua[sua] = {bottom, top};
+            }
+        }
+        const airspace = Object.entries(airspaceBySua).map(([identifier, value]) => ({
+            identifier,
+            bottom_altitude: value.bottom as string,
+            top_altitude: value.top as string,
+        }));
 
-        if (errors) {
-            toast.error(errors.map((e: { message: string }) => e.message).join(', '));
+        if (airspace.length === 0) {
+            toast.error('You must block at least one SUA.');
             return;
         }
 
-
-        router.push(`/sua/details?missionId=${mission?.id}`);
+        try {
+            const mission = await createSuaRequest.mutateAsync({
+                afiliation,
+                details,
+                airspace,
+                start_at: dayjs.utc(start).toISOString(),
+                end_at: dayjs.utc(end).toISOString(),
+            });
+            router.push(`/sua/details?missionId=${mission?.id}`);
+        } catch {
+            toast.error('Failed to submit mission. Please check your entries and try again.');
+        }
     }
 
     dayjs.extend(utc);
@@ -48,7 +73,6 @@ export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: s
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <form action={handleSubmit}>
-                <input type="hidden" name="userId" value={user.id}/>
                 <Grid container columns={2} spacing={2}>
                     <Grid
                         size={{
@@ -56,7 +80,7 @@ export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: s
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotName" label="Your Name"
-                                   defaultValue={user.fullName} disabled/>
+                                   defaultValue={me?.display_name} disabled/>
                     </Grid>
                     <Grid
                         size={{
@@ -64,7 +88,7 @@ export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: s
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotEmail" label="Your Email"
-                                   defaultValue={user.email} disabled/>
+                                   defaultValue={me?.email} disabled/>
                     </Grid>
                     <Grid
                         size={{
@@ -72,7 +96,7 @@ export default function SuaRequestForm({user, allSuas}: { user: User, allSuas: s
                             sm: 1
                         }}>
                         <TextField fullWidth variant="filled" name="pilotCid" label="Your VATSIM CID"
-                                   defaultValue={user.cid} disabled/>
+                                   defaultValue={me?.cid} disabled/>
                     </Grid>
                     <Grid
                         size={{

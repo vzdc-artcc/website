@@ -1,67 +1,14 @@
 import React from 'react';
-import {Card, CardContent, Container, Grid, Stack, Typography} from "@mui/material";
 import {Metadata} from "next";
-import prisma from "@/lib/db";
-import {User} from "next-auth";
-import TrainingStatsTimeSelector from "@/components/TrainingStatistics/TrainingStatsTimeSelector";
-import {getAllTrainingHours} from "@/actions/trainingStats";
+import TrainingStatsLayoutShell from "@/components/TrainingStatistics/TrainingStatsLayoutShell";
 
 export const metadata: Metadata = {
     title: 'Training Statistics | vZDC',
     description: 'vZDC training stats page',
 };
 
-export default async function Layout({children}: { children: React.ReactNode }) {
-
-    const mentorsAndInstructors = await prisma.user.findMany({
-        where: {
-            OR: [
-                {
-                    roles: {
-                        has: "MENTOR",
-                    },
-                },
-                {
-                    roles: {
-                        has: "INSTRUCTOR",
-                    },
-                },
-            ],
-        },
-    });
-
-    const totalHours = await getAllTrainingHours()
-
+export default function Layout({children}: { children: React.ReactNode }) {
     return (
-        (<Container maxWidth="lg">
-            <Stack direction="column" spacing={2}>
-                <Grid container columns={4} spacing={2}>
-                    <Grid
-                        size={{
-                            xs: 4,
-                            sm: 2,
-                            md: 3
-                        }}>
-                        <TrainingStatsTimeSelector trainingStaff={mentorsAndInstructors as User[]}/>
-                    </Grid>
-                    <Grid
-                        size={{
-                            xs: 4,
-                            sm: 2,
-                            md: 1
-                        }}>
-                        <Card>
-                            <CardContent>
-                                <Typography>All-Time Hours</Typography>
-                                <Typography variant="h6">{totalHours.toFixed(2)} hours</Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                    <Grid size={4}>
-                        {children}
-                    </Grid>
-                </Grid>
-            </Stack>
-        </Container>)
+        <TrainingStatsLayoutShell>{children}</TrainingStatsLayoutShell>
     );
 }

@@ -1,31 +1,33 @@
 'use client';
-import React from 'react';
-import {StatisticsPrefixes} from "@/generated/prisma/browser";
+import React, {useEffect} from 'react';
 import {Autocomplete, Chip, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {updatePrefixes} from "@/actions/statisticsPrefixes";
+import {useStatisticsPrefixes, useUpdateStatisticsPrefixes} from "@/lib/osmium/hooks/stats";
 import {toast} from "react-toastify";
 
-export default function StatisticsPrefixesForm({prefixes}: { prefixes?: StatisticsPrefixes, }) {
+export default function StatisticsPrefixesForm() {
 
-    const [selectedPrefixes, setSelectedPrefixes] = React.useState<string[]>(prefixes?.prefixes || []);
+    const {data: prefixes} = useStatisticsPrefixes();
+    const updatePrefixes = useUpdateStatisticsPrefixes();
+    const [selectedPrefixes, setSelectedPrefixes] = React.useState<string[]>([]);
 
-    const handleSubmit = async (formData: FormData) => {
-
-        const {errors} = await updatePrefixes(formData);
-
-        if (errors) {
-            toast(errors.map((error) => error.message).join('.  '), {type: 'error'});
-            return;
+    useEffect(() => {
+        if (prefixes) {
+            setSelectedPrefixes(prefixes.prefixes);
         }
+    }, [prefixes]);
 
-        toast('Prefixes saved successfully!', {type: 'success'});
+    const handleSubmit = async () => {
+        try {
+            await updatePrefixes.mutateAsync(selectedPrefixes);
+            toast('Prefixes saved successfully!', {type: 'success'});
+        } catch {
+            toast('Error saving prefixes.', {type: 'error'});
+        }
     }
 
     return (
         <form action={handleSubmit}>
-            <input type="hidden" name="id" value={prefixes?.id}/>
-            <input type="hidden" name="prefixes" value={selectedPrefixes.join(',')}/>
             <Autocomplete
                 sx={{mb: 1,}}
                 multiple
