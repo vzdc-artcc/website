@@ -1,10 +1,12 @@
 'use client';
-import React from 'react';
+import React, {useState} from 'react';
 import {Grid, TextField} from "@mui/material";
+import {Turnstile} from "@marsidev/react-turnstile";
 import RequestSubmitButton from "@/components/StaffingRequest/RequestSubmitButton";
 import {toast} from "react-toastify";
 import {useCreateStaffingRequest} from "@/lib/osmium/hooks/staffing";
 import {useRouter} from "next/navigation";
+import {checkCaptcha} from "@/lib/captcha";
 import {useMe} from "@/lib/osmium/hooks/me";
 
 export default function StaffingRequestForm() {
@@ -13,8 +15,13 @@ export default function StaffingRequestForm() {
 
     const router = useRouter();
     const createStaffingRequest = useCreateStaffingRequest();
+    const [captchaToken, setCaptchaToken] = useState('');
 
     const handleSubmit = async (formData: FormData) => {
+
+        if (!await checkCaptcha(captchaToken)) {
+            return;
+        }
 
         const name = formData.get('name') as string;
         const description = formData.get('description') as string;
@@ -72,8 +79,15 @@ export default function StaffingRequestForm() {
                                helperText="Include airports, times, routes, and any other staffing requirements needed."/>
                 </Grid>
                 <Grid size={2}>
+                    <Turnstile
+                        siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''}
+                        onSuccess={setCaptchaToken}
+                        onExpire={() => setCaptchaToken('')}
+                        onError={() => setCaptchaToken('')}
+                    />
+                </Grid>
+                <Grid size={2}>
                     <RequestSubmitButton/>
-                    
                 </Grid>
             </Grid>
         </form>)

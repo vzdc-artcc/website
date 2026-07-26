@@ -219,3 +219,20 @@ export function useAdminUpdateProfile() {
         },
     });
 }
+
+/**
+ * Admin bulk export of every on-roster controller's GDPR data document
+ * (`GET /api/v1/admin/data-export/roster`). SERVER_ADMIN-only on the backend
+ * (`users.data_export.read`); the Website Management area is already
+ * `server_admin`-gated. Returns the full MassDataExportDocument for the caller to
+ * save as a file.
+ */
+export function useDownloadRosterDataExport() {
+    return useMutation({
+        mutationFn: async () => {
+            const { data, error } = await osmium.GET("/api/v1/admin/data-export/roster");
+            if (error) throw error;
+            return data;
+        },
+    });
+}

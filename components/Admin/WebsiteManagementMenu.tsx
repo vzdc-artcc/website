@@ -1,7 +1,7 @@
 import React from 'react';
 import {ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import Link from "next/link";
-import {Campaign, Chat, Description, Drafts, History, Home, MarkEmailUnread, Outbox, Security, Send, Sync, VpnKey} from "@mui/icons-material";
+import {Campaign, Chat, CloudDownload, Description, Drafts, History, Home, MarkEmailUnread, Outbox, Security, Send, Sync, VpnKey} from "@mui/icons-material";
 import MenuWrapper from './MenuWrapper';
 
 export default function WebsiteManagementMenu({displayName}: { displayName: string }) {
@@ -40,6 +40,14 @@ export default function WebsiteManagementMenu({displayName}: { displayName: stri
                         <History/>
                     </ListItemIcon>
                     <ListItemText primary="Audit Log"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/website-management/data-export" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <CloudDownload/>
+                    </ListItemIcon>
+                    <ListItemText primary="Data Export"/>
                 </ListItemButton>
             </Link>
             <Link href="/website-management/jobs" style={{textDecoration: 'none', color: 'inherit',}}>

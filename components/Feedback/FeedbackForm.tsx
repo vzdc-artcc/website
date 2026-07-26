@@ -4,7 +4,9 @@ import React, {useState} from 'react';
 import {Autocomplete, Box, Grid, Rating, TextField, Typography} from "@mui/material";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
+import {Turnstile} from "@marsidev/react-turnstile";
 import FeedbackFormSubmitButton from "@/components/Feedback/FeedbackFormSubmitButton";
+import {checkCaptcha} from "@/lib/captcha";
 import Form from "next/form";
 import {useRosterControllers} from "@/lib/osmium/hooks/users";
 import {useCreateFeedback} from "@/lib/osmium/hooks/feedback";
@@ -76,12 +78,17 @@ export default function FeedbackForm() {
     const createFeedback = useCreateFeedback();
     const [controllerCid, setControllerCid] = useState<number | null>(null);
     const [controllerPosition, setControllerPosition] = useState('');
+    const [captchaToken, setCaptchaToken] = useState('');
 
     const controllers = (controllersData?.items ?? [])
         .filter((item) => item.basic.cid !== me?.cid)
         .sort((a, b) => a.basic.name.localeCompare(b.basic.name));
 
     const handleSubmit = async (formData: FormData) => {
+
+        if (!await checkCaptcha(captchaToken)) {
+            return;
+        }
 
         if (!controllerCid) {
             toast('Please select a controller.', {type: 'error'});
@@ -203,6 +210,14 @@ export default function FeedbackForm() {
                     <Grid size={2}>
                         <TextField fullWidth multiline rows={5} variant="filled" name="comments"
                                    label="Additional Comments"/>
+                    </Grid>
+                    <Grid size={2}>
+                        <Turnstile
+                            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''}
+                            onSuccess={setCaptchaToken}
+                            onExpire={() => setCaptchaToken('')}
+                            onError={() => setCaptchaToken('')}
+                        />
                     </Grid>
                     <Grid size={2}>
                         <FeedbackFormSubmitButton/>

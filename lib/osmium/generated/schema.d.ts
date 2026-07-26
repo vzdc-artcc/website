@@ -132,6 +132,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/data-export/roster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Admin bulk export of every on-roster controller's personal-data document.
+         * @description SERVER_ADMIN-only (`users.data_export.read`, granted to no role and kept out of
+         *     the assignable catalog): this is the entire roster's personal data in one
+         *     payload. Reuses the exact same per-subject assembler as the self-service
+         *     export, so each subject's document honours the same Article 15(4) third-party
+         *     scoping. The bulk access is recorded as a single audit entry.
+         */
+        get: operations["export_roster_data"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/emails/branding": {
         parameters: {
             query?: never;
@@ -4452,6 +4476,25 @@ export interface components {
             membership_updated: boolean;
             message?: string | null;
         };
+        /**
+         * @description Admin bulk export: every on-roster controller's `DataExportDocument` in one
+         *     payload. SERVER_ADMIN-only (`users.data_export.read`) — this is the entire
+         *     roster's personal data, so it is gated far more tightly than the self-service
+         *     Article 15 export and is not something a data subject can reach.
+         */
+        MassDataExportDocument: {
+            /** @description The same transparency notice that accompanies each per-subject document. */
+            gdpr_notice: components["schemas"]["GdprNotice"];
+            /** Format: date-time */
+            generated_at: string;
+            /**
+             * Format: int64
+             * @description Number of subjects (on-roster controllers) included.
+             */
+            subject_count: number;
+            /** @description One full export document per on-roster controller, ordered by CID. */
+            subjects: components["schemas"]["DataExportDocument"][];
+        };
         MeBody: {
             /** Format: int64 */
             cid: number;
@@ -5776,8 +5819,6 @@ export interface components {
             token: string;
         };
         VerifyCaptchaResponse: {
-            /** Format: double */
-            score?: number | null;
             success: boolean;
         };
         VisitArtccRequest: {
@@ -6249,6 +6290,40 @@ export interface operations {
             };
             /** @description Certification type not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    export_roster_data: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Every on-roster controller's export document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MassDataExportDocument"];
+                };
+            };
+            /** @description Not authenticated or missing permission */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Rate limited */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };

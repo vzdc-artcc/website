@@ -153,6 +153,14 @@ cross-linked from spec 012.
 - [ ] **Mass email `expected string received null`** — likely Zod/null on the
   deferred Mail path (`actions/mail/**` / `MailForm`). Fix when Mail work
   resumes; may pair with osmium custom-email-send.
+- [ ] **Event carousel banner not displaying** — home
+  `UpcomingEventsCarousel` (and likely `EventListView`) builds
+  `${NEXT_PUBLIC_OSMIUM_API_URL}/cdn/{banner_asset_id}` when
+  `banner_asset_id` is set, else falls back to Placeholder. Investigate whether
+  the asset id is missing on the event payload, the CDN route/`GET /cdn/{id}`
+  is failing (CORS, auth, public-policy, or storage), or the website image
+  URL/env is wrong. Could be osmium CDN or main-site wiring — don't assume
+  either until checked.
 
 **Osmium / product**
 - [ ] **Events OPS plan** — implement properly in osmium; rework the OPS plan
