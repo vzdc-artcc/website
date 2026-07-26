@@ -17,7 +17,7 @@ import {formatZuluDate} from '@/lib/date';
 import Placeholder from '@/public/img/logo_large.png';
 import {ExpandMore} from '@mui/icons-material';
 import {useEvents} from "@/lib/osmium/hooks/events";
-import {osmiumBaseUrl} from "@/lib/osmium/client";
+import {cdnImagesUnoptimized, osmiumBaseUrl} from "@/lib/osmium/client";
 import {useMe} from "@/lib/osmium/hooks/me";
 
 export default function EventListView() {
@@ -62,6 +62,7 @@ export default function EventListView() {
                             <Link href={`/events/${event.id}`} style={{color: 'inherit', textDecoration: 'none',}}>
                                 <Box sx={{position: 'relative', width: '100%', minHeight: 200,}}>
                                     <Image
+                                        unoptimized={cdnImagesUnoptimized}
                                         src={event.banner_asset_id ? `${osmiumBaseUrl}/cdn/${event.banner_asset_id}` : Placeholder}
                                         alt={event.title} fill style={{objectFit: 'contain'}}/>
                                 </Box>

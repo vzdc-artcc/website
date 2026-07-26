@@ -10,6 +10,15 @@ if (!baseUrl && typeof window !== "undefined") {
 
 export const osmiumBaseUrl = baseUrl ?? "";
 
+/**
+ * True when the osmium CDN is served from a local/private host (dev). Next.js 16's
+ * image optimizer refuses to fetch upstream images that resolve to a private IP
+ * (SSRF protection), which breaks `next/image` for CDN banners in local dev — so
+ * we render those `unoptimized` (direct load) when this is set. In prod the CDN is
+ * a public host, so optimization stays on.
+ */
+export const cdnImagesUnoptimized = /^https?:\/\/(localhost|127\.|\[?::1)/i.test(osmiumBaseUrl);
+
 export const osmium = createClient<paths>({
     baseUrl: baseUrl ?? "",
     credentials: "include",

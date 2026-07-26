@@ -7,7 +7,7 @@ import {Box, Card, CardContent, CircularProgress, Container, Paper, Stack, Typog
 import Image from "next/image";
 import {useQueries} from "@tanstack/react-query";
 import {useEvents} from "@/lib/osmium/hooks/events";
-import {osmium, osmiumBaseUrl} from "@/lib/osmium/client";
+import {cdnImagesUnoptimized, osmium, osmiumBaseUrl} from "@/lib/osmium/client";
 
 export default function Page() {
     const {data, isLoading} = useEvents({pageSize: 200});
@@ -51,6 +51,7 @@ export default function Page() {
                                 <Link href={`/events/${event.id}/ops`} style={{color: 'inherit', textDecoration: 'none',}}>
                                     <Box sx={{position: 'relative', width: '100%', minHeight: 200,}}>
                                         <Image
+                                            unoptimized={cdnImagesUnoptimized}
                                             src={event.banner_asset_id ? `${osmiumBaseUrl}/cdn/${event.banner_asset_id}` : Placeholder}
                                             alt={event.title} fill style={{objectFit: 'contain'}}/>
                                     </Box>

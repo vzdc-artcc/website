@@ -24,7 +24,7 @@ import {formatTimezoneDate, formatZuluDate} from '@/lib/date';
 import EventPositionRequestForm from '@/components/EventPosition/EventPositionRequestForm';
 import {useEvent, useEventOpsPlan, useEventPositions} from "@/lib/osmium/hooks/events";
 import {useMe} from "@/lib/osmium/hooks/me";
-import {osmiumBaseUrl} from "@/lib/osmium/client";
+import {cdnImagesUnoptimized, osmiumBaseUrl} from "@/lib/osmium/client";
 
 export default function EventDetailView({eventId}: {
     eventId: string,
@@ -65,6 +65,7 @@ export default function EventDetailView({eventId}: {
                             <Grid size={2}>
                                 <Box sx={{position: 'relative', width: '100%', minHeight: 400,}}>
                                     <Image
+                                        unoptimized={cdnImagesUnoptimized}
                                         src={event.banner_asset_id ? `${osmiumBaseUrl}/cdn/${event.banner_asset_id}` : Placeholder}
                                         alt={event.title} priority fill style={{objectFit: 'contain'}}/>
                                 </Box>

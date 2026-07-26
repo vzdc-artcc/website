@@ -7,7 +7,7 @@ import {formatZuluDate} from "@/lib/date";
 import Link from "next/link";
 import Placeholder from "@/public/img/logo_large.png"
 import {useEvents} from "@/lib/osmium/hooks/events";
-import {osmiumBaseUrl} from "@/lib/osmium/client";
+import {cdnImagesUnoptimized, osmiumBaseUrl} from "@/lib/osmium/client";
 
 export default function UpcomingEventsCarousel() {
     const {data} = useEvents({pageSize: 200});
@@ -34,6 +34,7 @@ export default function UpcomingEventsCarousel() {
                 <Box sx={{width: '100%', px: 4,}}>
                     <Box sx={{position: 'relative', width: '100%', height: 400,}}>
                         <Image priority
+                               unoptimized={cdnImagesUnoptimized}
                                src={event.banner_asset_id ? `${osmiumBaseUrl}/cdn/${event.banner_asset_id}` : Placeholder}
                                alt={event.title} fill
                                style={{objectFit: 'contain', position: 'absolute',}}/>
