@@ -14,6 +14,21 @@ export function useMe(options?: { enabled?: boolean }) {
     });
 }
 
+/**
+ * Fetches the caller's full GDPR self-service data export (Article 15) on demand.
+ * A mutation rather than a query so the (large, cross-domain) document is only
+ * pulled when the user explicitly asks to download it, not on page load.
+ */
+export function useDownloadDataExport() {
+    return useMutation({
+        mutationFn: async () => {
+            const { data, error } = await osmium.GET("/api/v1/me/data-export");
+            if (error) throw error;
+            return data;
+        },
+    });
+}
+
 export function useUpdateMe() {
     const queryClient = useQueryClient();
     return useMutation({

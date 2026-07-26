@@ -8,7 +8,7 @@ audit of what osmium already covers, what's deliberately deferred, and what's a
 non-goal). This document does not re-derive that audit — it assumes 012 as ground
 truth for *what* osmium supports and focuses on *how* the website cuts over to it.
 
-## Current Status & Remaining Work (updated 2026-07-24)
+## Current Status & Remaining Work (updated 2026-07-25)
 
 Read this first — it's the at-a-glance state. The detailed dated history lives
 in §5 (Phased rollout), which is long; this section is the summary of where
@@ -84,8 +84,81 @@ is the true end of the migration.
   compliance question about trainer-note redaction; confirm with compliance
   owner first), and authenticated user impersonation (012 — ships with retirement
   of the dev `login_as_cid` route). Both are "after parity" per principle 4.
+  Impersonation **website UI** (start control + banner) is listed under Later
+  polish below once the osmium APIs land.
 - **Small osmium additions the website work above needs**: a training-session
   self-read endpoint (#2), admin edit-another-user's-profile endpoints (#4).
+
+### Later polish & known bugs (post-migration — not blocking cutover)
+
+Lower priority than cutover, deferred domains, and the osmium-side backlog above.
+Ship when convenient after the migration is stable. Osmium-owned pieces are
+cross-linked from spec 012.
+
+**Website UI / product polish**
+- [ ] **Login button label** — when signed in, show `Display name - Rating` with
+  **no CID**. `LoginButton.tsx` already formats that way; verify/fix if
+  `display_name` from osmium `/me` still embeds a CID.
+- [ ] **Top 3 controllers (home)** — list the top 3 of *all* controllers by most
+  → least hours (`TopControllersCard` + osmium stats `leaders`).
+- [ ] **Stats page leaders / top 3** — same ordering bug on
+  `app/controllers/statistics/...` (and any shared leaders payload).
+- [ ] **Website Management look & feel** — restyle the WM portal to match the
+  rest of the site (functional today; this is visual parity only).
+- [ ] **Training calendar** — verify completeness / residual gaps in training
+  admin calendar. `TrainingAppointmentCalendar` already uses osmium hooks; not a
+  greenfield Prisma cutover — finish whatever still feels unfinished or broken.
+- [ ] **Audit / log tabs UI** — restyle `AuditLogTable` toward a clean Logs table
+  (timestamp, user, type/model, truncated message; sort/filter if the shared list
+  components support it). Prefer existing list/DataGrid patterns. Full before/
+  after JSON via an action button → dialog, not inline expand.
+- [ ] **Training stats charts** — improve training-stats diagrams; add more chart
+  types.
+- [ ] **Dossier confidential control** — redesign the confidential checkbox in
+  `DossierForm` (too tight next to Save); clearer toggle/layout.
+- [ ] **Impersonation UI** — Website Management start-impersonation control;
+  sticky bottom warning bar while impersonating + Stop. osmium start/stop +
+  `/me` impersonation fields are the backend half (012 Worker A); this item is
+  the website follow-on.
+- [ ] **CDN / file manager (Website Management)** — polished file browser in WM
+  (reference: dense searchable table with upload, filters, pagination, row
+  actions). List files the caller is allowed to see via existing osmium
+  `GET /api/v1/files` (permission-scoped); show name, size, uploaded time,
+  status, **created by**, and CDN/route metadata. Row actions: copy file key,
+  copy CDN URL, see logs (`GET /api/v1/admin/files/audit` or per-file audit),
+  modify metadata/policy where `files.assets.update` / `.policy.update` allow,
+  delete where `files.assets.delete` allows (destructive styling). Upload via
+  `POST /api/v1/files` (+ import if useful). Was an explicit WM v1 non-goal in
+  `website-management-spec.md` §5 — this is the deliberate later feature.
+- [ ] **Profile data-export button** — add a self-service control on the profile
+  (overview/settings) that downloads the caller's GDPR export via existing
+  osmium `GET /api/v1/me/data-export`. Backend exists; website UI does not yet.
+- [ ] **Admin mass data export (Website Management)** — multi-select users in WM
+  and export several people's data in one action (zip of per-user JSON, or
+  equivalent). Needs a new osmium admin endpoint (bulk/multi-CID export;
+  permission-gated, audited) — self-service `/me/data-export` is single-subject
+  only. See also spec 012.
+- [ ] **User session manager (Website Management)** — admin UI to list and manage
+  osmium auth sessions (`identity.sessions`): see active sessions per user
+  (created/last-seen, IP if available, impersonation state), revoke a single
+  session, and revoke all sessions for a user. Needs new osmium admin APIs
+  (today only `POST /auth/logout` revokes the *current* session) —
+  permission-gated + audited; never return raw session tokens. See also
+  spec 012.
+
+**Bugs to investigate / fix later**
+- [ ] **Discord linking failure** — investigate end-to-end (website OAuth →
+  osmium `/me/discord/*` → bot). Capture root cause before assigning a repo;
+  do not assume bot-side until proven.
+- [ ] **Mass email `expected string received null`** — likely Zod/null on the
+  deferred Mail path (`actions/mail/**` / `MailForm`). Fix when Mail work
+  resumes; may pair with osmium custom-email-send.
+
+**Osmium / product**
+- [ ] **Events OPS plan** — implement properly in osmium; rework the OPS plan
+  model/API if that makes a solid implementation easier. Website already has
+  ops-plan hooks/UI — treat as parity + possible redesign, not a silent bugfix.
+  See also spec 012.
 
 ---
 

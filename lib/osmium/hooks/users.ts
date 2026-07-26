@@ -75,6 +75,67 @@ export function useUserByCid(cid: number | undefined) {
     });
 }
 
+export function useUserSessions(cid: number | undefined) {
+    return useQuery({
+        queryKey: ["osmium", "users", cid, "sessions"],
+        enabled: !!cid,
+        queryFn: async () => {
+            const { data, error } = await osmium.GET("/api/v1/admin/users/{cid}/sessions", {
+                params: { path: { cid: cid! } },
+            });
+            if (error) throw error;
+            return data;
+        },
+    });
+}
+
+export function useRevokeSession(cid: number) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (sessionId: string) => {
+            const { data, error } = await osmium.DELETE(
+                "/api/v1/admin/users/{cid}/sessions/{session_id}",
+                { params: { path: { cid, session_id: sessionId } } },
+            );
+            if (error) throw error;
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["osmium", "users", cid, "sessions"] });
+        },
+    });
+}
+
+export function useRevokeAllSessions(cid: number) {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async () => {
+            const { data, error } = await osmium.DELETE("/api/v1/admin/users/{cid}/sessions", {
+                params: { path: { cid } },
+            });
+            if (error) throw error;
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["osmium", "users", cid, "sessions"] });
+        },
+    });
+}
+
+export function useUserIpHistory(cid: number | undefined, page: number = 1) {
+    return useQuery({
+        queryKey: ["osmium", "users", cid, "ip-history", page],
+        enabled: !!cid,
+        queryFn: async () => {
+            const { data, error } = await osmium.GET("/api/v1/admin/users/{cid}/ip-history", {
+                params: { path: { cid: cid! }, query: { page, page_size: 25 } },
+            });
+            if (error) throw error;
+            return data;
+        },
+    });
+}
+
 export function useUserFlags(cid: number | undefined) {
     return useQuery({
         queryKey: ["osmium", "users", cid, "flags"],

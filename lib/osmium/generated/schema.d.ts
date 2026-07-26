@@ -164,6 +164,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/impersonate/stop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["stop_impersonation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/impersonate/{cid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["start_impersonation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/incidents": {
         parameters: {
             query?: never;
@@ -916,6 +948,22 @@ export interface paths {
         patch: operations["update_user_flags"];
         trace?: never;
     };
+    "/api/v1/admin/users/{cid}/ip-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_user_ip_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/users/{cid}/operating-initials": {
         parameters: {
             query?: never;
@@ -959,6 +1007,38 @@ export interface paths {
         put?: never;
         post: operations["refresh_user_vatusa"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{cid}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_user_sessions"];
+        put?: never;
+        post?: never;
+        delete: operations["revoke_all_user_sessions"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{cid}/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["revoke_user_session"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1804,6 +1884,33 @@ export interface paths {
         patch: operations["patch_me"];
         trace?: never;
     };
+    "/api/v1/me/data-export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * GDPR Article 15 self-service data export.
+         * @description Returns a single JSON document assembling every domain that links to the
+         *     authenticated caller — identity, training, certifications, events, feedback,
+         *     incidents, workflows, notifications, visitor application, and their own audit
+         *     activity — alongside the Article 15(1) transparency notice. The request itself
+         *     is logged to the audit trail (Article 5(2) accountability).
+         *
+         *     Self-service only: gated by `auth.profile.read` and hard-scoped to the caller's
+         *     own `user.id` — there is no path to export another subject here.
+         */
+        get: operations["export_my_data"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/discord": {
         parameters: {
             query?: never;
@@ -1940,6 +2047,31 @@ export interface paths {
             cookie?: never;
         };
         get: operations["get_publication"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/routes/preferred": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search locally-owned FAA preferred IFR routes.
+         * @description Authenticated controllers only (not a specific permission — this is public FAA
+         *     reference data any logged-in member can use for flight planning, but it is
+         *     deliberately not exposed unauthenticated). At least one of `origin`/`destination`
+         *     must be supplied. The data is served from osmium's own copy (refreshed by the
+         *     `faa_preferred_routes` ingest job), replacing the removed request-time proxy of a
+         *     third-party aviation API.
+         */
+        get: operations["search_preferred_routes"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3557,6 +3689,52 @@ export interface components {
             home_facility: string;
             why_visit: string;
         };
+        /**
+         * @description GDPR Article 15 "right of access" self-service export document.
+         *
+         *     The heavy per-domain sections are carried as free-form JSON objects
+         *     (`serde_json::Value`) so the OpenAPI surface stays legible while the handler
+         *     assembles them from many typed row queries. The section names document what an
+         *     export contains; see `handlers/data_export.rs` for the exact per-table shapes.
+         */
+        DataExportDocument: {
+            /** @description Activity log — audit entries for actions the subject performed (metadata only). */
+            activity_log: Record<string, never>;
+            /** @description Certification grid and solo certifications. */
+            certifications: Record<string, never>;
+            /** @description Published event-position history. */
+            events: Record<string, never>;
+            /** @description Feedback submitted by, and received about, the subject. */
+            feedback: Record<string, never>;
+            /** @description Identity, profile, membership, flags, roles, and linked accounts. */
+            identity: Record<string, never>;
+            /** @description Incident reports filed by, and about, the subject. */
+            incidents: Record<string, never>;
+            /** @description Transparency metadata required alongside the raw records (Article 15(1)). */
+            meta: components["schemas"]["DataExportMeta"];
+            /** @description Broadcast acknowledgements, welcome-message state, and emails sent to the subject. */
+            notifications: Record<string, never>;
+            /**
+             * @description Training sessions (as student and as instructor), appointments, assignment,
+             *     requests, progression, and dossier entries about the subject.
+             */
+            training: Record<string, never>;
+            /** @description Visitor application, if any. */
+            visitor_application: Record<string, never>;
+            /** @description LOA, staffing, and SUA requests. */
+            workflows: Record<string, never>;
+        };
+        /** @description Article 15(1)(a)–(h) transparency information that must accompany the records. */
+        DataExportMeta: {
+            /** @description Machine-readable format (also satisfies the Article 20 portability right). */
+            format: string;
+            gdpr_notice: components["schemas"]["GdprNotice"];
+            /** Format: date-time */
+            generated_at: string;
+            /** Format: int64 */
+            subject_cid: number;
+            subject_user_id: string;
+        };
         DecideFeedbackRequest: {
             staff_comments?: string | null;
             status: string;
@@ -4028,6 +4206,28 @@ export interface components {
             /** Format: int64 */
             page_size?: number | null;
         };
+        /**
+         * @description Static GDPR transparency notice. Boilerplate, not queried per-request, but must
+         *     be present in what is returned (Article 15(1)).
+         */
+        GdprNotice: {
+            contact: string;
+            data_categories: string[];
+            data_sources: string[];
+            /** @description Documents how trainer/staff internal evaluative notes are handled in this export. */
+            evaluative_notes_disclosure: string;
+            legal_basis: string;
+            purposes: string[];
+            recipients: string[];
+            retention: string;
+            your_rights: string[];
+        };
+        /** @description Minimal real-admin identity surfaced on `/me` while impersonating. */
+        ImpersonationBanner: {
+            /** Format: int64 */
+            impersonator_cid: number;
+            impersonator_display_name: string;
+        };
         ImportFileFromUrlRequest: {
             filename?: string | null;
             url: string;
@@ -4055,6 +4255,21 @@ export interface components {
         };
         IncidentListResponse: components["schemas"]["PaginationMeta"] & {
             items: components["schemas"]["IncidentItem"][];
+        };
+        /** @description One row of a user's IP history, for the admin endpoint. */
+        IpRequestLogItem: {
+            /** Format: date-time */
+            created_at: string;
+            ip_address: string;
+            matched_path: string;
+            method: string;
+            /** Format: int32 */
+            status_code: number;
+        };
+        /** @description Paginated response body for `GET /admin/users/{cid}/ip-history`. */
+        IpRequestLogListResponse: {
+            items: components["schemas"]["IpRequestLogItem"][];
+            pagination: components["schemas"]["PaginationMeta"];
         };
         JobDetailResponse: {
             recent_runs: components["schemas"]["JobRunItem"][];
@@ -4245,6 +4460,7 @@ export interface components {
             email: string;
             flags: components["schemas"]["UserFlagsBody"];
             id: string;
+            impersonation?: null | components["schemas"]["ImpersonationBanner"];
             permissions: unknown;
             profile: components["schemas"]["MeProfileBody"];
             rating?: string | null;
@@ -4429,6 +4645,40 @@ export interface components {
         PermissionPath: {
             action: components["schemas"]["PermissionAction"];
             segments: string[];
+        };
+        /**
+         * @description One locally-owned FAA preferred IFR route, mirroring the columns the old PRD
+         *     page displayed. Sourced from the NFDC NASR `PFR_RMT_FMT.csv` on a 28-day cadence.
+         */
+        PreferredRouteItem: {
+            aircraft: string;
+            altitude: string;
+            area: string;
+            /** @description Arriving ARTCC boundary. */
+            arrival_artcc: string;
+            /** @description Departing ARTCC boundary (e.g. `ZDC`). */
+            departure_artcc: string;
+            destination: string;
+            /** @description Direction/flow limitation, if any. */
+            direction: string;
+            /**
+             * Format: date
+             * @description The 28-day NASR cycle effective date this route was ingested from.
+             */
+            effective_date?: string | null;
+            hours: string;
+            origin: string;
+            /** @description The assembled route string (fixes/airways/navaids), origin→destination. */
+            route_string: string;
+            /** @description FAA preferred-route type code (e.g. `TEC`, `L`, `H`, `LDR`, `HDR`, `SEA`). */
+            route_type: string;
+            /** Format: int32 */
+            sequence: number;
+        };
+        /** @description Response envelope for a preferred-routes search. */
+        PreferredRoutesResponse: {
+            count: number;
+            routes: components["schemas"]["PreferredRouteItem"][];
         };
         ProgressionAssignmentItem: {
             /** Format: date-time */
@@ -4683,6 +4933,10 @@ export interface components {
         };
         StaffingRequestListResponse: components["schemas"]["PaginationMeta"] & {
             items: components["schemas"]["StaffingRequestItem"][];
+        };
+        StartImpersonationRequest: {
+            /** @description Optional free-text reason, recorded in the server-level audit entry. */
+            reason?: string | null;
         };
         StatisticsPrefixes: {
             id: string;
@@ -5477,6 +5731,29 @@ export interface components {
             timezone?: string | null;
             visitor_home_facility?: string | null;
         };
+        /**
+         * @description One of a user's active auth sessions, for the admin session manager. Deliberately
+         *     omits the raw `session_token` — it is never exposed.
+         */
+        UserSessionItem: {
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            expires_at: string;
+            id: string;
+            /**
+             * @description True when this session is currently impersonating (i.e. an admin is acting as
+             *     this user through it); `impersonator_cid` names the real admin.
+             */
+            impersonated: boolean;
+            /** Format: int64 */
+            impersonator_cid?: number | null;
+            ip_address?: string | null;
+            user_agent?: string | null;
+        };
+        UserSessionListResponse: {
+            items: components["schemas"]["UserSessionItem"][];
+        };
         UserStats: {
             /** Format: int64 */
             active_sessions: number;
@@ -6070,6 +6347,95 @@ export interface operations {
             };
             /** @description Not authorized */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    stop_impersonation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Impersonation ended; returns the restored admin's /me view */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeBody"];
+                };
+            };
+            /** @description Not currently impersonating */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    start_impersonation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description VATSIM CID of the user to impersonate */
+                cid: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartImpersonationRequest"];
+            };
+        };
+        responses: {
+            /** @description Now impersonating the target; returns the target's /me view */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeBody"];
+                };
+            };
+            /** @description Invalid target (self, or already impersonating) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not authorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Target is a server admin (refused) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Target user not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -8892,6 +9258,48 @@ export interface operations {
             };
         };
     };
+    get_user_ip_history: {
+        parameters: {
+            query?: {
+                page?: number | null;
+                page_size?: number | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path: {
+                /** @description VATSIM CID */
+                cid: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A user's durable request IP history (spec 011) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IpRequestLogListResponse"];
+                };
+            };
+            /** @description Not authorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description User not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     reassign_user_operating_initials: {
         parameters: {
             query?: never;
@@ -9025,6 +9433,119 @@ export interface operations {
             };
             /** @description VATUSA or database unavailable */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_user_sessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description VATSIM CID */
+                cid: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A user's active auth sessions (metadata only, no tokens) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSessionListResponse"];
+                };
+            };
+            /** @description Not authorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description User not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    revoke_all_user_sessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description VATSIM CID */
+                cid: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description All the user's sessions revoked; returns the (now empty) active list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSessionListResponse"];
+                };
+            };
+            /** @description Not authorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description User not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    revoke_user_session: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description VATSIM CID */
+                cid: number;
+                /** @description Session id to revoke */
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Session revoked; returns the remaining active sessions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserSessionListResponse"];
+                };
+            };
+            /** @description Not authorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description User or session not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -12191,6 +12712,33 @@ export interface operations {
             };
         };
     };
+    export_my_data: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The caller's personal-data export */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataExportDocument"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     get_my_discord: {
         parameters: {
             query?: never;
@@ -12487,6 +13035,45 @@ export interface operations {
             };
             /** @description Publication not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    search_preferred_routes: {
+        parameters: {
+            query?: {
+                /** @description Origin airport identifier (e.g. `KJFK` or `JFK`). */
+                origin?: string | null;
+                /** @description Destination airport identifier. */
+                destination?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Matching preferred routes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferredRoutesResponse"];
+                };
+            };
+            /** @description Neither origin nor destination supplied */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not authenticated */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

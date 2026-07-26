@@ -267,6 +267,9 @@ utility on the Discord/overview area — same permission family.
 - Training / Events admin portals (unchanged).
 - Web content currently under Facility Admin: broadcasts, welcome
   messages, publications, stats prefixes, file center / CDN audit.
+  (**Note, 2026-07-25:** a polished WM **CDN / file manager** is now planned
+  as later polish — see `osmium-migration-plan.md` § "Later polish & known
+  bugs". Still out of scope for WM v1 cutover.)
 - Email branding UI.
 - Unimplemented osmium surfaces: `web.pages` / `web.announcements`
   handlers, GDPR `GET /api/v1/me/data-export`, rate-limit admin

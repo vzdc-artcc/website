@@ -4,9 +4,7 @@ import React, {useState} from 'react';
 import {Autocomplete, Box, Grid, Rating, TextField, Typography} from "@mui/material";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
-import {useGoogleReCaptcha} from "react-google-recaptcha-v3";
 import FeedbackFormSubmitButton from "@/components/Feedback/FeedbackFormSubmitButton";
-import {checkCaptcha} from "@/lib/captcha";
 import Form from "next/form";
 import {useRosterControllers} from "@/lib/osmium/hooks/users";
 import {useCreateFeedback} from "@/lib/osmium/hooks/feedback";
@@ -74,7 +72,6 @@ export default function FeedbackForm() {
 
     const router = useRouter();
     const {data: me} = useMe();
-    const {executeRecaptcha,} = useGoogleReCaptcha();
     const {data: controllersData} = useRosterControllers();
     const createFeedback = useCreateFeedback();
     const [controllerCid, setControllerCid] = useState<number | null>(null);
@@ -85,9 +82,6 @@ export default function FeedbackForm() {
         .sort((a, b) => a.basic.name.localeCompare(b.basic.name));
 
     const handleSubmit = async (formData: FormData) => {
-
-        const recaptchaToken = await executeRecaptcha?.('submit_feedback');
-        await checkCaptcha(recaptchaToken);
 
         if (!controllerCid) {
             toast('Please select a controller.', {type: 'error'});

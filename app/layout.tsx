@@ -15,6 +15,7 @@ import Footer from "@/components/Footer/Footer";
 import {ToastContainer} from "react-toastify";
 import InitColorSchemeScript from "@mui/system/InitColorSchemeScript";
 import BroadcastViewer from "@/components/BroadcastViewer/BroadcastViewer";
+import ImpersonationBanner from "@/components/Impersonation/ImpersonationBanner";
 import WelcomeMessageDialog from "@/components/WelcomeMessages/WelcomeMessageDialog";
 import StaffTasksAlert from "@/components/Admin/StaffTasksAlert";
 import OsmiumQueryProvider from "@/lib/osmium/QueryProvider";
@@ -46,6 +47,7 @@ export default function RootLayout({
             <InitColorSchemeScript attribute="class" defaultMode="system"/>
             <OsmiumQueryProvider>
             <div>
+                <ImpersonationBanner/>
                 <BroadcastViewer/>
                 <WelcomeMessageDialog/>
                 <Navbar/>

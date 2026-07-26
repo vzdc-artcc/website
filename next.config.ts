@@ -24,7 +24,6 @@ const nextConfig: NextConfig = {
             },
         ],
     },
-    serverExternalPackages: ['mjml'],
     experimental: {
         serverActions: {
             bodySizeLimit: '20MB',

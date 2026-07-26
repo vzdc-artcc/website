@@ -1,6 +1,6 @@
 import React from 'react';
 import {Card, CardContent, Container, Typography} from "@mui/material";
-import FeedbackFormWrapper from "@/components/Feedback/FeedbackFormWrapper";
+import FeedbackForm from "@/components/Feedback/FeedbackForm";
 import RequireAuth from "@/components/Access/RequireAuth";
 import {Metadata} from "next";
 
@@ -17,7 +17,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography variant="h5">Feedback</Typography>
-                        <FeedbackFormWrapper/>
+                        <FeedbackForm/>
                     </CardContent>
                 </Card>
             </Container>

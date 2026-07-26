@@ -1,6 +1,5 @@
 'use client';
 import React, {useState} from 'react';
-import {signOut} from "next-auth/react";
 import {
     Box,
     Button,
@@ -89,13 +88,11 @@ export default function LoginButton({sidebar, sidebarButtonClicked,}: {
     };
 
     const handleSignIn = () => {
-        // Transitional dual-login: osmium's VATSIM OAuth runs first (so the
-        // browser gets an osmium_session cookie for the new React Query
-        // hooks), then app/auth/osmium-bridge continues into NextAuth's own
-        // VATSIM sign-in so existing session-dependent pages/actions keep
-        // working unchanged. Collapse to osmium-only once NextAuth is retired.
-        const bridgeUrl = `${window.location.origin}/auth/osmium-bridge?dest=${encodeURIComponent(pathname)}`;
-        const osmiumLoginUrl = `${process.env.NEXT_PUBLIC_OSMIUM_API_URL}/api/v1/auth/vatsim/login?return_to=${encodeURIComponent(bridgeUrl)}`;
+        // osmium's VATSIM OAuth is the sole login step: it sets the httpOnly
+        // osmium_session cookie and redirects back to where the user was. (The
+        // transitional NextAuth bridge was removed at the end of the migration.)
+        const returnTo = `${window.location.origin}${pathname}`;
+        const osmiumLoginUrl = `${process.env.NEXT_PUBLIC_OSMIUM_API_URL}/api/v1/auth/vatsim/login?return_to=${encodeURIComponent(returnTo)}`;
         window.location.href = osmiumLoginUrl;
     };
 
@@ -104,18 +101,14 @@ export default function LoginButton({sidebar, sidebarButtonClicked,}: {
     }
 
     const logout = () => {
-        // End both sessions together — otherwise a stale osmium_session
-        // cookie would leave osmium-backed pages looking logged in after
-        // the user "logs out" via NextAuth. See handleSignIn for context.
+        // osmium owns the session now: revoke it, then hard-navigate so every
+        // osmium-backed query re-fetches as logged-out.
         osmium.POST("/api/v1/auth/logout").catch(() => {
-            // Best-effort: still proceed with NextAuth sign-out even if
-            // osmium's own session was already gone or unreachable.
+            // Best-effort: still reset the client even if the session was
+            // already gone or osmium was unreachable.
         }).finally(() => {
-            signOut({
-                callbackUrl: pathname,
-            }).then(() => {
-                closeDropdown();
-            });
+            closeDropdown();
+            window.location.href = pathname;
         });
     }
 

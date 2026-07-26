@@ -1,7 +1,7 @@
 import React from 'react';
 import {ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import Link from "next/link";
-import {Chat, Description, Drafts, History, Home, MarkEmailUnread, Outbox, Security, Send, Sync, VpnKey} from "@mui/icons-material";
+import {Campaign, Chat, Description, Drafts, History, Home, MarkEmailUnread, Outbox, Security, Send, Sync, VpnKey} from "@mui/icons-material";
 import MenuWrapper from './MenuWrapper';
 
 export default function WebsiteManagementMenu({displayName}: { displayName: string }) {
@@ -64,6 +64,14 @@ export default function WebsiteManagementMenu({displayName}: { displayName: stri
                         <Send/>
                     </ListItemIcon>
                     <ListItemText primary="Preview / Send Email"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/website-management/emails/mass" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <Campaign/>
+                    </ListItemIcon>
+                    <ListItemText primary="Mass Email"/>
                 </ListItemButton>
             </Link>
             <Link href="/website-management/emails/outbox" style={{textDecoration: 'none', color: 'inherit',}}>

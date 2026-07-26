@@ -1,7 +1,0 @@
--- AlterTable
-ALTER TABLE "File"
-    ADD COLUMN "order" INTEGER NOT NULL DEFAULT 0;
-
--- AlterTable
-ALTER TABLE "FileCategory"
-    ADD COLUMN "order" INTEGER NOT NULL DEFAULT 0;

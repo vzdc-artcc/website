@@ -4,6 +4,9 @@ import {useParams} from "next/navigation";
 import {Alert, Card, CardContent, CircularProgress, Stack, Typography} from "@mui/material";
 import {useUserByCid} from "@/lib/osmium/hooks/users";
 import UserPermissionsCard from "@/components/Access/UserPermissionsCard";
+import ImpersonateUserCard from "@/components/Impersonation/ImpersonateUserCard";
+import UserIpHistoryCard from "@/components/Access/UserIpHistoryCard";
+import UserSessionsCard from "@/components/Access/UserSessionsCard";
 
 export default function Page() {
     const params = useParams<{ cid: string }>();
@@ -29,6 +32,9 @@ export default function Page() {
                 </CardContent>
             </Card>
             <UserPermissionsCard cid={cid}/>
+            <ImpersonateUserCard cid={cid} name={user.basic.name}/>
+            <UserSessionsCard cid={cid}/>
+            <UserIpHistoryCard cid={cid}/>
         </Stack>
     );
 }

@@ -14,7 +14,6 @@ import {
     Home,
     ListAlt,
     MilitaryTech,
-    Send,
     ViewCompact
 } from "@mui/icons-material";
 import MenuWrapper from './MenuWrapper';
@@ -93,14 +92,6 @@ export default function AdminMenu() {
                         <PendingLoaBadge/>
                     </ListItemIcon>
                     <ListItemText primary="LOA Center"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/admin/mail" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Send/>
-                    </ListItemIcon>
-                    <ListItemText primary="Send Email"/>
                 </ListItemButton>
             </Link>
             {/*<Link href="/admin/discord/announcements" style={{textDecoration: 'none', color: 'inherit',}}>*/}

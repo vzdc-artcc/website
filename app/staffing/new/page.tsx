@@ -1,6 +1,6 @@
 import React from 'react';
 import {Card, CardContent, Container, Typography} from "@mui/material";
-import StaffingRequestFormWrapper from "@/components/StaffingRequest/StaffingRequestFormWrapper";
+import StaffingRequestForm from "@/components/StaffingRequest/StaffingRequestForm";
 import RequireAuth from "@/components/Access/RequireAuth";
 import {Metadata} from "next";
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography variant="h5" sx={{mb: 2,}}>Staffing Request</Typography>
-                        <StaffingRequestFormWrapper/>
+                        <StaffingRequestForm/>
                     </CardContent>
                 </Card>
             </Container>

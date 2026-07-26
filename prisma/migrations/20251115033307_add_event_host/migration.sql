@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Event"
-    ADD COLUMN "host" TEXT NOT NULL DEFAULT 'ERR - CTC EVENTS STAFF';

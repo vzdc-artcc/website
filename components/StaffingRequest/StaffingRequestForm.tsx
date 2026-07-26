@@ -1,12 +1,10 @@
 'use client';
 import React from 'react';
-import {useGoogleReCaptcha} from "react-google-recaptcha-v3";
 import {Grid, TextField} from "@mui/material";
 import RequestSubmitButton from "@/components/StaffingRequest/RequestSubmitButton";
 import {toast} from "react-toastify";
 import {useCreateStaffingRequest} from "@/lib/osmium/hooks/staffing";
 import {useRouter} from "next/navigation";
-import {checkCaptcha} from "@/lib/captcha";
 import {useMe} from "@/lib/osmium/hooks/me";
 
 export default function StaffingRequestForm() {
@@ -14,13 +12,9 @@ export default function StaffingRequestForm() {
     const {data: me} = useMe();
 
     const router = useRouter();
-    const {executeRecaptcha} = useGoogleReCaptcha();
     const createStaffingRequest = useCreateStaffingRequest();
 
     const handleSubmit = async (formData: FormData) => {
-
-        const recaptchaToken = await executeRecaptcha?.('submit_feedback');
-        await checkCaptcha(recaptchaToken);
 
         const name = formData.get('name') as string;
         const description = formData.get('description') as string;
@@ -79,6 +73,7 @@ export default function StaffingRequestForm() {
                 </Grid>
                 <Grid size={2}>
                     <RequestSubmitButton/>
+                    
                 </Grid>
             </Grid>
         </form>)
