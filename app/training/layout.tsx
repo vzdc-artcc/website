@@ -3,7 +3,7 @@ import {Grid, Stack} from "@mui/material";
 import TrainingMenu from "@/components/Admin/TrainingMenu";
 import {Metadata} from "next";
 import DoubleBookingAlert from "@/components/Training/DoubleBookingAlert";
-import RequireRole from "@/components/Access/RequireRole";
+import RequirePermission from "@/components/Access/RequirePermission";
 
 export const metadata: Metadata = {
     title: 'Training | vZDC',
@@ -15,7 +15,7 @@ const {BUFFER_TIME} = process.env;
 export default function Layout({children}: { children: React.ReactNode }) {
 
     return (
-        <RequireRole check="isMentor">
+        <RequirePermission perm="pages.training_admin.read">
             <Grid container columns={9} spacing={2}>
                 <Grid
                     size={{
@@ -31,6 +31,6 @@ export default function Layout({children}: { children: React.ReactNode }) {
                     </Stack>
                 </Grid>
             </Grid>
-        </RequireRole>
+        </RequirePermission>
     );
 }

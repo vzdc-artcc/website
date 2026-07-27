@@ -2,7 +2,7 @@ import React from 'react';
 import {Grid} from "@mui/material";
 import {Metadata} from "next";
 import EventsMenu from '@/components/Admin/EventsMenu';
-import RequireRole from "@/components/Access/RequireRole";
+import RequirePermission from "@/components/Access/RequirePermission";
 
 export const metadata: Metadata = {
     title: 'Events | vZDC',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function Layout({children}: { children: React.ReactNode }) {
 
     return (
-        <RequireRole check="isEventStaff">
+        <RequirePermission perm="pages.event_management.read">
             <Grid container columns={9} spacing={2}>
                 <Grid
                     size={{
@@ -25,6 +25,6 @@ export default function Layout({children}: { children: React.ReactNode }) {
                     {children}
                 </Grid>
             </Grid>
-        </RequireRole>
+        </RequirePermission>
     );
 }

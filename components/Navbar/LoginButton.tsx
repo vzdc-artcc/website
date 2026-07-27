@@ -37,7 +37,7 @@ import {toast} from "react-toastify";
 import TeamspeakUidDialog from "@/components/TeamspeakUID/TeamspeakUidDialog";
 import { osmium } from "@/lib/osmium/client";
 import { useMe, useRefreshMyVatusa } from "@/lib/osmium/hooks/me";
-import { deriveCoarseRoles } from "@/lib/osmium/coarseRoles";
+import { meHasPermission } from "@/lib/osmium/permissions";
 
 export default function LoginButton({sidebar, sidebarButtonClicked,}: {
     sidebar?: boolean,
@@ -48,7 +48,10 @@ export default function LoginButton({sidebar, sidebarButtonClicked,}: {
     // /me now — osmium is the sole authority (Phase 6: no NextAuth session).
     const {data: me} = useMe();
     const isServerAdmin = me?.server_admin === true;
-    const coarse = deriveCoarseRoles(me);
+    // Staff-tab visibility is an explicit permission grant, not a role fold.
+    const canFacilityAdmin = meHasPermission(me, "pages.facility_admin.read");
+    const canTrainingAdmin = meHasPermission(me, "pages.training_admin.read");
+    const canEventManagement = meHasPermission(me, "pages.event_management.read");
     const refreshVatusa = useRefreshMyVatusa();
 
     const [dropdownAnchor, setDropdownAnchor] = React.useState<null | HTMLElement>(null);
@@ -136,7 +139,7 @@ export default function LoginButton({sidebar, sidebarButtonClicked,}: {
                         <Link href="/profile/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                             <NavSidebarButton icon={<Settings/>} text="Profile"/>
                         </Link>}
-                    {coarse.isStaff &&
+                    {canFacilityAdmin &&
                         <Link href="/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                             <NavSidebarButton icon={<AdminPanelSettings/>} text="Facility Administration"/>
                         </Link>}
@@ -144,11 +147,11 @@ export default function LoginButton({sidebar, sidebarButtonClicked,}: {
                         <Link href="/website-management/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                             <NavSidebarButton icon={<Web/>} text="Website Management"/>
                         </Link>}
-                    {coarse.isMentor &&
+                    {canTrainingAdmin &&
                         <Link href="/training/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                             <NavSidebarButton icon={<Class/>} text="Training Administration"/>
                         </Link>}
-                    {coarse.isEventStaff &&
+                    {canEventManagement &&
                     <Link href="/events/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                         <NavSidebarButton icon={<CalendarMonth />} text="Events Administration"/>
                     </Link>}
@@ -173,7 +176,7 @@ export default function LoginButton({sidebar, sidebarButtonClicked,}: {
                         <ListItemText>Profile</ListItemText>
                     </MenuItem>
                     </Link>}
-                {coarse.isStaff &&
+                {canFacilityAdmin &&
                     <Link href="/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                         <MenuItem onClick={closeDropdown}>
                             <ListItemIcon>
@@ -191,7 +194,7 @@ export default function LoginButton({sidebar, sidebarButtonClicked,}: {
                             <ListItemText>Website Management</ListItemText>
                         </MenuItem>
                     </Link>}
-                {coarse.isMentor &&
+                {canTrainingAdmin &&
                     <Link href="/training/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                         <MenuItem onClick={closeDropdown}>
                             <ListItemIcon>
@@ -200,7 +203,7 @@ export default function LoginButton({sidebar, sidebarButtonClicked,}: {
                             <ListItemText>Training Administration</ListItemText>
                         </MenuItem>
                     </Link>}
-                {coarse.isEventStaff &&
+                {canEventManagement &&
                 <Link href="/events/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                     <MenuItem onClick={closeDropdown}>
                         <ListItemIcon>
