@@ -16,28 +16,12 @@ export function useMyDiscordLink() {
 
 export function useStartDiscordLink() {
     return useMutation({
-        mutationFn: async (redirectUri?: string) => {
+        mutationFn: async (returnUrl?: string) => {
             const { data, error } = await osmium.POST("/api/v1/me/discord/link/start", {
-                body: { redirect_uri: redirectUri },
+                body: { return_url: returnUrl },
             });
             if (error) throw error;
             return data;
-        },
-    });
-}
-
-export function useCompleteDiscordLink() {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: async (body: { code: string, state: string, redirectUri?: string }) => {
-            const { data, error } = await osmium.POST("/api/v1/me/discord/link/complete", {
-                body: { code: body.code, state: body.state, redirect_uri: body.redirectUri },
-            });
-            if (error) throw error;
-            return data;
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: LINK_KEY });
         },
     });
 }

@@ -18,11 +18,14 @@ export default function Page() {
         return <Alert severity="error">Category not found.</Alert>;
     }
 
+    const guildId = bundle?.configs.find((c) => c.id === category.discord_config_id)?.guild_id;
+
     return (
         <Card>
             <CardContent>
                 <Typography variant="h5" sx={{mb: 2,}}>{category.name}</Typography>
-                <DiscordCategoryForm discordConfigId={category.discord_config_id} category={category}/>
+                <DiscordCategoryForm discordConfigId={category.discord_config_id} category={category}
+                                     guildId={guildId}/>
             </CardContent>
         </Card>
     );

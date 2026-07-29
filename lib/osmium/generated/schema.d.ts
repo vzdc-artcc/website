@@ -348,6 +348,74 @@ export interface paths {
         patch: operations["update_discord_config"];
         trace?: never;
     };
+    "/api/v1/admin/integrations/discord/features": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_bot_features"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["update_bot_features"];
+        trace?: never;
+    };
+    "/api/v1/admin/integrations/discord/guilds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_discord_guilds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/integrations/discord/guilds/{guild_id}/discovery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["discover_discord_guild"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/integrations/discord/impromptu-claims": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bot-facing: record a student's claim by Discord id. Gated on the integrations
+         *     permission the bot's service account holds.
+         */
+        post: operations["record_impromptu_claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/integrations/discord/roles": {
         parameters: {
             query?: never;
@@ -1500,6 +1568,22 @@ export interface paths {
         patch: operations["update_event"];
         trace?: never;
     };
+    "/api/v1/events/{event_id}/discord-event": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["queue_event_discord_scheduled_event"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/events/{event_id}/ops-plan": {
         parameters: {
             query?: never;
@@ -1951,16 +2035,16 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/me/discord/link/complete": {
+    "/api/v1/me/discord/link/callback": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["discord_link_callback"];
         put?: never;
-        post: operations["complete_discord_link"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1993,6 +2077,33 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["unlink_discord"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/email-preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Self-service, session-authenticated email preferences (the profile "Email
+         *     Preferences" section). Same per-category model as the token-based unsubscribe
+         *     flow, but the caller's email is resolved from their session rather than an
+         *     unsubscribe token. Gated by `auth.profile.read` (baseline self-read).
+         */
+        get: operations["get_my_email_preferences"];
+        /**
+         * Update the caller's own per-category email preferences. Subscribe revokes the
+         *     suppression; unsubscribe creates it. Transactional categories cannot be
+         *     unsubscribed (rejected as a bad request). Gated by `auth.profile.update`.
+         */
+        put: operations["update_my_email_preferences"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2406,6 +2517,70 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["update_assignment"];
+        trace?: never;
+    };
+    "/api/v1/training/impromptu-offers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_impromptu_offers"];
+        put?: never;
+        post: operations["create_impromptu_offer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/training/impromptu-offers/{offer_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_impromptu_offer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/training/impromptu-offers/{offer_id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["accept_impromptu_offer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/training/impromptu-offers/{offer_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel_impromptu_offer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/training/lessons": {
@@ -2908,6 +3083,9 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AcceptImpromptuOfferRequest: {
+            user_id: string;
+        };
         AccessCatalogBody: {
             permissions: unknown;
             service_account_roles: string[];
@@ -2955,6 +3133,11 @@ export interface components {
         };
         AnnouncementRequest: {
             body_markdown: string;
+            /**
+             * @description Logical Discord config channel to post to; defaults to `announcements`.
+             *     Event promos pass `event_announcements`.
+             */
+            channel?: string | null;
             details_url?: string | null;
             send_discord?: boolean | null;
             send_email?: boolean | null;
@@ -3107,6 +3290,14 @@ export interface components {
         };
         AuditLogListResponse: components["schemas"]["PaginationMeta"] & {
             items: components["schemas"]["AuditLogItem"][];
+        };
+        BotFeatureFlag: {
+            enabled: boolean;
+            key: string;
+            label: string;
+        };
+        BotFeatureFlagsResponse: {
+            features: components["schemas"]["BotFeatureFlag"][];
         };
         BroadcastRecipientItem: {
             /** Format: date-time */
@@ -3394,6 +3585,13 @@ export interface components {
             name: string;
             role_id: string;
         };
+        CreateDiscordScheduledEventRequest: {
+            /**
+             * @description External event location text (required by Discord for external events),
+             *     e.g. `vatsim.net`. Defaults to `vatsim.net` when omitted.
+             */
+            location?: string | null;
+        };
         CreateDossierEntryRequest: {
             /**
              * @description Defaults to false. Confidential entries are only visible to callers
@@ -3466,6 +3664,16 @@ export interface components {
             rating: number;
             /** Format: int64 */
             target_cid: number;
+        };
+        CreateImpromptuOfferRequest: {
+            /**
+             * Format: date-time
+             * @description Omit / null for "available now"; otherwise a scheduled availability time.
+             */
+            available_at?: string | null;
+            notes?: string | null;
+            /** @description Any of `ground`, `tower`, `approach`, `center`. */
+            session_types: string[];
         };
         CreateIncidentRequest: {
             reason: string;
@@ -3811,13 +4019,13 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         };
-        DiscordLinkCompleteRequest: {
-            code: string;
-            redirect_uri?: string | null;
-            state: string;
-        };
         DiscordLinkStartRequest: {
-            redirect_uri?: string | null;
+            /**
+             * @description Website URL to return the browser to once linking completes. osmium 302s
+             *     here (with `discord_linked`/`discord_error` query params) after the
+             *     server-side token exchange. Honored only if its origin is allowlisted.
+             */
+            return_url?: string | null;
         };
         DiscordLinkStateBody: {
             auth_url?: string | null;
@@ -3834,6 +4042,32 @@ export interface components {
         };
         DiscordUnlinkRequest: {
             external_id?: string | null;
+        };
+        DiscoveredCategory: {
+            id: string;
+            name: string;
+        };
+        /** @description A selectable channel within a guild, proxied live from the Discord bot. */
+        DiscoveredChannel: {
+            id: string;
+            kind: string;
+            name: string;
+            parent_category_id?: string | null;
+        };
+        /**
+         * @description A guild the Discord bot is a member of, proxied from the bot for use in
+         *     configuration UIs so operators pick a guild instead of pasting an id.
+         */
+        DiscoveredGuild: {
+            id: string;
+            name: string;
+        };
+        DiscoveredGuildListResponse: {
+            guilds: components["schemas"]["DiscoveredGuild"][];
+        };
+        DiscoveredRole: {
+            id: string;
+            name: string;
         };
         DossierEntryItem: {
             /** Format: date-time */
@@ -4105,8 +4339,14 @@ export interface components {
             updated_at: string;
             /** Format: int64 */
             user_cid?: number | null;
+            /** @description Controller's roster status (`HOME` / `VISITOR` / `NONE`), from the membership. */
+            user_controller_status?: string | null;
+            /** @description Controller's linked Discord user id, for @mention on event postings. */
+            user_discord_id?: string | null;
             user_id?: string | null;
             user_name?: string | null;
+            /** @description Controller's VATSIM rating (e.g. `S3`, `C1`), from the roster membership. */
+            user_rating?: string | null;
         };
         EventPositionListResponse: components["schemas"]["PaginationMeta"] & {
             items: components["schemas"]["EventPosition"][];
@@ -4249,6 +4489,16 @@ export interface components {
             retention: string;
             your_rights: string[];
         };
+        /**
+         * @description Live channel/category/role snapshot for a single guild, proxied from the
+         *     Discord bot to populate the website's Discord configuration dropdowns.
+         */
+        GuildDiscoveryResponse: {
+            categories: components["schemas"]["DiscoveredCategory"][];
+            channels: components["schemas"]["DiscoveredChannel"][];
+            guild_id: string;
+            roles: components["schemas"]["DiscoveredRole"][];
+        };
         /** @description Minimal real-admin identity surfaced on `/me` while impersonating. */
         ImpersonationBanner: {
             /** Format: int64 */
@@ -4258,6 +4508,43 @@ export interface components {
         ImportFileFromUrlRequest: {
             filename?: string | null;
             url: string;
+        };
+        ImpromptuClaimItem: {
+            /** Format: int64 */
+            cid: number;
+            /** Format: date-time */
+            claimed_at: string;
+            controller_status?: string | null;
+            id: string;
+            /** Format: date-time */
+            last_session_at?: string | null;
+            name: string;
+            rating?: string | null;
+            /** Format: int64 */
+            session_count: number;
+            status: string;
+            user_id: string;
+        };
+        ImpromptuOfferDetail: components["schemas"]["ImpromptuOfferItem"] & {
+            claims: components["schemas"]["ImpromptuClaimItem"][];
+        };
+        ImpromptuOfferItem: {
+            accepted_user_id?: string | null;
+            /** Format: date-time */
+            available_at?: string | null;
+            /** Format: int64 */
+            claim_count: number;
+            /** Format: date-time */
+            created_at: string;
+            created_by_name: string;
+            created_by_user_id: string;
+            id: string;
+            notes?: string | null;
+            session_types: string[];
+            status: string;
+        };
+        ImpromptuOfferListResponse: {
+            items: components["schemas"]["ImpromptuOfferItem"][];
         };
         IncidentItem: {
             closed: boolean;
@@ -4330,6 +4617,16 @@ export interface components {
             /** Format: date-time */
             last_success_at?: string | null;
             latest_run?: null | components["schemas"]["JobRunItem"];
+        };
+        /**
+         * @description One ticket from a student's most recent training session, for the request
+         *     table's "Last Training Session" chips.
+         */
+        LastSessionTicket: {
+            /** @description The lesson's short identifier (e.g. `2-1-SV`), shown on the chip. */
+            lesson_identifier: string;
+            /** @description Whether the ticket passed (green chip) or failed (red chip). */
+            passed: boolean;
         };
         LessonRosterChangeSummary: {
             certification_option: string;
@@ -4514,13 +4811,19 @@ export interface components {
             server_admin: boolean;
             teamspeak_uids: components["schemas"]["TeamSpeakUidBody"][];
         };
+        /**
+         * @description Session-authenticated variant of [`EmailPreferencesUpdateRequest`]: the caller's
+         *     email is resolved from their session, so no unsubscribe token is required.
+         */
+        MeEmailPreferencesUpdateRequest: {
+            preferences: components["schemas"]["EmailPreferenceUpdateItem"][];
+        };
         MeProfileBody: {
             bio?: string | null;
             first_name?: string | null;
             last_name?: string | null;
             operating_initials?: string | null;
             preferred_name?: string | null;
-            receive_event_notifications: boolean;
             timezone: string;
         };
         MonthlyBucket: {
@@ -4650,8 +4953,6 @@ export interface components {
             bio?: string | null;
             /** @description Preferred display label for the user. Use null to clear. */
             preferred_name?: string | null;
-            /** @description Whether the user wants new event notifications. */
-            receive_event_notifications?: boolean | null;
             /** @description IANA timezone name such as `America/Chicago`. */
             timezone?: string | null;
         };
@@ -4852,6 +5153,11 @@ export interface components {
         };
         PurgeCandidatesResponse: {
             items: components["schemas"]["PurgeCandidateItem"][];
+        };
+        /** @description Bot-facing: record a student's claim by their Discord id. */
+        RecordImpromptuClaimRequest: {
+            discord_id: string;
+            offer_id: string;
         };
         RosterCertOption: {
             certification_option: string;
@@ -5160,12 +5466,22 @@ export interface components {
             decided_by?: string | null;
             id: string;
             interested_trainers: components["schemas"]["AssignmentTrainerSummary"][];
+            /**
+             * @description Tickets from the student's most recent training session (lesson id +
+             *     pass/fail), for the "Last Training Session" chips. Empty when none.
+             */
+            last_session_tickets: components["schemas"]["LastSessionTicket"][];
             status: string;
             /** Format: int64 */
             student_cid: number;
             student_controller_status: string;
             student_id: string;
             student_name: string;
+            /**
+             * @description Membership rating code (e.g. `S2`, `C1`); `None` if the student has no
+             *     membership row.
+             */
+            student_rating?: string | null;
             /** Format: date-time */
             submitted_at: string;
         };
@@ -5375,6 +5691,12 @@ export interface components {
             description?: string | null;
             name?: string | null;
             permissions?: unknown;
+        };
+        UpdateBotFeatureFlagsRequest: {
+            /** @description Map of feature key -> enabled. Unknown keys are ignored. */
+            features: {
+                [key: string]: boolean;
+            };
         };
         UpdateCertificationTypeOrderRequest: {
             items: components["schemas"]["CertificationTypeOrderItem"][];
@@ -7011,6 +7333,171 @@ export interface operations {
                 content?: never;
             };
             /** @description Discord config not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_bot_features: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Discord bot feature toggles */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BotFeatureFlagsResponse"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_bot_features: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateBotFeatureFlagsRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated Discord bot feature toggles */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BotFeatureFlagsResponse"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_discord_guilds: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Guilds the Discord bot is a member of */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscoveredGuildListResponse"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Discord bot unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    discover_discord_guild: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Discord guild id */
+                guild_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Live channels, categories, and roles for the guild */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuildDiscoveryResponse"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Discord bot unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    record_impromptu_claim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RecordImpromptuClaimRequest"];
+            };
+        };
+        responses: {
+            /** @description Claim recorded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Discord account not linked */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -11165,6 +11652,40 @@ export interface operations {
             };
         };
     };
+    queue_event_discord_scheduled_event: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Event ID */
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDiscordScheduledEventRequest"];
+            };
+        };
+        responses: {
+            /** @description Discord scheduled-event creation queued */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiMessageBody"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     get_event_ops_plan: {
         parameters: {
             query?: never;
@@ -12845,37 +13366,21 @@ export interface operations {
             };
         };
     };
-    complete_discord_link: {
+    discord_link_callback: {
         parameters: {
-            query?: never;
+            query?: {
+                code?: string | null;
+                state?: string | null;
+                error?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DiscordLinkCompleteRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
-            /** @description Discord identity linked */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DiscordLinkStateBody"];
-                };
-            };
-            /** @description Invalid request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Not authenticated */
-            401: {
+            /** @description Redirects back to the website with the link outcome */
+            303: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -12935,6 +13440,71 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ApiMessageBody"];
                 };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_my_email_preferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The caller's per-category email preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailPreferencesResponse"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_my_email_preferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MeEmailPreferencesUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated per-category email preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmailPreferencesResponse"];
+                };
+            };
+            /** @description Invalid request (unknown or transactional category) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Not authenticated */
             401: {
@@ -14234,6 +14804,172 @@ export interface operations {
             };
             /** @description Assignment not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_impromptu_offers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description My impromptu offers */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpromptuOfferListResponse"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    create_impromptu_offer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateImpromptuOfferRequest"];
+            };
+        };
+        responses: {
+            /** @description Impromptu offer posted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpromptuOfferItem"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Discord bot unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_impromptu_offer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Offer ID */
+                offer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Offer with claims */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpromptuOfferDetail"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    accept_impromptu_offer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Offer ID */
+                offer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptImpromptuOfferRequest"];
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpromptuOfferItem"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    cancel_impromptu_offer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Offer ID */
+                offer_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cancelled */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImpromptuOfferItem"];
+                };
+            };
+            /** @description Not authenticated */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

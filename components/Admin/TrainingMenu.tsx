@@ -4,6 +4,7 @@ import {Badge, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import Link from "next/link";
 import {
     Assignment,
+    Bolt,
     CalendarMonth,
     Checklist,
     Class,
@@ -48,6 +49,14 @@ export default function TrainingMenu() {
                         <School/>
                     </ListItemIcon>
                     <ListItemText primary="Your Students & Schedule"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/training/impromptu" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <Bolt/>
+                    </ListItemIcon>
+                    <ListItemText primary="Impromptu Sessions"/>
                 </ListItemButton>
             </Link>
             <Link href="/training/sessions" style={{textDecoration: 'none', color: 'inherit',}}>

@@ -18,11 +18,14 @@ export default function Page() {
         return <Alert severity="error">Channel not found.</Alert>;
     }
 
+    const guildId = bundle?.configs.find((c) => c.id === channel.discord_config_id)?.guild_id;
+
     return (
         <Card>
             <CardContent>
                 <Typography variant="h5" sx={{mb: 2,}}>{channel.name}</Typography>
-                <DiscordChannelForm discordConfigId={channel.discord_config_id} channel={channel}/>
+                <DiscordChannelForm discordConfigId={channel.discord_config_id} channel={channel}
+                                    guildId={guildId}/>
             </CardContent>
         </Card>
     );

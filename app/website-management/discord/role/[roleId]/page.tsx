@@ -18,11 +18,13 @@ export default function Page() {
         return <Alert severity="error">Role not found.</Alert>;
     }
 
+    const guildId = bundle?.configs.find((c) => c.id === role.discord_config_id)?.guild_id;
+
     return (
         <Card>
             <CardContent>
                 <Typography variant="h5" sx={{mb: 2,}}>{role.name}</Typography>
-                <DiscordRoleForm discordConfigId={role.discord_config_id} role={role}/>
+                <DiscordRoleForm discordConfigId={role.discord_config_id} role={role} guildId={guildId}/>
             </CardContent>
         </Card>
     );

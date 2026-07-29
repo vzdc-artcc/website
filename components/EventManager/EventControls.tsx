@@ -4,6 +4,9 @@ import ToggleVisibilityButton from "./ToggleVisibilityButton";
 import {Article, Edit, Info} from "@mui/icons-material";
 import ArchiveToggleButton from "./ArchiveToggleButton";
 import OpsPlanPublishButton from "@/components/EventManager/OpsPlanPublishButton";
+import EventPostToDiscordButton from "@/components/EventManager/EventPostToDiscordButton";
+import EventPromoButton from "@/components/EventManager/EventPromoButton";
+import EventDiscordEventButton from "@/components/EventManager/EventDiscordEventButton";
 import {eventGetDuration, formatZuluDate} from "@/lib/date";
 import Link from "next/link";
 import {useEventOpsPlan} from "@/lib/osmium/hooks/events";
@@ -58,10 +61,16 @@ export default function EventControls({event}: { event: EventLike }) {
                     </Tooltip>
                 </ButtonGroup>
                 <Divider sx={{my: 2,}}/>
-                <Stack direction="row" spacing={2}>
+                <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
                     <ToggleVisibilityButton event={event}/>
                     <ArchiveToggleButton event={event}/>
                     <OpsPlanPublishButton eventId={event.id}/>
+                </Stack>
+                <Divider sx={{my: 2,}}/>
+                <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+                    <EventPostToDiscordButton eventId={event.id}/>
+                    <EventPromoButton eventId={event.id} eventTitle={event.title}/>
+                    <EventDiscordEventButton eventId={event.id}/>
                 </Stack>
             </CardContent>
         </Card>

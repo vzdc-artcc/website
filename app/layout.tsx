@@ -41,10 +41,10 @@ export default function RootLayout({
   return (
       <html lang="en" suppressHydrationWarning>
       <body className={roboto.variable}>
+    <InitColorSchemeScript attribute="class" defaultMode="system"/>
     <AppRouterCacheProvider>
         <ThemeProvider theme={theme}>
             <CssBaseline/>
-            <InitColorSchemeScript attribute="class" defaultMode="system"/>
             <OsmiumQueryProvider>
             <div>
                 <ImpersonationBanner/>

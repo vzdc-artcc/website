@@ -15,6 +15,78 @@ export function useDiscordBundle() {
     });
 }
 
+/**
+ * Guilds the Discord bot is currently a member of, proxied live from the bot.
+ * Used to populate the guild dropdown when configuring a Discord config.
+ */
+export function useDiscordGuilds() {
+    return useQuery({
+        queryKey: ["osmium", "discord", "guilds"],
+        queryFn: async () => {
+            const { data, error } = await osmium.GET("/api/v1/admin/integrations/discord/guilds");
+            if (error) throw error;
+            return data;
+        },
+        // The bot may be briefly offline (e.g. restarting) and osmium returns 503.
+        // Retry a few times with backoff so the dropdown recovers on its own once
+        // the bot is back, instead of sticking empty until a manual refresh.
+        retry: 3,
+        retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
+        staleTime: 60_000,
+    });
+}
+
+/**
+ * Live channels, categories, and roles for a guild, proxied from the bot, used
+ * to populate channel/role/category selection dropdowns. Disabled until a
+ * guild id is known.
+ */
+export function useDiscordGuildDiscovery(guildId: string | null | undefined) {
+    return useQuery({
+        queryKey: ["osmium", "discord", "discovery", guildId],
+        enabled: !!guildId,
+        queryFn: async () => {
+            const { data, error } = await osmium.GET(
+                "/api/v1/admin/integrations/discord/guilds/{guild_id}/discovery",
+                { params: { path: { guild_id: guildId as string } } },
+            );
+            if (error) throw error;
+            return data;
+        },
+        // See useDiscordGuilds: retry so a transient bot outage self-heals.
+        retry: 3,
+        retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
+        staleTime: 60_000,
+    });
+}
+
+const FEATURES_KEY = ["osmium", "discord", "features"];
+
+export function useBotFeatures() {
+    return useQuery({
+        queryKey: FEATURES_KEY,
+        queryFn: async () => {
+            const { data, error } = await osmium.GET("/api/v1/admin/integrations/discord/features");
+            if (error) throw error;
+            return data;
+        },
+    });
+}
+
+export function useUpdateBotFeatures() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (features: Record<string, boolean>) => {
+            const { data, error } = await osmium.PATCH("/api/v1/admin/integrations/discord/features", {
+                body: { features },
+            });
+            if (error) throw error;
+            return data;
+        },
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: FEATURES_KEY }),
+    });
+}
+
 function useInvalidateBundle() {
     const queryClient = useQueryClient();
     return () => queryClient.invalidateQueries({ queryKey: BUNDLE_KEY });

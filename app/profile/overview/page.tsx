@@ -33,7 +33,6 @@ export default function Page() {
         email: me.email,
         preferredName: me.profile.preferred_name,
         rating: me.rating ?? '',
-        receiveEmail: me.profile.receive_event_notifications,
         timezone: me.profile.timezone,
         bio: me.profile.bio,
         noEditProfile: me.flags.no_edit_profile,

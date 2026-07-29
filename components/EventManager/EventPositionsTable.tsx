@@ -155,7 +155,18 @@ export default function EventPositionsTable({event}: { event: EventLike }) {
                             {positions.map((position) => (
                                 <TableRow key={position.id}>
                                     <TableCell>
-                                        <ControllerChip name={position.user_name} cid={position.user_cid} published={position.published}/>
+                                        <ControllerChip name={position.user_name} cid={position.user_cid} published={position.published}
+                                                        rating={position.user_rating}
+                                                        controllerStatus={position.user_controller_status}
+                                                        info={{
+                                                            userCid: position.user_cid,
+                                                            userName: position.user_name,
+                                                            requestedPosition: position.requested_position,
+                                                            requestedSecondaryPosition: position.requested_secondary_position,
+                                                            notes: position.notes,
+                                                            finalPosition: position.final_position,
+                                                            finalNotes: position.final_notes,
+                                                        }}/>
                                     </TableCell>
                                     <TableCell>{position.requested_position}</TableCell>
                                     <TableCell>{position.requested_secondary_position}</TableCell>

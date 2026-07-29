@@ -276,6 +276,18 @@ export function useQueueEventDiscordPublish(eventId: string) {
     });
 }
 
+export function useQueueEventDiscordScheduledEvent(eventId: string) {
+    return useMutation({
+        mutationFn: async (location: string) => {
+            const { error } = await osmium.POST("/api/v1/events/{event_id}/discord-event", {
+                params: { path: { event_id: eventId } },
+                body: { location },
+            });
+            if (error) throw error;
+        },
+    });
+}
+
 // --- Ops plan / TMIs / preset positions (single event) ---
 
 export function useEventOpsPlan(eventId: string | undefined) {

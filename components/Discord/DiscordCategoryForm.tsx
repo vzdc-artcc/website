@@ -5,15 +5,19 @@ import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {useCreateDiscordCategory, useUpdateDiscordCategory} from "@/lib/osmium/hooks/discord";
+import DiscordResourceSelect from "@/components/Discord/DiscordResourceSelect";
+import {useGuildResourceOptions} from "@/components/Discord/useGuildResourceOptions";
 import type {components} from "@/lib/osmium/generated/schema";
 
-export default function DiscordCategoryForm({category, discordConfigId}: {
+export default function DiscordCategoryForm({category, discordConfigId, guildId}: {
     category?: components["schemas"]["DiscordCategoryItem"],
-    discordConfigId: string
+    discordConfigId: string,
+    guildId?: string | null,
 }) {
     const router = useRouter();
     const createCategory = useCreateDiscordCategory();
     const updateCategory = useUpdateDiscordCategory();
+    const {options: categoryOptions, loading: discoveryLoading, helperText} = useGuildResourceOptions('category', guildId);
 
     const handleSubmit = async (formData: FormData) => {
         const name = (formData.get('name') as string || '').trim();
@@ -42,8 +46,15 @@ export default function DiscordCategoryForm({category, discordConfigId}: {
                                defaultValue={category?.name || ''}/>
                 </Grid>
                 <Grid size={{xs: 2, sm: 1}}>
-                    <TextField fullWidth required variant="filled" label="Category ID" name="categoryId"
-                               defaultValue={category?.category_id || ''}/>
+                    <DiscordResourceSelect
+                        name="categoryId"
+                        label="Category"
+                        required
+                        options={categoryOptions}
+                        defaultId={category?.category_id}
+                        loading={discoveryLoading}
+                        helperText={helperText}
+                    />
                 </Grid>
                 <Grid size={2}>
                     <FormSaveButton/>

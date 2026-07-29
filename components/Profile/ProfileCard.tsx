@@ -20,7 +20,6 @@ export type ProfileCardUser = {
     email?: string | null;
     preferredName?: string | null;
     rating: number | string;
-    receiveEmail?: boolean;
     timezone?: string | null;
     bio?: string | null;
     noEditProfile?: boolean;
@@ -89,13 +88,6 @@ export default function ProfileCard({user, admin, viewOnly}: {
                         }}>
                         <Typography variant="subtitle2">Rating</Typography>
                         <Typography variant="body2">{typeof user.rating === 'number' ? getRating(user.rating) : user.rating}</Typography>
-                    </Grid>
-                    <Grid size={{
-                        xs: 2,
-                        sm: 1
-                    }}>
-                        <Typography variant="subtitle2">Receive Email</Typography>
-                        <Typography variant="body2">{user.receiveEmail ? "Yes" : "No"}</Typography>
                     </Grid>
                     <Grid size={{
                         xs: 2,

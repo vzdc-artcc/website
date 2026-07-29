@@ -3,12 +3,22 @@ import React from 'react';
 import {Stack, TextField} from "@mui/material";
 import {toast} from "react-toastify";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {useCreateDiscordConfig, useUpdateDiscordConfig} from "@/lib/osmium/hooks/discord";
+import {useCreateDiscordConfig, useDiscordGuilds, useUpdateDiscordConfig} from "@/lib/osmium/hooks/discord";
+import DiscordResourceSelect from "@/components/Discord/DiscordResourceSelect";
 import type {components} from "@/lib/osmium/generated/schema";
 
 export default function DiscordConfigForm({config}: { config?: components["schemas"]["DiscordConfigItem"] }) {
     const createConfig = useCreateDiscordConfig();
     const updateConfig = useUpdateDiscordConfig();
+    const {data: guilds, isLoading: guildsLoading, isError: guildsError} = useDiscordGuilds();
+
+    // Memoized on the discovery payload so the option array's identity is stable
+    // across unrelated re-renders (keeps DiscordResourceSelect's label-upgrade
+    // effect from firing every keystroke).
+    const guildOptions = React.useMemo(
+        () => (guilds?.guilds ?? []).map((g) => ({id: g.id, label: `${g.name} (${g.id})`})),
+        [guilds],
+    );
 
     const handleSubmit = async (formData: FormData) => {
         const name = (formData.get('name') as string || '').trim();
@@ -34,8 +44,16 @@ export default function DiscordConfigForm({config}: { config?: components["schem
             <Stack direction="column" spacing={2}>
                 <TextField fullWidth required variant="filled" label="Name" name="name"
                            defaultValue={config?.name}/>
-                <TextField fullWidth variant="filled" label="Guild ID" name="guildId"
-                           defaultValue={config?.guild_id ?? ''}/>
+                <DiscordResourceSelect
+                    name="guildId"
+                    label="Guild"
+                    options={guildOptions}
+                    defaultId={config?.guild_id}
+                    loading={guildsLoading}
+                    helperText={guildsError
+                        ? "Couldn't reach the Discord bot — enter a guild ID manually."
+                        : "Pick the server the bot is in, or type an ID."}
+                />
                 <FormSaveButton/>
             </Stack>
         </form>

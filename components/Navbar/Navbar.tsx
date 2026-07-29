@@ -14,7 +14,7 @@ export default function Navbar() {
             <Toolbar>
                 <Stack direction="row" spacing={3} alignItems="center">
                     <RootSidebar/>
-                    <Logo/>
+                    <Logo priority/>
                     <Box sx={{display: {xs: 'none', xl: 'flex',},}}>
                         <NavButtons/>
                     </Box>

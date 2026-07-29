@@ -24,7 +24,7 @@ export default function Page() {
             <CardContent>
                 <Typography variant="h5">New Role</Typography>
                 <Typography variant="subtitle2" sx={{mb: 2,}}>{config.name}</Typography>
-                <DiscordRoleForm discordConfigId={config.id}/>
+                <DiscordRoleForm discordConfigId={config.id} guildId={config.guild_id}/>
             </CardContent>
         </Card>
     );

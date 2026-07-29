@@ -1,19 +1,25 @@
 'use client';
 import React from 'react';
-import {Grid, TextField} from "@mui/material";
+import {Grid} from "@mui/material";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {useCreateDiscordRole, useUpdateDiscordRole} from "@/lib/osmium/hooks/discord";
+import DiscordResourceSelect from "@/components/Discord/DiscordResourceSelect";
+import DiscordNameSelect from "@/components/Discord/DiscordNameSelect";
+import {useGuildResourceOptions} from "@/components/Discord/useGuildResourceOptions";
+import {KNOWN_DISCORD_ROLE_NAME_PREFIXES} from "@/components/Discord/knownNames";
 import type {components} from "@/lib/osmium/generated/schema";
 
-export default function DiscordRoleForm({role, discordConfigId}: {
+export default function DiscordRoleForm({role, discordConfigId, guildId}: {
     role?: components["schemas"]["DiscordRoleItem"],
-    discordConfigId: string
+    discordConfigId: string,
+    guildId?: string | null,
 }) {
     const router = useRouter();
     const createRole = useCreateDiscordRole();
     const updateRole = useUpdateDiscordRole();
+    const {options: roleOptions, loading: discoveryLoading, helperText} = useGuildResourceOptions('role', guildId);
 
     const handleSubmit = async (formData: FormData) => {
         const name = (formData.get('name') as string || '').trim();
@@ -38,12 +44,25 @@ export default function DiscordRoleForm({role, discordConfigId}: {
         <form action={handleSubmit}>
             <Grid container columns={2} spacing={2}>
                 <Grid size={{xs: 2, sm: 1}}>
-                    <TextField fullWidth required variant="filled" label="Name" name="name"
-                               defaultValue={role?.name}/>
+                    <DiscordNameSelect
+                        name="name"
+                        label="Name"
+                        required
+                        options={KNOWN_DISCORD_ROLE_NAME_PREFIXES}
+                        defaultValue={role?.name}
+                        helperText="Start from a known prefix (e.g. impromptu_s1), or type your own."
+                    />
                 </Grid>
                 <Grid size={{xs: 2, sm: 1}}>
-                    <TextField fullWidth required variant="filled" label="Role ID" name="roleId"
-                               defaultValue={role?.role_id}/>
+                    <DiscordResourceSelect
+                        name="roleId"
+                        label="Role"
+                        required
+                        options={roleOptions}
+                        defaultId={role?.role_id}
+                        loading={discoveryLoading}
+                        helperText={helperText}
+                    />
                 </Grid>
                 <Grid size={2}>
                     <FormSaveButton/>

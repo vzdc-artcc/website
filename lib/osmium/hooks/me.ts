@@ -36,7 +36,6 @@ export function useUpdateMe() {
             preferred_name?: string | null,
             timezone?: string,
             bio?: string | null,
-            receive_event_notifications?: boolean,
             operating_initials?: string,
         }) => {
             const { data, error } = await osmium.PATCH("/api/v1/me", { body });

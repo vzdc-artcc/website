@@ -1,12 +1,11 @@
 'use client';
 import React from 'react';
 import {Filter} from 'bad-words';
-import {Autocomplete, Card, CardContent, Divider, Stack, Switch, TextField, Tooltip} from "@mui/material";
+import {Autocomplete, Card, CardContent, Divider, Stack, TextField} from "@mui/material";
 import {z} from "zod";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import FormControlLabel from '@mui/material/FormControlLabel';
 import {useMe, useUpdateMe} from "@/lib/osmium/hooks/me";
 import {useAdminUpdateProfile, useReassignOperatingInitials, useUserByCid} from "@/lib/osmium/hooks/users";
 import {useCreateDossierEntry} from "@/lib/osmium/hooks/training";
@@ -37,14 +36,12 @@ export default function ProfileEditCard({cid, admin = false}: {
     const defaultPreferredName = (admin ? targetProfile?.preferred_name : me?.profile.preferred_name) || '';
     const defaultBio = (admin ? targetProfile?.bio : me?.profile.bio) || '';
     const defaultOperatingInitials = (admin ? targetProfile?.operating_initials : me?.profile.operating_initials) || '';
-    const defaultNewEventNotifications = admin ? false : me?.profile.receive_event_notifications;
 
     const handleSubmit = async (formData: FormData) => {
         const schema = z.object({
             preferredName: z.string().max(40, "Preferred name must not be over 40 characters").optional(),
             bio: z.string().max(400, "Bio must not be over 400 characters").optional(),
             operatingInitials: z.string().length(2, "Operating Initials must be 2 characters").toUpperCase(),
-            newEventNotifications: z.boolean(),
             timezone: z.string().min(1, "Timezone is required"),
         });
 
@@ -52,7 +49,6 @@ export default function ProfileEditCard({cid, admin = false}: {
             preferredName: formData.get('preferredName') as string,
             bio: formData.get('bio') as string,
             operatingInitials: formData.get('operatingInitials') as string || defaultOperatingInitials,
-            newEventNotifications: formData.get('newEventNotifications') === 'on',
             timezone: formData.get('timezone') as string,
         });
 
@@ -103,7 +99,6 @@ export default function ProfileEditCard({cid, admin = false}: {
                 preferred_name: result.data.preferredName || null,
                 bio: result.data.bio || null,
                 timezone: result.data.timezone,
-                receive_event_notifications: result.data.newEventNotifications,
             });
         } catch {
             toast('Failed to update profile.', {type: 'error'});
@@ -147,16 +142,6 @@ export default function ProfileEditCard({cid, admin = false}: {
                                        helperText="Initials are automatically converted to uppercase on submit."
                                        defaultValue={defaultOperatingInitials}/>
                         }
-                        {!admin &&
-                            <FormControlLabel name="newEventNotifications"
-                                              control={<Switch defaultChecked={defaultNewEventNotifications}/>}
-                                              label="Receive NEW event notifications"/>}
-                        {!admin &&
-                            <Tooltip title={'As of now, this feature is DISABLED! Once implemented, toggling this off will remove you from any email notifications send from this site.'}
-                                     placement="top-start">
-                                <FormControlLabel name="receiveEmail" checked disabled control={<Switch/>}
-                                                  label="Receive non-urgent emails"/>
-                            </Tooltip>}
                         <FormSaveButton/>
                     </Stack>
                 </form>

@@ -44,6 +44,7 @@ export function useQueueAnnouncement() {
             details_url?: string,
             send_discord?: boolean,
             send_email?: boolean,
+            channel?: string,
         }) => {
             const { data, error } = await osmium.POST("/api/v1/admin/notifications/announcements", { body });
             if (error) throw error;

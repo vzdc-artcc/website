@@ -54,7 +54,7 @@ export default function DiscordLinkButton() {
             return;
         }
         try {
-            const result = await startLink.mutateAsync(`${window.location.origin}/api/discord/callback`);
+            const result = await startLink.mutateAsync(`${window.location.origin}/profile/overview`);
             if (result?.auth_url) {
                 window.location.href = result.auth_url;
             } else {

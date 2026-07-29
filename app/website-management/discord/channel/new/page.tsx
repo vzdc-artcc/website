@@ -24,7 +24,7 @@ export default function Page() {
             <CardContent>
                 <Typography variant="h5">New Channel</Typography>
                 <Typography variant="subtitle2" sx={{mb: 2,}}>{config.name}</Typography>
-                <DiscordChannelForm discordConfigId={config.id}/>
+                <DiscordChannelForm discordConfigId={config.id} guildId={config.guild_id}/>
             </CardContent>
         </Card>
     );

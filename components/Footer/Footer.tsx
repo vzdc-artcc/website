@@ -37,13 +37,14 @@ export default function Footer() {
                             <Image src={vatsim} alt="VATSIM" height={50}/>
                         </Link>
                     </Stack>
-                    <Tooltip title={`Developed by ${config.author}`}>
-                        <Box sx={{mt: 2, textAlign: 'center',}}>
-                            {DEV_MODE &&
-                                <Typography variant="subtitle2" color="limegreen">Development Build</Typography>}
-                            {!DEV_MODE && <Typography>v{config.version}</Typography>}
-                        </Box>
-                    </Tooltip>
+                    <Box sx={{mt: 2, textAlign: 'center',}}>
+                        <Tooltip title={`Developed by ${config.author}`}>
+                            <Typography component="span" variant="subtitle2"
+                                        color={DEV_MODE ? 'limegreen' : undefined}>
+                                {DEV_MODE ? 'Development Build' : `v${config.version}`}
+                            </Typography>
+                        </Tooltip>
+                    </Box>
                     <Box sx={{textAlign: 'center', my: 2,}}>
                         <DonationButton/>
                     </Box>

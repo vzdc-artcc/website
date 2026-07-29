@@ -43,6 +43,38 @@ export default function TrainerAssignmentRequestsTable({controllerStatus}: {
             renderCell: (params) => params.row.student_cid,
         },
         {
+            field: 'rating',
+            flex: 1,
+            headerName: 'Rating',
+            sortable: false,
+            renderCell: (params) => params.row.student_rating ?? 'N/A',
+        },
+        {
+            field: 'lastSession',
+            flex: 1,
+            headerName: 'Last Training Session',
+            sortable: false,
+            renderCell: (params) => {
+                const tickets = params.row.last_session_tickets ?? [];
+                if (tickets.length === 0) {
+                    return 'N/A';
+                }
+                return (
+                    <Stack direction="row" spacing={0.5} sx={{flexWrap: 'wrap'}}>
+                        {tickets.map((ticket: { lesson_identifier: string, passed: boolean }, i: number) => (
+                            <Chip
+                                key={i}
+                                label={ticket.lesson_identifier}
+                                size="small"
+                                color={ticket.passed ? 'success' : 'error'}
+                                style={{margin: '2px'}}
+                            />
+                        ))}
+                    </Stack>
+                );
+            },
+        },
+        {
             field: 'interestedTrainers',
             flex: 1,
             headerName: 'Interested Trainers',

@@ -16,6 +16,7 @@ import {
     Outbox,
     Security,
     Send,
+    SmartToy,
     Sync,
     VpnKey
 } from "@mui/icons-material";
@@ -53,6 +54,7 @@ const SECTIONS: { heading?: string; items: NavItem[] }[] = [
         heading: 'Integrations',
         items: [
             {href: '/website-management/discord', label: 'Discord Integrations', icon: <Chat/>},
+            {href: '/website-management/bot-features', label: 'Bot Features', icon: <SmartToy/>},
             {href: '/website-management/outbound-jobs', label: 'Outbound Jobs', icon: <Outbox/>},
         ],
     },
