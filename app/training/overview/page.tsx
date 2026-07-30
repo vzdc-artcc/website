@@ -7,9 +7,13 @@ import EnvironmentStatusCard from "@/components/Training/EnvironmentStatusCard";
 import TrainingStaffCounts from "@/components/Training/TrainingStaffCounts";
 import RecentTrainingActivity from "@/components/Training/RecentTrainingActivity";
 
-const TRAINING_ENVIRONMENTS = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["ERR-CONFIG"];
+// TRAINING_ENVIRONMENTS is a server-side (non-NEXT_PUBLIC) runtime env var. Read
+// it at request time, not module scope — otherwise this static page bakes its
+// value (or the ERR-CONFIG fallback) at BUILD time, ignoring the runtime env.
+export const dynamic = 'force-dynamic';
 
 export default function Page() {
+    const trainingEnvironments = process.env.TRAINING_ENVIRONMENTS?.split(",") || ["ERR-CONFIG"];
     return (
         (<Grid container columns={4} spacing={2}>
             <TrainingStaffCounts/>
@@ -18,7 +22,7 @@ export default function Page() {
                 <SyncStatusChip jobName="appointments_sync" label="Appointments Sync"/>
             </Grid>
             <Grid size={{xs: 4, md: 2,}}>
-                <EnvironmentStatusCard environments={TRAINING_ENVIRONMENTS}/>
+                <EnvironmentStatusCard environments={trainingEnvironments}/>
             </Grid>
             <Grid
                 size={{
