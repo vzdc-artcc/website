@@ -10,9 +10,13 @@ export const metadata: Metadata = {
     description: 'vZDC training admin page',
 };
 
-const {BUFFER_TIME} = process.env;
+// BUFFER_TIME is a server-side runtime env var — read it per-request, not at
+// module scope, so it isn't baked at build time. force-dynamic covers the
+// training routes rendered under this layout.
+export const dynamic = 'force-dynamic';
 
 export default function Layout({children}: { children: React.ReactNode }) {
+    const {BUFFER_TIME} = process.env;
 
     return (
         <RequirePermission perm="pages.training_admin.read">
