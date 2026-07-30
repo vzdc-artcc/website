@@ -1,5 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { osmium } from "@/lib/osmium/client";
+import type { components } from "@/lib/osmium/generated/schema";
+
+export type UserListItem = components["schemas"]["UserListItem"];
 
 export function useRosterControllers() {
     return useQuery({
@@ -10,6 +13,34 @@ export function useRosterControllers() {
             });
             if (error) throw error;
             return data;
+        },
+    });
+}
+
+/**
+ * Loads the ENTIRE user list for client-side search. osmium's `/users` endpoint
+ * has no text-search param and caps `page_size` at 200, so we page through it
+ * (using `has_next`) and accumulate every user. Cached for 5 minutes since the
+ * roster changes slowly. Use with an Autocomplete that filters client-side.
+ */
+export function useAllUsers() {
+    return useQuery({
+        queryKey: ["osmium", "users", "all"],
+        staleTime: 5 * 60 * 1000,
+        queryFn: async () => {
+            const items: UserListItem[] = [];
+            let page = 1;
+            // Hard cap the loop so a bad `has_next` can never spin forever.
+            for (let i = 0; i < 50; i++) {
+                const { data, error } = await osmium.GET("/api/v1/users", {
+                    params: { query: { page, page_size: 200 } },
+                });
+                if (error) throw error;
+                items.push(...(data?.items ?? []));
+                if (!data?.has_next) break;
+                page += 1;
+            }
+            return items;
         },
     });
 }
