@@ -1,12 +1,12 @@
 import React from 'react';
 import {IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography} from "@mui/material";
-import {AtcBooking} from "@/lib/atcBooking";
+import {AtcBookingItem} from "@/lib/osmium/hooks/bookings";
 import AtcBookingDeleteButton from "@/components/AtcBooking/AtcBookingDeleteButton";
 import Link from "next/link";
 import {Edit} from "@mui/icons-material";
 import {formatTimezoneDate} from "@/lib/date";
 
-export default function AtcBookingTable({ bookings, timeZone }: { bookings: AtcBooking[], timeZone: string }) {
+export default function AtcBookingTable({ bookings, timeZone }: { bookings: AtcBookingItem[], timeZone: string }) {
 
     if (!bookings || bookings.length === 0) {
         return <Typography>No ATC Bookings found.</Typography>;
@@ -34,7 +34,7 @@ export default function AtcBookingTable({ bookings, timeZone }: { bookings: AtcB
                                     <Edit />
                                 </IconButton>
                             </Link>
-                            <AtcBookingDeleteButton bookingId={booking.id + ""}/>
+                            <AtcBookingDeleteButton bookingId={booking.id}/>
                         </TableCell> : <TableCell>
                             <Typography>DISABLED - TRAINING APPOINTMENT</Typography>
                         </TableCell>}

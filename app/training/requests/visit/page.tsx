@@ -1,20 +1,14 @@
 import React from 'react';
 import {Card, CardContent, Typography} from "@mui/material";
-import VisitTrainerAssignmentRequestsTable from "@/components/TrainerAssignmentRequest/VisitTrainerAssignmentRequestsTable";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
+import TrainerAssignmentRequestsTable from "@/components/TrainerAssignmentRequest/TrainerAssignmentRequestsTable";
 
-export default async function Page() {
-
-    const session = await getServerSession(authOptions);
-
-    const isTaOrAtaOrWm = session?.user?.staffPositions.includes('TA') || session?.user?.staffPositions.includes('ATA') || session?.user?.staffPositions.includes('WM');
+export default function Page() {
 
     return (
         <Card>
             <CardContent>
                 <Typography variant="h5" sx={{mb: 1,}}>Visiting Controller Trainer Assignment Requests</Typography>
-                <VisitTrainerAssignmentRequestsTable manageMode={!!isTaOrAtaOrWm}/>
+                <TrainerAssignmentRequestsTable controllerStatus="VISITOR"/>
             </CardContent>
         </Card>
     );

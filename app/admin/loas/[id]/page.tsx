@@ -1,29 +1,16 @@
+'use client';
 import React from 'react';
-import prisma from "@/lib/db";
-import {notFound} from "next/navigation";
-import {Card, CardContent, Chip, Grid, Stack, Typography} from "@mui/material";
-import {LOAStatus} from "@/generated/prisma/client";
+import {useParams} from 'next/navigation';
+import {Box, Card, CardContent, Chip, CircularProgress, Grid, Stack, Typography} from "@mui/material";
 import LoaDecisionForm from "@/components/LOA/LOADecisionForm";
+import {useAdminLoas} from "@/lib/osmium/hooks/loa";
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-    const params = await props.params;
+export default function Page() {
+    const params = useParams<{ id: string }>();
+    const {data, isLoading, isError} = useAdminLoas({pageSize: 200});
+    const loa = data?.items.find((item) => item.id === params.id);
 
-    const {id} = params;
-
-    const loa = await prisma.lOA.findUnique({
-        where: {
-            id,
-        },
-        include: {
-            user: true,
-        },
-    });
-
-    if (!loa) {
-        notFound();
-    }
-
-    const getLoaColor = (status: LOAStatus) => {
+    const getLoaColor = (status: string) => {
         switch (status) {
             case "APPROVED":
                 return "success";
@@ -36,6 +23,14 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
         }
     }
 
+    if (isLoading) {
+        return <Box sx={{display: 'flex', justifyContent: 'center', my: 4}}><CircularProgress/></Box>;
+    }
+
+    if (isError || !loa) {
+        return <Typography>LOA not found.</Typography>;
+    }
+
     return (
         (<Card>
             <CardContent>
@@ -44,7 +39,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                     <Chip label={loa.status} color={getLoaColor(loa.status)}/>
                 </Stack>
                 <Typography
-                    variant="subtitle2">{loa.user.firstName} {loa.user.lastName} ({loa.user.cid})</Typography>
+                    variant="subtitle2">{loa.display_name} ({loa.cid})</Typography>
                 <Grid container spacing={2} columns={2} sx={{mt: 2, mb: 4,}}>
                     <Grid
                         size={{
@@ -52,7 +47,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Start</Typography>
-                        <Typography variant="body2">{loa.start.toDateString()}</Typography>
+                        <Typography variant="body2">{new Date(loa.start).toDateString()}</Typography>
                     </Grid>
                     <Grid
                         size={{
@@ -60,7 +55,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">End</Typography>
-                        <Typography variant="body2">{loa.end.toDateString()}</Typography>
+                        <Typography variant="body2">{new Date(loa.end).toDateString()}</Typography>
                     </Grid>
                     <Grid size={2}>
                         <Typography variant="subtitle2">Reason for LOA</Typography>

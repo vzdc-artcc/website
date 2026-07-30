@@ -1,31 +1,39 @@
 'use client';
 import React from 'react';
-import {VisitorApplication} from "@/generated/prisma/browser";
 import {Box, Button, Divider, Stack, TextField} from "@mui/material";
 import {Check, Clear} from "@mui/icons-material";
-import {addVisitor, rejectVisitor} from "@/actions/visitor";
+import {useDecideVisitorApplication} from "@/lib/osmium/hooks/visitor";
 import {toast} from "react-toastify";
-import {User} from "next-auth";
 
-export default function VisitorApplicationDecisionForm({application, user}: {
-    application: VisitorApplication,
-    user: User,
+export default function VisitorApplicationDecisionForm({application}: {
+    application: {id: string},
 }) {
+
+    const decideVisitorApplication = useDecideVisitorApplication();
 
     const handleAccept = async () => {
         try {
-            await addVisitor(application, user);
+            await decideVisitorApplication.mutateAsync({applicationId: application.id, status: 'APPROVED'});
             toast("Controller added to roster successfully!", {type: "success"});
-        } catch (e) {
+        } catch {
             toast("There was an unexpected error trying to add the controller to the visiting roster.", {type: "error"});
         }
     }
 
     const handleReject = async (formData: FormData) => {
+        const reason = (formData.get("reason") as string || '').trim();
+        if (!reason) {
+            toast("A reason for rejection is required.", {type: "error"});
+            return;
+        }
         try {
-            await rejectVisitor({...application, reasonForDenial: formData.get("reason") as string}, user);
+            await decideVisitorApplication.mutateAsync({
+                applicationId: application.id,
+                status: 'DENIED',
+                reasonForDenial: reason,
+            });
             toast("Visitor rejected successfully", {type: "success"});
-        } catch (e) {
+        } catch {
             toast("There was an unexpected error trying to reject the visiting request.", {type: "error"});
         }
     }
@@ -36,8 +44,7 @@ export default function VisitorApplicationDecisionForm({application, user}: {
                 <form action={handleReject}>
                     <Stack direction="row" spacing={1} alignItems="center">
                         <TextField variant="filled" rows={4} fullWidth multiline name="reason"
-                                   label="Reason for rejection"
-                                   helperText="A reason is not required, but is highly encouraged"/>
+                                   label="Reason for rejection" required/>
                         <Box>
                             <Button type="submit" variant="contained" size="large" color="error"
                                     startIcon={<Clear/>}>Reject</Button>

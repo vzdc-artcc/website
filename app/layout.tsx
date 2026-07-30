@@ -15,11 +15,10 @@ import Footer from "@/components/Footer/Footer";
 import {ToastContainer} from "react-toastify";
 import InitColorSchemeScript from "@mui/system/InitColorSchemeScript";
 import BroadcastViewer from "@/components/BroadcastViewer/BroadcastViewer";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
+import ImpersonationBanner from "@/components/Impersonation/ImpersonationBanner";
 import WelcomeMessageDialog from "@/components/WelcomeMessages/WelcomeMessageDialog";
-import prisma from "@/lib/db";
 import StaffTasksAlert from "@/components/Admin/StaffTasksAlert";
+import OsmiumQueryProvider from "@/lib/osmium/QueryProvider";
 
 export const metadata: Metadata = {
     title: "Virtual Washington ARTCC",
@@ -33,27 +32,24 @@ const roboto = Roboto({
     variable: '--font-roboto',
 });
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
     children: ReactNode;
 }>) {
 
-    const session = await getServerSession(authOptions);
-
-    const welcomeMessages = await prisma.welcomeMessages.findFirst();
-
   return (
       <html lang="en" suppressHydrationWarning>
       <body className={roboto.variable}>
+    <InitColorSchemeScript attribute="class" defaultMode="system"/>
     <AppRouterCacheProvider>
         <ThemeProvider theme={theme}>
             <CssBaseline/>
-            <InitColorSchemeScript attribute="class" defaultMode="system"/>
+            <OsmiumQueryProvider>
             <div>
-                {session?.user && <BroadcastViewer user={session.user}/>}
-                {session?.user && session.user.controllerStatus !== 'NONE' && welcomeMessages &&
-                    <WelcomeMessageDialog user={session.user} welcomeMessages={welcomeMessages}/>}
+                <ImpersonationBanner/>
+                <BroadcastViewer/>
+                <WelcomeMessageDialog/>
                 <Navbar/>
                 <Container maxWidth="xl" sx={{marginTop: 2,}}>
                     <StaffTasksAlert/>
@@ -62,6 +58,7 @@ export default async function RootLayout({
                 <Footer/>
                 <ToastContainer theme="dark"/>
             </div>
+            </OsmiumQueryProvider>
         </ThemeProvider>
     </AppRouterCacheProvider>
     </body>

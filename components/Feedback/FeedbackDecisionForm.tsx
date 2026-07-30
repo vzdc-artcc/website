@@ -1,17 +1,28 @@
 'use client';
 import React from 'react';
-import {Feedback} from "@/generated/prisma/browser";
 import {Box, Button, Divider, Stack, TextField} from "@mui/material";
 import {Delete, Send} from "@mui/icons-material";
 import {toast} from "react-toastify";
-import {releaseFeedback, stashFeedback} from "@/actions/feedback";
+import {components} from "@/lib/osmium/generated/schema";
+import {useDecideFeedback} from "@/lib/osmium/hooks/feedback";
 
-export default function FeedbackDecisionForm({feedback}: { feedback: Feedback, }) {
-    const [staffComments, setStaffComments] = React.useState(feedback.staffComments || '');
+type FeedbackItem = components["schemas"]["FeedbackItem"];
+
+export default function FeedbackDecisionForm({feedback}: { feedback: FeedbackItem, }) {
+    const [staffComments, setStaffComments] = React.useState(feedback.staff_comments || '');
+    const decideFeedback = useDecideFeedback();
 
     const handleRelease = async (formData: FormData) => {
-        await releaseFeedback({...feedback, staffComments: formData.get("reason") as string});
-        toast("Feedback released successfully!", {type: "success"});
+        try {
+            await decideFeedback.mutateAsync({
+                feedbackId: feedback.id,
+                status: "RELEASED",
+                staffComments: (formData.get("reason") as string) || null,
+            });
+            toast("Feedback released successfully!", {type: "success"});
+        } catch {
+            toast("Failed to release feedback", {type: "error"});
+        }
     }
 
     const handleStash = async () => {
@@ -19,8 +30,16 @@ export default function FeedbackDecisionForm({feedback}: { feedback: Feedback, }
             toast("Staff comments are required when stashing feedback", {type: "error"});
             return;
         }
-        await stashFeedback({...feedback, staffComments});
-        toast("Feedback stashed successfully!", {type: "success"});
+        try {
+            await decideFeedback.mutateAsync({
+                feedbackId: feedback.id,
+                status: "STASHED",
+                staffComments,
+            });
+            toast("Feedback stashed successfully!", {type: "success"});
+        } catch {
+            toast("Failed to stash feedback", {type: "error"});
+        }
     }
 
     return (

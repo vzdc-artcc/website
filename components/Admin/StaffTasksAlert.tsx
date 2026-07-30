@@ -1,66 +1,26 @@
+'use client';
 import React from 'react';
-import prisma from "@/lib/db";
-import {Alert} from "@mui/material";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
+import StaffTasksAlertClient from "@/components/Admin/StaffTasksAlertClient";
+import {useMe} from "@/lib/osmium/hooks/me";
+import {useStaffPositions} from "@/lib/osmium/hooks/staff-positions";
 
-export default async function StaffTasksAlert() {
+const SENIOR_STAFF_POSITIONS = ['ATM', 'DATM', 'TA', 'WM'];
 
-    const session = await getServerSession(authOptions);
+/**
+ * Shows the pending-staff-tasks banner to senior staff (ATM/DATM/TA/WM),
+ * gated on osmium's staff-position data (Phase 6) instead of the NextAuth
+ * session's frozen `staffPositions`.
+ */
+export default function StaffTasksAlert() {
+    const {data: me} = useMe();
+    const {data: positions} = useStaffPositions(me?.cid ?? NaN);
 
-    if (!session?.user || !session.user.staffPositions.some(pos => ['ATM', 'DATM', 'TA', 'WM'].includes(pos)
-    )) {
+    const isSeniorStaff = (positions?.positions ?? [])
+        .some((p) => SENIOR_STAFF_POSITIONS.includes(p.position));
+
+    if (!me || !isSeniorStaff) {
         return <></>;
     }
 
-    const pendingVisitorApplications = await prisma.visitorApplication.count({
-        where: {
-            status: "PENDING",
-        },
-    });
-
-    const pendingFeedback = await prisma.feedback.count({
-        where: {
-            status: "PENDING",
-        },
-    });
-
-    const activeIncidentReports = await prisma.incidentReport.count({
-        where: {
-            closed: false,
-        },
-    });
-
-    const pendingLoas = await prisma.lOA.count({
-        where: {
-            status: "PENDING",
-        },
-    });
-
-    const pendingAdminTasks = pendingVisitorApplications + pendingFeedback + activeIncidentReports + pendingLoas;
-
-    const trainingReleaseRequests = await prisma.trainerReleaseRequest.count();
-
-    const pendingOtsRecs = await prisma.otsRecommendation.count({
-        where: {
-            assignedInstructorId: null,
-        },
-    });
-
-    const pendingTrainingTasks = trainingReleaseRequests + pendingOtsRecs;
-
-    return (
-        <>
-            {pendingAdminTasks > 0 &&
-                <Alert severity="warning" sx={{my: 1,}}>
-                    There {pendingAdminTasks == 1 ? 'is' : 'are'} currently <b>{pendingAdminTasks} pending senior staff
-                    task{pendingAdminTasks == 1 ? '' : 's'}</b> under Facility Administration.
-                </Alert>}
-            {pendingTrainingTasks > 0 &&
-                <Alert severity="warning" sx={{my: 1,}}>
-                    There {pendingTrainingTasks == 1 ? 'is' : 'are'} currently <b>{pendingTrainingTasks} pending TA
-                    task{pendingTrainingTasks == 1 ? '' : 's'}</b> under Training Administration.
-                </Alert>}
-        </>
-    );
+    return <StaffTasksAlertClient/>;
 }

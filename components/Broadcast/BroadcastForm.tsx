@@ -1,46 +1,97 @@
 'use client';
 import React, {useState} from 'react';
-import {ChangeBroadcast, File} from "@/generated/prisma/browser";
-import Form from "next/form";
-import {Autocomplete, FormControlLabel, Grid, Switch, TextField, Typography} from "@mui/material";
-import {MailGroup} from "@/app/admin/mail/page";
+import {
+    Autocomplete,
+    FormControlLabel,
+    Grid,
+    Switch,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TextField,
+    Typography
+} from "@mui/material";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {createOrUpdateBroadcast} from "@/actions/broadcast";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
+import {useCreateBroadcast, useUpdateBroadcast} from "@/lib/osmium/hooks/broadcasts";
+import BroadcastRecipientPicker from "@/components/Broadcast/BroadcastRecipientPicker";
+import {formatZuluDate} from "@/lib/date";
 
-export default function BroadcastForm({broadcast, file, allFiles, groups,}: {
-    broadcast?: ChangeBroadcast,
-    file?: File,
-    allFiles: File[],
-    groups: MailGroup[],
+interface PublicationOption {
+    id: string;
+    title: string;
+}
+
+interface BroadcastRecipient {
+    cid: number;
+    name: string;
+    seen_at?: string | null;
+    agreed_at?: string | null;
+}
+
+interface ExistingBroadcast {
+    id: string;
+    title: string;
+    description: string;
+    file_id?: string | null;
+    exempt_staff: boolean;
+    recipients?: BroadcastRecipient[];
+}
+
+export default function BroadcastForm({broadcast, allFiles}: {
+    broadcast?: ExistingBroadcast,
+    allFiles: PublicationOption[],
 }) {
 
     const router = useRouter();
-    const [selectedFile, setSelectedFile] = useState<File | undefined>(file);
+    const createBroadcast = useCreateBroadcast();
+    const updateBroadcast = useUpdateBroadcast();
+    const [selectedFile, setSelectedFile] = useState<PublicationOption | null>(
+        allFiles.find((f) => f.id === broadcast?.file_id) || null
+    );
     const [description, setDescription] = useState<string>(broadcast?.description || '');
-    const [selectedOptions, setSelectedOptions] = useState<({ group: string; name: string; ids: string[]; } | {
-        name: string;
-        id: string;
-        group: string;
-    })[]>([]);
+    const [title, setTitle] = useState<string>(broadcast?.title || '');
+    const [exemptStaff, setExemptStaff] = useState<boolean>(broadcast?.exempt_staff || false);
+    const [recipientGroups, setRecipientGroups] = useState<string[]>([]);
 
-    const options = [
-        ...groups.map(group => ({...group, group: 'Groups'})),
-    ];
+    const handleSubmit = async (_formData: FormData) => {
+        if (!title.trim() || !description.trim()) {
+            toast('Please fill out all required fields.', {type: 'error'});
+            return;
+        }
 
-    const selectedIds = selectedOptions.flatMap(option => 'ids' in option ? option.ids : [option.id]);
-    const uniqueSelectedIds = Array.from(new Set(selectedIds));
+        if (!broadcast && recipientGroups.length === 0) {
+            toast('Please select at least one recipient group.', {type: 'error'});
+            return;
+        }
 
-    const handleSubmit = async (formData: FormData) => {
-        formData.set('file', selectedFile?.id || '');
-        formData.set('description', description);
-
-        const {errors} = await createOrUpdateBroadcast(formData);
-
-        if (errors) {
-            toast.error(errors.map(e => e.message).join('. '));
+        try {
+            if (broadcast) {
+                await updateBroadcast.mutateAsync({
+                    broadcastId: broadcast.id,
+                    body: {
+                        title,
+                        description,
+                        file_id: selectedFile?.id || null,
+                        exempt_staff: exemptStaff,
+                    },
+                });
+            } else {
+                await createBroadcast.mutateAsync({
+                    title,
+                    description,
+                    file_id: selectedFile?.id || null,
+                    exempt_staff: exemptStaff,
+                    recipient_groups: recipientGroups,
+                });
+            }
+        } catch {
+            toast('Failed to save broadcast.', {type: 'error'});
             return;
         }
 
@@ -51,60 +102,71 @@ export default function BroadcastForm({broadcast, file, allFiles, groups,}: {
     }
 
     return (
-        <Form action={handleSubmit}>
-            <input type="hidden" name="id" value={broadcast?.id}/>
-            <input type="hidden" name="users" value={uniqueSelectedIds}/>
-            <Grid container columns={2} spacing={2}>
-                {!broadcast && <Grid size={2}>
-                    <Autocomplete
-                        id="group-user-autocomplete"
-                        options={options}
-                        groupBy={(option) => option.group}
-                        getOptionLabel={(option) => option.name}
-                        onChange={(event, newValue) => {
-                            setSelectedOptions(newValue);
-                        }}
-                        value={selectedOptions}
-                        renderInput={(params) => <TextField {...params} label="Broadcast To" variant="filled"
-                                                            helperText="You cannot change this later."/>}
-                        multiple
-                        disableCloseOnSelect
-                    />
-                </Grid>}
-                <Grid size={2}>
-                    <TextField fullWidth variant="filled" name="title" label="Title"
-                               defaultValue={broadcast?.title || ''}/>
-                </Grid>
-                <Grid size={2}>
-                    <Typography gutterBottom>Description:</Typography>
-                    <MarkdownEditor
-                        enableScroll={false}
-                        minHeight="200px"
-                        value={description}
-                        onChange={(d) => setDescription(d)}
-                    />
-                </Grid>
-                {!broadcast && <Grid size={2}>
-                    <FormControlLabel name="exemptStaff"
-                                      control={<Switch/>}
-                                      label="Exempt 'STAFF'? (Cannot be changed later)"/>
-                </Grid>}
-                <Grid size={2}>
-                    <Autocomplete
-                        id="file-autocomplete"
-                        options={allFiles}
-                        getOptionLabel={(option) => option.name}
-                        onChange={(event, newValue) => {
-                            setSelectedFile(newValue || undefined);
-                        }}
-                        value={selectedFile}
-                        renderInput={(params) => <TextField {...params} label="File (optional)" variant="filled"/>}
-                    />
-                </Grid>
-                <Grid size={2}>
-                    <FormSaveButton/>
-                </Grid>
+        <form action={handleSubmit}>
+        <Grid container columns={2} spacing={2}>
+            {!broadcast && <Grid size={2}>
+                <BroadcastRecipientPicker selectedGroups={recipientGroups} onChange={setRecipientGroups}/>
+            </Grid>}
+            <Grid size={2}>
+                <TextField fullWidth variant="filled" label="Title" value={title}
+                           onChange={(e) => setTitle(e.target.value)}/>
             </Grid>
-        </Form>
+            <Grid size={2}>
+                <Typography gutterBottom>Description:</Typography>
+                <MarkdownEditor
+                    enableScroll={false}
+                    minHeight="200px"
+                    value={description}
+                    onChange={(d) => setDescription(d)}
+                />
+            </Grid>
+            {!broadcast && <Grid size={2}>
+                <FormControlLabel
+                    control={<Switch checked={exemptStaff} onChange={(e) => setExemptStaff(e.target.checked)}/>}
+                    label="Exempt 'STAFF'? (Cannot be changed later)"/>
+            </Grid>}
+            <Grid size={2}>
+                <Autocomplete
+                    id="file-autocomplete"
+                    options={allFiles}
+                    getOptionLabel={(option) => option.title}
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    onChange={(event, newValue) => setSelectedFile(newValue)}
+                    value={selectedFile}
+                    renderInput={(params) => <TextField {...params} label="File (optional)" variant="filled"/>}
+                />
+            </Grid>
+            <Grid size={2}>
+                <FormSaveButton/>
+            </Grid>
+            {broadcast?.recipients && (
+                <Grid size={2}>
+                    <Typography variant="h6" gutterBottom>Recipients</Typography>
+                    <TableContainer>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Controller</TableCell>
+                                    <TableCell>Seen</TableCell>
+                                    <TableCell>Reviewed</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {broadcast.recipients
+                                    .sort((a, b) => a.name.localeCompare(b.name))
+                                    .map((r) => (
+                                        <TableRow key={r.cid}>
+                                            <TableCell>{r.name} ({r.cid})</TableCell>
+                                            <TableCell>{r.seen_at ? formatZuluDate(new Date(r.seen_at)) : '-'}</TableCell>
+                                            <TableCell>{r.agreed_at ? formatZuluDate(new Date(r.agreed_at)) : '-'}</TableCell>
+                                        </TableRow>
+                                    ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Grid>
+            )}
+        </Grid>
+        </form>
     );
 }

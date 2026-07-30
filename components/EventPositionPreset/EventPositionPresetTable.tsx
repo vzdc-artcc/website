@@ -1,37 +1,35 @@
 'use client';
-import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "../DataTable/DataTable";
-import {fetchEventPresets} from "@/actions/eventPreset";
-import {EventPositionPreset} from "@/generated/prisma/browser";
+import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import {EventPositionPresetDeleteButton} from "./EventPositionPresetDeleteButton";
-import {Tooltip} from "@mui/material";
+import {Box, Tooltip} from "@mui/material";
 import {Edit} from "@mui/icons-material";
 import {useRouter} from "next/navigation";
+import {useEventPositionPresets} from "@/lib/osmium/hooks/events";
 
 export function EventPositionPresetTable() {
-    
+
     const router = useRouter();
+    const {data, isLoading} = useEventPositionPresets();
+    const rows = data?.items ?? [];
 
     const columns: GridColDef[] = [
         {
-            field: 'name', 
-            headerName: 'Name', 
-            flex: 1, 
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator]
+            field: 'name',
+            headerName: 'Name',
+            flex: 1,
         },
         {
-            field: 'positions', 
+            field: 'positions',
             headerName: 'Positions',
-            flex: 2, 
+            flex: 2,
             renderCell: (params) => {
-                const positions = params.row.positions;
+                const positions: string[] = params.row.positions;
                 if (positions.length <= 4) {
                     return positions.join(', ');
                 }
                 const firstFour = positions.slice(0, 4).join(', ');
                 return `${firstFour}, ${positions.length - 4} more`;
-            },            
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator]
+            },
         },
         {
             field: 'actions',
@@ -46,19 +44,24 @@ export function EventPositionPresetTable() {
                         onClick={() => router.push(`/events/admin/event-presets/${params.row.id}`)}
                     />
                 </Tooltip>,
-                <EventPositionPresetDeleteButton key={`deletebtn-${params.row.id}`} positionPreset={params.row as EventPositionPreset} />,
+                <EventPositionPresetDeleteButton key={`deletebtn-${params.row.id}`} positionPreset={params.row}/>,
             ],
         }
     ];
 
     return (
-        <DataTable columns={columns} initialSort={[{field: 'name', sort: 'asc',}]}
-                   fetchData={async (pagination, sortModel, filter) => {
-                       const eventPresets = await fetchEventPresets(pagination, sortModel, filter);
-                       return {
-                           data: eventPresets[1],
-                           rowCount: eventPresets[0],
-                       };
-                   }}/>
+        <Box sx={{boxSizing: 'border-box', width: '100%'}}>
+            <DataGrid
+                loading={isLoading}
+                columns={columns}
+                rows={rows}
+                initialState={{
+                    sorting: {sortModel: [{field: 'name', sort: 'asc'}]},
+                    pagination: {paginationModel: {pageSize: 10}},
+                }}
+                pageSizeOptions={[5, 10, 20]}
+                autoHeight
+            />
+        </Box>
     );
 }

@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
 import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
-import {fetchStaffingRequests} from "@/actions/staffingRequest";
+import DataTable, {containsOnlyFilterOperator} from "@/components/DataTable/DataTable";
+import {osmium} from "@/lib/osmium/client";
 import {useRouter} from "next/navigation";
 import {Visibility} from "@mui/icons-material";
 import {Tooltip} from "@mui/material";
@@ -16,28 +16,23 @@ export default function StaffingRequestTable() {
             headerName: 'User',
             flex: 1,
             sortable: false,
-            renderCell: (params) => `${params.row.user.firstName} ${params.row.user.lastName}`,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
-        },
-        {
-            field: 'cid',
-            headerName: 'CID',
-            flex: 1,
-            renderCell: (params) => params.row.user.cid,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+            renderCell: (params) => `${params.row.display_name} (${params.row.cid})`,
+            filterOperators: containsOnlyFilterOperator,
         },
         {
             field: 'email',
             headerName: 'Email',
             flex: 1,
-            renderCell: (params) => params.row.user.email,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+            sortable: false,
+            filterable: false,
+            renderCell: (params) => params.row.email,
         },
         {
             field: 'name',
             headerName: 'Proposed Name',
             flex: 1,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+            sortable: false,
+            filterable: false,
         },
         {
             field: 'actions',
@@ -59,10 +54,31 @@ export default function StaffingRequestTable() {
     return (
         <DataTable columns={columns} initialSort={[{field: 'name', sort: 'asc'}]}
                    fetchData={async (pagination, sortModel, filter) => {
-                       const staffingRequests = await fetchStaffingRequests(pagination, sortModel, filter);
+                       let cid: number | undefined;
+                       let displayName: string | undefined;
+
+                       if (filter && filter.field === 'user' && filter.value) {
+                           const value = filter.value as string;
+                           const asNumber = Number(value);
+                           if (!Number.isNaN(asNumber)) cid = asNumber;
+                           else displayName = value;
+                       }
+
+                       const {data, error} = await osmium.GET("/api/v1/admin/staffing-requests", {
+                           params: {
+                               query: {
+                                   page: pagination.page + 1,
+                                   page_size: pagination.pageSize,
+                                   cid,
+                                   display_name: displayName,
+                               },
+                           },
+                       });
+                       if (error) throw error;
+
                        return {
-                           data: staffingRequests[1],
-                           rowCount: staffingRequests[0],
+                           data: data?.items ?? [],
+                           rowCount: data?.total ?? 0,
                        };
                    }}/>
     );

@@ -3,7 +3,6 @@ import Link from "next/link";
 import {List, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import {
     AddComment,
-    AirplanemodeActive,
     BarChart,
     CalendarMonth,
     ListAlt,
@@ -37,14 +36,6 @@ export default function QuickLinksList() {
                         <BarChart/>
                     </ListItemIcon>
                     <ListItemText primary="Statistics"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/airports" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <AirplanemodeActive/>
-                    </ListItemIcon>
-                    <ListItemText primary="Airport Database"/>
                 </ListItemButton>
             </Link>
             <Link href="/sua/new" style={{textDecoration: 'none', color: 'inherit',}}>

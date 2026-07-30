@@ -1,12 +1,12 @@
 import React from 'react';
-import {File} from '@/generated/prisma/browser';
 import {IconButton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import Link from "next/link";
 import {Edit, OpenInNew} from "@mui/icons-material";
 import FileDeleteButton from "@/components/Files/FileDeleteButton";
+import {Publication} from "@/lib/osmium/hooks/publications";
 
-export default async function FileTable({files, admin, ids = true,}: {
-    files: File[],
+export default function FileTable({files, admin, ids = true,}: {
+    files: Publication[],
     admin?: boolean,
     ids?: boolean,
 }) {
@@ -17,9 +17,9 @@ export default async function FileTable({files, admin, ids = true,}: {
                 <TableHead>
                     <TableRow>
                         <TableCell>Name</TableCell>
-                        {admin && <TableCell>Alias</TableCell>}
                         <TableCell>Description</TableCell>
                         <TableCell>Updated At (UTC)</TableCell>
+                        {admin && <TableCell>Status</TableCell>}
                         {admin && <TableCell>Actions</TableCell>}
                     </TableRow>
                 </TableHead>
@@ -27,21 +27,21 @@ export default async function FileTable({files, admin, ids = true,}: {
                     {files.map((file) => (
                         <TableRow key={file.id}>
                             <TableCell>
-                                <Link href={ids ? `https://utfs.io/f/${file.key}` : `/publications/${file.id}`}
+                                <Link href={ids ? file.cdn_url : `/publications/${file.id}`}
                                       target={ids ? '_self' : '_blank'}
-                                      style={{color: file.highlightColor || 'inherit', textDecoration: 'none'}}>
+                                      style={{color: 'inherit', textDecoration: 'none'}}>
                                     <Stack direction="row" alignItems="center">
-                                        {file.name}
+                                        {file.title}
                                         {!ids && <OpenInNew fontSize="small"/>}
                                     </Stack>
                                 </Link>
                             </TableCell>
-                            {admin && <TableCell>{file.alias}</TableCell>}
                             <TableCell>{file.description}</TableCell>
-                            <TableCell>{file.updatedAt.toUTCString()}</TableCell>
+                            <TableCell>{new Date(file.updated_at).toUTCString()}</TableCell>
+                            {admin && <TableCell>{file.status}</TableCell>}
                             {admin && <TableCell>
-                                <Link href={`/admin/files/${file.categoryId}/${file.id}`}
-                                      style={{color: file.highlightColor || 'inherit',}}>
+                                <Link href={`/admin/files/${file.category_id}/${file.id}`}
+                                      style={{color: 'inherit',}}>
                                     <IconButton>
                                         <Edit/>
                                     </IconButton>

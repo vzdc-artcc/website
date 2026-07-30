@@ -1,36 +1,30 @@
 'use client';
-import {publishEventPosition, unpublishEventPosition} from "@/actions/eventPosition";
 import {Publish, Unpublished} from "@mui/icons-material";
 import {IconButton, Tooltip} from "@mui/material";
-import {Event, EventPosition} from "@/generated/prisma/browser";
 import {toast} from "react-toastify";
+import {useUpdateEventPosition} from "@/lib/osmium/hooks/events";
 
-export default function EventPositionPublishButton({ event, position, }: { event: Event, position: EventPosition, }) {
-    
+export default function EventPositionPublishButton({eventId, position}: {
+    eventId: string,
+    position: { id: string, published: boolean },
+}) {
+
+    const updatePosition = useUpdateEventPosition(eventId);
+
     const handleClick = async () => {
-        
-        if (position.published) {
-            await unpublishEventPosition(event, position);
-            toast.success('Position unpublished successfully!');
-            return;
+        try {
+            await updatePosition.mutateAsync({positionId: position.id, body: {published: !position.published}});
+            toast.success(`Position ${position.published ? 'unpublished' : 'published'} successfully!`);
+        } catch {
+            toast.error('Failed to update position.');
         }
-
-        const {error} = await publishEventPosition(event, position);
-
-        if (error) {
-            toast.error(error.errors.map((error) => error.message).join('.  '));
-            return;
-        }
-
-        toast.success('Position published successfully!');
     }
 
     return (
         <Tooltip title={`${position.published ? 'Unp' : 'P'}ublish Position`}>
             <IconButton onClick={handleClick}>
-                { position.published ? <Unpublished /> : <Publish /> }
+                {position.published ? <Unpublished/> : <Publish/>}
             </IconButton>
         </Tooltip>
     );
 }
-    

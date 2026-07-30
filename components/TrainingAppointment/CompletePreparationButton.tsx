@@ -1,6 +1,5 @@
 'use client';
 import React, {useState} from 'react';
-import {Lesson, TrainingAppointment} from "@/generated/prisma/browser";
 import {
     Accordion,
     AccordionDetails,
@@ -18,29 +17,58 @@ import {
 } from "@mui/material";
 import {Check, ExpandMore, LocalLibrary, Visibility} from "@mui/icons-material";
 import Markdown from "react-markdown";
-import {completePreparation} from "@/actions/trainingAppointment";
 import {toast} from "react-toastify";
+import {useTrainingLessons, useUpdateTrainingAppointment} from "@/lib/osmium/hooks/training";
 
-export default function CompletePreparationButton({trainingAppointment, lessons}: {
-    trainingAppointment: TrainingAppointment,
-    lessons: Lesson[],
-}) {
+interface AppointmentLike {
+    id: string;
+    student_id: string;
+    start: string;
+    preparation_completed: boolean;
+    notes: string;
+    environment?: string | null;
+    lessons: { id: string, identifier: string, name: string }[];
+    additional_trainers: { trainer_id: string, description: string }[];
+}
+
+export default function CompletePreparationButton({appointment}: { appointment: AppointmentLike }) {
 
     const [open, setOpen] = useState(false);
+    const {data: lessonsData} = useTrainingLessons();
+    const allLessons = lessonsData?.items ?? [];
+    const updateAppointment = useUpdateTrainingAppointment();
 
     const handleCompletePreparation = async () => {
-        await completePreparation(trainingAppointment.id);
-        toast.success("Preparation completed successfully!  Your trainer has been notified.");
-        setOpen(false);
+        try {
+            await updateAppointment.mutateAsync({
+                appointmentId: appointment.id,
+                body: {
+                    student_id: appointment.student_id,
+                    start: appointment.start,
+                    lesson_ids: appointment.lessons.map((l) => l.id),
+                    notes: appointment.notes || undefined,
+                    environment: appointment.environment ?? undefined,
+                    additional_trainers: appointment.additional_trainers.map((at) => ({
+                        trainer_id: at.trainer_id,
+                        description: at.description
+                    })),
+                    preparation_completed: true,
+                },
+            });
+            toast.success("Preparation completed successfully!  Your trainer has been notified.");
+            setOpen(false);
+        } catch {
+            toast.error("Failed to complete preparation.");
+        }
     }
 
     return (
         <>
             <Button variant="contained"
-                    startIcon={trainingAppointment.preparationCompleted ? <Check/> : <LocalLibrary/>}
-                    disabled={trainingAppointment.preparationCompleted}
-                    onClick={() => setOpen(true)}>{trainingAppointment.preparationCompleted ? 'Preparation Completed' : 'Complete Preparation'}</Button>
-            {trainingAppointment.preparationCompleted &&
+                    startIcon={appointment.preparation_completed ? <Check/> : <LocalLibrary/>}
+                    disabled={appointment.preparation_completed}
+                    onClick={() => setOpen(true)}>{appointment.preparation_completed ? 'Preparation Completed' : 'Complete Preparation'}</Button>
+            {appointment.preparation_completed &&
                 <Tooltip title="View Preparation">
                     <IconButton size="small" onClick={() => setOpen(true)}><Visibility fontSize="small"/></IconButton>
                 </Tooltip>
@@ -51,17 +79,20 @@ export default function CompletePreparationButton({trainingAppointment, lessons}
                     <DialogContentText>Before every training session, you <b>must</b> complete any necessary preparation
                         related to the lesson or as instructed by your trainer:</DialogContentText>
                     <Box sx={{my: 2,}}>
-                        {lessons.map((lesson) => (
-                            <Accordion key={lesson.id}>
-                                <AccordionSummary expandIcon={<ExpandMore/>}>
-                                    <Typography>{lesson.identifier} - {lesson.name}</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <Typography>{lesson.traineePreparation ?
-                                        <Markdown>{lesson.traineePreparation}</Markdown> : 'There is no trainee preparation for this lesson.'}</Typography>
-                                </AccordionDetails>
-                            </Accordion>
-                        ))}
+                        {appointment.lessons.map((lesson) => {
+                            const fullLesson = allLessons.find((l) => l.id === lesson.id);
+                            return (
+                                <Accordion key={lesson.id}>
+                                    <AccordionSummary expandIcon={<ExpandMore/>}>
+                                        <Typography>{lesson.identifier} - {lesson.name}</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Typography>{fullLesson?.trainee_preparation ?
+                                            <Markdown>{fullLesson.trainee_preparation}</Markdown> : 'There is no trainee preparation for this lesson.'}</Typography>
+                                    </AccordionDetails>
+                                </Accordion>
+                            );
+                        })}
                     </Box>
                     <DialogContentText sx={{mb: 1,}}>By selecting &apos;Complete Preparation&apos; below, you agree that
                         all
@@ -78,7 +109,7 @@ export default function CompletePreparationButton({trainingAppointment, lessons}
                 <DialogActions>
                     <Button size="small" color="inherit" onClick={() => setOpen(false)}>Close</Button>
                     <Button variant="contained" size="small" startIcon={<Check/>} onClick={handleCompletePreparation}
-                            disabled={trainingAppointment.preparationCompleted}>Complete
+                            disabled={appointment.preparation_completed}>Complete
                         Preparation</Button>
                 </DialogActions>
             </Dialog>

@@ -2,13 +2,10 @@ import React from 'react';
 import {Button, Card, CardContent, Stack, Typography} from "@mui/material";
 import Link from "next/link";
 import {Add} from "@mui/icons-material";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
 import PerformanceIndicatorTable from "@/components/PerformanceIndicator/PerformanceIndicatorTable";
+import RoleOnly from "@/components/Access/RoleOnly";
 
-export default async function Page() {
-
-    const session = await getServerSession(authOptions);
+export default function Page() {
 
     return (
         <Card>
@@ -17,11 +14,13 @@ export default async function Page() {
                     <Stack direction="column" spacing={1}>
                         <Typography variant="h5">Performance Indicators</Typography>
                     </Stack>
-                    {session?.user.roles.includes("STAFF") && <Link href="/training/indicators/new">
-                        <Button variant="contained" size="large" startIcon={<Add/>}>New Performance Indicator</Button>
-                    </Link>}
+                    <RoleOnly check="isStaff">
+                        <Link href="/training/indicators/new">
+                            <Button variant="contained" size="large" startIcon={<Add/>}>New Performance Indicator</Button>
+                        </Link>
+                    </RoleOnly>
                 </Stack>
-                <PerformanceIndicatorTable admin={session?.user.roles.includes("STAFF")}/>
+                <PerformanceIndicatorTable/>
             </CardContent>
         </Card>
     );

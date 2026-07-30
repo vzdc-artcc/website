@@ -1,29 +1,32 @@
 'use client';
-import React, {useState} from 'react';
-import {OtsRecommendation} from "@/generated/prisma/browser";
-import {toast} from "react-toastify";
-import {IconButton, Tooltip} from "@mui/material";
-import {Delete} from "@mui/icons-material";
-import {deleteOtsRec} from "@/actions/ots";
+import { useState } from 'react';
+import { toast } from "react-toastify";
+import { IconButton, Tooltip } from "@mui/material";
+import { Delete } from "@mui/icons-material";
+import { useDeleteOtsRecommendation } from "@/lib/osmium/hooks/training";
 
-export default function OtsRecommendationDeleteButton({rec}: { rec: OtsRecommendation }) {
+export default function OtsRecommendationDeleteButton({ recommendationId }: { recommendationId: string }) {
     const [clicked, setClicked] = useState(false);
+    const deleteOts = useDeleteOtsRecommendation();
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteOtsRec(rec.id);
-            toast('Recommendation deleted successfully!', {type: 'success'});
+            try {
+                await deleteOts.mutateAsync(recommendationId);
+                toast.success('Recommendation deleted successfully!');
+            } catch {
+                toast.error('Failed to delete recommendation.');
+            }
         } else {
-            toast.warn(`The student and instructor will receive an email regarding this deletion.  Click again to confirm.`);
+            toast.warn(`Deleting this recommendation is not reversable. Click again to confirm.`);
             setClicked(true);
         }
-
     }
 
     return (
         <Tooltip title="Delete Recommendation">
             <IconButton onClick={handleClick}>
-                <Delete color={clicked ? "warning" : "inherit"}/>
+                <Delete color={clicked ? "warning" : "inherit"} />
             </IconButton>
         </Tooltip>
     );

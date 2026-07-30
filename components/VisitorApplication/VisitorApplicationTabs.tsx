@@ -2,7 +2,10 @@
 import React from 'react';
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 import {Tab, Tabs} from "@mui/material";
-import {VisitorApplicationStatus} from "@/generated/prisma/browser";
+
+// Local string-literal union replacing the legacy Prisma `VisitorApplicationStatus`
+// enum (this component does no Prisma queries — it only types the status tab value).
+type VisitorApplicationStatus = "PENDING" | "APPROVED" | "DENIED";
 
 export default function VisitorApplicationTabs() {
 

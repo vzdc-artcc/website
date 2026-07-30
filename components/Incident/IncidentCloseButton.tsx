@@ -1,17 +1,21 @@
 'use client'
 import React from 'react';
-import {IncidentReport} from "@/generated/prisma/browser";
 import {Button} from "@mui/material";
-import {closeIncident} from "@/actions/incident";
 import {toast} from "react-toastify";
 import {Check} from "@mui/icons-material";
+import {useCloseIncident} from "@/lib/osmium/hooks/incidents";
 
-export default function IncidentCloseButton({incident}: { incident: IncidentReport, }) {
+export default function IncidentCloseButton({incidentId}: { incidentId: string, }) {
+
+    const closeIncident = useCloseIncident();
 
     const handleClick = async () => {
-        await closeIncident(incident);
-
-        toast('Incident closed successfully.', {type: 'success'});
+        try {
+            await closeIncident.mutateAsync(incidentId);
+            toast('Incident closed successfully.', {type: 'success'});
+        } catch {
+            toast('Failed to close incident.', {type: 'error'});
+        }
     }
 
     return (

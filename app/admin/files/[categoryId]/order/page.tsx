@@ -1,40 +1,47 @@
-import React from 'react';
-import {Card, CardContent, Typography} from "@mui/material";
-import OrderList from "@/components/Order/OrderList";
-import {updateFileOrder} from "@/actions/files";
-import prisma from "@/lib/db";
-import {notFound} from "next/navigation";
+'use client';
+import React, {use} from 'react';
+import {Card, CardContent, Skeleton, Typography} from "@mui/material";
+import OrderList, {OrderItem} from "@/components/Order/OrderList";
+import {useAdminPublications, useUpdatePublication} from "@/lib/osmium/hooks/publications";
 
-export default async function Page({params}: { params: Promise<{ categoryId: string }> }) {
+export default function Page({params}: { params: Promise<{ categoryId: string }> }) {
 
-    const {categoryId} = await params;
-    const fileCategory = await prisma.fileCategory.findUnique({
-        where: {id: categoryId},
-    });
+    const {categoryId} = use(params);
+    const {data: pubsData, isLoading} = useAdminPublications();
+    const update = useUpdatePublication();
 
-    if (!fileCategory) {
-        notFound();
-    }
+    const files = (pubsData?.items ?? [])
+        .filter((p) => p.category_id === categoryId)
+        .sort((a, b) => a.sort_order - b.sort_order);
 
-    const files = await prisma.file.findMany({
-        where: {categoryId},
-        orderBy: {
-            order: 'asc',
-        },
-    });
+    const handleSubmit = async (items: OrderItem[]) => {
+        await Promise.all(items.map((item) => {
+            const pub = files.find((p) => p.id === item.id);
+            if (!pub) return Promise.resolve();
+            return update.mutateAsync({
+                publicationId: pub.id,
+                body: {
+                    category_id: pub.category_id,
+                    title: pub.title,
+                    description: pub.description ?? null,
+                    effective_at: pub.effective_at,
+                    file_id: pub.file_id,
+                    is_public: pub.is_public,
+                    sort_order: item.order,
+                    status: pub.status as "draft" | "published" | "archived",
+                },
+            });
+        }));
+    };
 
     return (
         <Card>
             <CardContent>
-                <Typography variant="h5" gutterBottom>File Category Order - {fileCategory.name}</Typography>
-                <OrderList items={files.map((fc) => ({
-                    id: fc.id,
-                    name: fc.name,
-                    order: fc.order,
-                }))} onSubmit={async (order) => {
-                    'use server'
-                    await updateFileOrder(fileCategory, order)
-                }}/>
+                <Typography variant="h5" gutterBottom>File Order</Typography>
+                {isLoading ? <Skeleton height={200}/> : (
+                    <OrderList items={files.map((f) => ({id: f.id, name: f.title, order: f.sort_order}))}
+                               onSubmit={handleSubmit}/>
+                )}
             </CardContent>
         </Card>
     );

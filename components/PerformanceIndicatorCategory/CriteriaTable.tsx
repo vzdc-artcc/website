@@ -1,14 +1,13 @@
 import React from 'react';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
-import {PerformanceIndicatorCriteria, PerformanceIndicatorCriteriaCategory} from "@/generated/prisma/browser";
 import PerformanceIndicatorCriteriaDialogForm
     from "@/components/PerformanceIndicatorCriteria/PerformanceIndicatorCriteriaDialogForm";
 import PerformanceIndicatorCriteriaDeleteButton
     from "@/components/PerformanceIndicatorCriteria/PerformanceIndicatorCriteriaDeleteButton";
 
-export default async function CriteriaTable({criteria, category}: {
-    criteria: PerformanceIndicatorCriteria[],
-    category: PerformanceIndicatorCriteriaCategory
+export default function CriteriaTable({criteria, category}: {
+    criteria: { id: string, name: string, sort_order: number }[],
+    category: { id: string, name: string, sort_order: number }
 }) {
 
     if (criteria.length === 0) {

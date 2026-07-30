@@ -1,16 +1,16 @@
+'use client';
 import React from 'react';
-import prisma from "@/lib/db";
 import {Box, Card, CardContent, Grid, IconButton, Stack, Tooltip, Typography} from "@mui/material";
 import Link from "next/link";
 import {StackedLineChart} from "@mui/icons-material";
-import {getRating} from "@/lib/vatsim";
 import StatisticsTable from "@/components/Statistics/StatisticsTable";
-import {getControllerLog, getMonthLog, getTop3Controllers} from "@/lib/hours";
+import {useArtccStats} from "@/lib/osmium/hooks/stats";
+import {useParams} from "next/navigation";
+import {getMonth} from "@/lib/date";
 
-export default async function Page(props: { params: Promise<{ year: string }> }) {
-    const params = await props.params;
-
-    const {year} = params;
+export default function Page() {
+    const params = useParams();
+    const year = params.year as string;
 
     if (!Number(year) || Number(year) < 2000 || Number(year) > new Date().getFullYear()) {
         return (
@@ -23,42 +23,31 @@ export default async function Page(props: { params: Promise<{ year: string }> })
         );
     }
 
-    const logs = await prisma.controllerLogMonth.findMany({
-        where: {
-            year: parseInt(year),
-        },
-        include: {
-            log: {
-                include: {
-                    user: true
-                }
-            }
-        }
-    });
+    const {data} = useArtccStats({year: Number(year)});
 
-    const totalHours = logs.reduce((acc, log) => {
+    if (!data) {
+        return null;
+    }
 
-        acc.deliveryHours += log.deliveryHours;
-        acc.groundHours += log.groundHours;
-        acc.towerHours += log.towerHours;
-        acc.approachHours += log.approachHours;
-        acc.centerHours += log.centerHours;
+    const monthLog = (data.monthly ?? []).map((m) => ({
+        title: getMonth(m.month - 1),
+        delivery_hours: m.delivery_hours,
+        ground_hours: m.ground_hours,
+        tower_hours: m.tower_hours,
+        tracon_hours: m.tracon_hours,
+        center_hours: m.center_hours,
+        total_hours: m.total_hours,
+    }));
 
-        return acc;
-    }, {
-        deliveryHours: 0,
-        groundHours: 0,
-        towerHours: 0,
-        approachHours: 0,
-        centerHours: 0
-
-    });
-
-    const monthLog = getMonthLog(logs);
-
-    const top3Controllers = getTop3Controllers(logs);
-
-    const controllerLog = getControllerLog(logs);
+    const controllerLog = data.controllers.map((c) => ({
+        title: `${c.name} (${c.cid})`,
+        delivery_hours: c.delivery_hours,
+        ground_hours: c.ground_hours,
+        tower_hours: c.tower_hours,
+        tracon_hours: c.tracon_hours,
+        center_hours: c.center_hours,
+        total_hours: c.total_hours,
+    }));
 
     return (
         (<Grid container columns={30} spacing={2}>
@@ -78,7 +67,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography>Delivery Hours</Typography>
-                        <Typography variant="h6">{totalHours.deliveryHours.toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{data.summary.delivery_hours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -91,7 +80,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography>Ground Hours</Typography>
-                        <Typography variant="h6">{totalHours.groundHours.toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{data.summary.ground_hours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -104,7 +93,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography>Tower Hours</Typography>
-                        <Typography variant="h6">{totalHours.towerHours.toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{data.summary.tower_hours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -117,7 +106,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography>TRACON Hours</Typography>
-                        <Typography variant="h6">{totalHours.approachHours.toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{data.summary.tracon_hours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -130,7 +119,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography>Center Hours</Typography>
-                        <Typography variant="h6">{totalHours.centerHours.toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{data.summary.center_hours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -143,14 +132,13 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography>Total Hours</Typography>
-                        <Typography
-                            variant="h6">{(totalHours.deliveryHours + totalHours.groundHours + totalHours.towerHours + totalHours.approachHours + totalHours.centerHours).toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{data.summary.active_hours.toPrecision(3)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
-            {top3Controllers.map((controller, idx) => (
+            {data.leaders.map((leader) => (
                 <Grid
-                    key={controller.user.cid}
+                    key={leader.cid}
                     size={{
                         xs: 30,
                         md: 10
@@ -159,22 +147,18 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                         <CardContent>
                             <Box sx={{mb: 2,}}>
                                 <Stack direction="row" spacing={1} alignItems="center">
-                                    <Typography
-                                        variant="h5">{idx + 1} - {controller.user.preferredName || `${controller.user.firstName} ${controller.user.lastName}`}</Typography>
+                                    <Typography variant="h5">{leader.rank} - {leader.name}</Typography>
                                     <Tooltip title="View Statistics for this controller">
-                                        <Link href={`/controllers/statistics/${year}/-/${controller.user.cid}`}>
+                                        <Link href={`/controllers/statistics/${year}/-/${leader.cid}`}>
                                             <IconButton size="large">
                                                 <StackedLineChart fontSize="large"/>
                                             </IconButton>
                                         </Link>
                                     </Tooltip>
                                 </Stack>
-                                <Typography
-                                    variant="subtitle2">{controller.user.preferredName && `${controller.user.firstName} ${controller.user.lastName}`}</Typography>
-                                <Typography
-                                    variant="body1">{getRating(controller.user.rating)} • {controller.user.cid}</Typography>
+                                <Typography variant="body1">{leader.rating} • {leader.cid}</Typography>
                             </Box>
-                            <Typography variant="h6">{controller.hours.toPrecision(3)} hours</Typography>
+                            <Typography variant="h6">{leader.active_hours.toPrecision(3)} hours</Typography>
                         </CardContent>
                     </Card>
                 </Grid>
@@ -183,7 +167,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Monthly Totals</Typography>
-                        <StatisticsTable heading="Month" logs={monthLog.filter((log) => !!log)}/>
+                        <StatisticsTable heading="Month" logs={monthLog}/>
                     </CardContent>
                 </Card>
             </Grid>
@@ -191,7 +175,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Controller Totals</Typography>
-                        <StatisticsTable heading="Controller" logs={controllerLog.filter((log) => !!log)}/>
+                        <StatisticsTable heading="Controller" logs={controllerLog}/>
                     </CardContent>
                 </Card>
             </Grid>

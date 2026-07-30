@@ -1,21 +1,21 @@
-import React from 'react';
-import {fetchAtcBooking} from "@/actions/atcBooking";
+'use client';
+import React, {use} from 'react';
 import {notFound} from "next/navigation";
-import {Card, CardContent, Typography} from "@mui/material";
+import {Card, CardContent, Skeleton, Typography} from "@mui/material";
 import AtcBookingForm from "@/components/AtcBooking/AtcBookingForm";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
+import RequireAuth from "@/components/Access/RequireAuth";
+import {useMe} from "@/lib/osmium/hooks/me";
+import {useAtcBooking} from "@/lib/osmium/hooks/bookings";
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+function EditBookingView({id}: { id: number }) {
+    const {data: me} = useMe();
+    const {data: booking, isLoading, error} = useAtcBooking(id);
 
-    const { id } = await params;
-    const session = await getServerSession(authOptions);
+    if (!me || isLoading) {
+        return <Card><CardContent><Skeleton height={200}/></CardContent></Card>;
+    }
 
-    if (!session?.user) return;
-
-    const booking = await fetchAtcBooking(Number(id));
-
-    if (typeof booking === 'string' || !booking) {
+    if (error || !booking) {
         notFound();
     }
 
@@ -23,8 +23,17 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         <Card>
             <CardContent>
                 <Typography variant="h5" gutterBottom>Edit ATC Booking</Typography>
-                <AtcBookingForm user={session.user} booking={booking} />
+                <AtcBookingForm cid={me.cid} timezone={me.profile.timezone} booking={booking}/>
             </CardContent>
         </Card>
+    );
+}
+
+export default function Page({params}: { params: Promise<{ id: string }> }) {
+    const {id} = use(params);
+    return (
+        <RequireAuth>
+            <EditBookingView id={Number(id)}/>
+        </RequireAuth>
     );
 }

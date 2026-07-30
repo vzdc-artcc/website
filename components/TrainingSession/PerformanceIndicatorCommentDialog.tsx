@@ -1,6 +1,5 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingSessionPerformanceIndicatorCriteria} from "@/generated/prisma/browser";
 import {
     Button,
     Dialog,
@@ -14,7 +13,7 @@ import {
 import {Comment} from "@mui/icons-material";
 
 export default function PerformanceIndicatorCommentDialog({criteria}: {
-    criteria: TrainingSessionPerformanceIndicatorCriteria
+    criteria: { name: string, comments?: string | null }
 }) {
 
     const [open, setOpen] = useState(false);

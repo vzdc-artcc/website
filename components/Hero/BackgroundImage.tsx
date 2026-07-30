@@ -5,8 +5,8 @@ import {Box} from "@mui/material";
 
 export default function BackgroundImage() {
     return (
-        <Box sx={{zIndex: -10, overflow: 'hidden',}}>
-            <Image src={bg} alt="vZDC" fill style={{objectFit: 'contain', opacity: 0.3,}}/>
+        <Box sx={{position: 'fixed', inset: 0, zIndex: -10, overflow: 'hidden', pointerEvents: 'none',}}>
+            <Image src={bg} alt="" fill priority style={{objectFit: 'contain', opacity: 0.3,}}/>
         </Box>
     );
 }

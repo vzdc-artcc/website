@@ -1,36 +1,25 @@
+'use client';
 import React from 'react';
-import {Alert, Box, Card, CardActions, CardContent, Container, Divider, Stack, Typography} from "@mui/material";
-import {Metadata} from "next";
-import prisma from "@/lib/db";
+import {Alert, Box, Card, CardActions, CardContent, CircularProgress, Container, Divider, Stack, Typography} from "@mui/material";
 import ErrorCard from "@/components/Error/ErrorCard";
 import {formatZuluDate} from "@/lib/date";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
+import {useSearchParams} from "next/navigation";
 import SuaRequestDeleteButton from "@/components/SuaRequest/SuaRequestDeleteButton";
+import {useSuaMission} from "@/lib/osmium/hooks/sua";
+import {useMe} from "@/lib/osmium/hooks/me";
 
-export const metadata: Metadata = {
-    title: 'vSOA Scheduling | vZDC',
-    description: 'vZDC mission details page',
-};
+export default function Page() {
 
-export default async function Page({searchParams}: { searchParams: Promise<{ missionId?: string }> }) {
+    const searchParams = useSearchParams();
+    const missionId = searchParams.get('missionId') || '';
+    const {data: suaBlock, isLoading, isError} = useSuaMission(missionId);
+    const {data: me} = useMe();
 
-    const {missionId} = await searchParams;
-    const session = await getServerSession(authOptions);
+    if (isLoading) {
+        return <Box sx={{display: 'flex', justifyContent: 'center', my: 4}}><CircularProgress/></Box>;
+    }
 
-    const suaBlock = await prisma.suaBlock.findFirst({
-        where: {
-            OR: [
-                {id: missionId},
-                {missionNumber: missionId},
-            ],
-        },
-        include: {
-            airspace: true,
-        },
-    });
-
-    if (!suaBlock) {
+    if (isError || !suaBlock) {
         return <ErrorCard heading="Special Use Airspace Request" message="Mission not found."/>
     }
 
@@ -41,16 +30,16 @@ export default async function Page({searchParams}: { searchParams: Promise<{ mis
                 <Card>
                     <CardContent>
                         <Typography variant="h5" gutterBottom>Mission Information</Typography>
-                        <Typography variant="body1">Mission Number: <b>{suaBlock.missionNumber}</b></Typography>
+                        <Typography variant="body1">Mission Number: <b>{suaBlock.mission_number}</b></Typography>
                         <Divider sx={{my: 2,}}/>
                         <Typography variant="h6" gutterBottom>Details</Typography>
-                        <Typography>{formatZuluDate(suaBlock.start)} - {formatZuluDate(suaBlock.end)}</Typography>
+                        <Typography>{formatZuluDate(new Date(suaBlock.start_at))} - {formatZuluDate(new Date(suaBlock.end_at))}</Typography>
                         <Typography>Affiliated with {suaBlock.afiliation}</Typography>
                         <ul>
                             {suaBlock.airspace.map((a) => (
                                 <li key={a.id}>
                                     <Typography variant="body1">
-                                        <b>{a.identifier}</b>: FL{a.bottomAltitude} - FL{a.topAltitude}
+                                        <b>{a.identifier}</b>: FL{a.bottom_altitude} - FL{a.top_altitude}
                                     </Typography>
                                 </li>
                             ))}
@@ -80,7 +69,7 @@ export default async function Page({searchParams}: { searchParams: Promise<{ mis
                     </CardContent>
                     <CardActions>
                         <Box>
-                            {session?.user?.id === suaBlock.userId &&
+                            {me?.cid === suaBlock.cid &&
                                 <SuaRequestDeleteButton suaRequest={suaBlock}/>
                             }
                         </Box>

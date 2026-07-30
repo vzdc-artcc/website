@@ -1,8 +1,7 @@
+'use client';
+
 import React from 'react';
-import prisma from "@/lib/db";
 import {notFound} from "next/navigation";
-import {EventType} from "@/generated/prisma/enums";
-import {Feedback} from "@/generated/prisma/client";
 import {
     Accordion,
     AccordionDetails,
@@ -15,171 +14,86 @@ import {
     Stack,
     Typography
 } from "@mui/material";
-import {getChips} from "@/lib/staffPositions";
-import {User} from "next-auth";
-import {getRating} from "@/lib/vatsim";
+import UserStaffPositionChips from "@/components/StaffPositions/UserStaffPositionChips";
 import {formatZuluDate} from "@/lib/date";
 import {ExpandMore} from "@mui/icons-material";
 import {getIconForCertificationOption} from "@/lib/certification";
 import EventStatisticsOnlinePositionTable from "@/components/EventStatistics/EventStatisticsOnlinePositionTable";
+import {useUserByCid} from "@/lib/osmium/hooks/users";
+import {useReceivedFeedback} from "@/lib/osmium/hooks/feedback";
+import {useUserEventPositions} from "@/lib/osmium/hooks/events";
+import {useCertificationTypes, useUserCertifications, useUserSoloCertifications} from "@/lib/osmium/hooks/certifications";
+import {useControllerTotals, useControllerPositions} from "@/lib/osmium/hooks/stats";
 
-export default async function EventStatisticsInformation({cid,}: { cid: string, }) {
-    const user = await prisma.user.findUnique({
-        where: {
-            cid,
-        },
-    });
+// Big events (100+ attendees) — event_type values that count toward big-event hours.
+const BIG_EVENT_TYPES = ['HOME', 'FRIDAY_NIGHT_OPERATIONS', 'SUPPORT_REQUIRED'];
 
-    if (!user) {
+const SIXTY_DAYS_MS = 60 * 24 * 60 * 60 * 1000;
+
+export default function EventStatisticsInformation({cid,}: { cid: string, }) {
+    const numCid = Number(cid);
+    const sixtyDaysAgo = new Date(Date.now() - SIXTY_DAYS_MS);
+
+    const {data: resolvedUser, isLoading: userLoading} = useUserByCid(numCid);
+    const {data: feedbackData} = useReceivedFeedback(numCid, {status: 'RELEASED', pageSize: 200});
+    const {data: eventPositionsData} = useUserEventPositions(numCid);
+    const {data: certTypesData} = useCertificationTypes();
+    const {data: certificationsData} = useUserCertifications(numCid);
+    const {data: soloData} = useUserSoloCertifications(numCid);
+    const {data: totalsAll} = useControllerTotals(numCid);
+    const {data: totals60} = useControllerTotals(numCid, {since: sixtyDaysAgo.toISOString()});
+    const {data: positionsData} = useControllerPositions(numCid);
+
+    if (!userLoading && !resolvedUser) {
         notFound();
     }
 
-    const feedback = await prisma.feedback.findMany({
-        where: {
-            controller: {
-                cid,
-            },
-            status: 'RELEASED',
-        },
-        orderBy: {
-            decidedAt: 'desc',
-        }
-    });
+    if (userLoading || !resolvedUser) {
+        return <Typography>Loading controller statistics…</Typography>;
+    }
 
-    const eventPositions = await prisma.eventPosition.findMany({
-        where: {
-            user: {
-                cid,
-            },
-            published: true,
-        },
-        include: {
-            event: true,
-        },
-        orderBy: {
-            event: {
-                start: 'desc',
-            },
-        },
-    });
+    const profile = resolvedUser.full?.profile;
+    const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || resolvedUser.basic.name;
+    const joinDate = profile?.join_date ? new Date(profile.join_date) : null;
 
-    const certificationTypes = await prisma.certificationType.findMany({
-        orderBy: {
-            order: 'asc',
-        }
-    });
+    const feedback = feedbackData?.items ?? [];
+    const eventPositions = eventPositionsData?.items ?? [];
+    const certificationTypes = [...(certTypesData?.items ?? [])].sort((a, b) => a.sort_order - b.sort_order);
+    const certifications = certificationsData?.items ?? [];
+    const soloCertification = (soloData?.items ?? []).find((s) => new Date(s.expires) > new Date());
+    const onlinePositions = (positionsData?.items ?? []).map((p) => ({
+        position: p.position_name,
+        started_at: p.started_at,
+        ended_at: p.ended_at,
+    }));
 
-    const certifications = await prisma.certification.findMany({
-        where: {
-            controller: {
-                cid,
-            },
-            certificationOption: {
-                not: 'NONE',
-            },
-        },
-    });
+    const eventPositionLast60Days = eventPositions.filter((ep) => new Date(ep.event_starts_at) >= sixtyDaysAgo);
 
-    const soloCertification = await prisma.soloCertification.findFirst({
-        where: {
-            controller: {
-                cid,
-            },
-            expires: {
-                gt: new Date(),
-            },
-        }
-    });
-
-    const onlinePositions = await prisma.controllerPosition.findMany({
-        where: {
-            log: {
-                user: {
-                    cid,
-                },
-            },
-            active: false,
-        },
-        orderBy: {
-            start: 'desc',
-        },
-    });
-
-    const msPerHour = 1000 * 60 * 60;
-
-    const sumPositionMs = (positions: typeof onlinePositions, facility?: number, since?: Date) => {
-        return positions.reduce((acc, pos) => {
-            if (typeof facility !== 'undefined' && pos.facility !== facility) return acc;
-            if (!pos.end) return acc;
-
-            // If a position started before the `since` boundary, only count the overlapping portion.
-            const start = since && pos.start < since ? since : pos.start;
-            const end = pos.end;
-            const delta = end.getTime() - start.getTime();
-            if (delta <= 0) return acc;
-            return acc + delta;
-        }, 0);
+    const durationHours = (start?: string | null, end?: string | null) => {
+        if (!start || !end) return 0;
+        return (new Date(end).getTime() - new Date(start).getTime()) / (1000 * 60 * 60);
     };
 
-    const totalDeliveryHours = sumPositionMs(onlinePositions, 2) / msPerHour;
-    const totalGroundHours = sumPositionMs(onlinePositions, 3) / msPerHour;
-    const totalTowerHours = sumPositionMs(onlinePositions, 4) / msPerHour;
-    const totalApproachHours = sumPositionMs(onlinePositions, 5) / msPerHour;
-    const totalCenterHours = sumPositionMs(onlinePositions, 6) / msPerHour;
-
-    const totalHours = (totalDeliveryHours + totalGroundHours + totalTowerHours + totalApproachHours + totalCenterHours);
-
-    const now = new Date();
-    const sixtyDaysAgo = new Date(now.getTime() - (60 * 24 * 60 * 60 * 1000));
-
-    const totalDeliveryHoursLast60 = sumPositionMs(onlinePositions, 2, sixtyDaysAgo) / msPerHour;
-    const totalGroundHoursLast60 = sumPositionMs(onlinePositions, 3, sixtyDaysAgo) / msPerHour;
-    const totalTowerHoursLast60 = sumPositionMs(onlinePositions, 4, sixtyDaysAgo) / msPerHour;
-    const totalApproachHoursLast60 = sumPositionMs(onlinePositions, 5, sixtyDaysAgo) / msPerHour;
-    const totalCenterHoursLast60 = sumPositionMs(onlinePositions, 6, sixtyDaysAgo) / msPerHour;
-
-    const totalHoursLast60 = (totalDeliveryHoursLast60 + totalGroundHoursLast60 + totalTowerHoursLast60 + totalApproachHoursLast60 + totalCenterHoursLast60);
-
-    const eventPositionLast60Days = eventPositions.filter((ep) => {
-        const now = new Date();
-        const sixtyDaysAgo = new Date(now.getTime() - (60 * 24 * 60 * 60 * 1000));
-        return ep.event.start >= sixtyDaysAgo;
-    });
-
-    const bigEventTypes: EventType[] = ['HOME', 'FRIDAY_NIGHT_OPERATIONS', 'SUPPORT_REQUIRED',];
-
-    const eventHours = eventPositions.reduce((acc, ep) => {
-        if (!ep.finalStartTime || !ep.finalEndTime) return acc;
-        const eventDuration = (ep.finalEndTime.getTime() - ep.finalStartTime.getTime()) / (1000 * 60 * 60); // duration in hours
-        return acc + eventDuration;
-    }, 0);
-
+    const eventHours = eventPositions.reduce((acc, ep) => acc + durationHours(ep.final_start_time, ep.final_end_time), 0);
     const eventHoursBigEvents = eventPositions.reduce((acc, ep) => {
-        if (!ep.finalStartTime || !ep.finalEndTime) return acc;
-        if (!bigEventTypes.includes(ep.event.type)) return acc; // Only count events with 100+ attendees
-        const eventDuration = (ep.finalEndTime.getTime() - ep.finalStartTime.getTime()) / (1000 * 60 * 60); // duration in hours
-        return acc + eventDuration;
+        if (!BIG_EVENT_TYPES.includes(ep.event_type)) return acc;
+        return acc + durationHours(ep.final_start_time, ep.final_end_time);
     }, 0);
 
-    const feedbackLast60Days = feedback.filter((f) => {
-        const now = new Date();
-        const sixtyDaysAgo = new Date(now.getTime() - (60 * 24 * 60 * 60 * 1000));
-        return f.submittedAt >= sixtyDaysAgo;
-    });
+    const feedbackLast60Days = feedback.filter((f) => new Date(f.submitted_at) >= sixtyDaysAgo);
 
-    const averageFeedback = (feedback: Feedback[]) => {
-        if (feedback.length === 0) return 0;
-        const total = feedback.reduce((acc, f) => acc + f.rating, 0);
-        return total / feedback.length;
-    }
+    const averageFeedback = (items: typeof feedback) => {
+        if (items.length === 0) return 0;
+        return items.reduce((acc, f) => acc + f.rating, 0) / items.length;
+    };
 
-    const calculateMonthsSinceJoin = (joinDate: Date): string => {
+    const calculateMonthsSinceJoin = (date: Date): string => {
         const now = new Date();
-        const months = (now.getFullYear() - joinDate.getFullYear()) * 12 + (now.getMonth() - joinDate.getMonth());
-        const dayDifference = now.getDate() - joinDate.getDate();
+        const months = (now.getFullYear() - date.getFullYear()) * 12 + (now.getMonth() - date.getMonth());
+        const dayDifference = now.getDate() - date.getDate();
         const exactMonths = months + (dayDifference / 30.44);
         return Math.max(0, exactMonths).toFixed(3);
-    }
+    };
 
     return (
         <Grid container columns={6} spacing={2}>
@@ -187,11 +101,11 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                 <Card>
                     <CardContent>
                         <Typography
-                            variant="h6">{user.fullName} ({user.operatingInitials}) {getChips(user as User)}</Typography>
-                        <Typography gutterBottom><b>{user.controllerStatus}</b> {getRating(user.rating)} | {user.cid}
+                            variant="h6">{fullName} ({profile?.operating_initials}) <UserStaffPositionChips cid={resolvedUser.basic.cid}/></Typography>
+                        <Typography gutterBottom><b>{profile?.controller_status}</b> {resolvedUser.basic.rating ?? 'Unknown'} | {resolvedUser.basic.cid}
                         </Typography>
                         <Typography gutterBottom>Join Date (after suspension, if
-                            applicable): {formatZuluDate(user.joinDate)} ({calculateMonthsSinceJoin(user.joinDate)} months)</Typography>
+                            applicable): {joinDate ? `${formatZuluDate(joinDate)} (${calculateMonthsSinceJoin(joinDate)} months)` : 'N/A'}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -215,13 +129,13 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                                 <Box sx={{maxHeight: 200, overflowY: 'auto',}}>
                                     {eventPositions.map((ep) => (
                                         <Typography key={ep.id} variant="caption"
-                                                    gutterBottom>{ep.finalPosition} - {ep.event.name} - {formatZuluDate(ep.event.start)}<br/></Typography>
+                                                    gutterBottom>{ep.final_position} - {ep.event_title} - {formatZuluDate(new Date(ep.event_starts_at))}<br/></Typography>
                                     ))}
                                 </Box>
                             </AccordionDetails>
                         </Accordion>
                         <Typography variant="caption" fontSize={10}>*A big event is one of the
-                            following: {bigEventTypes.join(', ')}.</Typography>
+                            following: {BIG_EVENT_TYPES.join(', ')}.</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -235,12 +149,9 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                         <Typography variant="subtitle2"
                                     gutterBottom>{feedback.filter((f) => f.rating < 4).length}</Typography>
                         <Typography>Average last 60 days:</Typography>
-                        {feedbackLast60Days.length >= 0 ?
-                            <Rating readOnly value={averageFeedback(feedbackLast60Days)}/> :
-                            <Typography variant="caption">N/A</Typography>}
+                        <Rating readOnly value={averageFeedback(feedbackLast60Days)}/>
                         <Typography>Average all time:</Typography>
-                        {feedback.length >= 0 ? <Rating readOnly value={averageFeedback(feedback)}/> :
-                            <Typography variant="caption">N/A</Typography>}
+                        <Rating readOnly value={averageFeedback(feedback)}/>
                     </CardContent>
                 </Card>
             </Grid>
@@ -251,14 +162,14 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                         {certificationTypes.map((ct) => (
                             <Stack key={ct.id} direction="row" spacing={1} alignItems="center">
                                 <Typography gutterBottom>{ct.name}:</Typography>
-                                {getIconForCertificationOption(certifications.find((c) => c.certificationTypeId === ct.id)?.certificationOption || 'NONE')}
+                                {getIconForCertificationOption(certifications.find((c) => c.certification_type_id === ct.id)?.certification_option || 'NONE')}
                             </Stack>
                         ))}
                         {soloCertification &&
                             <Box sx={{mt: 2,}}>
                                 <Typography fontWeight="bold">Solo
                                     Certification: {soloCertification.position}</Typography>
-                                <Typography>Expires: {formatZuluDate(soloCertification.expires)}</Typography>
+                                <Typography>Expires: {formatZuluDate(new Date(soloCertification.expires))}</Typography>
                             </Box>}
                     </CardContent>
                 </Card>
@@ -279,22 +190,22 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                             <Card variant="outlined" sx={{width: '100%', height: '100%',}}>
                                 <CardContent>
                                     <Typography gutterBottom fontWeight="bold">Last 60
-                                        days: {totalHoursLast60.toFixed(3)}</Typography>
-                                    <Typography>Delivery: {totalDeliveryHoursLast60.toFixed(3)}</Typography>
-                                    <Typography>Ground: {totalGroundHoursLast60.toFixed(3)}</Typography>
-                                    <Typography>Tower: {totalTowerHoursLast60.toFixed(3)}</Typography>
-                                    <Typography>Approach: {totalApproachHoursLast60.toFixed(3)}</Typography>
-                                    <Typography>Center: {totalCenterHoursLast60.toFixed(3)}</Typography>
+                                        days: {(totals60?.active_hours ?? 0).toFixed(3)}</Typography>
+                                    <Typography>Delivery: {(totals60?.delivery_hours ?? 0).toFixed(3)}</Typography>
+                                    <Typography>Ground: {(totals60?.ground_hours ?? 0).toFixed(3)}</Typography>
+                                    <Typography>Tower: {(totals60?.tower_hours ?? 0).toFixed(3)}</Typography>
+                                    <Typography>Approach: {(totals60?.tracon_hours ?? 0).toFixed(3)}</Typography>
+                                    <Typography>Center: {(totals60?.center_hours ?? 0).toFixed(3)}</Typography>
                                 </CardContent>
                             </Card>
                             <Card variant="outlined" sx={{width: '100%', height: '100%',}}>
                                 <CardContent>
-                                    <Typography gutterBottom fontWeight="bold">ALL: {totalHours.toFixed(3)}</Typography>
-                                    <Typography>Delivery: {totalDeliveryHours.toFixed(3)}</Typography>
-                                    <Typography>Ground: {totalGroundHours.toFixed(3)}</Typography>
-                                    <Typography>Tower: {totalTowerHours.toFixed(3)}</Typography>
-                                    <Typography>Approach: {totalApproachHours.toFixed(3)}</Typography>
-                                    <Typography>Center: {totalCenterHours.toFixed(3)}</Typography>
+                                    <Typography gutterBottom fontWeight="bold">ALL: {(totalsAll?.active_hours ?? 0).toFixed(3)}</Typography>
+                                    <Typography>Delivery: {(totalsAll?.delivery_hours ?? 0).toFixed(3)}</Typography>
+                                    <Typography>Ground: {(totalsAll?.ground_hours ?? 0).toFixed(3)}</Typography>
+                                    <Typography>Tower: {(totalsAll?.tower_hours ?? 0).toFixed(3)}</Typography>
+                                    <Typography>Approach: {(totalsAll?.tracon_hours ?? 0).toFixed(3)}</Typography>
+                                    <Typography>Center: {(totalsAll?.center_hours ?? 0).toFixed(3)}</Typography>
                                 </CardContent>
                             </Card>
                         </Stack>

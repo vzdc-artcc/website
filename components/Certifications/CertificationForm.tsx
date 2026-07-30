@@ -1,52 +1,62 @@
 'use client';
-import React from 'react';
-import {Certification, CertificationOption, CertificationType, SoloCertification} from "@/generated/prisma/browser";
-import {FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
+import React, {useState} from 'react';
+import {CircularProgress, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography} from "@mui/material";
 import Link from "next/link";
-import {saveCertifications} from "@/actions/certifications";
 import {toast} from "react-toastify";
 import {getIconForCertificationOption} from "@/lib/certification";
 import {z} from "zod";
 import FormSaveButton from "@/components/Form/FormSaveButton";
+import {
+    useCertificationTypes,
+    useSaveUserCertifications,
+    useUserCertifications,
+    useUserSoloCertifications,
+} from "@/lib/osmium/hooks/certifications";
 
-export default function CertificationForm({cid, certificationTypes, certifications, soloCertifications}: {
-    cid: string,
-    certificationTypes: CertificationType[],
-    certifications: Certification[],
-    soloCertifications: SoloCertification[]
-}) {
+export default function CertificationForm({cid}: { cid: number }) {
 
-    const handleSubmit = async (formData: FormData) => {
-        const newCertifications: Certification[] = [];
+    const {data: typesData, isLoading: typesLoading} = useCertificationTypes();
+    const {data: certsData, isLoading: certsLoading} = useUserCertifications(cid);
+    const {data: soloData} = useUserSoloCertifications(cid);
+    const save = useSaveUserCertifications(cid);
+
+    const certificationTypes = typesData?.items ?? [];
+    const certifications = certsData?.items ?? [];
+    const soloCertifications = soloData?.items ?? [];
+
+    const getOptionForType = (typeId: string) =>
+        certifications.find((c) => c.certification_type_id === typeId)?.certification_option;
+    const getSoloForType = (typeId: string) =>
+        soloCertifications.find((s) => s.certification_type_id === typeId);
+
+    const [selections, setSelections] = useState<Record<string, string>>({});
+    const [dossier, setDossier] = useState('');
+
+    const handleSubmit = async () => {
         const dossierZ = z.string().min(1);
-        const dossier = dossierZ.safeParse(formData.get('dossier') as string);
-        if (!dossier.success) {
+        if (!dossierZ.safeParse(dossier).success) {
             toast('Dossier entry is required!', {type: 'error',});
             return;
         }
-        for (const certificationType of certificationTypes) {
-            const certificationOption = formData.get(certificationType.id) as CertificationOption || "NONE";
-            const certification = getCertificationForType(certifications, certificationType);
-            if (certification) {
-                if (certification.certificationOption !== certificationOption) {
-                    certification.certificationOption = certificationOption;
-                    newCertifications.push(certification);
-                }
-            } else {
-                newCertifications.push({
-                    id: '',
-                    certificationOption,
-                    certificationTypeId: certificationType.id,
-                    userId: cid,
-                });
-            }
+        // Skip types with an active solo cert (managed separately); send the
+        // rest with their selected option (default NONE).
+        const payload = certificationTypes
+            .filter((type) => !getSoloForType(type.id))
+            .map((type) => ({
+                certification_type_id: type.id,
+                certification_option: selections[type.id] ?? getOptionForType(type.id) ?? "NONE",
+            }));
+        try {
+            await save.mutateAsync({certifications: payload, dossier_message: dossier});
+            toast(`Certifications for '${cid}' saved successfully!`, {type: 'success',});
+            setDossier('');
+        } catch {
+            toast('Failed to save certifications.', {type: 'error',});
         }
-        await saveCertifications(cid, newCertifications, dossier.data);
-        toast(`Certifications for '${cid}' saved successfully!`, {type: 'success',});
     }
 
-    const getCertificationForType = (certifications: Certification[], certificationType: CertificationType) => {
-        return certifications.find((certification) => certification.certificationTypeId === certificationType.id);
+    if (typesLoading || certsLoading) {
+        return <Stack alignItems="center" sx={{mt: 2,}}><CircularProgress/></Stack>;
     }
 
     return (
@@ -56,10 +66,11 @@ export default function CertificationForm({cid, certificationTypes, certificatio
                     <Typography textAlign="center">No certification types found. Create certification types <Link
                         href="/admin/certification-types" style={{color: 'inherit',}}>here</Link>.</Typography>}
                 {certificationTypes.map((certificationType) => {
-                    const soloCertification = soloCertifications.find(
-                        (soloCert) => soloCert.certificationTypeId === certificationType.id
-                    );
+                    const soloCertification = getSoloForType(certificationType.id);
                     const isSolo = Boolean(soloCertification);
+                    const currentValue = isSolo
+                        ? 'SOLO'
+                        : selections[certificationType.id] ?? getOptionForType(certificationType.id) ?? '';
                     return (
                         <FormControl key={certificationType.id} fullWidth>
                             <InputLabel id={certificationType.id + 'label'}>{certificationType.name}</InputLabel>
@@ -67,11 +78,15 @@ export default function CertificationForm({cid, certificationTypes, certificatio
                                 variant="filled"
                                 labelId={certificationType.id + 'label'}
                                 id={certificationType.id}
-                                defaultValue={isSolo ? 'SOLO' : getCertificationForType(certifications, certificationType)?.certificationOption || ''}
+                                value={currentValue}
                                 label="Certification"
                                 name={certificationType.id}
-                                disabled={isSolo}>
-                                {certificationType.certificationOptions.map((certificationOption) => (
+                                disabled={isSolo}
+                                onChange={(e) => setSelections((prev) => ({
+                                    ...prev,
+                                    [certificationType.id]: e.target.value,
+                                }))}>
+                                {certificationType.certification_options.map((certificationOption) => (
                                     <MenuItem key={certificationOption} value={certificationOption}>
                                         <Stack direction="row" spacing={1} alignItems="center">
                                             {getIconForCertificationOption(certificationOption)}
@@ -94,9 +109,10 @@ export default function CertificationForm({cid, certificationTypes, certificatio
                     );
                 })}
                 {certificationTypes.length > 0 &&
-                    <TextField variant="filled" fullWidth label="Dossier Entry*" name="dossier"/>}
+                    <TextField variant="filled" fullWidth label="Dossier Entry*" name="dossier"
+                               value={dossier} onChange={(e) => setDossier(e.target.value)}/>}
                 {certificationTypes.length > 0 &&
-                    <FormSaveButton />}
+                    <FormSaveButton/>}
             </Stack>
 
         </form>

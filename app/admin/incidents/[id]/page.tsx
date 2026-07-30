@@ -1,26 +1,21 @@
+'use client';
 import React from 'react';
-import prisma from "@/lib/db";
-import {notFound} from "next/navigation";
-import {Card, CardContent, Chip, Grid, Stack, Typography} from "@mui/material";
+import {useParams} from 'next/navigation';
+import {Box, Card, CardContent, Chip, CircularProgress, Grid, Stack, Typography} from "@mui/material";
 import IncidentCloseButton from "@/components/Incident/IncidentCloseButton";
+import {useIncidentItem} from "@/lib/osmium/hooks/incidents";
+import {formatZuluDate} from "@/lib/date";
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-    const params = await props.params;
+export default function Page() {
+    const params = useParams<{ id: string }>();
+    const {data: incident, isLoading, isError} = useIncidentItem(params.id);
 
-    const {id} = params;
+    if (isLoading) {
+        return <Box sx={{display: 'flex', justifyContent: 'center', my: 4}}><CircularProgress/></Box>;
+    }
 
-    const incident = await prisma.incidentReport.findUnique({
-        where: {
-            id,
-        },
-        include: {
-            reportee: true,
-            reporter: true,
-        }
-    });
-
-    if (!incident) {
-        notFound();
+    if (isError || !incident) {
+        return <Typography>Incident not found.</Typography>;
     }
 
     return (
@@ -30,7 +25,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                     <Typography variant="h5">Incident Report</Typography>
                     <Chip label={incident.closed ? 'CLOSED' : 'OPEN'} color={incident.closed ? 'success' : 'warning'}/>
                 </Stack>
-                <Typography variant="subtitle2">{incident.timestamp.toUTCString()}</Typography>
+                <Typography variant="subtitle2">{formatZuluDate(new Date(incident.timestamp))}</Typography>
                 <Grid container columns={2} spacing={2} sx={{mt: 1,}}>
                     <Grid
                         size={{
@@ -38,23 +33,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Reporter</Typography>
-                        <Typography>{incident.reporter.firstName} {incident.reporter.lastName} ({incident.reporter.cid})</Typography>
-                    </Grid>
-                    <Grid
-                        size={{
-                            xs: 2,
-                            md: 1
-                        }}>
-                        <Typography variant="subtitle2">Reporter Email</Typography>
-                        <Typography>{incident.reporter.email}</Typography>
-                    </Grid>
-                    <Grid
-                        size={{
-                            xs: 2,
-                            md: 1
-                        }}>
-                        <Typography variant="subtitle2">Reporter CID</Typography>
-                        <Typography>{incident.reporter.cid}</Typography>
+                        <Typography>{incident.reporter_name} {incident.reporter_cid && `(${incident.reporter_cid})`}</Typography>
                     </Grid>
                     <Grid
                         size={{
@@ -62,7 +41,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Reported Controller</Typography>
-                        <Typography>{incident.reportee.firstName} {incident.reportee.lastName} ({incident.reportee.cid})</Typography>
+                        <Typography>{incident.reportee_name} {incident.reportee_cid && `(${incident.reportee_cid})`}</Typography>
                     </Grid>
                     <Grid
                         size={{
@@ -70,7 +49,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Controller Callsign</Typography>
-                        <Typography>{incident.reporteeCallsign || 'N/A'}</Typography>
+                        <Typography>{incident.reportee_callsign || 'N/A'}</Typography>
                     </Grid>
                     <Grid
                         size={{
@@ -78,14 +57,14 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Reporter Callsign</Typography>
-                        <Typography>{incident.reporterCallsign || 'N/A'}</Typography>
+                        <Typography>{incident.reporter_callsign || 'N/A'}</Typography>
                     </Grid>
                     <Grid size={2}>
                         <Typography variant="subtitle2">Description</Typography>
                         <Typography>{incident.reason}</Typography>
                     </Grid>
                     {!incident.closed && <Grid size={2}>
-                        <IncidentCloseButton incident={incident}/>
+                        <IncidentCloseButton incidentId={incident.id}/>
                     </Grid>}
                 </Grid>
             </CardContent>

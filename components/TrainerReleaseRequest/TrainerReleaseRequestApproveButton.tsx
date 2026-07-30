@@ -2,19 +2,25 @@
 import React from 'react';
 import {Check} from "@mui/icons-material";
 import {Tooltip} from "@mui/material";
-import {approveReleaseRequest} from "@/actions/trainingAssignmentRelease";
 import {toast} from "react-toastify";
 import {GridActionsCellItem} from "@mui/x-data-grid";
+import {useDecideTrainerReleaseRequest} from "@/lib/osmium/hooks/training";
 
-export default function TrainerReleaseRequestApproveButton({studentId}: { studentId: string, }) {
+export default function TrainerReleaseRequestApproveButton({requestId}: { requestId: string, }) {
+    const decideRequest = useDecideTrainerReleaseRequest();
+
     return (
         <Tooltip title="Approve Release Request">
             <GridActionsCellItem
                 icon={<Check/>}
                 label="Approve Release Request"
                 onClick={async () => {
-                    await approveReleaseRequest(studentId);
-                    toast('Release request approved successfully!', {type: 'success'});
+                    try {
+                        await decideRequest.mutateAsync({requestId, status: 'APPROVED'});
+                        toast.success('Release request approved successfully!');
+                    } catch {
+                        toast.error('Failed to approve release request.');
+                    }
                 }}
             />
         </Tooltip>

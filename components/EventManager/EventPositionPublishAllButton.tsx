@@ -1,150 +1,38 @@
 'use client';
-import {publishEventPosition, unpublishEventPosition, validateFinalEventPosition} from "@/actions/eventPosition";
-import {EventPositionWithSolo} from "@/app/events/admin/events/[id]/manager/page";
-import {ZodErrorSlimResponse} from "@/types";
-import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
-import {Event,} from "@/generated/prisma/browser";
-import {User} from "next-auth";
-import {useState} from "react";
+import {Button} from "@mui/material";
 import {toast} from "react-toastify";
+import {usePublishEventPositions, useUpdateEventPosition} from "@/lib/osmium/hooks/events";
 
-export default function EventPositionPublishAllButton({ event, positions, }: { event: Event, positions: EventPositionWithSolo[], }) {
+export default function EventPositionPublishAllButton({eventId, positions, archived}: {
+    eventId: string,
+    positions: { id: string, published: boolean }[],
+    archived?: boolean,
+}) {
 
-    const [errorDialogOpen, setErrorDialogOpen] = useState(false);
-    const [errors, setErrors] = useState<EventPositionError[]>([]);
+    const publishAll = usePublishEventPositions(eventId);
+    const updatePosition = useUpdateEventPosition(eventId);
 
     const allPublished = positions.length > 0 && positions.every((position) => position.published);
 
     const handleClick = async () => {
-        if (allPublished) {
-            await Promise.all(positions.map(async (position) => {
-                await unpublishEventPosition(event, position);
-            }));
-            toast.success('All positions unpublished successfully!');
-            return;
-        }
-
-        const errors = await getErrors(event, positions);
-
-        if (errors.length === 0) {
-            await Promise.all(positions.map(async (position) => {
-                if (!position.published) {
-                    await publishEventPosition(event, {
-                        ...position,
-                        finalPosition: position.finalPosition || position.requestedPosition || 'ERR - CONTACT EVENT STAFF',
-                    });
-                }
-            }));
-            toast.success('All positions published successfully!');
-        } else {
-            setErrors(errors);
-            setErrorDialogOpen(true);
+        try {
+            if (allPublished) {
+                await Promise.all(positions.map((position) =>
+                    updatePosition.mutateAsync({positionId: position.id, body: {published: false}})));
+                toast.success('All positions unpublished successfully!');
+            } else {
+                await publishAll.mutateAsync();
+                toast.success('All positions published successfully!');
+            }
+        } catch {
+            toast.error('Failed to update positions.');
         }
     }
 
     return (
-        <>
-            <Button variant={allPublished ? 'outlined' : 'contained'} color={allPublished ? 'error' : 'success'} disabled={!!event.archived || positions.length === 0} onClick={handleClick}>{allPublished ? 'Unp' : 'P'}ublish All</Button>
-            <Dialog open={errorDialogOpen} onClose={() => setErrorDialogOpen(false)}>
-                <DialogTitle>Could Not Auto-Publish</DialogTitle>
-                <DialogContent>
-                    <ul>
-                        {errors.map((error) => (
-                            <li key={error.user.id}>
-                                <DialogContentText>{error.user.firstName} {error.user.lastName}</DialogContentText>
-                                <ul>
-                                    {error.errors.map((error, index) => (
-                                        <li key={index}><DialogContentText>{error}</DialogContentText></li>
-                                    ))}
-                                </ul>
-                            </li>
-                        ))}
-                    </ul>
-                    <DialogContentText>Fix these conflicts and try again.</DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setErrorDialogOpen(false)} variant="contained" size="small">Ok</Button>
-                </DialogActions>
-            </Dialog>
-        </>
+        <Button variant={allPublished ? 'outlined' : 'contained'} color={allPublished ? 'error' : 'success'}
+                disabled={!!archived || positions.length === 0} onClick={handleClick}>
+            {allPublished ? 'Unp' : 'P'}ublish All
+        </Button>
     )
-}
-
-type EventPositionError = {
-    user: User;
-    errors: string[];
-}
-
-const getErrors = async (event: Event, positions: EventPositionWithSolo[]): Promise<EventPositionError[]> => {
-    
-    if (positions.length === 0) {
-        return [];
-    }
-
-    const errors: EventPositionError[] = [];
-
-    for (const position of positions) {
-
-        // check for duplicate positions
-        const duplicate = positions.find((p) => p !== position && p.requestedPosition === position.requestedPosition);
-
-        if (!duplicate) {
-            continue;
-        }
-        if (position.finalPosition !== duplicate.finalPosition) {
-            continue;
-        }
-
-        if (duplicate && position.user) {
-            if (errors.find((error) => error.user === position.user)) {
-                errors.find((error) => error.user === position.user)?.errors.push(`Duplicate position ${position.requestedPosition}`);
-            } else {
-                errors.push({ user: position.user as User, errors: [`Duplicate position ${position.requestedPosition}`] });
-            }
-        }
-
-        const modPosition = position;
-
-        if (!position.finalPosition && event.presetPositions.includes(position.requestedPosition)) {
-            modPosition.finalPosition = position.requestedPosition;
-        } else if (!position.finalPosition && position.user) {
-            if (errors.find((error) => error.user === position.user)) {
-                errors.find((error) => error.user === position.user)?.errors.push('Final Position is required and cannot be autofilled because it is not one of the presets.');
-            } else {
-                errors.push({ user: position.user as User, errors: ['Final Position is required and cannot be autofilled because it is not one of the presets.'] });
-            }
-        }
-
-        modPosition.finalStartTime = position.finalStartTime || position.requestedStartTime;
-        modPosition.finalEndTime = position.finalEndTime || position.requestedEndTime;
-        modPosition.finalNotes = position.finalNotes || '';
-
-        const formData = new FormData();
-        formData.set('finalPosition', modPosition.finalPosition || '');
-        formData.set('finalStartTime', modPosition.finalStartTime.toISOString());
-        formData.set('finalEndTime', modPosition.finalEndTime.toISOString());
-        formData.set('finalNotes', modPosition.finalNotes);
-        formData.set('controllingCategory', modPosition.controllingCategory || 'LOCAL');
-        formData.set('isInstructor', String(Boolean(modPosition.isInstructor)));
-        formData.set('isSolo', String(Boolean(modPosition.isSolo)));
-        formData.set('isOts', String(Boolean(modPosition.isOts)));
-        formData.set('isTmu', String(Boolean(modPosition.isTmu)));
-        formData.set('isCic', String(Boolean(modPosition.isCic)));
-
-        const parse = await validateFinalEventPosition(event, formData) as ZodErrorSlimResponse;
-
-        if (parse.success) {
-            continue;
-        }
-    
-        for (const error of parse.errors) {
-            if (errors.find((error) => error.user === position.user)) {
-                errors.find((error) => error.user === position.user)?.errors.push(error.message);
-            } else {
-                errors.push({ user: position.user as User, errors: [error.message] });
-            }
-        }
-    }
-
-    return errors;
 }

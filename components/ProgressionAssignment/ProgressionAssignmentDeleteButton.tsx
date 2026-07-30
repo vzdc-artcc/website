@@ -4,17 +4,17 @@ import {toast} from "react-toastify";
 import {Tooltip} from "@mui/material";
 import {Delete} from "@mui/icons-material";
 import {GridActionsCellItem} from "@mui/x-data-grid";
-import {deleteProgressionAssignment} from "@/actions/progressionAssignment";
-import {User} from "next-auth";
+import {useDeleteProgressionAssignment} from "@/lib/osmium/hooks/training";
 
 export default function ProgressionAssignmentDeleteButton({user}: {
-    user: User,
+    user: { user_id: string },
 }) {
     const [clicked, setClicked] = useState(false);
+    const deleteAssignment = useDeleteProgressionAssignment();
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteProgressionAssignment(user.id);
+            await deleteAssignment.mutateAsync(user.user_id);
             toast(`Training assign deleted successfully!`, {type: 'success'});
         } else {
             toast(`Deleting this remove it from this user but will NOT affect any existing training sessions.  Click again to confirm.`, {type: 'warning'});

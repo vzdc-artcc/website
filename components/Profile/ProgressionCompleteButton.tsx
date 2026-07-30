@@ -1,25 +1,23 @@
 'use client';
-import React, {useState} from 'react';
-import {TrainingProgression} from "@/generated/prisma/browser";
-import {User} from "next-auth";
+import React from 'react';
 import {Done} from "@mui/icons-material";
-import {assignNextProgressionOrRemove} from "@/actions/progressionAssignment";
 import {Button} from "@mui/material";
+import {toast} from "react-toastify";
+import {useForceCompleteProgression} from "@/lib/osmium/hooks/training";
 
-export default function ProgressionCompleteButton({user, progression}: {
-    user: User,
-    progression: TrainingProgression
-}) {
+export default function ProgressionCompleteButton({cid}: { cid: number }) {
 
-    const [loading, setLoading] = useState(false);
+    const complete = useForceCompleteProgression(cid);
 
     const handleClick = () => {
-        setLoading(true);
-        assignNextProgressionOrRemove(user.id, progression, true).then(() => setLoading(false));
+        complete.mutate(undefined, {
+            onSuccess: () => toast('Progression completed!', {type: 'success'}),
+            onError: () => toast('Could not complete progression.', {type: 'error'}),
+        });
     }
 
     return (
-        <Button variant="contained" size="large" color="success" startIcon={<Done/>} loading={loading}
+        <Button variant="contained" size="large" color="success" startIcon={<Done/>} loading={complete.isPending}
                 onClick={handleClick}>Complete Progression</Button>
     );
 }

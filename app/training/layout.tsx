@@ -1,10 +1,9 @@
 import React from 'react';
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
-import {Alert, Grid, Stack, Typography} from "@mui/material";
+import {Grid, Stack} from "@mui/material";
 import TrainingMenu from "@/components/Admin/TrainingMenu";
 import {Metadata} from "next";
-import prisma from "@/lib/db";
+import DoubleBookingAlert from "@/components/Training/DoubleBookingAlert";
+import RequirePermission from "@/components/Access/RequirePermission";
 
 export const metadata: Metadata = {
     title: 'Training | vZDC',
@@ -13,43 +12,25 @@ export const metadata: Metadata = {
 
 const {BUFFER_TIME} = process.env;
 
-export default async function Layout({children}: { children: React.ReactNode }) {
-    const session = await getServerSession(authOptions);
-
-    if (!session || !session.user.roles.some(r => ["MENTOR", "INSTRUCTOR", "STAFF"].includes(r))) {
-        return (
-            <Typography variant="h5" textAlign="center">You do not have access to this page.</Typography>
-        );
-    }
-
-    const numDoubleBookedAppointments = await prisma.trainingAppointment.count({
-        where: {
-            start: {
-                gte: new Date(),
-            },
-            doubleBooking: true,
-        },
-    });
+export default function Layout({children}: { children: React.ReactNode }) {
 
     return (
-        (<Grid container columns={9} spacing={2}>
-            <Grid
-                size={{
-                    xs: 9,
-                    lg: 2
-                }}>
-                <TrainingMenu/>
+        <RequirePermission perm="pages.training_admin.read">
+            <Grid container columns={9} spacing={2}>
+                <Grid
+                    size={{
+                        xs: 9,
+                        lg: 2
+                    }}>
+                    <TrainingMenu/>
+                </Grid>
+                <Grid size="grow">
+                    <Stack direction="column" spacing={2}>
+                        <DoubleBookingAlert bufferTimeMinutes={BUFFER_TIME}/>
+                        {children}
+                    </Stack>
+                </Grid>
             </Grid>
-            <Grid size="grow">
-                <Stack direction="column" spacing={2}>
-                    {numDoubleBookedAppointments > 0 &&
-                        <Alert severity="warning">There are one or more double booked training
-                            appointments scheduled. Check the calendar for appointments prefixed
-                            with &apos;(DB)&apos; and
-                            consider rescheduling.<br/>Appointment Buffer Time: {BUFFER_TIME} minutes</Alert>}
-                    {children}
-                </Stack>
-            </Grid>
-        </Grid>)
+        </RequirePermission>
     );
 }

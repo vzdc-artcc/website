@@ -1,33 +1,38 @@
 'use client';
-import React from 'react';
-import {User} from "next-auth";
-import {Autocomplete, TextField} from "@mui/material";
-import {assignOts} from "@/actions/ots";
-import {OtsRecommendation} from "@/generated/prisma/browser";
-import {toast} from "react-toastify";
+import { Autocomplete, TextField } from "@mui/material";
+import { toast } from "react-toastify";
+import { useUpdateOtsRecommendation } from "@/lib/osmium/hooks/training";
 
-export default function InstructorDropdown({rec, allInstructors, assignedInstructorId,}: {
-    rec: OtsRecommendation,
-    allInstructors: User[],
-    assignedInstructorId?: string | null
+interface InstructorOption {
+    id: string;
+    cid: number;
+    name: string;
+}
+
+export default function InstructorDropdown({ recommendationId, instructors, assignedInstructorId }: {
+    recommendationId: string;
+    instructors: InstructorOption[];
+    assignedInstructorId?: string | null;
 }) {
-
-    const [selectedInstructor, setSelectedInstructor] = React.useState<User | null>(allInstructors.find(i => i.id === assignedInstructorId) || null);
-
+    const updateOts = useUpdateOtsRecommendation();
+    const selected = instructors.find((i) => i.id === assignedInstructorId) || null;
 
     return (
         <Autocomplete
             size="small"
-            options={allInstructors}
-            getOptionLabel={(i) => `${i.operatingInitials} - ${i.fullName}`}
-            value={selectedInstructor}
+            options={instructors}
+            getOptionLabel={(i) => i.name}
+            isOptionEqualToValue={(a, b) => a.id === b.id}
+            value={selected}
             fullWidth
-            onChange={(_, newValue) => {
-                setSelectedInstructor(newValue);
-                assignOts(rec.id, newValue || undefined).then(() => toast.success('Instructor assignment updated successfully!')).catch(() => toast.error('Failed to update instructor assignment.'));
+            onChange={(_e, newValue) => {
+                updateOts.mutateAsync({ recommendationId, assignedInstructorId: newValue?.id ?? null })
+                    .then(() => toast.success('Instructor assignment updated successfully!'))
+                    .catch(() => toast.error('Failed to update instructor assignment.'));
             }}
-            renderInput={(params) => <TextField {...params} label={selectedInstructor ? 'ASSIGNED TO' : 'ASSIGN'}
-                                                variant="outlined"/>}
+            renderInput={(params) => (
+                <TextField {...params} label={selected ? 'ASSIGNED TO' : 'ASSIGN'} variant="outlined" />
+            )}
         />
     );
 }

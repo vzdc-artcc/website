@@ -1,21 +1,22 @@
 'use client';
 import React from 'react';
 import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
-import {fetchVisitorApplications} from "@/actions/visitor";
-import {VisitorApplicationStatus} from "@/generated/prisma/browser";
+import DataTable, {containsOnlyFilterOperator} from "@/components/DataTable/DataTable";
+import {osmium} from "@/lib/osmium/client";
 import {Grading, Info} from "@mui/icons-material";
 import {useRouter} from "next/navigation";
 import {formatZuluDate} from "@/lib/date";
 import {Chip, Link, Tooltip} from "@mui/material";
 
-const getChipColor = (status: VisitorApplicationStatus) => {
+const STATUSES = ['PENDING', 'APPROVED', 'DENIED'];
+
+const getChipColor = (status: string) => {
     switch (status) {
-        case VisitorApplicationStatus.PENDING:
+        case 'PENDING':
             return 'warning';
-        case VisitorApplicationStatus.APPROVED:
+        case 'APPROVED':
             return 'success';
-        case VisitorApplicationStatus.DENIED:
+        case 'DENIED':
             return 'error';
         default:
             return 'default';
@@ -32,7 +33,8 @@ export default function VisitorApplicationTable() {
             headerName: 'Submitted',
             flex: 1,
             filterable: false,
-            valueFormatter: (params) => formatZuluDate(params),
+            sortable: false,
+            renderCell: (params) => formatZuluDate(new Date(params.row.submitted_at)),
         },
         {
             field: 'user',
@@ -41,11 +43,11 @@ export default function VisitorApplicationTable() {
             sortable: false,
             renderCell: (params) => {
                 return (
-                    <Link href={`https://vatusa.net/mgt/controller/${params.row.user.cid}`} target="_blank"
+                    <Link href={`https://vatusa.net/mgt/controller/${params.row.cid}`} target="_blank"
                                               style={{textDecoration: 'none',}}>
                         <Chip
-                                key={params.row.user.id}
-                                label={`${params.row.user.firstName} ${params.row.user.lastName}` || 'Unknown'}
+                                key={params.row.id}
+                                label={`${params.row.display_name} (${params.row.cid})` || 'Unknown'}
                                 size="small"
                                 color='info'
                                 style={{margin: '2px'}}
@@ -53,36 +55,23 @@ export default function VisitorApplicationTable() {
                     </Link>
                 )
             },
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
-        },
-        {
-            field: 'cid',
-            headerName: 'CID',
-            flex: 1,
-            sortable: false,
-            renderCell: (params) => params.row.user.cid,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
-        },
-        {
-            field: 'email',
-            headerName: 'Email',
-            flex: 1,
-            sortable: false,
-            renderCell: (params) => params.row.user.email,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+            filterOperators: containsOnlyFilterOperator,
         },
         {
             field: 'homeFacility',
             headerName: 'Home Facility',
             flex: 1,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+            sortable: false,
+            renderCell: (params) => params.row.home_facility,
+            filterOperators: containsOnlyFilterOperator,
         },
         {
             field: 'status',
             headerName: 'Status',
             type: 'singleSelect',
-            valueOptions: Object.keys(VisitorApplicationStatus).map((type) => ({value: type, label: type})),
+            valueOptions: STATUSES,
             flex: 1,
+            sortable: false,
             renderCell: params => (
                 <Chip size="small" color={getChipColor(params.row.status)} label={params.row.status}/>),
         },
@@ -91,7 +80,7 @@ export default function VisitorApplicationTable() {
             getActions: (params) => [
                 <Tooltip title="View Application" key={`view-${params.row.id}`}>
                     <GridActionsCellItem
-                        icon={params.row.status === VisitorApplicationStatus.PENDING ? <Grading/> : <Info/>}
+                        icon={params.row.status === 'PENDING' ? <Grading/> : <Info/>}
                         label="View Application"
                         onClick={() => router.push(`/admin/visitor-applications/${params.row.id}`)}
                     />
@@ -103,10 +92,41 @@ export default function VisitorApplicationTable() {
     return (
         <DataTable columns={columns} initialSort={[{field: 'submittedAt', sort: 'desc',}]}
                    fetchData={async (pagination, sortModel, filter) => {
-                       const applications = await fetchVisitorApplications(pagination, sortModel, filter);
+                       let cid: number | undefined;
+                       let displayName: string | undefined;
+                       let homeFacility: string | undefined;
+                       let status: string | undefined;
+
+                       if (filter && filter.value !== undefined && filter.value !== '') {
+                           if (filter.field === 'user') {
+                               const value = filter.value as string;
+                               const asNumber = Number(value);
+                               if (!Number.isNaN(asNumber)) cid = asNumber;
+                               else displayName = value;
+                           } else if (filter.field === 'homeFacility') {
+                               homeFacility = filter.value as string;
+                           } else if (filter.field === 'status') {
+                               status = filter.value as string;
+                           }
+                       }
+
+                       const {data, error} = await osmium.GET("/api/v1/admin/visitor-applications", {
+                           params: {
+                               query: {
+                                   page: pagination.page + 1,
+                                   page_size: pagination.pageSize,
+                                   cid,
+                                   display_name: displayName,
+                                   home_facility: homeFacility,
+                                   status,
+                               },
+                           },
+                       });
+                       if (error) throw error;
+
                        return {
-                           data: applications[1],
-                           rowCount: applications[0],
+                           data: data?.items ?? [],
+                           rowCount: data?.total ?? 0,
                        };
                    }}/>
     );

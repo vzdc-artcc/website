@@ -1,48 +1,51 @@
 'use client';
 import React from 'react';
-import {Lesson, TrainingProgression} from "@/generated/prisma/browser";
-import {GridColDef} from "@mui/x-data-grid";
-import {Chip} from "@mui/material";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
-import {fetchTrainingProgressionSteps} from "@/actions/trainingProgressionStep";
+import {Box, Chip} from "@mui/material";
+import {DataGrid, GridColDef} from "@mui/x-data-grid";
 import TrainingProgressionStepDeleteButton
     from "@/components/TrainingProgressionStep/TrainingProgressionStepDeleteButton";
 import TrainingProgressionStepEditButton from "@/components/TrainingProgressionStep/TrainingProgressionStepEditButton";
+import {useTrainingLessons, useTrainingProgressionSteps} from "@/lib/osmium/hooks/training";
 
-export default function TrainingProgressionStepTable({trainingProgression, allLessons}: {
-    trainingProgression: TrainingProgression,
-    allLessons: Lesson[],
+export default function TrainingProgressionStepTable({trainingProgression}: {
+    trainingProgression: { id: string },
 }) {
+
+    const {data: stepsData, isLoading} = useTrainingProgressionSteps();
+    const {data: lessonsData} = useTrainingLessons();
+    const lessons = lessonsData?.items ?? [];
+
+    const rows = (stepsData?.items ?? [])
+        .filter((s) => s.progression_id === trainingProgression.id)
+        .map((s) => ({
+            ...s,
+            lesson: lessons.find((l) => l.id === s.lesson_id) || null,
+        }));
 
     const columns: GridColDef[] = [
         {
             field: 'lesson',
             flex: 1,
             headerName: 'Lesson',
-            renderCell: (params) => {
-                return (
-                    <Chip
-                        key={params.row.lesson.id}
-                        label={params.row.lesson.identifier}
-                        size="small"
-                    />
-                );
-            },
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+            renderCell: (params) => (
+                <Chip
+                    key={params.row.lesson_id}
+                    label={params.row.lesson?.identifier ?? 'Unknown'}
+                    size="small"
+                />
+            ),
         },
         {
             field: 'optional',
             flex: 1,
             headerName: 'Optional',
             type: 'boolean',
-            filterOperators: [...equalsOnlyFilterOperator],
         },
         {
-            field: 'order',
+            field: 'sort_order',
             flex: 1,
             headerName: 'Order',
             type: 'number',
-            filterable: false,
         },
         {
             field: 'actions',
@@ -51,7 +54,7 @@ export default function TrainingProgressionStepTable({trainingProgression, allLe
             headerName: 'Actions',
             getActions: (params) => [
                 <TrainingProgressionStepEditButton trainingProgression={trainingProgression}
-                                                   trainingProgressionStep={params.row} allLessons={allLessons}
+                                                   trainingProgressionStep={params.row}
                                                    key={`${params.row.id}-edit`}/>,
                 <TrainingProgressionStepDeleteButton trainingProgressionStep={params.row}
                                                      key={`${params.row.id}-delete`}/>,
@@ -60,14 +63,19 @@ export default function TrainingProgressionStepTable({trainingProgression, allLe
     ];
 
     return (
-        <DataTable
-            columns={columns}
-            initialSort={[{field: 'order', sort: 'asc',}]}
-            fetchData={async (pagination, sortModel, filter,) => {
-                const fetchedSteps = await fetchTrainingProgressionSteps(trainingProgression, pagination, sortModel, filter);
-                return {data: fetchedSteps[1], rowCount: fetchedSteps[0]};
-            }}
-        />
+        <Box sx={{boxSizing: 'border-box', width: '100%'}}>
+            <DataGrid
+                loading={isLoading}
+                columns={columns}
+                rows={rows}
+                initialState={{
+                    sorting: {sortModel: [{field: 'sort_order', sort: 'asc'}]},
+                    pagination: {paginationModel: {pageSize: 25}},
+                }}
+                pageSizeOptions={[10, 25, 50]}
+                autoHeight
+            />
+        </Box>
     );
 
 }

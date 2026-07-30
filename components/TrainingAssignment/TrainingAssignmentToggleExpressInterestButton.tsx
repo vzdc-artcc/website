@@ -1,29 +1,33 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingAssignmentRequest} from "@/generated/prisma/browser";
 import {Button} from "@mui/material";
-import {expressInterest, removeInterest} from "@/actions/trainingAssignment";
-import {User} from "next-auth";
 import {toast} from "react-toastify";
+import {useAddAssignmentRequestInterest, useRemoveAssignmentRequestInterest} from "@/lib/osmium/hooks/training";
 
-export default function TrainingAssignmentToggleExpressInterestButton({user, request, hasAlreadyExpressedInterest,}: {
-    user: User,
-    request: TrainingAssignmentRequest,
+export default function TrainingAssignmentToggleExpressInterestButton({request, hasAlreadyExpressedInterest,}: {
+    request: { id: string },
     hasAlreadyExpressedInterest?: boolean,
 }) {
 
     const [loading, setLoading] = useState(false);
+    const addInterest = useAddAssignmentRequestInterest();
+    const removeInterest = useRemoveAssignmentRequestInterest();
 
     const handleToggleExpressInterest = async () => {
         setLoading(true);
-        if (hasAlreadyExpressedInterest) {
-            await removeInterest(request.id, user.id);
-            toast('Expression of interest removed successfully!', {type: 'success'});
-        } else {
-            await expressInterest(request.id, user.id);
-            toast('Expression of interest saved successfully!', {type: 'success'});
+        try {
+            if (hasAlreadyExpressedInterest) {
+                await removeInterest.mutateAsync(request.id);
+                toast.success('Expression of interest removed successfully!');
+            } else {
+                await addInterest.mutateAsync(request.id);
+                toast.success('Expression of interest saved successfully!');
+            }
+        } catch {
+            toast.error('Failed to update expression of interest.');
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }
 
     return (

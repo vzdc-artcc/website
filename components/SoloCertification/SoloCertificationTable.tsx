@@ -1,51 +1,39 @@
 'use client';
 import React from 'react';
-import {GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
-import {fetchSoloCertifications} from "@/actions/solo";
+import {DataGrid, GridColDef} from "@mui/x-data-grid";
 import SoloCertificationDeleteButton from "@/components/SoloCertification/SoloCertificationDeleteButton";
 import {formatZuluDate} from "@/lib/date";
-import {CertificationType} from "@/generated/prisma/browser";
 import {Chip, Tooltip} from "@mui/material";
 import Link from "next/link";
+import {useAdminSoloCertifications} from "@/lib/osmium/hooks/certifications";
 
 export default function SoloCertificationTable() {
 
+    const {data, isLoading} = useAdminSoloCertifications();
+    const rows = data?.items ?? [];
+
     const columns: GridColDef[] = [
         {
-            field: 'controller',
+            field: 'display_name',
             headerName: 'Controller',
             flex: 1,
-            sortable: false,
-            renderCell: (params) => {
-                return (
-                    <Tooltip title={`${params.row.controller.controllerStatus}`}>
-                        <Link href={`/admin/controller/${params.row.controller.cid}`} target="_blank"
-                              style={{textDecoration: 'none',}}>
-                            <Chip
-                                key={params.row.controller.id}
-                                label={`${params.row.controller.firstName} ${params.row.controller.lastName}` || 'Unknown'}
-                                size="small"
-                            />
-                        </Link>
-                    </Tooltip>
-                )
-            }, filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+            renderCell: (params) => (
+                <Tooltip title={`CID ${params.row.cid}`}>
+                    <Link href={`/admin/controller/${params.row.cid}`} target="_blank"
+                          style={{textDecoration: 'none',}}>
+                        <Chip label={params.row.display_name || 'Unknown'} size="small"/>
+                    </Link>
+                </Tooltip>
+            ),
         },
+        {field: 'certification_type_name', headerName: 'Certification Type', flex: 1},
+        {field: 'position', headerName: 'Position', flex: 1},
         {
-            field: 'certificationType',
-            headerName: 'Certification Type',
-            valueFormatter: (params: CertificationType) => params.name,
+            field: 'expires',
+            headerName: 'Expires',
             flex: 1,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+            valueFormatter: (value) => formatZuluDate(new Date(value)),
         },
-        {
-            field: 'position',
-            headerName: 'Position',
-            flex: 1,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
-        },
-        {field: 'expires', headerName: 'Expires', flex: 1, valueFormatter: (params) => formatZuluDate(params)},
         {
             field: 'actions',
             headerName: 'Actions',
@@ -58,13 +46,13 @@ export default function SoloCertificationTable() {
     ];
 
     return (
-        <DataTable columns={columns} initialSort={[{field: 'expires', sort: 'desc',}]}
-                   fetchData={async (pagination, sortModel, filter) => {
-                       const soloCertifications = await fetchSoloCertifications(pagination, sortModel, filter);
-                       return {
-                           data: soloCertifications[1],
-                           rowCount: soloCertifications[0],
-                       };
-                   }}/>
+        <DataGrid
+            autoHeight
+            loading={isLoading}
+            rows={rows}
+            columns={columns}
+            initialState={{sorting: {sortModel: [{field: 'expires', sort: 'desc'}]}}}
+            pageSizeOptions={[10, 25, 50]}
+        />
     );
 }

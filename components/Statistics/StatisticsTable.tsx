@@ -4,11 +4,12 @@ import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typogr
 export default function StatisticsTable({heading, logs,}: {
     heading: string, logs: {
         title: string,
-        deliveryHours: number,
-        groundHours: number,
-        towerHours: number,
-        approachHours: number,
-        centerHours: number,
+        delivery_hours: number,
+        ground_hours: number,
+        tower_hours: number,
+        tracon_hours: number,
+        center_hours: number,
+        total_hours: number,
     }[]
 }) {
 
@@ -16,7 +17,7 @@ export default function StatisticsTable({heading, logs,}: {
         return <Typography sx={{my: 1,}}>No data for this time period</Typography>
     }
 
-    logs.sort((a,b)=> parseFloat((b.deliveryHours + b.groundHours + b.towerHours + b.approachHours + b.centerHours).toPrecision(3)) - parseFloat((a.deliveryHours + a.groundHours + a.towerHours + a.approachHours + a.centerHours).toPrecision(3)))
+    logs.sort((a, b) => b.total_hours - a.total_hours);
 
     return (
         <TableContainer sx={{maxHeight: 600,}}>
@@ -36,13 +37,12 @@ export default function StatisticsTable({heading, logs,}: {
                     {logs.map(log => (
                         <TableRow key={log.title}>
                             <TableCell>{log.title}</TableCell>
-                            <TableCell>{log.deliveryHours.toPrecision(3)}</TableCell>
-                            <TableCell>{log.groundHours.toPrecision(3)}</TableCell>
-                            <TableCell>{log.towerHours.toPrecision(3)}</TableCell>
-                            <TableCell>{log.approachHours.toPrecision(3)}</TableCell>
-                            <TableCell>{log.centerHours.toPrecision(3)}</TableCell>
-                            <TableCell
-                                sx={{border: 1,}}>{(log.deliveryHours + log.groundHours + log.towerHours + log.approachHours + log.centerHours).toPrecision(3)}</TableCell>
+                            <TableCell>{log.delivery_hours.toPrecision(3)}</TableCell>
+                            <TableCell>{log.ground_hours.toPrecision(3)}</TableCell>
+                            <TableCell>{log.tower_hours.toPrecision(3)}</TableCell>
+                            <TableCell>{log.tracon_hours.toPrecision(3)}</TableCell>
+                            <TableCell>{log.center_hours.toPrecision(3)}</TableCell>
+                            <TableCell sx={{border: 1,}}>{log.total_hours.toPrecision(3)}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

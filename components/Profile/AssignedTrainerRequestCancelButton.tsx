@@ -1,13 +1,13 @@
 'use client';
 import React, {useState} from 'react';
-import {TrainingAssignmentRequest} from "@/generated/prisma/browser";
 import {Button} from "@mui/material";
 import {toast} from "react-toastify";
-import {cancelTrainingAssignmentRequest} from "@/actions/trainingAssignmentRequest";
+import {useDeleteTrainingAssignmentRequest} from "@/lib/osmium/hooks/training";
 
-export default function AssignedTrainerRequestCancelButton({request}: { request: TrainingAssignmentRequest, }) {
+export default function AssignedTrainerRequestCancelButton({requestId}: { requestId: string, }) {
 
     const [clicked, setClicked] = useState(false);
+    const deleteRequest = useDeleteTrainingAssignmentRequest();
 
     const submit = async () => {
         if (!clicked) {
@@ -16,15 +16,12 @@ export default function AssignedTrainerRequestCancelButton({request}: { request:
             return;
         }
 
-        const {errors} = await cancelTrainingAssignmentRequest(request.id);
-
-        if (errors) {
-            toast(errors.join(' '), {type: 'error',});
-            setClicked(false);
-            return;
+        try {
+            await deleteRequest.mutateAsync(requestId);
+            toast('Your training assignment request has been cancelled.', {type: 'success',});
+        } catch {
+            toast('Failed to cancel training assignment request.', {type: 'error',});
         }
-
-        toast('Your training assignment request has been cancelled.', {type: 'success',});
         setClicked(false);
     }
 

@@ -1,10 +1,22 @@
 import React from 'react';
-import {TrainingSessionIndicatorWithAll} from "@/components/TrainingSession/TrainingSessionForm";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import PerformanceIndicatorCommentDialog from "@/components/TrainingSession/PerformanceIndicatorCommentDialog";
 
+interface CriterionLike {
+    id: string;
+    name: string;
+    marker?: string | null;
+    comments?: string | null;
+}
+
+interface CategoryLike {
+    id: string;
+    name: string;
+    criteria: CriterionLike[];
+}
+
 export default function PerformanceIndicatorInformation({performanceIndicator}: {
-    performanceIndicator: TrainingSessionIndicatorWithAll
+    performanceIndicator: { categories: CategoryLike[] }
 }) {
     return (
         <TableContainer>
@@ -16,9 +28,6 @@ export default function PerformanceIndicatorInformation({performanceIndicator}: 
                         <TableCell sx={{textAlign: 'center',}}>Observed</TableCell>
                         <TableCell sx={{textAlign: 'center',}}>Not Observed</TableCell>
                         <TableCell sx={{textAlign: 'center',}}>Comment</TableCell>
-                        {/*<TableCell sx={{textAlign: 'center',}}>Satisfactory</TableCell>*/}
-                        {/*<TableCell sx={{textAlign: 'center',}}>Needs Improvement</TableCell>*/}
-                        {/*<TableCell sx={{textAlign: 'center',}}>Unsatisfactory</TableCell>*/}
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -45,18 +54,6 @@ export default function PerformanceIndicatorInformation({performanceIndicator}: 
                                         <PerformanceIndicatorCommentDialog criteria={criterion}/>
                                     }
                                 </TableCell>
-                                {/*<TableCell sx={{*/}
-                                {/*    border: 1,*/}
-                                {/*    background: criterion.marker === 'SATISFACTORY' ? 'rgba(0, 200, 0, 0.2)' : 'inherit',*/}
-                                {/*}}></TableCell>*/}
-                                {/*<TableCell sx={{*/}
-                                {/*    border: 1,*/}
-                                {/*    background: criterion.marker === 'NEEDS_IMPROVEMENT' ? 'rgba(244,146,0,0.2)' : 'inherit',*/}
-                                {/*}}></TableCell>*/}
-                                {/*<TableCell sx={{*/}
-                                {/*    border: 1,*/}
-                                {/*    background: criterion.marker === 'UNSATISFACTORY' ? 'rgba(200, 0, 0, 0.2)' : 'inherit',*/}
-                                {/*}}></TableCell>*/}
                             </TableRow>
                         ));
                     })}

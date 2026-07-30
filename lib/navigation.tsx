@@ -15,7 +15,6 @@ import {
     PersonAdd,
     Radar,
     Radio,
-    TurnSharpRight,
     Workspaces,
 } from "@mui/icons-material";
 
@@ -42,11 +41,6 @@ export const NAVIGATION: NavigationButton[] = [
         icon: <AirplanemodeActive/>,
         dropdown: {
             buttons: [
-                {
-                    label: 'Airports',
-                    link: '/airports',
-                    icon: <AirplanemodeActive/>,
-                },
                 {
                     label: 'vSOA Scheduling',
                     link: '/sua/new',
@@ -84,11 +78,6 @@ export const NAVIGATION: NavigationButton[] = [
                     label: 'Statistics',
                     link: '/controllers/statistics',
                     icon: <BarChart/>,
-                },
-                {
-                    label: 'Flight Plan Practice',
-                    link: '/routepractice',
-                    icon: <TurnSharpRight/>,
                 },
                 {
                     label: 'ATC Bookings',

@@ -1,6 +1,5 @@
 'use client';
 import React, {useState} from 'react';
-import {signIn, signOut} from "next-auth/react";
 import {
     Box,
     Button,
@@ -15,7 +14,6 @@ import {
     MenuItem,
     Typography
 } from "@mui/material";
-import {Session} from "next-auth";
 import {
     AdminPanelSettings,
     CalendarMonth,
@@ -31,20 +29,30 @@ import {
 } from "@mui/icons-material";
 import NavDropdown from "@/components/Navbar/NavDropdown";
 import Link from "next/link";
-import {getRating} from "@/lib/vatsim";
 import NavSidebarButton from "@/components/Sidebar/NavSidebarButton";
 import NavButton from "@/components/Navbar/NavButton";
 import NavSidebar from "@/components/Sidebar/NavSidebar";
 import {usePathname} from "next/navigation";
-import {refreshAccountData} from "@/actions/user";
 import {toast} from "react-toastify";
 import TeamspeakUidDialog from "@/components/TeamspeakUID/TeamspeakUidDialog";
+import { osmium } from "@/lib/osmium/client";
+import { useMe, useRefreshMyVatusa } from "@/lib/osmium/hooks/me";
+import { meHasPermission } from "@/lib/osmium/permissions";
 
-export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
-    session: Session | null,
+export default function LoginButton({sidebar, sidebarButtonClicked,}: {
     sidebar?: boolean,
     sidebarButtonClicked?: () => void
 }) {
+
+    // Identity, nav visibility and Website Management all come from osmium's
+    // /me now — osmium is the sole authority (Phase 6: no NextAuth session).
+    const {data: me} = useMe();
+    const isServerAdmin = me?.server_admin === true;
+    // Staff-tab visibility is an explicit permission grant, not a role fold.
+    const canFacilityAdmin = meHasPermission(me, "pages.facility_admin.read");
+    const canTrainingAdmin = meHasPermission(me, "pages.training_admin.read");
+    const canEventManagement = meHasPermission(me, "pages.event_management.read");
+    const refreshVatusa = useRefreshMyVatusa();
 
     const [dropdownAnchor, setDropdownAnchor] = React.useState<null | HTMLElement>(null);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -54,10 +62,11 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
     const [accepted, setAccepted] = useState(false);
 
     const handleRefresh = async () => {
-        if (!session) return;
+        if (!me) return;
 
-        const error = await refreshAccountData(session?.user);
-        if (error) {
+        try {
+            await refreshVatusa.mutateAsync();
+        } catch {
             toast('Error refreshing account information.', {type: 'error'});
             return;
         }
@@ -66,7 +75,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
     }
 
     const handleClick = (e: { currentTarget: HTMLElement | EventTarget | null, }) => {
-        if (!session) {
+        if (!me) {
             setOpenAlert(true);
         } else {
             setDropdownAnchor(e.currentTarget as HTMLElement);
@@ -82,9 +91,12 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
     };
 
     const handleSignIn = () => {
-        signIn('vatsim', {
-            callbackUrl: pathname,
-        }).then();
+        // osmium's VATSIM OAuth is the sole login step: it sets the httpOnly
+        // osmium_session cookie and redirects back to where the user was. (The
+        // transitional NextAuth bridge was removed at the end of the migration.)
+        const returnTo = `${window.location.origin}${pathname}`;
+        const osmiumLoginUrl = `${process.env.NEXT_PUBLIC_OSMIUM_API_URL}/api/v1/auth/vatsim/login?return_to=${encodeURIComponent(returnTo)}`;
+        window.location.href = osmiumLoginUrl;
     };
 
     const closeDropdown = () => {
@@ -92,10 +104,14 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
     }
 
     const logout = () => {
-        signOut({
-            callbackUrl: pathname,
-        }).then(() => {
+        // osmium owns the session now: revoke it, then hard-navigate so every
+        // osmium-backed query re-fetches as logged-out.
+        osmium.POST("/api/v1/auth/logout").catch(() => {
+            // Best-effort: still reset the client even if the session was
+            // already gone or osmium was unreachable.
+        }).finally(() => {
             closeDropdown();
+            window.location.href = pathname;
         });
     }
 
@@ -109,37 +125,37 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
 
     return (
         <>
-            {session && <TeamspeakUidDialog user={session.user} open={openTeamspeakUidDialog}
+            {me && <TeamspeakUidDialog open={openTeamspeakUidDialog}
                                             onClose={() => setOpenTeamspeakUidDialog(false)}/>}
             {sidebar && <NavSidebarButton icon={<Person/>}
-                                          text={session ? `${session.user.fullName} - ${getRating(session.user.rating)}` : 'Login'}
+                                          text={me ? (me.rating ? `${me.display_name} - ${me.rating}` : me.display_name) : 'Login'}
                                           isSidebar onClick={handleClick}/>}
-            {session && <NavSidebar open={sidebarOpen} title="Account" onClose={() => setSidebarOpen(false)}>
+            {me && <NavSidebar open={sidebarOpen} title="Account" onClose={() => setSidebarOpen(false)}>
                 <Box onClick={() => {
                     setSidebarOpen(false);
                     sidebarButtonClicked && sidebarButtonClicked();
                 }}>
-                    {session.user.roles.length > 0 &&
+                    {me &&
                         <Link href="/profile/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                             <NavSidebarButton icon={<Settings/>} text="Profile"/>
                         </Link>}
-                    {session?.user.roles.some((r) => ["STAFF"].includes(r)) &&
+                    {canFacilityAdmin &&
                         <Link href="/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                             <NavSidebarButton icon={<AdminPanelSettings/>} text="Facility Administration"/>
                         </Link>}
-                    {session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) || session?.user.staffPositions.includes("WM") &&
-                        <Link href="/web-system/overview" style={{textDecoration: 'none', color: 'inherit',}}>
-                            <NavSidebarButton icon={<Web/>} text="Web System Administration"/>
+                    {isServerAdmin &&
+                        <Link href="/website-management/overview" style={{textDecoration: 'none', color: 'inherit',}}>
+                            <NavSidebarButton icon={<Web/>} text="Website Management"/>
                         </Link>}
-                    {session?.user.roles.some((r) => ["MENTOR", "INSTRUCTOR", "STAFF"].includes(r)) &&
+                    {canTrainingAdmin &&
                         <Link href="/training/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                             <NavSidebarButton icon={<Class/>} text="Training Administration"/>
                         </Link>}
-                    {session?.user.roles.some((r) => ["EVENT_STAFF", "STAFF"].includes(r)) &&
+                    {canEventManagement &&
                     <Link href="/events/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                         <NavSidebarButton icon={<CalendarMonth />} text="Events Administration"/>
                     </Link>}
-                    {session && <NavSidebarButton icon={<Radio/>} text="TeamSpeak UID" onClick={() => {
+                    {me && <NavSidebarButton icon={<Radio/>} text="TeamSpeak UID" onClick={() => {
                         setOpenTeamspeakUidDialog(true);
                     }}/>}
                     <NavSidebarButton icon={<Refresh/>} text="Refresh VATUSA Account Information"
@@ -148,10 +164,10 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                 </Box>
             </NavSidebar>}
             {!sidebar && <NavButton icon={null}
-                                    text={session ? `${session.user.fullName} - ${getRating(session.user.rating)}` : 'Login'}
+                                    text={me ? (me.rating ? `${me.display_name} - ${me.rating}` : me.display_name) : 'Login'}
                                     isDropdown dropdownOpen={!!dropdownAnchor} onClick={handleClick}/>}
             {!sidebar && <NavDropdown open={!!dropdownAnchor} anchorElement={dropdownAnchor} onClose={closeDropdown}>
-                {session?.user.controllerStatus !== "NONE" &&
+                {me &&
                     <Link href="/profile/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                     <MenuItem onClick={closeDropdown}>
                         <ListItemIcon>
@@ -160,7 +176,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                         <ListItemText>Profile</ListItemText>
                     </MenuItem>
                     </Link>}
-                {session?.user.roles.some((r) => ["STAFF"].includes(r)) &&
+                {canFacilityAdmin &&
                     <Link href="/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                         <MenuItem onClick={closeDropdown}>
                             <ListItemIcon>
@@ -169,16 +185,16 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                             <ListItemText>Facility Administration</ListItemText>
                         </MenuItem>
                     </Link>}
-                {session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) || session?.user.staffPositions.includes("WM") &&
-                    <Link href="/web-system/overview" style={{textDecoration: 'none', color: 'inherit',}}>
+                {isServerAdmin &&
+                    <Link href="/website-management/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                         <MenuItem onClick={closeDropdown}>
                             <ListItemIcon>
                                 <Web/>
                             </ListItemIcon>
-                            <ListItemText>Web System Administration</ListItemText>
+                            <ListItemText>Website Management</ListItemText>
                         </MenuItem>
                     </Link>}
-                {session?.user.roles.some((r) => ["MENTOR", "INSTRUCTOR", "STAFF"].includes(r)) &&
+                {canTrainingAdmin &&
                     <Link href="/training/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                         <MenuItem onClick={closeDropdown}>
                             <ListItemIcon>
@@ -187,7 +203,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                             <ListItemText>Training Administration</ListItemText>
                         </MenuItem>
                     </Link>}
-                {session?.user.roles.some((r) => ["EVENT_STAFF", "STAFF"].includes(r)) &&
+                {canEventManagement &&
                 <Link href="/events/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                     <MenuItem onClick={closeDropdown}>
                         <ListItemIcon>
@@ -196,7 +212,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                         <ListItemText>Events Administration</ListItemText>
                     </MenuItem>
                 </Link>}
-                {session && <MenuItem onClick={() => {
+                {me && <MenuItem onClick={() => {
                     setOpenTeamspeakUidDialog(true);
                     closeDropdown();
                 }}>

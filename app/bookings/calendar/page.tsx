@@ -1,8 +1,6 @@
+'use client';
 import React from 'react';
 import AtcBookingsCalendar from "@/components/AtcBooking/AtcBookingsCalendar";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
-import {fetchAtcBookings} from "@/actions/atcBooking";
 import {
     Accordion,
     AccordionDetails,
@@ -14,12 +12,14 @@ import {
     Typography
 } from "@mui/material";
 import {ExpandMore} from "@mui/icons-material";
+import RequireAuth from "@/components/Access/RequireAuth";
+import {useMe} from "@/lib/osmium/hooks/me";
+import {useAtcBookings} from "@/lib/osmium/hooks/bookings";
 
-export default async function Page() {
-
-    const session = await getServerSession(authOptions);
-
-    const atcBookings = await fetchAtcBookings();
+function CalendarView() {
+    const {data: me} = useMe();
+    const {data} = useAtcBookings();
+    const bookings = data?.items ?? [];
 
     return (
         <Container maxWidth="lg">
@@ -30,17 +30,24 @@ export default async function Page() {
                 <AccordionDetails>
                     <Stack direction="column" spacing={2} sx={{mt: 1,}}>
                         <Typography color="cyan" fontWeight="bold" sx={{p: 1, border: 1,}}>Booking</Typography>
-                        <Typography color="red" fontWeight="bold"
-                                    sx={{p: 1, border: 1,}}>Training</Typography>
+                        <Typography color="red" fontWeight="bold" sx={{p: 1, border: 1,}}>Training</Typography>
                     </Stack>
                 </AccordionDetails>
             </Accordion>
             <Card>
                 <CardContent>
-                    <AtcBookingsCalendar bookings={Array.isArray(atcBookings) ? atcBookings : []}
-                                         timeZone={session?.user.timezone || 'America/New_York'}/>
+                    <AtcBookingsCalendar bookings={bookings}
+                                         timeZone={me?.profile.timezone || 'America/New_York'}/>
                 </CardContent>
             </Card>
         </Container>
-    )
+    );
+}
+
+export default function Page() {
+    return (
+        <RequireAuth>
+            <CalendarView/>
+        </RequireAuth>
+    );
 }

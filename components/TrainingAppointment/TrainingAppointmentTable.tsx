@@ -1,127 +1,108 @@
 'use client';
 import React from 'react';
-import {GridColDef} from "@mui/x-data-grid";
+import {Box, Chip} from "@mui/material";
+import {DataGrid, GridColDef} from "@mui/x-data-grid";
 import Link from "next/link";
-import {Chip} from "@mui/material";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
 import {formatTimezoneDate} from "@/lib/date";
-import {fetchTrainingAppointments} from "@/actions/trainingAppointment";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
-import {User} from "next-auth";
 import TrainingAppointmentInformationDialog
     from "@/components/TrainingAppointment/TrainingAppointmentInformationDialog";
-import {Lesson} from "@/generated/prisma/browser";
+import {useTrainingAppointments} from "@/lib/osmium/hooks/training";
+import {useMe} from "@/lib/osmium/hooks/me";
+import {useHasStaffPosition} from "@/lib/osmium/hooks/staff-positions";
 
-export default function TrainingAppointmentTable({sessionUser}: { sessionUser: User }) {
+export default function TrainingAppointmentTable() {
+
+    const {data: me} = useMe();
+    const timeZone = me?.profile.timezone ?? 'America/New_York';
+    const {has: isTrainingStaff} = useHasStaffPosition(['TA', 'ATA']);
+    const {data, isLoading} = useTrainingAppointments();
+    const rows = data?.items ?? [];
 
     const columns: GridColDef[] = [
         {
-            field: 'student',
+            field: 'student_name',
             flex: 1,
             headerName: 'Student',
-            renderCell: (params) => {
-                return (
-                    <Link href={`/training/history/${params.row.student.cid}`} target="_blank"
-                          style={{textDecoration: 'none',}}>
-                        <Chip
-                            key={params.row.student.id}
-                            label={`${params.row.student.firstName} ${params.row.student.lastName}` || 'Unknown'}
-                            size="small"
-                        />
-                    </Link>
-                )
-            },
+            renderCell: (params) => (
+                <Link href={`/training/history/${params.row.student_cid}`} target="_blank"
+                      style={{textDecoration: 'none',}}>
+                    <Chip label={params.row.student_name} size="small"/>
+                </Link>
+            ),
             sortable: false,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
         {
-            field: 'trainer',
+            field: 'trainer_name',
             flex: 1,
             headerName: 'Trainer',
-            renderCell: (params) => {
-                return (
-                    <Chip
-                        key={params.row.trainer.id}
-                        label={`${params.row.trainer.firstName} ${params.row.trainer.lastName}` || 'Unknown'}
-                        size="small"
-                    />
-                )
-            },
+            renderCell: (params) => <Chip label={params.row.trainer_name} size="small"/>,
             sortable: false,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
         {
             field: 'start',
             flex: 1,
             headerName: 'Start',
-            renderCell: (params) => formatTimezoneDate(params.row.start, sessionUser.timezone),
-            type: 'dateTime',
-            filterable: false,
+            renderCell: (params) => formatTimezoneDate(new Date(params.row.start), timeZone),
         },
         {
-            field: 'duration',
+            field: 'estimated_duration_minutes',
             flex: 1,
-            renderCell: (params) => {
-                return params.row.lessons.map((l: Lesson) => l.duration)
-                    .reduce((acc: number, curr: number) => acc + curr, 0);
-            },
             headerName: 'Duration (mins)',
-            filterable: false,
+            renderCell: (params) => params.row.estimated_duration_minutes ?? 0,
         },
         {
             field: 'environment',
-
             flex: 1,
             headerName: 'Environment',
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
-            renderCell: (params) => {
-                return (
-                    <span style={{color: params.row.doubleBooking ? 'red' : 'inherit',}}>{params.row.environment}</span>
-                )
-            }
+            renderCell: (params) => (
+                <span style={{color: params.row.double_booking ? 'red' : 'inherit',}}>{params.row.environment}</span>
+            ),
         },
         {
             field: 'lessons',
             flex: 1,
             headerName: 'Lesson(s)',
             sortable: false,
-            renderCell: (params) => params.row.lessons.map((lesson: Lesson) => {
-                return (
-                    <Chip
-                        key={lesson.id}
-                        label={lesson.identifier}
-                        size="small"
-                        color="info"
-                        style={{margin: '2px'}}
-                    />
-                );
-            }),
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
+            renderCell: (params) => params.row.lessons.map((lesson: { id: string, identifier: string }) => (
+                <Chip
+                    key={lesson.id}
+                    label={lesson.identifier}
+                    size="small"
+                    color="info"
+                    style={{margin: '2px'}}
+                />
+            )),
         },
         {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',
             getActions: (params) => [
-                <TrainingAppointmentInformationDialog timeZone={sessionUser.timezone} trainingAppointment={params.row}
+                <TrainingAppointmentInformationDialog timeZone={timeZone} trainingAppointment={params.row}
                                                       key={params.id}
-                                                      isTrainingStaff={["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as any))}/>,
-                ["TA", "ATA"].some((sp) => sessionUser.staffPositions.includes(sp as any)) || sessionUser.cid == `${params.row.trainer.cid}` ?
-                    <TrainingAppointmentDeleteButton trainingAppointment={params.row} fromAdmin/>
+                                                      isTrainingStaff={isTrainingStaff}/>,
+                isTrainingStaff || String(me?.cid) === String(params.row.trainer_cid) ?
+                    <TrainingAppointmentDeleteButton trainingAppointment={params.row} fromAdmin key={`delete-${params.id}`}/>
                     : <></>,
             ],
             flex: 1,
-        }
+        },
     ];
 
     return (
-        <DataTable
-            columns={columns}
-            initialSort={[{field: 'start', sort: 'desc',}]}
-            fetchData={async (pagination, sortModel, filter,) => {
-                const fetchedAppointments = await fetchTrainingAppointments(pagination, sortModel, filter);
-                return {data: fetchedAppointments[1], rowCount: fetchedAppointments[0]};
-            }}
-        />
+        <Box sx={{boxSizing: 'border-box', width: '100%'}}>
+            <DataGrid
+                loading={isLoading}
+                columns={columns}
+                rows={rows}
+                initialState={{
+                    sorting: {sortModel: [{field: 'start', sort: 'desc'}]},
+                    pagination: {paginationModel: {pageSize: 25}},
+                }}
+                pageSizeOptions={[10, 25, 50]}
+                autoHeight
+            />
+        </Box>
     );
 }

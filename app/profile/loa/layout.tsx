@@ -1,20 +1,15 @@
 import React from 'react';
 import {Container} from "@mui/material";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
-import ErrorCard from "@/components/Error/ErrorCard";
+import FlagGate from "@/components/Access/FlagGate";
 
-export default async function Layout({children}: { children: React.ReactNode }) {
-
-    const session = await getServerSession(authOptions);
-
-    if (session?.user.noRequestLoas) {
-        return <ErrorCard heading="LOA" message="You are not allowed to access this page."/>
-    }
+export default function Layout({children}: { children: React.ReactNode }) {
 
     return (
-        <Container maxWidth="md">
-            {children}
-        </Container>
+        <FlagGate flag="no_request_loas" deniedHeading="LOA"
+                  deniedMessage="You are not allowed to access this page.">
+            <Container maxWidth="md">
+                {children}
+            </Container>
+        </FlagGate>
     );
 }

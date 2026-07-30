@@ -1,30 +1,17 @@
-import React from 'react';
-import prisma from "@/lib/db";
+'use client';
+import React, {use} from 'react';
 import ProfileEditCard from "@/components/Profile/ProfileEditCard";
-import {notFound} from "next/navigation";
-import {getServerSession, User} from "next-auth";
-import {authOptions} from "@/auth/auth";
+import RequireRole from "@/components/Access/RequireRole";
 
-export default async function Page(props: { params: Promise<{ cid: string }> }) {
-    const params = await props.params;
+export default function Page(props: { params: Promise<{ cid: string }> }) {
+    const {cid} = use(props.params);
 
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-        notFound();
-    }
-
-    const user = await prisma.user.findUnique({
-        where: {
-            cid: params.cid,
-        },
-    });
-
-    if (!user) {
-        notFound();
-    }
-
+    // Reachable from the training area (instructors/staff); the osmium
+    // admin-profile + operating-initials endpoints are the write authority
+    // (users.flags.update / users.operating_initials.update).
     return (
-        <ProfileEditCard user={user as User} sessionUser={session.user} admin/>
+        <RequireRole check="isInstructor">
+            <ProfileEditCard cid={Number(cid)} admin/>
+        </RequireRole>
     );
 }

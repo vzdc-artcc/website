@@ -10,19 +10,23 @@ import {
     DialogTitle,
     Stack
 } from "@mui/material";
-import {ChangeBroadcast} from "@/generated/prisma/browser";
-import {handleAgreeBroadcast, handleSeenBroadcast} from "@/actions/broadcastViewer";
-import {User} from "next-auth";
 import {Check} from "@mui/icons-material";
 import {usePathname} from "next/navigation";
+import {useMarkBroadcastAgreed, useMarkBroadcastSeen} from "@/lib/osmium/hooks/broadcasts";
 
-export default function BroadcastDialog({user, broadcasts, children}: {
-    user: User,
-    broadcasts: ChangeBroadcast[],
+interface PendingBroadcast {
+    id: string;
+    title: string;
+}
+
+export default function BroadcastDialog({broadcasts, children}: {
+    broadcasts: PendingBroadcast[],
     children: React.ReactNode
 }) {
 
     const pathname = usePathname();
+    const markSeen = useMarkBroadcastSeen();
+    const markAgreed = useMarkBroadcastAgreed();
     const [open, setOpen] = useState(false);
     const [confirmAction, setConfirmAction] = useState<null | 'later' | 'reviewed'>(null);
 
@@ -38,11 +42,11 @@ export default function BroadcastDialog({user, broadcasts, children}: {
         setConfirmAction('reviewed');
     }
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         if (confirmAction === 'later') {
-            broadcasts.forEach((b) => handleSeenBroadcast(user, b.id));
+            await Promise.all(broadcasts.map((b) => markSeen.mutateAsync(b.id)));
         } else if (confirmAction === 'reviewed') {
-            broadcasts.forEach((b) => handleAgreeBroadcast(user, b.id));
+            await Promise.all(broadcasts.map((b) => markAgreed.mutateAsync(b.id)));
         }
         setConfirmAction(null);
         setOpen(false);

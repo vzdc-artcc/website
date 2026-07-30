@@ -1,11 +1,9 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {TrainingSessionIndicatorWithAll} from "@/components/TrainingSession/TrainingSessionForm";
-import {Lesson, TrainingSessionPerformanceIndicatorCriteria} from "@/generated/prisma/browser";
-import {getData} from "@/actions/trainingSessionPerformanceIndicator";
 import {
     Box,
     Button,
+    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
@@ -23,51 +21,92 @@ import {
     Typography
 } from "@mui/material";
 import {AddComment, Edit} from "@mui/icons-material";
+import {
+    usePerformanceIndicatorCategories,
+    usePerformanceIndicatorCriteria,
+    usePerformanceIndicatorTemplates
+} from "@/lib/osmium/hooks/training";
+
+export interface PiCriterionState {
+    id: string;
+    name: string;
+    order: number;
+    marker: 'OBSERVED' | 'NOT_OBSERVED' | null;
+    comments: string | null;
+}
+
+export interface PiCategoryState {
+    id: string;
+    name: string;
+    order: number;
+    criteria: PiCriterionState[];
+}
+
+export interface PiFormState {
+    categories: PiCategoryState[];
+}
 
 export default function TrainingSessionPerformanceIndicatorForm({lesson, onChange}: {
-    lesson: Lesson,
-    onChange: (data: TrainingSessionIndicatorWithAll) => void
+    lesson: { id: string, performance_indicator_template_id?: string | null },
+    onChange: (data: PiFormState) => void
 }) {
 
-    const [data, setData] = useState<TrainingSessionIndicatorWithAll>();
+    const {data: templatesData, isLoading: templatesLoading} = usePerformanceIndicatorTemplates();
+    const {data: categoriesData, isLoading: categoriesLoading} = usePerformanceIndicatorCategories();
+    const {data: criteriaData, isLoading: criteriaLoading} = usePerformanceIndicatorCriteria();
+
+    const [data, setData] = useState<PiFormState>();
     const [dialogOpen, setDialogOpen] = useState(false);
     const [comment, setComment] = useState('');
-    const [openCriteria, setOpenCriteria] = useState<TrainingSessionPerformanceIndicatorCriteria>();
+    const [openCriteria, setOpenCriteria] = useState<PiCriterionState>();
+
+    const templateId = lesson.performance_indicator_template_id;
+    const isLoading = templatesLoading || categoriesLoading || criteriaLoading;
 
     useEffect(() => {
-        getData(lesson.id).then((newData) => {
-            if (!newData) return;
-            setData({
-                id: newData.id,
-                sessionId: '',
-                categories: newData.template.categories.map((category) => ({
-                    id: category.id,
-                    name: category.name,
-                    order: category.order,
-                    sessionId: '',
-                    criteria: category.criteria.map((criterion) => ({
+        if (isLoading || !templateId) {
+            setData(undefined);
+            return;
+        }
+
+        const template = templatesData?.items.find((t) => t.id === templateId);
+        if (!template) {
+            setData(undefined);
+            return;
+        }
+
+        const categories = (categoriesData?.items ?? [])
+            .filter((c) => c.template_id === templateId)
+            .sort((a, b) => a.sort_order - b.sort_order)
+            .map((category) => ({
+                id: category.id,
+                name: category.name,
+                order: category.sort_order,
+                criteria: (criteriaData?.items ?? [])
+                    .filter((c) => c.category_id === category.id)
+                    .sort((a, b) => a.sort_order - b.sort_order)
+                    .map((criterion) => ({
                         id: criterion.id,
-                        order: criterion.order,
-                        comments: null,
-                        marker: null,
-                        categoryId: '',
                         name: criterion.name,
+                        order: criterion.sort_order,
+                        marker: null as PiCriterionState['marker'],
+                        comments: null,
                     })),
-                })),
-            });
-        });
-    }, [lesson.id]);
+            }));
+
+        setData({categories});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [templateId, isLoading, templatesData, categoriesData, criteriaData]);
 
     useEffect(() => {
         if (!data) return;
         onChange(data);
     }, [data, onChange])
 
-    const handleObserved = (criterion: TrainingSessionPerformanceIndicatorCriteria) => {
+    const handleObserved = (criterion: PiCriterionState) => {
         setData((prev) => {
             if (!prev) return prev;
             return {
-                ...prev,
                 categories: prev.categories.map((category) => ({
                     ...category,
                     criteria: category.criteria.map((c) => c.id === criterion.id ? {
@@ -79,11 +118,10 @@ export default function TrainingSessionPerformanceIndicatorForm({lesson, onChang
         });
     }
 
-    const handleNotObserved = (criterion: TrainingSessionPerformanceIndicatorCriteria) => {
+    const handleNotObserved = (criterion: PiCriterionState) => {
         setData((prev) => {
             if (!prev) return prev;
             return {
-                ...prev,
                 categories: prev.categories.map((category) => ({
                     ...category,
                     criteria: category.criteria.map((c) => c.id === criterion.id ? {
@@ -95,55 +133,7 @@ export default function TrainingSessionPerformanceIndicatorForm({lesson, onChang
         });
     }
 
-    // const handleSatisfactory = (criterion: TrainingSessionPerformanceIndicatorCriteria) => {
-    //     setData((prev) => {
-    //         if (!prev) return prev;
-    //         return {
-    //             ...prev,
-    //             categories: prev.categories.map((category) => ({
-    //                 ...category,
-    //                 criteria: category.criteria.map((c) => c.id === criterion.id ? {
-    //                     ...c,
-    //                     marker: c.marker === 'SATISFACTORY' ? null : 'SATISFACTORY'
-    //                 } : c),
-    //             })),
-    //         };
-    //     });
-    // }
-    //
-    // const handleNeedsImprovement = (criterion: TrainingSessionPerformanceIndicatorCriteria) => {
-    //     setData((prev) => {
-    //         if (!prev) return prev;
-    //         return {
-    //             ...prev,
-    //             categories: prev.categories.map((category) => ({
-    //                 ...category,
-    //                 criteria: category.criteria.map((c) => c.id === criterion.id ? {
-    //                     ...c,
-    //                     marker: c.marker === 'NEEDS_IMPROVEMENT' ? null : 'NEEDS_IMPROVEMENT'
-    //                 } : c),
-    //             })),
-    //         };
-    //     });
-    // }
-    //
-    // const handleUnsatisfactory = (criterion: TrainingSessionPerformanceIndicatorCriteria) => {
-    //     setData((prev) => {
-    //         if (!prev) return prev;
-    //         return {
-    //             ...prev,
-    //             categories: prev.categories.map((category) => ({
-    //                 ...category,
-    //                 criteria: category.criteria.map((c) => c.id === criterion.id ? {
-    //                     ...c,
-    //                     marker: c.marker === 'UNSATISFACTORY' ? null : 'UNSATISFACTORY'
-    //                 } : c),
-    //             })),
-    //         };
-    //     });
-    // }
-
-    const openDialog = (c: TrainingSessionPerformanceIndicatorCriteria) => {
+    const openDialog = (c: PiCriterionState) => {
         setOpenCriteria(c);
         setComment(c.comments || '');
         setDialogOpen(true);
@@ -153,7 +143,6 @@ export default function TrainingSessionPerformanceIndicatorForm({lesson, onChang
         setData((prev) => {
             if (!prev) return prev;
             return {
-                ...prev,
                 categories: prev.categories.map((category) => ({
                     ...category,
                     criteria: category.criteria.map((c) => c.id === openCriteria?.id ? {...c, comments: comment} : c),
@@ -163,6 +152,7 @@ export default function TrainingSessionPerformanceIndicatorForm({lesson, onChang
         setDialogOpen(false);
     }
 
+    if (isLoading) return <CircularProgress/>;
     if (!data) return <Typography>There are no performance indicators configured for this lesson.</Typography>;
 
     return (
@@ -176,9 +166,6 @@ export default function TrainingSessionPerformanceIndicatorForm({lesson, onChang
                             <TableCell sx={{textAlign: 'center',}}>Observed</TableCell>
                             <TableCell sx={{textAlign: 'center',}}>Not Observed</TableCell>
                             <TableCell sx={{textAlign: 'center',}}>Comment</TableCell>
-                            {/*<TableCell sx={{textAlign: 'center',}}>Satisfactory</TableCell>*/}
-                            {/*<TableCell sx={{textAlign: 'center',}}>Needs Improvement</TableCell>*/}
-                            {/*<TableCell sx={{textAlign: 'center',}}>Unsatisfactory</TableCell>*/}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -212,21 +199,6 @@ export default function TrainingSessionPerformanceIndicatorForm({lesson, onChang
                                             </Tooltip>
                                         </Box>
                                     </TableCell>
-                                    {/*<TableCell sx={{*/}
-                                    {/*    border: 1,*/}
-                                    {/*    cursor: 'pointer',*/}
-                                    {/*    background: criterion.marker === 'SATISFACTORY' ? 'rgba(0, 200, 0, 0.2)' : 'inherit',*/}
-                                    {/*}} onClick={() => handleSatisfactory(criterion)}></TableCell>*/}
-                                    {/*<TableCell sx={{*/}
-                                    {/*    border: 1,*/}
-                                    {/*    cursor: 'pointer',*/}
-                                    {/*    background: criterion.marker === 'NEEDS_IMPROVEMENT' ? 'rgba(244,146,0,0.2)' : 'inherit',*/}
-                                    {/*}} onClick={() => handleNeedsImprovement(criterion)}></TableCell>*/}
-                                    {/*<TableCell sx={{*/}
-                                    {/*    border: 1,*/}
-                                    {/*    cursor: 'pointer',*/}
-                                    {/*    background: criterion.marker === 'UNSATISFACTORY' ? 'rgba(200, 0, 0, 0.2)' : 'inherit',*/}
-                                    {/*}} onClick={() => handleUnsatisfactory(criterion)}></TableCell>*/}
                                 </TableRow>
                             ));
                         })}

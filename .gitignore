@@ -39,3 +39,9 @@ next-env.d.ts
 local.env
 /.env
 /generated/
+.claude
+
+# Filled-in k8s manifests with real secrets — keep the *.example.yaml templates
+# in git; never commit a copy with real values.
+/deploy/k8s/*.local.yaml
+/deploy/k8s/website-next-all-in-one.yaml

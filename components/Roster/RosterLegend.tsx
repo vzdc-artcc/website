@@ -1,12 +1,12 @@
 import React from 'react';
 import {Grid, Stack, Typography} from "@mui/material";
-import {CertificationOption} from "@/generated/prisma/browser";
+import {CERTIFICATION_OPTIONS, CertificationOption} from "@/lib/osmium/hooks/certifications";
 import {getIconForCertificationOption} from "@/lib/certification";
 
 function RosterLegend() {
     return (
         <Grid container spacing={2} justifyContent="center" sx={{mb: 2,}}>
-            {Object.values(CertificationOption).map((co: CertificationOption, idx) => (
+            {CERTIFICATION_OPTIONS.map((co: CertificationOption, idx) => (
                 <Grid key={idx} size={1}>
                     <Stack key={co} direction="column" alignItems="center">
                         {getIconForCertificationOption(co)}

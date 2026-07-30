@@ -1,20 +1,23 @@
 'use client';
 import React, {useState} from 'react';
-import {Lesson, TrainingAppointment} from "@/generated/prisma/browser";
-import {User} from "next-auth";
 import {Visibility} from "@mui/icons-material";
 import {GridActionsCellItem} from "@mui/x-data-grid";
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material";
 import {formatTimezoneDate} from "@/lib/date";
 import TrainingAppointmentDeleteButton from "@/components/TrainingAppointment/TrainingAppointmentDeleteButton";
 
-type TrainingAppointmentWithAll = TrainingAppointment & {
-    student: User,
-    trainer: User,
-    lessons: Lesson[],
-    additionalTrainers: {
-        trainer: User,
-    }[],
+interface AppointmentLike {
+    id: string;
+    student_name: string;
+    trainer_name: string;
+    start: string;
+    environment?: string | null;
+    double_booking: boolean;
+    preparation_completed: boolean;
+    lessons: { id: string, identifier: string, name: string, duration: number }[];
+    additional_trainers: { trainer_id: string, trainer_name: string }[];
+    estimated_duration_minutes?: number | null;
+    estimated_end?: string | null;
 }
 
 export default function TrainingAppointmentInformationDialog({
@@ -24,7 +27,7 @@ export default function TrainingAppointmentInformationDialog({
                                                                  isTrainingStaff,
                                                                  timeZone,
                                                              }: {
-    trainingAppointment: TrainingAppointmentWithAll,
+    trainingAppointment: AppointmentLike,
     manualOpen?: boolean,
     onClose?: () => void,
     isTrainingStaff: boolean,
@@ -51,21 +54,21 @@ export default function TrainingAppointmentInformationDialog({
             <Dialog open={open} onClose={() => close()} fullWidth maxWidth="sm">
                 <DialogTitle>Training Appointment</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>Trainer: {trainingAppointment.trainer.fullName}</DialogContentText>
+                    <DialogContentText>Trainer: {trainingAppointment.trainer_name}</DialogContentText>
                     <DialogContentText>Additional
-                        Trainer(s): {trainingAppointment.additionalTrainers.length > 0 ? trainingAppointment.additionalTrainers.map((at) => at.trainer.fullName).join(', ') : 'N/A'}</DialogContentText>
-                    <DialogContentText>Student: {trainingAppointment.student.fullName}</DialogContentText>
+                        Trainer(s): {trainingAppointment.additional_trainers.length > 0 ? trainingAppointment.additional_trainers.map((at) => at.trainer_name).join(', ') : 'N/A'}</DialogContentText>
+                    <DialogContentText>Student: {trainingAppointment.student_name}</DialogContentText>
                     <br/>
                     <DialogContentText
-                        color={trainingAppointment.doubleBooking ? 'error' : 'textSecondary'}>Environment: {trainingAppointment.doubleBooking ? 'DOUBLE BOOKED' : trainingAppointment.environment || 'PENDING ASSIGNMENT'}</DialogContentText>
+                        color={trainingAppointment.double_booking ? 'error' : 'textSecondary'}>Environment: {trainingAppointment.double_booking ? 'DOUBLE BOOKED' : trainingAppointment.environment || 'PENDING ASSIGNMENT'}</DialogContentText>
                     <br/>
-                    <DialogContentText>Start: {formatTimezoneDate(trainingAppointment.start, timeZone)}</DialogContentText>
-                    <DialogContentText>Duration: {trainingAppointment.lessons.map((l) => l.duration).reduce((acc, c) => acc + c, 0)} minutes</DialogContentText>
-                    <DialogContentText>Estimated
-                        End: {formatTimezoneDate(new Date(trainingAppointment.start.getTime() + trainingAppointment.lessons.map(l => l.duration).reduce((a, b) => a + b, 0) * 60000), timeZone)}</DialogContentText>
+                    <DialogContentText>Start: {formatTimezoneDate(new Date(trainingAppointment.start), timeZone)}</DialogContentText>
+                    <DialogContentText>Duration: {trainingAppointment.estimated_duration_minutes ?? 0} minutes</DialogContentText>
+                    {trainingAppointment.estimated_end && <DialogContentText>Estimated
+                        End: {formatTimezoneDate(new Date(trainingAppointment.estimated_end), timeZone)}</DialogContentText>}
                     <br/>
                     <DialogContentText>Preparation
-                        Complete: {trainingAppointment.preparationCompleted ? 'YES' : 'NO'}</DialogContentText>
+                        Complete: {trainingAppointment.preparation_completed ? 'YES' : 'NO'}</DialogContentText>
                     <br/>
                     <DialogContentText>Lessons:</DialogContentText>
                     {trainingAppointment.lessons.map((lesson) => (

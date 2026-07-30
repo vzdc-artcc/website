@@ -1,36 +1,39 @@
 'use client';
 import React from 'react';
-import {PerformanceIndicatorTemplate} from "@/generated/prisma/browser";
 import Form from "next/form";
 import {TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {createOrUpdatePerformanceIndicator} from "@/actions/performanceIndicator";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
+import {useCreatePerformanceIndicatorTemplate, useUpdatePerformanceIndicatorTemplate} from "@/lib/osmium/hooks/training";
 
 export default function PerformanceIndicatorForm({performanceIndicator}: {
-    performanceIndicator?: PerformanceIndicatorTemplate
+    performanceIndicator?: { id: string, name: string }
 }) {
 
     const router = useRouter();
+    const createTemplate = useCreatePerformanceIndicatorTemplate();
+    const updateTemplate = useUpdatePerformanceIndicatorTemplate();
 
     const handleSubmit = async (formData: FormData) => {
-        const {errors, performanceIndicator: newPi} = await createOrUpdatePerformanceIndicator(formData);
+        const name = formData.get('name') as string;
 
-        if (errors) {
-            toast.error(errors.map(e => e.message).join(". "));
-            return;
-        }
-
-        toast.success("Performance Indicator saved!");
-        if (!performanceIndicator) {
-            router.push(`/training/indicators/${newPi.id}`);
+        try {
+            if (performanceIndicator) {
+                await updateTemplate.mutateAsync({templateId: performanceIndicator.id, body: {name}});
+                toast.success("Performance Indicator saved!");
+            } else {
+                const created = await createTemplate.mutateAsync({name});
+                toast.success("Performance Indicator saved!");
+                router.push(`/training/indicators/${created!.id}`);
+            }
+        } catch {
+            toast.error("Failed to save Performance Indicator.");
         }
     }
 
     return (
         <Form action={handleSubmit}>
-            <input type="hidden" name="id" value={performanceIndicator?.id}/>
             <TextField fullWidth variant="filled" name="name" label="Name"
                        defaultValue={performanceIndicator?.name || ''} sx={{mb: 2,}}/>
             <FormSaveButton/>

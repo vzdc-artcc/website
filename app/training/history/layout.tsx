@@ -1,19 +1,9 @@
 import React from 'react';
 import {Box, Card, CardContent, Stack, Typography} from "@mui/material";
 import CidForm from "@/components/Form/CidForm";
-import prisma from "@/lib/db";
-import {User} from "next-auth";
 
 
-export default async function Layout({children}: { children: React.ReactNode, }) {
-
-    const controllers = await prisma.user.findMany({
-        where: {
-            controllerStatus: {
-                not: 'NONE',
-            },
-        },
-    });
+export default function Layout({children}: { children: React.ReactNode, }) {
     
     return (
         <Stack direction="column" spacing={2}>
@@ -21,7 +11,7 @@ export default async function Layout({children}: { children: React.ReactNode, })
                 <CardContent>
                     <Typography variant="h5">Controller Training History</Typography>
                     <Box sx={{my: 2,}}>
-                        <CidForm basePath="/training/history" controllers={controllers as User[]}/>
+                        <CidForm basePath="/training/history"/>
                     </Box>
                 </CardContent>
             </Card>

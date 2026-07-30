@@ -3,11 +3,8 @@ import {Box, Button, Card, CardContent, Stack, Typography} from "@mui/material";
 import Link from "next/link";
 import {Add} from "@mui/icons-material";
 import BroadcastTable from "@/components/Broadcast/BroadcastTable";
-import {deleteStaleBroadcasts} from "@/actions/broadcast";
 
 export default async function Page() {
-
-    await deleteStaleBroadcasts();
 
     return (
         <Card>
@@ -15,8 +12,6 @@ export default async function Page() {
                 <Stack direction="row" spacing={2} justifyContent="space-between" sx={{mb: 2,}}>
                     <Box>
                         <Typography variant="h5">Active Broadcasts</Typography>
-                        <Typography>Broadcasts are automatically deleted 6 months after they were last
-                            updated.</Typography>
                     </Box>
 
                     <Link href="/admin/broadcasts/new">

@@ -1,29 +1,31 @@
 'use client';
 import React from 'react';
-import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
+import {Box, Tooltip} from "@mui/material";
+import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import PerformanceIndicatorDeleteButton from "@/components/PerformanceIndicator/PerformanceIndicatorDeleteButton";
-import {fetchPerformanceIndicators} from "@/actions/performanceIndicator";
-import {Tooltip} from "@mui/material";
 import {Edit} from "@mui/icons-material";
 import {useRouter} from "next/navigation";
+import {usePerformanceIndicatorTemplates} from "@/lib/osmium/hooks/training";
+import {useCoarseRoles} from "@/lib/osmium/coarseRoles";
 
-export default function PerformanceIndicatorTable({admin}: { admin?: boolean }) {
+export default function PerformanceIndicatorTable() {
 
     const router = useRouter();
+    const {data, isLoading} = usePerformanceIndicatorTemplates();
+    const rows = data?.items ?? [];
+    const {isStaff} = useCoarseRoles();
 
     const columns: GridColDef[] = [
         {
             field: 'name',
             headerName: 'Name',
             flex: 1,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator,]
         },
         {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',
-            getActions: (params) => admin ? [
+            getActions: (params) => isStaff ? [
                 <Tooltip title="Edit Performance Indicator" key={`edit-${params.row.id}`}>
                     <GridActionsCellItem
                         icon={<Edit/>}
@@ -37,12 +39,18 @@ export default function PerformanceIndicatorTable({admin}: { admin?: boolean }) 
     ];
 
     return (
-        <DataTable columns={columns} initialSort={[{field: 'name', sort: 'asc'}]}
-                   fetchData={async (pagination, sortModel, filter) => {
-                       const pis = await fetchPerformanceIndicators(pagination, sortModel, filter);
-                       return {
-                           data: pis[1],
-                           rowCount: pis[0],
-                       };
-                   }}/>);
+        <Box sx={{boxSizing: 'border-box', width: '100%'}}>
+            <DataGrid
+                loading={isLoading}
+                columns={columns}
+                rows={rows}
+                initialState={{
+                    sorting: {sortModel: [{field: 'name', sort: 'asc'}]},
+                    pagination: {paginationModel: {pageSize: 25}},
+                }}
+                pageSizeOptions={[10, 25, 50]}
+                autoHeight
+            />
+        </Box>
+    );
 }

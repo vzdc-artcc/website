@@ -1,73 +1,32 @@
+'use client';
 import React from 'react';
-import {Badge, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
+import {ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import Link from "next/link";
 import {
-    AccessTime,
     AddModerator,
-    AirplanemodeActive,
     Badge as BadgeIcon,
     BarChart,
     CellTower,
     Chat,
     DeleteSweep,
     EmojiPeople,
-    Feedback,
     Folder,
     Home,
     ListAlt,
     MilitaryTech,
-    Report,
-    Send,
-    Task,
     ViewCompact
 } from "@mui/icons-material";
-import prisma from "@/lib/db";
 import MenuWrapper from './MenuWrapper';
+import PendingFeedbackBadge from './PendingFeedbackBadge';
+import PendingIncidentsBadge from './PendingIncidentsBadge';
+import PendingLoaBadge from './PendingLoaBadge';
+import PendingVisitorApplicationsBadge from './PendingVisitorApplicationsBadge';
+import {useStaffPositionHolderName} from "@/lib/osmium/hooks/staff-positions";
 
-export default async function AdminMenu() {
+export default function AdminMenu() {
 
-    const pendingVisitorApplications = await prisma.visitorApplication.count({
-        where: {
-            status: "PENDING",
-        },
-    });
-
-    const pendingFeedback = await prisma.feedback.count({
-        where: {
-            status: "PENDING",
-        },
-    });
-
-    const activeIncidentReports = await prisma.incidentReport.count({
-        where: {
-            closed: false,
-        },
-    });
-
-    const pendingLoas = await prisma.lOA.count({
-        where: {
-            status: "PENDING",
-        },
-    });
-
-    const atm = await prisma.user.findFirst({
-        where: {
-            staffPositions: {
-                has: "ATM",
-            },
-        },
-    });
-
-    const datm = await prisma.user.findFirst({
-        where: {
-            staffPositions: {
-                has: "DATM",
-            },
-        },
-    });
-
-    const atmName = atm ? `${atm.firstName} ${atm.lastName || 'N/A'}` : 'N/A';
-    const datmName = datm ? `${datm.firstName} ${datm.lastName || 'N/A'}` : 'N/A';
+    const atmName = useStaffPositionHolderName("ATM");
+    const datmName = useStaffPositionHolderName("DATM");
 
     return (
         <MenuWrapper 
@@ -83,14 +42,6 @@ export default async function AdminMenu() {
                         <Home/>
                     </ListItemIcon>
                     <ListItemText primary="Overview"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/admin/airports" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <AirplanemodeActive/>
-                    </ListItemIcon>
-                    <ListItemText primary="Airports"/>
                 </ListItemButton>
             </Link>
             <Link href="/admin/certification-types" style={{textDecoration: 'none', color: 'inherit',}}>
@@ -138,19 +89,9 @@ export default async function AdminMenu() {
             <Link href="/admin/loas" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
-                        <Badge color="primary" badgeContent={pendingLoas}>
-                            <AccessTime/>
-                        </Badge>
+                        <PendingLoaBadge/>
                     </ListItemIcon>
                     <ListItemText primary="LOA Center"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/admin/mail" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Send/>
-                    </ListItemIcon>
-                    <ListItemText primary="Send Email"/>
                 </ListItemButton>
             </Link>
             {/*<Link href="/admin/discord/announcements" style={{textDecoration: 'none', color: 'inherit',}}>*/}
@@ -164,9 +105,7 @@ export default async function AdminMenu() {
             <Link href="/admin/visitor-applications" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
-                        <Badge color="primary" badgeContent={pendingVisitorApplications}>
-                            <Task/>
-                        </Badge>
+                        <PendingVisitorApplicationsBadge/>
                     </ListItemIcon>
                     <ListItemText primary="Visitor Applications"/>
                 </ListItemButton>
@@ -174,9 +113,7 @@ export default async function AdminMenu() {
             <Link href="/admin/feedback" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
-                        <Badge color="primary" badgeContent={pendingFeedback}>
-                            <Feedback/>
-                        </Badge>
+                        <PendingFeedbackBadge/>
                     </ListItemIcon>
                     <ListItemText primary="Feedback"/>
                 </ListItemButton>
@@ -184,9 +121,7 @@ export default async function AdminMenu() {
             <Link href="/admin/incidents" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
-                        <Badge color="primary" badgeContent={activeIncidentReports}>
-                            <Report/>
-                        </Badge>
+                        <PendingIncidentsBadge/>
                     </ListItemIcon>
                     <ListItemText primary="Incident Reports"/>
                 </ListItemButton>

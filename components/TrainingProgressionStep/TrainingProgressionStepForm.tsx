@@ -1,60 +1,84 @@
 'use client';
 import React, {useState} from 'react';
-import {Lesson, TrainingProgression, TrainingProgressionStep} from "@/generated/prisma/browser";
 import Form from "next/form";
 import {Autocomplete, Box, FormControlLabel, Stack, Switch, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {createOrUpdateTrainingProgressionStep} from "@/actions/trainingProgressionStep";
 import {toast} from "react-toastify";
+import {
+    useCreateTrainingProgressionStep,
+    useTrainingLessons,
+    useTrainingProgressionSteps,
+    useUpdateTrainingProgressionStep
+} from "@/lib/osmium/hooks/training";
 
-export type TrainingProgressionStepWithLesson = TrainingProgressionStep & {
-    lesson: Lesson,
-};
+interface LessonOption {
+    id: string;
+    identifier: string;
+    name: string;
+}
 
 export default function TrainingProgressionStepForm({
-                                                        allLessons,
                                                         trainingProgression,
                                                         trainingProgressionStep,
                                                         onSubmit
                                                     }: {
-    allLessons: Lesson[],
-    trainingProgression: TrainingProgression,
-    trainingProgressionStep?: TrainingProgressionStepWithLesson,
+    trainingProgression: { id: string },
+    trainingProgressionStep?: { id: string, lesson_id: string, sort_order: number, optional: boolean },
     onSubmit?: () => void
 }) {
 
-    const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(trainingProgressionStep?.lesson || null);
+    const {data: lessonsData} = useTrainingLessons();
+    const {data: stepsData} = useTrainingProgressionSteps();
+    const createStep = useCreateTrainingProgressionStep();
+    const updateStep = useUpdateTrainingProgressionStep();
+    const allLessons: LessonOption[] = lessonsData?.items ?? [];
+
+    const [selectedLesson, setSelectedLesson] = useState<LessonOption | null>(
+        allLessons.find((l) => l.id === trainingProgressionStep?.lesson_id) || null
+    );
     const [optional, setOptional] = useState<boolean>(trainingProgressionStep?.optional || false);
 
-    const handleSubmit = async (data: FormData) => {
+    const handleSubmit = async () => {
         if (!selectedLesson) {
             toast.error('Please select a lesson');
             return;
         }
 
-        data.set('lessonId', selectedLesson.id);
+        try {
+            if (trainingProgressionStep) {
+                await updateStep.mutateAsync({
+                    stepId: trainingProgressionStep.id,
+                    body: {lesson_id: selectedLesson.id, optional},
+                });
+            } else {
+                const existingSteps = (stepsData?.items ?? []).filter((s) => s.progression_id === trainingProgression.id);
+                const nextOrder = existingSteps.length > 0
+                    ? Math.max(...existingSteps.map((s) => s.sort_order)) + 1
+                    : 1;
+                await createStep.mutateAsync({
+                    progression_id: trainingProgression.id,
+                    lesson_id: selectedLesson.id,
+                    sort_order: nextOrder,
+                    optional,
+                });
+            }
 
-        const {errors} = await createOrUpdateTrainingProgressionStep(data);
-
-        if (errors) {
-            toast.error(errors.map((e) => e.message).join('. '));
-            return;
+            toast.success(`Training progression step saved successfully`);
+            setSelectedLesson(null);
+            setOptional(false);
+            onSubmit?.();
+        } catch {
+            toast.error("Failed to save training progression step.");
         }
-
-        toast.success(`Training progression step saved successfully`);
-        setSelectedLesson(null);
-        setOptional(false);
-        onSubmit?.();
     }
 
     return (
         <Form action={handleSubmit}>
-            <input type="hidden" name="stepId" value={trainingProgressionStep?.id || ''}/>
-            <input type="hidden" name="progressionId" value={trainingProgression.id}/>
             <Stack direction="column" spacing={2}>
                 <Autocomplete
                     options={allLessons}
                     getOptionLabel={(option) => `${option.identifier} - ${option.name}`}
+                    isOptionEqualToValue={(a, b) => a.id === b.id}
                     value={selectedLesson}
                     onChange={(event, newValue) => {
                         setSelectedLesson(newValue);

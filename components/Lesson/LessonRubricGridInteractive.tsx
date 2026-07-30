@@ -1,23 +1,36 @@
 'use client';
 import React, {useState} from 'react';
-import {LessonRubricCell, LessonRubricCriteria, RubricCriteraScore} from "@/generated/prisma/browser";
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip} from "@mui/material";
 import Markdown from "react-markdown";
 
-export default function LessonRubricGridInteractive({criteria, cells, scores, updateScores}: {
-    criteria: LessonRubricCriteria[],
-    cells: LessonRubricCell[],
-    scores?: RubricCriteraScore[]
+interface CellLike {
+    id: string;
+    points: number;
+    description: string;
+}
+
+interface CriterionLike {
+    id: string;
+    criteria: string;
+    description: string;
+    passing: number;
+    max_points: number;
+    cells: CellLike[];
+}
+
+export default function LessonRubricGridInteractive({criteria, scores, updateScores}: {
+    criteria: CriterionLike[],
+    scores?: { criteria_id: string, cell_id: string }[]
     updateScores: (scores: Record<string, number>) => void
 }) {
 
-    const [selectedScores, setSelectedScores] = useState<Record<string, number>>(criteria.reduce((acc, criterion) => {
-        const score = scores?.find((score) => score.criteriaId === criterion.id);
-        acc[criterion.id as string] = cells.find((cell) => cell.id === score?.cellId)?.points || 0;
+    const [selectedScores, setSelectedScores] = useState<Record<string, number>>(() => criteria.reduce((acc, criterion) => {
+        const score = scores?.find((score) => score.criteria_id === criterion.id);
+        acc[criterion.id] = criterion.cells.find((cell) => cell.id === score?.cell_id)?.points || 0;
         return acc;
-    }, {} as any));
+    }, {} as Record<string, number>));
 
-    const maxPoints = Math.max(...criteria.map(criterion => criterion.maxPoints));
+    const maxPoints = Math.max(...criteria.map(criterion => criterion.max_points));
 
     const handleCellClick = (criterionId: string, points: number) => {
         const newScores = {
@@ -46,7 +59,7 @@ export default function LessonRubricGridInteractive({criteria, cells, scores, up
                                 <Tooltip title={<Markdown>{criterion.description}</Markdown>}>
                                     <TableCell>{criterion.criteria}</TableCell>
                                 </Tooltip>
-                                {Array.from({length: criterion.maxPoints + 1}, (_, i) => i).map((point) => (
+                                {Array.from({length: criterion.max_points + 1}, (_, i) => i).map((point) => (
                                     <TableCell key={point} align="center"
                                                onClick={() => handleCellClick(criterion.id, point)} sx={{
                                         border: 1,
@@ -55,7 +68,7 @@ export default function LessonRubricGridInteractive({criteria, cells, scores, up
                                         ) : 'inherit',
                                         cursor: 'pointer',
                                     }}>
-                                        {cells.filter((c) => c.criteriaId === criterion.id).find((cell) => cell.points === point)?.description}
+                                        {criterion.cells.find((cell) => cell.points === point)?.description}
                                     </TableCell>
                                 ))}
                             </TableRow>

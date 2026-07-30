@@ -1,23 +1,51 @@
 'use client';
 import React from 'react';
-import {LOA} from "@/generated/prisma/browser";
 import {Grid, TextField} from "@mui/material";
 import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {createOrUpdateLoa} from "@/actions/loa";
+import {useCreateLoa, useUpdateLoa} from "@/lib/osmium/hooks/loa";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
 
-export default function LoaForm({loa}: { loa?: LOA, }) {
+interface LoaLike {
+    id: string;
+    start: string;
+    end: string;
+    reason: string;
+}
+
+export default function LoaForm({loa}: { loa?: LoaLike, }) {
 
     const router = useRouter();
+    const createLoa = useCreateLoa();
+    const updateLoa = useUpdateLoa();
 
     const handleSubmit = async (formData: FormData) => {
-        const {errors} = await createOrUpdateLoa(formData);
-        if (errors) {
-            toast(errors.map(e => e.message).join(". "), {type: "error"});
+        const start = new Date(formData.get("start") as string);
+        const end = new Date(formData.get("end") as string);
+        const reason = formData.get("reason") as string;
+
+        if (!reason?.trim()) {
+            toast("Reason is required.", {type: "error"});
+            return;
+        }
+        if (end.getTime() - start.getTime() < 7 * 24 * 60 * 60 * 1000) {
+            toast("End date must be at least 7 days after start date.", {type: "error"});
+            return;
+        }
+
+        const body = {start: start.toISOString(), end: end.toISOString(), reason};
+
+        try {
+            if (loa) {
+                await updateLoa.mutateAsync({loaId: loa.id, body});
+            } else {
+                await createLoa.mutateAsync(body);
+            }
+        } catch {
+            toast("Failed to save LOA request.", {type: "error"});
             return;
         }
 
@@ -30,7 +58,6 @@ export default function LoaForm({loa}: { loa?: LOA, }) {
     return (
         (<LocalizationProvider dateAdapter={AdapterDayjs}>
             <form action={handleSubmit}>
-                <input type="hidden" name="id" value={loa?.id}/>
                 <Grid container columns={2} spacing={2}>
                     <Grid
                         size={{

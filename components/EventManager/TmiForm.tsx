@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useCallback, useEffect, useMemo, useState} from "react";
+import React, {useMemo, useState} from "react";
 import {
     Box,
     Button,
@@ -8,281 +8,182 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    FormControl,
     Grid,
+    InputLabel,
     MenuItem,
     Select,
-    SelectChangeEvent,
     TextField,
     Typography
 } from "@mui/material";
 import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
-import Form from "next/form";
 import {toast} from "react-toastify";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {Event, EventPosition, TmiCategory, User} from "@/generated/prisma/browser";
-import {addTmi, deleteTmi, fetchTmis, updateTmi} from "@/actions/tmi";
 import TmiDeleteButton from "@/components/EventManager/TmiDeleteButton";
+import {useCreateEventTmi, useDeleteEventTmi, useEventTmis, useUpdateEventTmi} from "@/lib/osmium/hooks/events";
 
-type Props = {
-    admin?: boolean;
-    currentUser: User;
-    event: Event;
-    eventPosition?: EventPosition | null;
-};
+// Selectable Traffic Management Initiative types.
+const TMI_TYPES = ["Local", "Terminal", "Enroute"] as const;
 
-type Row = {
-    id: string;
-    category: TmiCategory | string;
-    text: string;
-    createdAt?: string;
-};
+export default function TmiForm({event}: { event: { id: string } }) {
+    const {data, isLoading} = useEventTmis(event.id);
+    const createTmi = useCreateEventTmi(event.id);
+    const updateTmi = useUpdateEventTmi(event.id);
+    const deleteTmi = useDeleteEventTmi(event.id);
+    const rows = data?.items ?? [];
 
-const CATEGORY_OPTIONS: { value: TmiCategory | string; label: string }[] = [
-    { value: "LOCAL", label: "Local" },
-    { value: "TERMINAL", label: "Terminal" },
-    { value: "ENROUTE", label: "Enroute" },
-];
-
-export default function TmiForm({ admin, event, eventPosition }: Props) {
-    const [rows, setRows] = useState<Row[] | undefined>(undefined);
-    const [loading, setLoading] = useState(false);
-
-    const [newCategory, setNewCategory] = useState<TmiCategory | string>("LOCAL");
+    const [newType, setNewType] = useState("");
     const [newText, setNewText] = useState("");
 
     const [editOpen, setEditOpen] = useState(false);
-    const [editRow, setEditRow] = useState<Row | null>(null);
+    const [editRow, setEditRow] = useState<{ id: string; tmi_type: string; notes?: string | null } | null>(null);
 
-    const saveDisabled = !admin && (eventPosition || (event as any).positionsLocked);
-
-    const load = useCallback(async () => {
-        setLoading(true);
-        try {
-            // in TmiForm.load()
-            const tmis = await fetchTmis(event.id);
-            const mapped: Row[] = tmis.map((t: any) => ({
-                id: t.id,
-                category: String(t.category || 'LOCAL').trim().toUpperCase(),
-                text: t.text,
-                createdAt: t.createdAt,
-            }));
-            setRows(mapped);
-        } catch (err) {
-            console.error("fetchTmis error", err);
-            toast.error("Failed to load TMIs");
-        } finally {
-            setLoading(false);
-        }
-    }, [event.id]);
-
-    useEffect(() => {
-        load();
-    }, [load]);
-
-    const columns = useMemo<GridColDef<Row>[]>(() => [
-        {
-            field: "category",
-            headerName: "Category",
-            width: 140,
-            renderCell: (params) => {
-                const v = String(params.row.category || '').toUpperCase();
-                if (v === "TERMINAL") return "Terminal";
-                if (v === "ENROUTE") return "Enroute";
-                return "Local";
-            },
-        },
-
-        { field: "text", headerName: "TMI", flex: 1, minWidth: 300 },
+    const columns = useMemo<GridColDef[]>(() => [
+        {field: "tmi_type", headerName: "Type", width: 140},
+        {field: "notes", headerName: "Traffic Management Initiative", flex: 1, minWidth: 300},
         {
             field: "actions",
             type: "actions",
             headerName: "Actions",
-            width: 160,
-            getActions: (params) => {
-                const idStr = String(params.id);
-                return [
-                    <GridActionsCellItem
-                        icon={<EditIcon />}
-                        label="Edit"
-                        key="edit"
-                        onClick={() => {
-                            setEditRow(params.row);
-                            setEditOpen(true);
-                        }}
-                    />,
-                    <TmiDeleteButton
-                        key={`delete-${idStr}`}
-                        id={idStr}
-                        label="Delete"
-                        warningMessage="Are you sure you want to delete this TMI? Click again to confirm."
-                        deleteFunction={async (id) => {
-                            // wrap deleteTmi to include admin flag if needed and throw on errors
-                            const result = await deleteTmi(id, admin);
-                            if (result && (result as any).errors) {
-                                throw new Error("Failed to delete TMI");
-                            }
-                            return result;
-                        }}
-                        onSuccess={async () => {
-                            toast.success("TMI deleted successfully!");
-                            await load();
-                        }}
-                    />,
-                ];
-            },
+            width: 100,
+            getActions: (params) => [
+                <GridActionsCellItem
+                    icon={<EditIcon/>}
+                    label="Edit"
+                    key="edit"
+                    onClick={() => {
+                        setEditRow(params.row as any);
+                        setEditOpen(true);
+                    }}
+                />,
+                <TmiDeleteButton
+                    key={`delete-${params.id}`}
+                    id={String(params.id)}
+                    label="Delete"
+                    warningMessage="Are you sure you want to delete this TMI? Click again to confirm."
+                    deleteFunction={async (id) => deleteTmi.mutateAsync(id)}
+                    onSuccess={() => toast.success("TMI deleted successfully!")}
+                />,
+            ],
         },
-    ], [admin, load]);
+    ], [deleteTmi]);
 
-    // Add handler
-    const handleAdd = async (formData: FormData) => {
-        if (saveDisabled) return;
-        formData.set("text", newText);
-        formData.set("category", String(newCategory));
+    const handleAdd = async () => {
+        if (!newType.trim() || !newText.trim()) {
+            toast.error('Please select a type and enter the initiative.');
+            return;
+        }
         try {
-            const res = await addTmi(event.id, formData, admin);
-            if ((res as any).errors) {
-                toast.error((res as any).errors.map((e: any) => e.message).join(". "));
-                return;
-            }
+            await createTmi.mutateAsync({tmi_type: newType, notes: newText.trim()});
+            setNewType("");
             setNewText("");
-            setNewCategory("LOCAL");
             toast.success("TMI added");
-            load();
-        } catch (err) {
-            console.error(err);
+        } catch {
             toast.error("Failed to add TMI");
         }
     };
 
-    // Edit save
-    const handleEditSave = async (formData: FormData) => {
+    const handleEditSave = async () => {
         if (!editRow) return;
-        formData.set("text", (formData.get("text") as string) || editRow.text);
-        formData.set("category", String(formData.get("category") || editRow.category));
         try {
-            const res = await updateTmi(editRow.id, formData, admin);
-            if ((res as any).errors) {
-                toast.error((res as any).errors.map((e: any) => e.message).join(". "));
-                return;
-            }
+            await updateTmi.mutateAsync({
+                tmiId: editRow.id,
+                body: {tmi_type: editRow.tmi_type, notes: editRow.notes},
+            });
             toast.success("TMI updated");
             setEditOpen(false);
             setEditRow(null);
-            load();
-        } catch (err) {
-            console.error(err);
+        } catch {
             toast.error("Failed to update TMI");
         }
     };
 
     return (
         <>
-            {loading && rows === undefined ? (
-                <Box sx={{ py: 4 }}>
-                    <Typography>Loading TMIs…</Typography>
-                </Box>
-            ) : rows && rows.length === 0 ? (
-                <Box sx={{ p: 1, borderRadius: 1, bgcolor: "background.paper", boxShadow: 1 }}>
+            {rows.length === 0 && !isLoading ? (
+                <Box sx={{p: 1, borderRadius: 1, bgcolor: "background.paper", boxShadow: 1}}>
                     <Typography variant="h6">No Traffic Management Initiatives</Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                        This event does not have any Traffic Management Initiatives added. Please add one or more below.
+                    <Typography variant="body2" color="text.secondary" sx={{mt: 1}}>
+                        This event does not have any TMIs added yet. Please add one below.
                     </Typography>
                 </Box>
             ) : (
-                <Box sx={{ width: "100%" }}>
+                <Box sx={{width: "100%"}}>
                     <DataGrid
-                        rows={rows ?? []}
+                        rows={rows}
                         columns={columns}
-                        loading={loading || rows === undefined}
+                        loading={isLoading}
                         disableRowSelectionOnClick
                         autoHeight
                         pageSizeOptions={[5, 10, 20]}
-                        initialState={{ pagination: { paginationModel: { pageSize: 10, page: 0 } } }}
-                        getRowId={(r) => r.id}
-                        sx={{ mt: 1 }}
+                        initialState={{pagination: {paginationModel: {pageSize: 10, page: 0}}}}
+                        sx={{mt: 1}}
                     />
                 </Box>
-
             )}
-            <Form action={handleAdd}>
-                <Grid container spacing={2} sx={{mt: 2}}>
-                        <Select
-                            value={newCategory}
-                            onChange={(e: SelectChangeEvent) => setNewCategory(e.target.value)}
-                            size="small"
-                            fullWidth
-                            name="category"
-                        >
-                            {CATEGORY_OPTIONS.map((opt) => (
-                                <MenuItem key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </MenuItem>
-                            ))}
-                        </Select>
+            <form action={handleAdd}>
+                <Grid container spacing={2} sx={{mt: 2}} alignItems="center">
+                    <Grid size={{xs: 12, sm: 3}}>
+                        <FormControl fullWidth>
+                            <InputLabel id="tmi-type-label">TMI Type</InputLabel>
+                            <Select
+                                labelId="tmi-type-label"
+                                label="TMI Type"
+                                value={newType}
+                                onChange={(e) => setNewType(e.target.value)}
+                            >
+                                {TMI_TYPES.map((t) => (
+                                    <MenuItem key={t} value={t}>{t}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid size={{xs: 12, sm: 9}}>
                         <TextField
                             fullWidth
-                            multiline
-                            minRows={2}
                             placeholder="Traffic Management Initiative"
                             value={newText}
                             onChange={(e) => setNewText(e.target.value)}
-                            name="text"
                         />
+                    </Grid>
                 </Grid>
-                    <div style={{ marginTop: 16 }}>
-                        {saveDisabled ? (
-                            <Button variant="contained" disabled startIcon={<SaveIcon />} fullWidth>
-                                Save
-                            </Button>
-                        ) : (
-                            <FormSaveButton text="Save" />
-                        )}
-                    </div>
-            </Form>
+                <Box sx={{mt: 2}}>
+                    <FormSaveButton text="Save" icon={<SaveIcon/>}/>
+                </Box>
+            </form>
 
-            {/* Edit dialog */}
             <Dialog open={editOpen} onClose={() => setEditOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle>Edit TMI</DialogTitle>
-                <Form action={handleEditSave}>
-                    <DialogContent>
+                <DialogContent>
+                    <FormControl fullWidth sx={{mb: 2, mt: 1}}>
+                        <InputLabel id="edit-tmi-type-label">Type</InputLabel>
                         <Select
-                            fullWidth
-                            name="category"
-                            value={editRow?.category || "LOCAL"}
-                            onChange={(e: any) => setEditRow((r) => (r ? { ...r, category: e.target.value } : r))}
-                            sx={{ mb: 2 }}
+                            labelId="edit-tmi-type-label"
+                            label="Type"
+                            value={editRow?.tmi_type || ""}
+                            onChange={(e) => setEditRow((r) => (r ? {...r, tmi_type: e.target.value} : r))}
                         >
-                            {CATEGORY_OPTIONS.map((opt) => (
-                                <MenuItem key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </MenuItem>
+                            {TMI_TYPES.map((t) => (
+                                <MenuItem key={t} value={t}>{t}</MenuItem>
                             ))}
                         </Select>
-                        <TextField
-                            fullWidth
-                            name="text"
-                            value={editRow?.text || ""}
-                            onChange={(e) => setEditRow((r) => (r ? { ...r, text: e.target.value } : r))}
-                            multiline
-                            minRows={3}
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <Button
-                            onClick={() => {
-                                setEditOpen(false);
-                                setEditRow(null);
-                            }}
-                        >
-                            Cancel
-                        </Button>
-                        <Button type="submit" variant="contained" startIcon={<SaveIcon />}>
-                            Save
-                        </Button>
-                    </DialogActions>
-                </Form>
+                    </FormControl>
+                    <TextField
+                        fullWidth
+                        placeholder="Traffic Management Initiative"
+                        value={editRow?.notes || ""}
+                        onChange={(e) => setEditRow((r) => (r ? {...r, notes: e.target.value} : r))}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => {
+                        setEditOpen(false);
+                        setEditRow(null);
+                    }}>Cancel</Button>
+                    <Button onClick={handleEditSave} variant="contained" startIcon={<SaveIcon/>}>Save</Button>
+                </DialogActions>
             </Dialog>
         </>
     );

@@ -1,34 +1,41 @@
 'use client';
 import React from 'react';
-import {GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
+import {Box, Chip, Tooltip} from "@mui/material";
+import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import Link from "next/link";
-import {Chip, Tooltip} from "@mui/material";
-import DataTable, {containsOnlyFilterOperator, equalsOnlyFilterOperator} from "@/components/DataTable/DataTable";
-import {fetchProgressionAssignments} from "@/actions/progressionAssignment";
 import ProgressionAssignmentDeleteButton from "@/components/ProgressionAssignment/ProgressionAssignmentDeleteButton";
 import {Edit} from "@mui/icons-material";
 import {useRouter} from "next/navigation";
-import ProgressionAssignmentStatusButton from "@/components/ProgressionAssignment/ProgressionAssignmentStatusButton";
+import {useProgressionAssignments} from "@/lib/osmium/hooks/training";
+import {useRosterControllers} from "@/lib/osmium/hooks/users";
+import {useCoarseRoles} from "@/lib/osmium/coarseRoles";
 
-export default function ProgressionAssignmentsTable({allowEdit}: { allowEdit: boolean }) {
+export default function ProgressionAssignmentsTable() {
 
+    const {isStaff: allowEdit} = useCoarseRoles();
     const router = useRouter();
+    const {data, isLoading} = useProgressionAssignments();
+    const {data: rosterData} = useRosterControllers();
+
+    const controllerStatusByCid = new Map((rosterData?.items ?? []).map((u) => [u.basic.cid, u.full?.controller_status]));
+
+    const rows = data?.items ?? [];
 
     const columns: GridColDef[] = [
         {
-            field: 'student',
+            field: 'display_name',
             flex: 1,
             headerName: 'Student',
             renderCell: (params) => {
-                const color = params.row.controllerStatus === "HOME" ? 'default' : 'secondary';
+                const status = params.row.cid ? controllerStatusByCid.get(params.row.cid) : undefined;
+                const color = status === "HOME" ? 'default' : 'secondary';
 
                 return (
-                    <Tooltip title={`${params.row.controllerStatus}`}>
-                        <Link href={`/admin/controller/${params.row.cid}`} target="_blank"
+                    <Tooltip title={status ?? ''}>
+                        <Link href={`/training/controller/${params.row.cid}`} target="_blank"
                               style={{textDecoration: 'none',}}>
                             <Chip
-                                key={params.row.id}
-                                label={`${params.row.firstName} ${params.row.lastName}` || 'Unknown'}
+                                label={params.row.display_name || 'Unknown'}
                                 size="small"
                                 color={color}
                             />
@@ -37,22 +44,17 @@ export default function ProgressionAssignmentsTable({allowEdit}: { allowEdit: bo
                 )
             },
             sortable: false,
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
         },
         {
-            field: 'trainingProgression',
+            field: 'progression_name',
             flex: 1,
             headerName: 'Progression',
-            filterOperators: [...equalsOnlyFilterOperator, ...containsOnlyFilterOperator],
-            renderCell: (params) => {
-                return (
-                    <Chip
-                        key={params.row.trainingProgression.id}
-                        label={params.row.trainingProgression.name}
-                        size="small"
-                    />
-                )
-            },
+            renderCell: (params) => (
+                <Chip
+                    label={params.row.progression_name}
+                    size="small"
+                />
+            ),
         },
         {
             field: 'actions',
@@ -60,30 +62,34 @@ export default function ProgressionAssignmentsTable({allowEdit}: { allowEdit: bo
             type: 'actions',
             flex: 1,
             getActions: (params) => [
-                <ProgressionAssignmentStatusButton user={params.row} progression={params.row.trainingProgression}
-                                                   key={`${params.row.id}-stat`}/>,
-                 allowEdit ? (
-                     <Tooltip title="Edit" key={`${params.row.id}-edit`}>
+                allowEdit ? (
+                    <Tooltip title="Edit" key={`${params.row.user_id}-edit`}>
                         <GridActionsCellItem
-                            icon={<Edit />}
+                            icon={<Edit/>}
                             label="Edit"
                             onClick={() => router.push(`/training/progressions/assignments/${params.row.cid}`)}
                         />
                     </Tooltip>
                 ) : <></>,
                 allowEdit ?
-                    <ProgressionAssignmentDeleteButton user={params.row} key={`${params.row.id}-delete`}/> : <></>,
+                    <ProgressionAssignmentDeleteButton user={params.row} key={`${params.row.user_id}-delete`}/> : <></>,
             ],
         }
     ];
 
     return (
-        <DataTable
-            columns={columns}
-            fetchData={async (pagination, sortModel, filter,) => {
-                const fetchedUsers = await fetchProgressionAssignments(pagination, sortModel, filter);
-                return {data: fetchedUsers[1], rowCount: fetchedUsers[0]};
-            }}
-        />
+        <Box sx={{boxSizing: 'border-box', width: '100%'}}>
+            <DataGrid
+                loading={isLoading}
+                columns={columns}
+                rows={rows}
+                getRowId={(row) => row.user_id}
+                initialState={{
+                    pagination: {paginationModel: {pageSize: 25}},
+                }}
+                pageSizeOptions={[10, 25, 50]}
+                autoHeight
+            />
+        </Box>
     );
 }

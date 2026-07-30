@@ -1,19 +1,34 @@
+'use client';
 import React from 'react';
-import {User} from "next-auth";
-import {Card, CardContent, Chip, Grid, Stack, Typography} from "@mui/material";
-import {getProgressionStatus} from "@/actions/progressionAssignment";
+import {Card, CardContent, Chip, Grid, Skeleton, Stack, Typography} from "@mui/material";
 import {East, South} from "@mui/icons-material";
 import {formatZuluDate} from "@/lib/date";
 import Link from "next/link";
 import ProgressionCompleteButton from "@/components/Profile/ProgressionCompleteButton";
+import {useMe} from "@/lib/osmium/hooks/me";
+import {useUserProgression} from "@/lib/osmium/hooks/training";
 
-export default async function ProgressionCard({user}: { user: User }) {
+export default function ProgressionCard() {
 
-    const status = await getProgressionStatus(user.id);
+    const {data: me} = useMe();
+    const cid = me?.cid;
+    const {data: status, isLoading} = useUserProgression(cid);
 
-    const allRequiredCompleted = status.filter(step => !step.step.optional && !step.passed).length === 0;
+    const steps = status?.steps ?? [];
+    const allRequiredCompleted = steps.filter((step) => !step.optional && !step.passed).length === 0;
 
-    if (status.length === 0) {
+    if (isLoading || !me) {
+        return (
+            <Card sx={{height: '100%',}}>
+                <CardContent>
+                    <Typography variant="h6" gutterBottom>Training Progression</Typography>
+                    <Skeleton height={120}/>
+                </CardContent>
+            </Card>
+        );
+    }
+
+    if (steps.length === 0) {
         return (
             <Card sx={{height: '100%',}}>
                 <CardContent>
@@ -29,11 +44,11 @@ export default async function ProgressionCard({user}: { user: User }) {
         <Card sx={{height: '100%',}}>
             <CardContent>
                 <Typography
-                    variant="h6">{status[0]?.progression ? `Progression - ${status[0].progression.name}` : 'Training Progression'}</Typography>
+                    variant="h6">{status?.progression_name ? `Progression - ${status.progression_name}` : 'Training Progression'}</Typography>
                 <Typography gutterBottom>Click on a lesson to view the ticket submitted for it.</Typography>
                 <Grid container columns={11} spacing={1}>
-                    {status.map((step, i) => (
-                        <>
+                    {steps.map((step, i) => (
+                        <React.Fragment key={step.step_id}>
                             {i !== 0 &&
                                 <Grid size={{
                                     xs: 11,
@@ -50,32 +65,32 @@ export default async function ProgressionCard({user}: { user: User }) {
                                 xs: 11,
                                 md: 4,
                                 lg: 2,
-                            }} key={step.step.id}>
+                            }}>
                                 <Card variant="outlined" sx={{height: '100%',}}>
                                     <CardContent>
-                                        {step.step.optional ?
+                                        {step.optional ?
                                             <Typography variant="subtitle2" gutterBottom>OPTIONAL</Typography> :
                                             <Typography variant="subtitle2" gutterBottom>REQUIRED</Typography>}
                                         <Link
-                                            href={step.trainingSession ? `/profile/training/${step.trainingSession.id}` : ''}>
+                                            href={step.training_session_id ? `/profile/training/${step.training_session_id}` : ''}>
                                             <Chip
-                                                label={step.lesson.identifier}
+                                                label={step.lesson_identifier}
                                                 size="medium"
-                                                color={step.passed ? 'success' : step.trainingTicket ? 'error' : 'default'}
+                                                color={step.passed ? 'success' : step.training_session_id ? 'error' : 'default'}
                                             />
                                         </Link>
-                                        <Typography variant="subtitle1" gutterBottom>{step.lesson.name}</Typography>
-                                        {step.trainingSession ? <Typography
-                                                variant="subtitle2">Attempted {formatZuluDate(step.trainingSession.start)}</Typography> :
+                                        <Typography variant="subtitle1" gutterBottom>{step.lesson_name}</Typography>
+                                        {step.session_end ? <Typography
+                                                variant="subtitle2">Attempted {formatZuluDate(new Date(step.session_end))}</Typography> :
                                             <Typography variant="subtitle2">Never Attempted</Typography>}
                                     </CardContent>
                                 </Card>
 
                             </Grid>
-                        </>
+                        </React.Fragment>
                     ))}
-                    {!user.noForceProgressionFinish && allRequiredCompleted && <Grid size={11} sx={{mt: 2,}}>
-                        <ProgressionCompleteButton user={user} progression={status[0].progression}/>
+                    {!me.flags.no_force_progression_finish && allRequiredCompleted && <Grid size={11} sx={{mt: 2,}}>
+                        <ProgressionCompleteButton cid={me.cid}/>
                         <Typography variant="subtitle2" sx={{mt: 1,}}>Even though you meet all the requirements to
                             complete this progression, we strongly encourage you to complete all of the optional steps
                             to reinforce your understanding. The next progression (if applicable) will automatically be

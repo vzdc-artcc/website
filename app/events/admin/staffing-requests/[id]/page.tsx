@@ -1,25 +1,21 @@
+'use client';
 import React from 'react';
-import prisma from "@/lib/db";
-import {notFound} from "next/navigation";
-import {Card, CardContent, Grid, Typography} from "@mui/material";
+import {useParams} from 'next/navigation';
+import {Box, Card, CardContent, CircularProgress, Grid, Typography} from "@mui/material";
 import StaffingRequestDecisionForm from "@/components/StaffingRequest/StaffingRequestDecisionForm";
+import {useAdminStaffingRequests} from "@/lib/osmium/hooks/staffing";
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-    const params = await props.params;
+export default function Page() {
+    const params = useParams<{ id: string }>();
+    const {data, isLoading, isError} = useAdminStaffingRequests({pageSize: 200});
+    const staffingRequest = data?.items.find((item) => item.id === params.id);
 
-    const {id} = params;
+    if (isLoading) {
+        return <Box sx={{display: 'flex', justifyContent: 'center', my: 4}}><CircularProgress/></Box>;
+    }
 
-    const staffingRequest = await prisma.staffingRequest.findUnique({
-        where: {
-            id: id,
-        },
-        include: {
-            user: true,
-        },
-    });
-
-    if (!staffingRequest) {
-        notFound();
+    if (isError || !staffingRequest) {
+        return <Typography>Staffing request not found.</Typography>;
     }
 
     return (
@@ -33,8 +29,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Name</Typography>
-                        <Typography
-                            variant="body2">{staffingRequest.user.firstName} {staffingRequest.user.lastName}</Typography>
+                        <Typography variant="body2">{staffingRequest.display_name}</Typography>
                     </Grid>
                     <Grid
                         size={{
@@ -42,7 +37,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">CID</Typography>
-                        <Typography variant="body2">{staffingRequest.user.cid}</Typography>
+                        <Typography variant="body2">{staffingRequest.cid}</Typography>
                     </Grid>
                     <Grid
                         size={{
@@ -50,7 +45,7 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                             md: 1
                         }}>
                         <Typography variant="subtitle2">Email</Typography>
-                        <Typography variant="body2">{staffingRequest.user.email}</Typography>
+                        <Typography variant="body2">{staffingRequest.email}</Typography>
                     </Grid>
                     <Grid
                         size={{

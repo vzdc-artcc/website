@@ -1,33 +1,27 @@
+'use client';
 import React from 'react';
-import {RubricCriteraScore} from "@/generated/prisma/browser";
-import prisma from "@/lib/db";
-import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip} from "@mui/material";
+import {CircularProgress, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip} from "@mui/material";
 import Markdown from "react-markdown";
+import {useLessonRubric} from "@/lib/osmium/hooks/training";
 
-export default async function LessonRubricGrid({lessonId, scores}: {
+export default function LessonRubricGrid({lessonId, scores}: {
     lessonId: string,
-    scores?: RubricCriteraScore[]
+    scores?: { criteriaId: string, cellId: string }[]
 }) {
 
-    const criteria = await prisma.lessonRubricCriteria.findMany({
-        where: {
-            rubric: {
-                Lesson: {
-                    id: lessonId,
-                },
-            },
-        },
-        include: {
-            cells: true,
-        },
-        orderBy: {
-            cells: {
-                _count: 'asc',
-            },
-        }
-    });
+    const {data: rubric, isLoading} = useLessonRubric(lessonId);
 
-    const maxPoints = Math.max(...criteria.map(criterion => criterion.maxPoints));
+    if (isLoading) {
+        return <CircularProgress/>;
+    }
+
+    const criteria = rubric?.criteria ?? [];
+
+    if (criteria.length === 0) {
+        return null;
+    }
+
+    const maxPoints = Math.max(...criteria.map(criterion => criterion.max_points));
 
     return (
         <TableContainer>
@@ -50,7 +44,7 @@ export default async function LessonRubricGrid({lessonId, scores}: {
                                 <Tooltip title={<Markdown>{criterion.description}</Markdown>}>
                                     <TableCell>{criterion.criteria}</TableCell>
                                 </Tooltip>
-                                {Array.from({length: criterion.maxPoints + 1}, (_, i) => i).map((point) => (
+                                {Array.from({length: criterion.max_points + 1}, (_, i) => i).map((point) => (
                                     <TableCell key={point} align="center" sx={{
                                         border: 1,
                                         backgroundColor: criterion.cells.find((cell) => cell.points === point)?.id === scoreCellId ? (

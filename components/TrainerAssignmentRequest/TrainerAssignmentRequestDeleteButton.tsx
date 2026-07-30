@@ -3,24 +3,24 @@ import React, {useState} from 'react';
 import {toast} from "react-toastify";
 import {IconButton, Tooltip} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-import {TrainingAssignmentRequest} from "@/generated/prisma/browser";
-import {deleteTrainingAssignmentRequest} from "@/actions/trainingAssignmentRequest";
 import {useRouter} from "next/navigation";
 import {GridActionsCellItem} from "@mui/x-data-grid";
+import {useDeleteTrainingAssignmentRequest} from "@/lib/osmium/hooks/training";
 
 export default function TrainerAssignmentRequestDeleteButton({request, noTable = false,}: {
-    request: TrainingAssignmentRequest,
+    request: { id: string },
     noTable?: boolean,
 }) {
 
     const [clicked, setClicked] = useState(false);
     const router = useRouter();
+    const deleteRequest = useDeleteTrainingAssignmentRequest();
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteTrainingAssignmentRequest(request.id);
+            await deleteRequest.mutateAsync(request.id);
             toast(`Request deleted successfully!`, {type: 'success'});
-            router.replace('/training/requests');
+            router.replace('/training/requests/home');
         } else {
             toast(`Click again to confirm deletion.`, {type: 'warning'});
             setClicked(true);

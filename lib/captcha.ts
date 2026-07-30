@@ -1,20 +1,23 @@
 import {toast} from "react-toastify";
-import {validateCaptcha} from "@/actions/captcha";
+import {osmium} from "@/lib/osmium/client";
 
-export const checkCaptcha = async (token?: string) => {
+/**
+ * Verifies a Cloudflare Turnstile token server-side via osmium's captcha proxy.
+ * Returns true only when verification succeeds; toasts and returns false
+ * otherwise so callers can abort the submit.
+ */
+export const checkCaptcha = async (token?: string): Promise<boolean> => {
     if (!token) {
-        toast('Recaptcha validation failed', {type: 'error'});
-        return;
-    }
-    const captchaResult = await validateCaptcha(token);
-
-    if (!captchaResult.success) {
-        toast('Recaptcha validation failed', {type: 'error'});
-        return;
+        toast('Please complete the captcha.', {type: 'error'});
+        return false;
     }
 
-    if (captchaResult.score < 0.7) {
-        toast('Recaptcha validation failed', {type: 'error'});
-        return;
+    const {data, error} = await osmium.POST("/api/v1/captcha/verify", {body: {token}});
+
+    if (error || !data?.success) {
+        toast('Captcha verification failed. Please try again.', {type: 'error'});
+        return false;
     }
+
+    return true;
 }

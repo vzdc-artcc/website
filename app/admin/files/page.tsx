@@ -1,26 +1,20 @@
+'use client';
 import React from 'react';
-import {Box, Button, Card, CardContent, IconButton, Stack, Typography} from "@mui/material";
+import {Box, Button, Card, CardContent, IconButton, Skeleton, Stack, Typography} from "@mui/material";
 import FileCategoryForm from "@/components/Files/FileCategoryForm";
-import prisma from "@/lib/db";
 import Link from "next/link";
 import {CloudUpload, Edit, Reorder} from "@mui/icons-material";
 import FileCategoryDeleteButton from "@/components/Files/FileCategoryDeleteButton";
 import FileTable from "@/components/Files/FileTable";
+import {useAdminPublicationCategories, useAdminPublications} from "@/lib/osmium/hooks/publications";
 
-export default async function Page() {
+export default function Page() {
 
-    const fileCategories = await prisma.fileCategory.findMany({
-        include: {
-            files: {
-                orderBy: {
-                    order: 'asc',
-                },
-            },
-        },
-        orderBy: {
-            order: 'asc',
-        },
-    });
+    const {data: categoriesData, isLoading} = useAdminPublicationCategories();
+    const {data: pubsData} = useAdminPublications();
+
+    const categories = [...(categoriesData ?? [])].sort((a, b) => a.sort_order - b.sort_order);
+    const publications = pubsData?.items ?? [];
 
     return (
         <Stack direction="column" spacing={2}>
@@ -35,32 +29,29 @@ export default async function Page() {
                     </Stack>
                 </CardContent>
             </Card>
-            {fileCategories.map((fileCategory) => (
-                <Card key={fileCategory.id}>
+            {isLoading && <Skeleton height={120}/>}
+            {categories.map((category) => (
+                <Card key={category.id}>
                     <CardContent>
                         <Stack direction="row" spacing={1} justifyContent="space-between" sx={{mb: 1,}}>
-                            <Typography variant="h6">{fileCategory.name}</Typography>
+                            <Typography variant="h6">{category.name}</Typography>
                             <Box>
-                                <Link href={`/admin/files/${fileCategory.id}/order`} style={{color: 'inherit',}}>
-                                    <IconButton>
-                                        <Reorder/>
-                                    </IconButton>
+                                <Link href={`/admin/files/${category.id}/order`} style={{color: 'inherit',}}>
+                                    <IconButton><Reorder/></IconButton>
                                 </Link>
-                                <Link href={`/admin/files/${fileCategory.id}/new`}>
-                                    <IconButton>
-                                        <CloudUpload/>
-                                    </IconButton>
+                                <Link href={`/admin/files/${category.id}/new`}>
+                                    <IconButton><CloudUpload/></IconButton>
                                 </Link>
-                                <Link href={`/admin/files/${fileCategory.id}`}
-                                      style={{color: 'inherit',}}>
-                                    <IconButton>
-                                        <Edit/>
-                                    </IconButton>
+                                <Link href={`/admin/files/${category.id}`} style={{color: 'inherit',}}>
+                                    <IconButton><Edit/></IconButton>
                                 </Link>
-                                <FileCategoryDeleteButton fileCategory={fileCategory}/>
+                                <FileCategoryDeleteButton fileCategory={category}/>
                             </Box>
                         </Stack>
-                        <FileTable files={fileCategory.files} admin/>
+                        <FileTable
+                            files={publications.filter((p) => p.category_id === category.id)
+                                .sort((a, b) => a.sort_order - b.sort_order)}
+                            admin/>
                     </CardContent>
                 </Card>
             ))}
@@ -72,5 +63,4 @@ export default async function Page() {
             </Card>
         </Stack>
     );
-
 }

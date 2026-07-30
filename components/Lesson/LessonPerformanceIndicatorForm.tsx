@@ -1,46 +1,77 @@
 'use client';
-import React, {useEffect, useState} from 'react';
-import {Lesson, PerformanceIndicatorTemplate} from "@/generated/prisma/browser";
+import React, {useState} from 'react';
 import Form from "next/form";
 import {Autocomplete, Box, CircularProgress, TextField} from "@mui/material";
-import {fetchAllPerformanceIndicators, getLessonPerformanceIndicator} from "@/actions/performanceIndicator";
 import FormSaveButton from "@/components/Form/FormSaveButton";
-import {updateLessonIndicator} from "@/actions/lesson";
 import {toast} from "react-toastify";
+import {usePerformanceIndicatorTemplates, useUpdateTrainingLesson} from "@/lib/osmium/hooks/training";
 
-export default function LessonPerformanceIndicatorForm({lesson}: { lesson: Lesson, }) {
+interface LessonLike {
+    id: string;
+    identifier: string;
+    location: number;
+    name: string;
+    description: string;
+    position: string;
+    facility: string;
+    duration: number;
+    trainee_preparation?: string | null;
+    instructor_only: boolean;
+    notify_instructor_on_pass: boolean;
+    release_request_on_pass: boolean;
+    performance_indicator_template_id?: string | null;
+}
 
-    const [performanceIndicators, setPerformanceIndicators] = useState<PerformanceIndicatorTemplate[]>();
-    const [selectedPerformanceIndicator, setSelectedPerformanceIndicator] = useState<PerformanceIndicatorTemplate>();
+export default function LessonPerformanceIndicatorForm({lesson}: { lesson: LessonLike, }) {
 
-    useEffect(() => {
-        fetchAllPerformanceIndicators().then((pis) => {
-            setPerformanceIndicators(pis);
-            getLessonPerformanceIndicator(lesson.id).then((lpi) => {
-                setSelectedPerformanceIndicator(pis.find((pi) => pi.id === lpi?.templateId));
-            });
-        });
-    }, [lesson]);
+    const {data, isLoading} = usePerformanceIndicatorTemplates();
+    const updateLesson = useUpdateTrainingLesson();
+    const templates = data?.items ?? [];
+    const [selected, setSelected] = useState(() => templates.find((t) => t.id === lesson.performance_indicator_template_id));
+
+    React.useEffect(() => {
+        setSelected(templates.find((t) => t.id === lesson.performance_indicator_template_id));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data, lesson.performance_indicator_template_id]);
 
     const handleSubmit = async () => {
-        const performanceIndicatorId = selectedPerformanceIndicator?.id;
-        await updateLessonIndicator(lesson.id, performanceIndicatorId);
-
-        toast.success('Performance Indicator updated.');
+        try {
+            await updateLesson.mutateAsync({
+                lessonId: lesson.id,
+                body: {
+                    identifier: lesson.identifier,
+                    location: lesson.location,
+                    name: lesson.name,
+                    description: lesson.description,
+                    position: lesson.position,
+                    facility: lesson.facility,
+                    duration: lesson.duration,
+                    trainee_preparation: lesson.trainee_preparation ?? null,
+                    instructor_only: lesson.instructor_only,
+                    notify_instructor_on_pass: lesson.notify_instructor_on_pass,
+                    release_request_on_pass: lesson.release_request_on_pass,
+                    performance_indicator_template_id: selected?.id ?? null,
+                },
+            });
+            toast.success('Performance Indicator updated.');
+        } catch {
+            toast.error('Failed to update Performance Indicator.');
+        }
     }
 
-    if (!performanceIndicators) {
+    if (isLoading) {
         return <CircularProgress/>;
     }
 
     return (
         <Form action={handleSubmit}>
             <Autocomplete
-                options={performanceIndicators}
+                options={templates}
                 getOptionLabel={(option) => `${option.name}`}
-                value={selectedPerformanceIndicator || null}
+                isOptionEqualToValue={(a, b) => a.id === b.id}
+                value={selected || null}
                 onChange={(event, newValue) => {
-                    setSelectedPerformanceIndicator(newValue || undefined);
+                    setSelected(newValue || undefined);
                 }}
                 renderInput={(params) => <TextField {...params} label="Performance Indicator" variant="filled"/>}
             />

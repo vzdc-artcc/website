@@ -1,53 +1,42 @@
+'use client';
+
 import React from 'react';
-import prisma from "@/lib/db";
+import {useParams} from "next/navigation";
 import {getMonth} from "@/lib/date";
 import {Card, CardContent, Chip, Grid, Typography} from "@mui/material";
-import {getRating} from "@/lib/vatsim";
 import {notFound} from "next/navigation";
-import {
-    calculatePassRate,
-    endOfMonthUTC,
-    endOfYearUTC,
-    getLessonDistributionData,
-    getMostRunLesson,
-    getTrainerFailedSessionsCountInMonth,
-    getTrainerFailedSessionsCountInYear,
-    getTrainerMonthlySessionCountsForYear,
-    getTrainerPassedSessionsCountInMonth,
-    getTrainerPassedSessionsCountInYear,
-    getTrainerSessionsInMonth,
-    getTrainerSessionsInYear,
-    startOfMonthUTC,
-    startOfYearUTC
-} from "@/actions/trainingStats";
+import {calculatePassRate} from "@/lib/trainingStats";
+import {useTrainingStats} from "@/lib/osmium/hooks/training";
+import {useUserByCid} from "@/lib/osmium/hooks/users";
 import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
 import TrainingSessionsByMonthGraph from "@/components/TrainingStatistics/TrainingSessionsByMonthGraph";
 
-export default async function Page(props: { params: Promise<{ year: string, month: string, cid: string }> }) {
-    const params = await props.params;
+export default function Page() {
+    const params = useParams();
+    const year = Array.isArray(params.year) ? params.year[0] : params.year;
+    const month = Array.isArray(params.month) ? params.month[0] : params.month;
+    const cid = Array.isArray(params.cid) ? params.cid[0] : params.cid;
 
-    const {year, month, cid} = params;
+    const numYear = parseInt(year ?? '');
+    const isYearScope = month === '-';
+    const numMonth = isYearScope ? -1 : parseInt(month ?? '');
 
-    const numYear = parseInt(year);
-    const numMonth = month === '-' ? -1 : parseInt(month);
+    const {data: resolvedUser, isLoading: userLoading} = useUserByCid(cid ? Number(cid) : undefined);
 
-    const trainer = await prisma.user.findUnique({
-        where: {cid: cid},
-        select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            preferredName: true,
-            cid: true,
-            rating: true,
-        },
+    const invalidYear = isNaN(numYear) || numYear < 2000 || numYear > new Date().getFullYear();
+    const invalidMonth = !isYearScope && (isNaN(numMonth) || numMonth < 0 || numMonth > 11);
+
+    const {data: stats, isLoading: statsLoading} = useTrainingStats({
+        year: invalidYear || invalidMonth ? undefined : numYear,
+        month: isYearScope ? undefined : numMonth,
+        cid: cid ? Number(cid) : undefined,
     });
 
-    if (!trainer) {
+    if (!userLoading && !resolvedUser) {
         notFound();
     }
 
-    if (isNaN(numYear) || numYear < 2000 || numYear > new Date().getFullYear()) {
+    if (invalidYear) {
         return (
             <Card>
                 <CardContent>
@@ -58,303 +47,150 @@ export default async function Page(props: { params: Promise<{ year: string, mont
         );
     }
 
-    if (month !== '-' && (isNaN(numMonth) || numMonth < 0 || numMonth > 11)) {
+    if (invalidMonth) {
         return (
             <Card>
                 <CardContent>
                     <Typography variant="h4">Invalid Month</Typography>
-                    <Typography sx={{mt: 1,}}>Month must be within 0-11 range or &apos-&apos for all months.</Typography>
+                    <Typography sx={{mt: 1,}}>Month must be within 0-11 range or &apos;-&apos; for all months.</Typography>
                 </CardContent>
             </Card>
         );
     }
 
-    if (month === '-') {
-        const yearStart = startOfYearUTC(numYear);
-        const yearEnd = endOfYearUTC(numYear);
-
-        const sessionsInYear = await getTrainerSessionsInYear(numYear, trainer.id);
-        const totalHoursInYear = sessionsInYear.reduce((sum, session) => {
-            const duration = (session.end.getTime() - session.start.getTime()) / (1000 * 60 * 60);
-            return sum + duration;
-        }, 0).toFixed(3);
-        const passedSessionsInYear = await getTrainerPassedSessionsCountInYear(numYear, trainer.id);
-        const failedSessionsInYear = await getTrainerFailedSessionsCountInYear(numYear, trainer.id);
-
-        const yearPassRate = calculatePassRate(passedSessionsInYear, failedSessionsInYear);
-
-        const mostRunLessonYearly = await getMostRunLesson(yearStart, yearEnd, trainer.id);
-        const lessonDistributionYearly = await getLessonDistributionData(yearStart, yearEnd, trainer.id);
-        const monthlyTrainerGraphData = await getTrainerMonthlySessionCountsForYear(numYear, trainer.id);
-
-
-        return (
-            <Grid container columns={30} spacing={2}>
-                <Grid size={30}>
-                    <Card>
-                        <CardContent>
-                            <Typography
-                                variant="h5">{trainer.preferredName || `${trainer.firstName} ${trainer.lastName}`}</Typography>
-                            <Typography
-                                variant="body2">{trainer.preferredName && `${trainer.firstName} ${trainer.lastName}`}</Typography>
-                            <Typography>{getRating(trainer.rating)} • {trainer.cid}</Typography>
-                            <Typography>{numYear} Yearly Training Statistics</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography>Sessions</Typography>
-                            <Typography variant="h4">{sessionsInYear.length}</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography>Training Hours</Typography>
-                            <Typography variant="h4">{totalHoursInYear}</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography>Sessions Passed</Typography>
-                            <Typography variant="h4">{passedSessionsInYear}</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography>Sessions Failed</Typography>
-                            <Typography variant="h4">{failedSessionsInYear}</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography gutterBottom>Pass Rate</Typography>
-                            <Chip
-                                label={`${yearPassRate.percentage}%`}
-                                color={yearPassRate.color}
-                                variant="filled"
-                                size="medium"
-                            />
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography gutterBottom>Most Run Session</Typography>
-                            {mostRunLessonYearly.lessonIdentifier ? (
-                                <Chip
-                                    label={`${mostRunLessonYearly.lessonIdentifier} (${mostRunLessonYearly.count} times)`}
-                                    color="info"
-                                    variant="filled"
-                                    size="medium"
-                                />
-                            ) : (
-                                <Typography variant="body2">N/A</Typography>
-                            )}
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid size={30}>
-                    <Card>
-                        <CardContent>
-                            <TrainingSessionsByMonthGraph data={monthlyTrainerGraphData}/>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid size={30}>
-                    <Card>
-                        <CardContent>
-                            {lessonDistributionYearly.length > 0 ? (
-                                <LessonDistributionGraph data={lessonDistributionYearly}/>
-                            ) : (
-                                <Typography variant="body2" sx={{mt: 2}}>No lesson data available for this instructor in
-                                    this year.</Typography>
-                            )}
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
-        );
-
-    } else {
-
-        const sessions = await getTrainerSessionsInMonth(year, month, cid);
-
-        const totalHours = sessions.reduce((sum, session) => {
-            const duration = (session.end.getTime() - session.start.getTime()) / (1000 * 60 * 60);
-            return sum + duration;
-        }, 0).toFixed(3);
-
-        const trainerPassedSessions = await getTrainerPassedSessionsCountInMonth(numYear, numMonth, cid);
-        const trainerFailedSessions = await getTrainerFailedSessionsCountInMonth(numYear, numMonth, cid);
-
-        const trainerMonthPassRate = calculatePassRate(trainerPassedSessions, trainerFailedSessions);
-
-        const trainerMonthStart = startOfMonthUTC(numYear, numMonth);
-        const trainerMonthEnd = endOfMonthUTC(numYear, numMonth);
-        const mostRunLessonTrainerMonthly = await getMostRunLesson(trainerMonthStart, trainerMonthEnd, trainer.id);
-
-        const lessonDistributionTrainerMonthly = await getLessonDistributionData(trainerMonthStart, trainerMonthEnd, trainer.id);
-
-        return (
-            <Grid container columns={30} spacing={2}>
-                <Grid size={30}>
-                    <Card>
-                        <CardContent>
-                            <Typography
-                                variant="h5">{trainer.preferredName || `${trainer.firstName} ${trainer.lastName}`}</Typography>
-                            <Typography
-                                variant="body2">{trainer.preferredName && `${trainer.firstName} ${trainer.lastName}`}</Typography>
-                            <Typography>{getRating(trainer.rating)} • {trainer.cid}</Typography>
-                            <Typography>{parseInt(month) >= 0 && `${getMonth(parseInt(month))}, `}{year} Statistics</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography>Sessions</Typography>
-                            <Typography variant="h4">{sessions.length}</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography>Training Hours</Typography>
-                            <Typography variant="h4">{totalHours}</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography>Sessions Passed</Typography>
-                            <Typography variant="h4">{trainerPassedSessions}</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography>Sessions Failed</Typography>
-                            <Typography variant="h4">{trainerFailedSessions}</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography gutterBottom>Pass Rate</Typography>
-                            <Chip
-                                label={`${trainerMonthPassRate.percentage}%`}
-                                color={trainerMonthPassRate.color}
-                                variant="filled"
-                                size="medium"
-                            />
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid
-                    size={{
-                        xs: 30,
-                        sm: 15,
-                        md: 5
-                    }}>
-                    <Card>
-                        <CardContent>
-                            <Typography gutterBottom>Most Run Session</Typography>
-                            {mostRunLessonTrainerMonthly.lessonIdentifier ? (
-                                <Chip
-                                    label={`${mostRunLessonTrainerMonthly.lessonIdentifier} (${mostRunLessonTrainerMonthly.count} times)`}
-                                    color="info"
-                                    variant="filled"
-                                    size="medium"
-                                />
-                            ) : (
-                                <Typography variant="body2">N/A</Typography>
-                            )}
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid size={30}>
-                    <Card>
-                        <CardContent>
-                            {lessonDistributionTrainerMonthly.length > 0 ? (
-                                <LessonDistributionGraph data={lessonDistributionTrainerMonthly}/>
-                            ) : (
-                                <Typography variant="body2" sx={{mt: 2}}>No lesson data available for this instructor in
-                                    this month.</Typography>
-                            )}
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
-        );
+    if (userLoading || statsLoading || !resolvedUser || !stats) {
+        return <Typography>Loading statistics…</Typography>;
     }
+
+    const profile = resolvedUser.full?.profile;
+    const displayName = profile?.preferred_name || `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`;
+    const passRate = calculatePassRate(stats.passed, stats.failed);
+
+    return (
+        <Grid container columns={30} spacing={2}>
+            <Grid size={30}>
+                <Card>
+                    <CardContent>
+                        <Typography variant="h5">{displayName}</Typography>
+                        <Typography variant="body2">{profile?.preferred_name && `${profile?.first_name ?? ''} ${profile?.last_name ?? ''}`}</Typography>
+                        <Typography>{resolvedUser.basic.rating ?? 'Unknown'} • {resolvedUser.basic.cid}</Typography>
+                        <Typography>{isYearScope ? `${numYear} Yearly Training Statistics` : `${getMonth(numMonth)}, ${numYear} Statistics`}</Typography>
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid
+                size={{
+                    xs: 30,
+                    sm: 15,
+                    md: 5
+                }}>
+                <Card>
+                    <CardContent>
+                        <Typography>Sessions</Typography>
+                        <Typography variant="h4">{stats.sessions}</Typography>
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid
+                size={{
+                    xs: 30,
+                    sm: 15,
+                    md: 5
+                }}>
+                <Card>
+                    <CardContent>
+                        <Typography>Training Hours</Typography>
+                        <Typography variant="h4">{stats.total_hours.toFixed(3)}</Typography>
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid
+                size={{
+                    xs: 30,
+                    sm: 15,
+                    md: 5
+                }}>
+                <Card>
+                    <CardContent>
+                        <Typography>Sessions Passed</Typography>
+                        <Typography variant="h4">{stats.passed}</Typography>
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid
+                size={{
+                    xs: 30,
+                    sm: 15,
+                    md: 5
+                }}>
+                <Card>
+                    <CardContent>
+                        <Typography>Sessions Failed</Typography>
+                        <Typography variant="h4">{stats.failed}</Typography>
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid
+                size={{
+                    xs: 30,
+                    sm: 15,
+                    md: 5
+                }}>
+                <Card>
+                    <CardContent>
+                        <Typography gutterBottom>Pass Rate</Typography>
+                        <Chip
+                            label={`${passRate.percentage}%`}
+                            color={passRate.color}
+                            variant="filled"
+                            size="medium"
+                        />
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid
+                size={{
+                    xs: 30,
+                    sm: 15,
+                    md: 5
+                }}>
+                <Card>
+                    <CardContent>
+                        <Typography gutterBottom>Most Run Session</Typography>
+                        {stats.most_run_lesson.identifier ? (
+                            <Chip
+                                label={`${stats.most_run_lesson.identifier} (${stats.most_run_lesson.count} times)`}
+                                color="info"
+                                variant="filled"
+                                size="medium"
+                            />
+                        ) : (
+                            <Typography variant="body2">N/A</Typography>
+                        )}
+                    </CardContent>
+                </Card>
+            </Grid>
+            {isYearScope && (
+                <Grid size={30}>
+                    <Card>
+                        <CardContent>
+                            <TrainingSessionsByMonthGraph data={stats.monthly_sessions}/>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            )}
+            <Grid size={30}>
+                <Card>
+                    <CardContent>
+                        {stats.lesson_distribution.length > 0 ? (
+                            <LessonDistributionGraph data={stats.lesson_distribution}/>
+                        ) : (
+                            <Typography variant="body2" sx={{mt: 2}}>No lesson data available for this instructor in
+                                this {isYearScope ? 'year' : 'month'}.</Typography>
+                        )}
+                    </CardContent>
+                </Card>
+            </Grid>
+        </Grid>
+    );
 }

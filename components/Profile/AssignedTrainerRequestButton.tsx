@@ -2,24 +2,21 @@
 import React, {useState} from 'react';
 import {Button} from "@mui/material";
 import {toast} from "react-toastify";
-import {submitTrainingAssignmentRequest} from "@/actions/trainingAssignmentRequest";
+import {useCreateTrainingAssignmentRequest} from "@/lib/osmium/hooks/training";
 
 export default function AssignedTrainerRequestButton() {
 
     const [loading, setLoading] = useState(false);
+    const createRequest = useCreateTrainingAssignmentRequest();
 
     const submit = async () => {
         setLoading(true);
-
-        const {errors,} = await submitTrainingAssignmentRequest();
-
-        if (errors) {
-            toast(errors.join(' '), {type: 'error',});
-            setLoading(false);
-            return;
+        try {
+            await createRequest.mutateAsync({});
+            toast('Your training assignment request has been submitted!', {type: 'success',});
+        } catch {
+            toast('Failed to submit training assignment request.', {type: 'error',});
         }
-
-        toast('Your training assignment request has been submitted!', {type: 'success',});
         setLoading(false);
     }
 

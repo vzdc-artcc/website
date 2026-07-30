@@ -1,6 +1,6 @@
 import React from 'react';
 import {Box, Card, CardContent, List, ListItemButton, ListItemIcon, ListItemText, Typography} from "@mui/material";
-import {AccessTime, Badge, CellTower, Event, Feedback, Forum, Shield} from "@mui/icons-material";
+import {AccessTime, Badge, CellTower, Email, Event, Feedback, Forum, Shield} from "@mui/icons-material";
 import Link from "next/link";
 import DonationButton from "@/components/Donation/DonationButton";
 
@@ -62,6 +62,14 @@ export default function LinksCard() {
                                 <CellTower/>
                             </ListItemIcon>
                             <ListItemText primary="Facility Broadcasts"/>
+                        </ListItemButton>
+                    </Link>
+                    <Link href="/profile/email-preferences" style={{color: 'inherit', textDecoration: 'none',}}>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <Email/>
+                            </ListItemIcon>
+                            <ListItemText primary="Email Preferences"/>
                         </ListItemButton>
                     </Link>
                     <Link href="/profile/bookings" style={{color: 'inherit', textDecoration: 'none',}}>

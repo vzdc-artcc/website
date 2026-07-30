@@ -1,30 +1,47 @@
+'use client';
 import React from 'react';
 import {Avatar, Box, Card, CardContent, Chip, Grid, IconButton, Stack, Tooltip, Typography} from "@mui/material";
 import {getRating} from "@/lib/vatsim";
-import {User} from "next-auth";
 import {Edit} from "@mui/icons-material";
 import Link from "next/link";
-import {getChips} from "@/lib/staffPositions";
+import UserStaffPositionChips from "@/components/StaffPositions/UserStaffPositionChips";
 import DiscordLinkCard from "@/components/Profile/DiscordLinkButton";
 
-export default async function ProfileCard({user, admin, viewOnly}: {
-    user: User,
+// The fields ProfileCard renders. Structurally satisfied by both the legacy
+// NextAuth/Prisma `User` (admin/staff views) and osmium-sourced adapters built
+// from `/me` (self) or `/users/{cid}` (admin controller view). `rating` may be
+// a numeric VATSIM index (Prisma) or an already-resolved label string (osmium).
+export type ProfileCardUser = {
+    cid: number | string;
+    fullName: string;
+    avatarUrl?: string | null;
+    operatingInitials?: string | null;
+    controllerStatus?: string | null;
+    email?: string | null;
+    preferredName?: string | null;
+    rating: number | string;
+    timezone?: string | null;
+    bio?: string | null;
+    noEditProfile?: boolean;
+};
+
+export default function ProfileCard({user, admin, viewOnly}: {
+    user: ProfileCardUser,
     admin?: boolean,
     viewOnly?: boolean,
 }) {
 
-    // @ts-ignore
     return (
         (<Card sx={{height: '100%',}}>
             <CardContent>
                 <Stack direction="row" justifyContent="space-between" spacing={2}>
                     <Stack direction="row" spacing={2} alignItems="center">
-                        <Avatar src={user.avatarUrl}/>
+                        <Avatar src={user.avatarUrl ?? undefined}/>
                         <Box>
                             <Typography
                                 variant="h6">{user.fullName} {user.operatingInitials ? `(${user.operatingInitials})` : ''}<Chip
                                 sx={{ml: 1,}} label={user.controllerStatus}/></Typography>
-                            {getChips(user)}
+                            <UserStaffPositionChips cid={Number(user.cid)}/>
                         </Box>
                     </Stack>
                     {!viewOnly && (admin || !user.noEditProfile) && <Box>
@@ -70,14 +87,7 @@ export default async function ProfileCard({user, admin, viewOnly}: {
                             sm: 1
                         }}>
                         <Typography variant="subtitle2">Rating</Typography>
-                        <Typography variant="body2">{getRating(user.rating)}</Typography>
-                    </Grid>
-                    <Grid size={{
-                        xs: 2,
-                        sm: 1
-                    }}>
-                        <Typography variant="subtitle2">Receive Email</Typography>
-                        <Typography variant="body2">{user.receiveEmail ? "Yes" : "No"}</Typography>
+                        <Typography variant="body2">{typeof user.rating === 'number' ? getRating(user.rating) : user.rating}</Typography>
                     </Grid>
                     <Grid size={{
                         xs: 2,
@@ -92,7 +102,7 @@ export default async function ProfileCard({user, admin, viewOnly}: {
                         sm: 1
                     }}>
                         <Typography variant="subtitle2">Discord</Typography>
-                        <DiscordLinkCard linked={!!user.discordUid} discordUid={user.discordUid} />
+                        <DiscordLinkCard/>
                         </Grid>}
                     <Grid size={2}>
                         <Typography variant="subtitle2">Bio</Typography>

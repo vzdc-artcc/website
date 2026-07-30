@@ -1,63 +1,65 @@
 'use client';
-import React, {useCallback, useEffect} from 'react';
-import {Lesson, LessonRubricCell, LessonRubricCriteria, RubricCriteraScore} from "@/generated/prisma/browser";
+import React, {useEffect, useState} from 'react';
 import {Alert, Autocomplete, Button, CircularProgress, Grid, TextField} from "@mui/material";
 import LessonRubricGridInteractive from "@/components/Lesson/LessonRubricGridInteractive";
-import {getCriteriaForLesson} from "@/actions/trainingSessionFormHelper";
+import {useLessonRubric, useTrainingLessons} from "@/lib/osmium/hooks/training";
 import {toast} from "react-toastify";
 import {Check} from "@mui/icons-material";
 
+interface LessonLike {
+    id: string;
+    identifier: string;
+    name: string;
+}
+
+interface ScoreLike {
+    criteria_id: string;
+    cell_id: string;
+    passed: boolean;
+}
+
 export default function TrainingTicketForm({
-                                               allLessons,
                                                lesson,
                                                scores,
                                                onSubmit
                                            }: {
-    allLessons: Lesson[],
-    lesson?: Lesson,
-    scores?: RubricCriteraScore[],
-    onSubmit: (lesson: Lesson, scores: RubricCriteraScore[]) => boolean
+    lesson?: LessonLike,
+    scores?: ScoreLike[],
+    onSubmit: (lesson: LessonLike, scores: ScoreLike[]) => boolean
 }) {
 
-    const [selectedLesson, setSelectedLesson] = React.useState<Lesson | null>(lesson || null);
-    const [criteria, setCriteria] = React.useState<LessonRubricCriteria[]>();
-    const [cells, setCells] = React.useState<LessonRubricCell[]>();
-    const [rubricScores, setRubricScores] = React.useState<RubricCriteraScore[]>(scores || []);
+    const {data: lessonsData} = useTrainingLessons();
+    const allLessons: LessonLike[] = lessonsData?.items ?? [];
 
-    const getCriteria = useCallback(async (lessonId: string) => {
-        const {criteria, cells} = await getCriteriaForLesson(lessonId);
-        setCriteria(criteria);
-        setCells(cells);
-    }, []);
+    const [selectedLesson, setSelectedLesson] = useState<LessonLike | null>(lesson || null);
+    const [rubricScores, setRubricScores] = useState<ScoreLike[]>(scores || []);
+
+    const {data: rubric, isLoading: rubricLoading, isError: rubricError} = useLessonRubric(selectedLesson?.id);
+    const criteria = rubricError ? [] : (rubric?.criteria ?? []);
+
+    useEffect(() => {
+        setRubricScores(scores || []);
+    }, [scores]);
 
     const handleSubmit = async () => {
-        if (!selectedLesson || !criteria || !cells) {
+        if (!selectedLesson || rubricLoading) {
             toast('Please select a lesson', {type: 'error'});
             return;
         }
-        const success = onSubmit(selectedLesson, rubricScores.length !== criteria.length ?
-            criteria.map((criterion) => {
-                return {
-                    id: '',
-                    criteriaId: criterion.id,
-                    cellId: cells.find((cell) => cell.criteriaId === criterion.id && cell.points === 0)?.id || '',
-                    trainingTicketId: null,
-                    passed: false,
-                };
-            }) : rubricScores);
+
+        const finalScores = rubricScores.length !== criteria.length ?
+            criteria.map((criterion) => ({
+                criteria_id: criterion.id,
+                cell_id: criterion.cells.find((cell) => cell.points === 0)?.id || '',
+                passed: false,
+            })) : rubricScores;
+
+        const success = onSubmit(selectedLesson, finalScores);
         if (success && !scores) {
             setRubricScores([]);
             setSelectedLesson(null);
-            setCriteria(undefined);
-            setCells(undefined);
         }
     }
-
-    useEffect(() => {
-        if (selectedLesson) {
-            getCriteria(selectedLesson.id).then();
-        }
-    }, [getCriteria, selectedLesson]);
 
     return (
         (<Grid container columns={2} spacing={2}>
@@ -67,6 +69,7 @@ export default function TrainingTicketForm({
                     disabled={!!scores}
                     options={allLessons}
                     getOptionLabel={(option) => `${option.identifier} - ${option.name}`}
+                    isOptionEqualToValue={(a, b) => a.id === b.id}
                     value={selectedLesson}
                     onChange={(event, newValue) => {
                         setSelectedLesson(newValue);
@@ -75,19 +78,19 @@ export default function TrainingTicketForm({
                 />
             </Grid>
             <Grid size={2}>
-                {selectedLesson && (!criteria || !cells) && <CircularProgress/>}
-                {criteria && cells && <LessonRubricGridInteractive criteria={criteria} cells={cells} scores={scores}
-                                                                   updateScores={(scores) => {
-                                                                       setRubricScores(Object.keys(scores).map((criteriaId) => {
-                                                                           return {
-                                                                               id: '',
-                                                                               criteriaId,
-                                                                               cellId: cells.find((cell) => cell.criteriaId === criteriaId && cell.points === scores[criteriaId])?.id || '',
-                                                                               trainingTicketId: null,
-                                                                               passed: scores[criteriaId] >= (criteria.find((c) => c.id === criteriaId)?.passing || 0),
-                                                                           }
-                                                                       }));
-                                                                   }}/>}
+                {selectedLesson && rubricLoading && <CircularProgress/>}
+                {selectedLesson && !rubricLoading && criteria.length > 0 &&
+                    <LessonRubricGridInteractive criteria={criteria} scores={scores}
+                                                 updateScores={(pointsByCriteria) => {
+                                                     setRubricScores(Object.keys(pointsByCriteria).map((criteriaId) => {
+                                                         const criterion = criteria.find((c) => c.id === criteriaId);
+                                                         return {
+                                                             criteria_id: criteriaId,
+                                                             cell_id: criterion?.cells.find((cell) => cell.points === pointsByCriteria[criteriaId])?.id || '',
+                                                             passed: pointsByCriteria[criteriaId] >= (criterion?.passing || 0),
+                                                         };
+                                                     }));
+                                                 }}/>}
             </Grid>
             <Grid size={2}>
                 <Button variant="contained" onClick={handleSubmit} startIcon={<Check/>}>Save Ticket</Button>

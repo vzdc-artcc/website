@@ -3,12 +3,19 @@ import React from 'react';
 import dayGridPlugin from "@fullcalendar/daygrid";
 import FullCalendar from "@fullcalendar/react";
 import {useRouter} from "next/navigation";
-import {EventType} from '@/generated/prisma/browser';
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import tz from "dayjs/plugin/timezone";
 
-export default function EventCalendar({events, timeZone}: { events: any[], timeZone: string, }) {
+interface CalendarEvent {
+    id: string;
+    title: string;
+    starts_at: string;
+    ends_at: string;
+    event_type?: string | null;
+}
+
+export default function EventCalendar({events, timeZone}: { events: CalendarEvent[], timeZone: string, }) {
 
     const router = useRouter();
 
@@ -22,24 +29,24 @@ export default function EventCalendar({events, timeZone}: { events: any[], timeZ
             editable={false}
             events={events.map((event) => {
 
-                const startOffset = dayjs.utc(event.start).tz(timeZone).utcOffset();
-                let newStart = dayjs.utc(event.start).subtract(Math.abs(startOffset), 'minute').toDate();
+                const startOffset = dayjs.utc(event.starts_at).tz(timeZone).utcOffset();
+                let newStart = dayjs.utc(event.starts_at).subtract(Math.abs(startOffset), 'minute').toDate();
                 if (startOffset > 0) {
-                    newStart = dayjs.utc(event.start).add(Math.abs(startOffset), 'minute').toDate();
+                    newStart = dayjs.utc(event.starts_at).add(Math.abs(startOffset), 'minute').toDate();
                 }
 
-                const endOffset = dayjs.utc(event.end).tz(timeZone).utcOffset();
-                let newEnd = dayjs.utc(event.end).subtract(Math.abs(endOffset), 'minute').toDate();
+                const endOffset = dayjs.utc(event.ends_at).tz(timeZone).utcOffset();
+                let newEnd = dayjs.utc(event.ends_at).subtract(Math.abs(endOffset), 'minute').toDate();
                 if (endOffset > 0) {
-                    newEnd = dayjs.utc(event.end).add(Math.abs(endOffset), 'minute').toDate();
+                    newEnd = dayjs.utc(event.ends_at).add(Math.abs(endOffset), 'minute').toDate();
                 }
 
                 return {
                     id: event.id,
-                    title: event.name,
+                    title: event.title,
                     start: newStart,
                     end: newEnd,
-                    color: getEventColor(event.type),
+                    color: getEventColor(event.event_type),
                 };
             })}
             eventClick={(info) => {
@@ -52,21 +59,21 @@ export default function EventCalendar({events, timeZone}: { events: any[], timeZ
     );
 }
 
-const getEventColor = (eventType: EventType) => {
+const getEventColor = (eventType?: string | null) => {
     switch (eventType) {
-        case EventType.HOME:
+        case 'HOME':
             return '#f44336';
-        case EventType.SUPPORT_REQUIRED:
+        case 'SUPPORT_REQUIRED':
             return '#834091';
-        case EventType.SUPPORT_OPTIONAL:
+        case 'SUPPORT_OPTIONAL':
             return '#cd8dd8';
-        case EventType.FRIDAY_NIGHT_OPERATIONS:
+        case 'FRIDAY_NIGHT_OPERATIONS':
             return '#36d1e7';
-        case EventType.SATURDAY_NIGHT_OPERATIONS:
+        case 'SATURDAY_NIGHT_OPERATIONS':
             return '#e6af34';
-        case EventType.GROUP_FLIGHT:
+        case 'GROUP_FLIGHT':
             return '#66bb6a';
-        case EventType.TRAINING:
+        case 'TRAINING':
             return 'darkgray';
         default:
             return 'darkgray';
