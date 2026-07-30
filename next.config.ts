@@ -17,6 +17,12 @@ const nextConfig: NextConfig = {
                 pathname: '/cdn/**',
             },
             {
+                protocol: 'https',
+                hostname: 'next-api.vzdc.org',
+                port: '',
+                pathname: '/cdn/**',
+            },
+            {
                 protocol: 'http',
                 hostname: 'localhost',
                 port: '3900',
