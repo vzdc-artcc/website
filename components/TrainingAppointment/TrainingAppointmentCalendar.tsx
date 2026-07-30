@@ -28,7 +28,11 @@ export default function TrainingAppointmentCalendar({onlyMine}: {
     const onlyForCid = onlyMine && me ? String(me.cid) : undefined;
 
     const [openId, setOpenId] = React.useState<string | null>(null);
-    const {data, isLoading} = useTrainingAppointments();
+    // Newest-first: the endpoint caps at 200 and there are hundreds of (mostly
+    // historical, migrated) appointments — the default start-ascending sort would
+    // fetch only the oldest 200 and leave the calendar's current/upcoming view
+    // empty. Sorting by start descending fetches the current + upcoming ones.
+    const {data, isLoading} = useTrainingAppointments({sortField: 'start', sortOrder: 'desc'});
     const {data: rosterData} = useRosterControllers();
 
     if (isLoading) {

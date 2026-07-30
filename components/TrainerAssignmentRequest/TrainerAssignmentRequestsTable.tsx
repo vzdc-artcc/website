@@ -55,22 +55,20 @@ export default function TrainerAssignmentRequestsTable({controllerStatus}: {
             headerName: 'Last Training Session',
             sortable: false,
             renderCell: (params) => {
-                const tickets = params.row.last_session_tickets ?? [];
+                const tickets = (params.row.last_session_tickets ?? []) as { lesson_identifier: string, passed: boolean }[];
                 if (tickets.length === 0) {
                     return 'N/A';
                 }
+                // The query returns the most recent session's tickets ordered by
+                // created_at asc, so the last element is the last lesson completed.
+                // Show only that one — a single chip for the last training session.
+                const last = tickets[tickets.length - 1];
                 return (
-                    <Stack direction="row" spacing={0.5} sx={{flexWrap: 'wrap'}}>
-                        {tickets.map((ticket: { lesson_identifier: string, passed: boolean }, i: number) => (
-                            <Chip
-                                key={i}
-                                label={ticket.lesson_identifier}
-                                size="small"
-                                color={ticket.passed ? 'success' : 'error'}
-                                style={{margin: '2px'}}
-                            />
-                        ))}
-                    </Stack>
+                    <Chip
+                        label={last.lesson_identifier}
+                        size="small"
+                        color={last.passed ? 'success' : 'error'}
+                    />
                 );
             },
         },
