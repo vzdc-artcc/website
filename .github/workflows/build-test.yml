@@ -28,8 +28,5 @@ jobs:
       - name: Rename .env.public to .env
         run: mv .env.public .env
 
-      - name: Generate Prisma client
-        run: npx prisma generate
-
       - name: Build
         run: npm run build
