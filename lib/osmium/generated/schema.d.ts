@@ -3283,6 +3283,7 @@ export interface components {
             created_at: string;
             id: string;
             ip_address?: string | null;
+            message?: string | null;
             resource_id?: string | null;
             resource_type: string;
             scope_key?: string | null;
@@ -6259,6 +6260,12 @@ export interface operations {
                 scope_type?: string | null;
                 scope_key?: string | null;
                 action?: string | null;
+                /**
+                 * @description Comma-separated resource_type allow-list for domain-scoped views (e.g.
+                 *     `TRAINING_SESSION,TRAINING_APPOINTMENT`). Single string, not repeated keys,
+                 *     because the handler uses serde_urlencoded which can't build a Vec.
+                 */
+                resource_types?: string | null;
             };
             header?: never;
             path?: never;
