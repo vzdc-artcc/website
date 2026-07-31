@@ -8,22 +8,18 @@ import {
     CardActionArea,
     CardContent,
     Chip,
-    CircularProgress,
-    Divider,
     Grid,
     Stack,
     Typography
 } from "@mui/material";
-import {ErrorOutline, History, Outbox, People, Sync, Task} from "@mui/icons-material";
+import {ErrorOutline, Outbox, People, Sync, Task} from "@mui/icons-material";
 import Link from "next/link";
 import {useJobs} from "@/lib/osmium/hooks/jobs";
 import {useRosterControllers} from "@/lib/osmium/hooks/users";
 import {useAdminVisitorApplications} from "@/lib/osmium/hooks/visitor";
 import {useEmailOutbox} from "@/lib/osmium/hooks/emails";
-import {useAuditLogs} from "@/lib/osmium/hooks/audit";
+import RecentAuditActivity from "@/components/Logs/RecentAuditActivity";
 import {jobLabel} from "@/lib/jobs";
-import {getTimeAgo} from "@/lib/date";
-import {auditActionColor} from "@/lib/audit";
 
 type TileColor = 'default' | 'success' | 'warning' | 'error';
 
@@ -61,7 +57,6 @@ export default function Page() {
     const {data: roster} = useRosterControllers();
     const {data: visitors} = useAdminVisitorApplications({status: 'PENDING', pageSize: 1});
     const {data: outbox} = useEmailOutbox({pageSize: 1});
-    const {data: audit, isLoading: auditLoading, isError: auditError} = useAuditLogs({pageSize: 6});
 
     const jobList = jobs ?? [];
     const failingJobs = jobList.filter((j) => j.last_result_ok === false);
@@ -117,40 +112,7 @@ export default function Page() {
                 </Alert>
             )}
 
-            <Card>
-                <CardContent>
-                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{mb: 1}}>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                            <History fontSize="small" color="action"/>
-                            <Typography variant="h6">Recent Activity</Typography>
-                        </Stack>
-                        <Link href="/website-management/audit" style={{color: 'inherit'}}>
-                            <Typography variant="body2" color="primary">View all →</Typography>
-                        </Link>
-                    </Stack>
-                    {auditLoading && <CircularProgress size={22}/>}
-                    {auditError && <Alert severity="error">Failed to load recent activity.</Alert>}
-                    {audit && audit.items.length === 0 && <Typography color="text.secondary" variant="body2">No recent activity.</Typography>}
-                    {audit && audit.items.map((item, idx) => (
-                        <React.Fragment key={item.id}>
-                            {idx > 0 && <Divider/>}
-                            <Stack direction="row" alignItems="center" spacing={1.5} sx={{py: 1, flexWrap: 'wrap'}}>
-                                <Chip label={item.action} size="small" color={auditActionColor(item.action)}
-                                      variant={auditActionColor(item.action) === 'default' ? 'outlined' : 'filled'}/>
-                                <Typography variant="body2" sx={{flex: 1, minWidth: 120}}>
-                                    {item.resource_type}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {item.actor_display_name || 'system'}
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                    {getTimeAgo(new Date(item.created_at))}
-                                </Typography>
-                            </Stack>
-                        </React.Fragment>
-                    ))}
-                </CardContent>
-            </Card>
+            <RecentAuditActivity domain="all" limit={6} href="/website-management/audit"/>
         </Stack>
     );
 }

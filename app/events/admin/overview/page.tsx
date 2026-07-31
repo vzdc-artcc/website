@@ -7,29 +7,13 @@ import {
     Grid,
     IconButton,
     Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
     Tooltip,
     Typography
 } from "@mui/material";
 import {Article, Checklist, Edit, Info} from "@mui/icons-material";
-import {eventGetDuration, getTimeAgo} from "@/lib/date";
+import {eventGetDuration} from "@/lib/date";
 import {useEventOpsPlan, useEvents} from "@/lib/osmium/hooks/events";
-import {useAuditLogs} from "@/lib/osmium/hooks/audit";
-
-const EVENT_RESOURCE_TYPES = new Set([
-    "EVENT",
-    "EVENT_POSITION",
-    "EVENT_POSITION_BATCH",
-    "EVENT_OPS_PLAN",
-    "EVENT_OPS_PLAN_FILE",
-    "EVENT_TMI",
-    "EVENT_POSITION_PRESET",
-]);
+import RecentAuditActivity from "@/components/Logs/RecentAuditActivity";
 
 function NextEventLinks({eventId, hidden}: { eventId: string, hidden: boolean }) {
     const {data: opsPlan} = useEventOpsPlan(eventId);
@@ -73,9 +57,8 @@ function NextEventLinks({eventId, hidden}: { eventId: string, hidden: boolean })
 
 export default function Page() {
     const {data: eventsData, isLoading: eventsLoading} = useEvents({pageSize: 200});
-    const {data: auditData, isLoading: auditLoading} = useAuditLogs({pageSize: 25});
 
-    if (eventsLoading || auditLoading) {
+    if (eventsLoading) {
         return <CircularProgress/>;
     }
 
@@ -84,8 +67,6 @@ export default function Page() {
     const upcomingEvents = (eventsData?.items ?? [])
         .filter((e) => !e.archived_at && new Date(e.starts_at) >= now && new Date(e.starts_at) <= in30Days)
         .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
-
-    const recentLogs = (auditData?.items ?? []).filter((log) => EVENT_RESOURCE_TYPES.has(log.resource_type));
 
     return (
         <Grid container columns={2} spacing={2}>
@@ -114,34 +95,7 @@ export default function Page() {
                 </Card>
             </Grid>
             <Grid size={2}>
-                <Card>
-                    <CardContent>
-                        <Typography variant="h5">Recent Events Activity</Typography>
-                        {recentLogs.length === 0 && <Typography sx={{mt: 1}}>No recent events activity</Typography>}
-                        {recentLogs.length > 0 && <TableContainer>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Time</TableCell>
-                                        <TableCell>User</TableCell>
-                                        <TableCell>Action</TableCell>
-                                        <TableCell>Resource</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {recentLogs.map((log) => (
-                                        <TableRow key={log.id}>
-                                            <TableCell>{getTimeAgo(new Date(log.created_at))}</TableCell>
-                                            <TableCell>{log.actor_display_name || 'N/A'}</TableCell>
-                                            <TableCell>{log.action}</TableCell>
-                                            <TableCell>{log.resource_type}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>}
-                    </CardContent>
-                </Card>
+                <RecentAuditActivity domain="events" title="Recent Events Activity" href="/events/admin/logs"/>
             </Grid>
         </Grid>
     )

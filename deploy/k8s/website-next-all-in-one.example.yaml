@@ -1,0 +1,121 @@
+# =============================================================================
+# website-next — ALL-IN-ONE Kubernetes manifest for the NEXT environment.
+#
+# The website is a STATELESS Next.js frontend that talks only to osmium — no
+# database, no Prisma, no email. So this needs no db-secret, no email-secret, and
+# no DATABASE_URL. Every env var below is actually referenced in the code.
+#
+# The CI step "Update Kubernetes Deployment (NEXT)" runs
+#   kubectl set image deployment/website-next website=...:next-<sha>
+# so the Deployment must be named `website-next` with a container named `website`.
+#
+# ⚠️  Fill in the REPLACE values. Once real secret values are in, do NOT commit —
+#     copy to `website-next-all-in-one.yaml` (gitignored) and fill that in.
+#
+# NOTE: NEXT_PUBLIC_* vars are inlined into the client bundle at BUILD time. For
+# the browser to reach the NEXT osmium, they must be baked when the next-latest
+# image is built (on the next branch), not only set here at runtime. The non-
+# NEXT_PUBLIC vars below are read server-side at runtime and work from this file.
+# =============================================================================
+---
+# ============================ non-secret env =================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: website-next-config
+  namespace: default
+  labels:
+    app: website-next
+data:
+  # Browser → osmium (lib/osmium/client.ts, LoginButton, etc.). Build-time inlined.
+  NEXT_PUBLIC_OSMIUM_API_URL: "https://next-api.vzdc.org"
+  # Server → osmium for the TeamSpeak proxy (app/api/teamspeak). In-cluster next
+  # osmium Service; falls back to NEXT_PUBLIC_OSMIUM_API_URL if unset.
+  OSMIUM_INTERNAL_API_URL: "http://osmium:3900"
+  # Cloudflare Turnstile site key (captcha forms). Build-time inlined.
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: "REPLACE_TURNSTILE_SITE_KEY"
+  # Facility code shown on staff pages (code default is 'vZDC' if unset).
+  NEXT_PUBLIC_VATUSA_FACILITY: "ZDC"
+  # Donation button link.
+  NEXT_PUBLIC_DONATION_URL: "https://www.paypal.com/donate/?hosted_button_id=SZJQGMBF5MFG4"
+  # Training overview environment cards (shows ERR-CONFIG if missing).
+  TRAINING_ENVIRONMENTS: "SBX1,SBX2"
+  # Double-booking alert buffer minutes (training layout).
+  BUFFER_TIME: "15"
+  # Footer shows "Development Build" when "true" — appropriate for the next env.
+  DEV_MODE: "true"
+  # Special-use airspace list for /sua/new (comma-separated). Copy prod's if set.
+  SUAS: ""
+---
+# ========================= website-next app secrets ==========================
+apiVersion: v1
+kind: Secret
+metadata:
+  name: website-next-secret
+  namespace: default
+  labels:
+    app: website-next
+type: Opaque
+stringData:
+  # Shared key the TeamSpeak bot presents to app/api/teamspeak.
+  TS_KEY: "REPLACE"
+  # osmium service-account bearer token — must be valid on the NEXT osmium.
+  OSMIUM_SERVICE_TOKEN: "REPLACE"
+---
+# ============================== deployment ===================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: website-next
+  namespace: default
+  labels:
+    app: website-next
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: website-next
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: website-next
+    spec:
+      containers:
+        # Container name MUST stay `website` — the CI step does
+        # `kubectl set image deployment/website-next website=<img>`.
+        # No command override needed: the image's default CMD is `node server.js`.
+        - name: website
+          image: ghcr.io/vzdc-artcc/website:next-latest
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: website-next-config
+            - secretRef:
+                name: website-next-secret
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          resources:
+            requests:
+              memory: 400Mi
+---
+# =============================== service =====================================
+# ClusterIP on 3000, for the DO load balancer to route the next website hostname
+# (e.g. next.vzdc.org) to — same wiring as the prod `website` Service.
+apiVersion: v1
+kind: Service
+metadata:
+  name: website-next
+  namespace: default
+  labels:
+    app: website-next
+spec:
+  type: ClusterIP
+  selector:
+    app: website-next
+  ports:
+    - port: 3000
+      protocol: TCP
+      targetPort: 3000
