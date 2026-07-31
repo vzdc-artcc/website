@@ -8,7 +8,7 @@ import {useCreateDiscordRole, useUpdateDiscordRole} from "@/lib/osmium/hooks/dis
 import DiscordResourceSelect from "@/components/Discord/DiscordResourceSelect";
 import DiscordNameSelect from "@/components/Discord/DiscordNameSelect";
 import {useGuildResourceOptions} from "@/components/Discord/useGuildResourceOptions";
-import {KNOWN_DISCORD_ROLE_NAME_PREFIXES} from "@/components/Discord/knownNames";
+import {KNOWN_DISCORD_ROLE_NAMES} from "@/components/Discord/knownNames";
 import type {components} from "@/lib/osmium/generated/schema";
 
 export default function DiscordRoleForm({role, discordConfigId, guildId}: {
@@ -48,9 +48,9 @@ export default function DiscordRoleForm({role, discordConfigId, guildId}: {
                         name="name"
                         label="Name"
                         required
-                        options={KNOWN_DISCORD_ROLE_NAME_PREFIXES}
+                        options={KNOWN_DISCORD_ROLE_NAMES}
                         defaultValue={role?.name}
-                        helperText="Start from a known prefix (e.g. impromptu_s1), or type your own."
+                        helperText="Pick a known role name (e.g. impromptu_ground, break_board_unrestricted_twr), or type your own."
                     />
                 </Grid>
                 <Grid size={{xs: 2, sm: 1}}>

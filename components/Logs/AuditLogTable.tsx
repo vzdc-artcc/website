@@ -55,6 +55,13 @@ export default function AuditLogTable({
         resourceType: resourceType || undefined,
     });
 
+    // IP addresses are sensitive; only the site-wide Website Management audit
+    // (`all`) surfaces them. Scoped section views (training/events/facility) don't.
+    const showIp = domain === 'all';
+    // Columns spanned by the expanded before/after row: chevron, Time, User, Type,
+    // Model, Message, and IP only when shown.
+    const detailColSpan = showIp ? 7 : 6;
+
     const toggleExpanded = (id: string) => setExpanded(expanded === id ? null : id);
 
     return (
@@ -92,7 +99,7 @@ export default function AuditLogTable({
                                         <TableCell>Type</TableCell>
                                         <TableCell>Model</TableCell>
                                         <TableCell>Message</TableCell>
-                                        <TableCell>IP</TableCell>
+                                        {showIp && <TableCell>IP</TableCell>}
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -140,13 +147,14 @@ export default function AuditLogTable({
                                                     <TableCell>
                                                         <Typography variant="body2">{item.message || '—'}</Typography>
                                                     </TableCell>
-                                                    <TableCell sx={{fontFamily: MONO, fontSize: '0.8rem', color: 'text.secondary'}}>
-                                                        {item.ip_address || '—'}
-                                                    </TableCell>
+                                                    {showIp &&
+                                                        <TableCell sx={{fontFamily: MONO, fontSize: '0.8rem', color: 'text.secondary'}}>
+                                                            {item.ip_address || '—'}
+                                                        </TableCell>}
                                                 </TableRow>
                                                 {isOpen && (
                                                     <TableRow selected>
-                                                        <TableCell colSpan={7} sx={{py: 2}}>
+                                                        <TableCell colSpan={detailColSpan} sx={{py: 2}}>
                                                             <Stack direction={{xs: 'column', md: 'row'}} spacing={2}>
                                                                 <StatePanel label="Before" value={item.before_state}/>
                                                                 <StatePanel label="After" value={item.after_state}/>

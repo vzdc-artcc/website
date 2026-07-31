@@ -14,10 +14,24 @@ export const KNOWN_DISCORD_CHANNEL_NAMES: readonly string[] = [
     'staffup',
 ];
 
-// Role "Name" values are prefix-matched by the bot (resolve_role_prefix), so the
-// suffix is arbitrary (e.g. `impromptu_s1`). These prefixes are offered as
-// starting points; operators complete them or type a full custom name.
-export const KNOWN_DISCORD_ROLE_NAME_PREFIXES: readonly string[] = [
-    'impromptu_',
-    'break_board_',
+// Role "Name" values are prefix-matched by the bot (resolve_role_prefix), so any
+// `impromptu_*` / `break_board_*` suffix works. These are the concrete roles this
+// facility uses, offered as suggestions; the field stays free-text so operators
+// can add their own. For break board, the button label is derived from the suffix
+// (e.g. `break_board_unrestricted_twr` -> "Unrestricted TWR").
+export const KNOWN_DISCORD_ROLE_NAMES: readonly string[] = [
+    // Impromptu training — one role per session type (ground/tower/approach/center),
+    // pinged when a session of that type is offered.
+    'impromptu_ground',
+    'impromptu_tower',
+    'impromptu_approach',
+    'impromptu_center',
+    // Break board — each role becomes a position button on the break board.
+    'break_board_tier_1_gnd',
+    'break_board_tier_1_twr',
+    'break_board_unrestricted_gnd',
+    'break_board_unrestricted_twr',
+    'break_board_unrestricted_app',
+    'break_board_center',
+    'break_board_pct',
 ];
