@@ -29,7 +29,9 @@ export default function TopControllersCard() {
                                         </Link>
                                     </Tooltip>
                                 </Stack>
-                                <Typography variant="subtitle2">{controller.active_hours.toPrecision(3)} hours</Typography>
+                                {/* online_hours = connected time, the same metric the leaderboard is ranked by,
+                                    so the number matches the rank (matches the current site's behavior). */}
+                                <Typography variant="subtitle2">{controller.online_hours.toPrecision(3)} hours</Typography>
                             </CardContent>
                         </Card>
                     ))}

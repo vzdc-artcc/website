@@ -95,4 +95,4 @@ jobs:
         env:
           IMAGE_TAG: ghcr.io/${{ github.repository }}:next-${{ env.COMMIT_HASH }}
         run: |
-          kubectl set image deployment/website-next website=$IMAGE_TAG -n default
+          kubectl set image deployment/next-website website=$IMAGE_TAG -n default

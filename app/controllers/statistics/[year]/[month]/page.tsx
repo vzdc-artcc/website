@@ -150,7 +150,7 @@ export default function Page() {
                                 </Stack>
                                 <Typography variant="body1">{leader.rating} • {leader.cid}</Typography>
                             </Box>
-                            <Typography variant="h6">{leader.active_hours.toPrecision(3)} hours</Typography>
+                            <Typography variant="h6">{leader.online_hours.toPrecision(3)} hours</Typography>
                         </CardContent>
                     </Card>
                 </Grid>

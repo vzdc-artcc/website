@@ -22,11 +22,9 @@ export default function Footer() {
                         Rights Reserved.</Typography>
                     <Typography textAlign="center" gutterBottom>A sub-division of VATUSA, a division of the
                         VATSIM network.</Typography>
-                    <Link href="/misc/AvDr/" style={{color: 'inherit',textDecoration: 'none'}}>
-                        <Typography textAlign="center" fontWeight={700} sx={{marginTop: 2,}}>NOT FOR REAL WORLD
-                        USE
-                        </Typography>
-                    </Link>
+                    <Typography textAlign="center" fontWeight={700} sx={{marginTop: 2,}}>NOT FOR REAL WORLD
+                    USE
+                    </Typography>
                     <Stack direction={{xs: 'column', lg: 'row',}} spacing={5} justifyContent="center"
                            alignItems="center" sx={{marginTop: 3,}}>
                         <Link href="https://www.vatusa.net/" target="_blank">
