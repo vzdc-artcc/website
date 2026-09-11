@@ -1,0 +1,62 @@
+name: Chore
+description: Tooling, dependencies, CI, deployment, or refactoring work
+labels: ["type:chore"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For maintainers and contributors. If you are reporting something that is
+        broken from a user's point of view, file a bug report instead.
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What should change
+      description: The end state, described concretely.
+      placeholder: |
+        The generated osmium schema should be regenerated and committed on its own,
+        so a feature diff is not buried under half a megabyte of generated types.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why now
+      description: >
+        What this unblocks, or what it costs to leave alone. "It would be tidier"
+        is not a reason on its own.
+    validations:
+      required: true
+
+  - type: textarea
+    id: risk
+    attributes:
+      label: What could this break
+      description: >
+        The build, the Docker image, shared components, `next.config.ts`, the
+        generated schema — anything downstream of the change. Remember the build
+        is the only mechanical gate this repo has.
+    validations:
+      required: true
+
+  - type: input
+    id: parent
+    attributes:
+      label: Related issue
+      description: >
+        If this came out of work on another issue, reference it — `Relates to #123`.
+        Follow-ups filed from a branch must reference their parent.
+      placeholder: "Relates to #123"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: validation
+    attributes:
+      label: Before you file
+      options:
+        - label: I searched open and closed issues and did not find this one
+          required: true
+        - label: This is pre-existing work, not a defect I am about to introduce or have just introduced
+          required: true

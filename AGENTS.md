@@ -323,7 +323,44 @@ as done.
 
 ---
 
-## 10. Git and PR workflow
+## 10. Issue tracking
+
+Work is tracked as GitHub issues on `vzdc-artcc/website` and on the shared
+`Osmium / Website` board (project **#7**, owner `vzdc-artcc`). All interaction
+goes through the `gh` CLI.
+
+**`.github/ISSUE_GUIDELINES.md` is binding, and it is not optional reading
+before you file, comment on, or pick up an issue.** It covers the title and body
+structure, the four-comment budget, the `#123 [summary] (Status)` reference
+format, the eleven board columns and which three an agent may set, the label
+taxonomy, the four tests a follow-up must pass, and how to search for duplicates.
+It is not restated here.
+
+The five things most often got wrong:
+
+1. **Which repo.** The website renders; osmium decides. Wrong data, a wrong
+   permission, or a record that saved incorrectly is an osmium issue. Right data
+   rendered wrong is a website issue.
+2. **Filing is two steps.** `gh issue create` does not put the issue on the
+   board, and `gh project item-add` leaves its Status empty, which puts it in no
+   column at all. Add it and set `Triaging`, then read the status back — both
+   commands print nothing on success, so silence is not evidence.
+3. **Priority is never yours to set.** Propose a grade, let the maintainer
+   choose.
+4. **A defect you introduced is yours to fix now**, on this branch, whatever its
+   grade. Follow-ups are only for pre-existing defects outside the issue's
+   logical scope that are not already filed — and the duplicate search covers
+   both repos, because a rendering complaint here is often already filed in
+   osmium as a response-shape defect.
+5. **No AI attribution in issue comments either.** Comments post as the account
+   owner and read as written by them.
+
+Controllers file through the forms in `.github/ISSUE_TEMPLATE/`, which produce a
+conforming issue without anyone having to read the guidelines first.
+
+---
+
+## 11. Git and PR workflow
 
 - Work happens on a branch. Do not commit directly to `master` or `next`.
 - **`next` is the integration branch for the osmium-backed rework.** Feature
@@ -341,7 +378,7 @@ as done.
 
 ---
 
-## 11. Known-stale documentation
+## 12. Known-stale documentation
 
 `README.md` on this branch still describes the pre-rework architecture: Prisma
 migrations, NextAuth, a local Postgres, and a `/api/seed` endpoint. **None of

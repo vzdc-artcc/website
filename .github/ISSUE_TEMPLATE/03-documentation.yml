@@ -1,0 +1,60 @@
+name: Documentation
+description: Repository docs or on-site copy that is wrong, missing, or out of date
+labels: ["type:documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This covers the README, `AGENTS.md` / `CLAUDE.md`, the specs under `docs/`,
+        and user-facing copy on the site itself.
+
+        The README on the `next` branch is already known to describe the old
+        Prisma and NextAuth architecture. That is tracked; no need to re-file it.
+
+  - type: input
+    id: page
+    attributes:
+      label: Which page or file
+      description: A path in the repo, or a page path on the site.
+      placeholder: "README.md, or /credits"
+    validations:
+      required: true
+
+  - type: textarea
+    id: says
+    attributes:
+      label: What it currently says
+      description: Quote the passage. Automatically formatted as code.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: should-say
+    attributes:
+      label: What is actually true
+      description: >
+        The correct version, and how you know — a file, a component, or something
+        you observed on the site.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of problem
+      options:
+        - Wrong — it states something false
+        - Out of date — it was true once
+        - Missing — the behaviour is undocumented
+        - Unclear — it is correct but cannot be followed
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: validation
+    attributes:
+      label: Before you file
+      options:
+        - label: I searched open and closed issues and did not find this one
+          required: true

@@ -1,0 +1,100 @@
+# Canonical label set for vzdc-artcc/website.
+#
+# Synced by .github/workflows/labels.yml on push to master or next. Add labels
+# here, not through the GitHub UI, or the next sync run will not know about them.
+#
+# skip-delete is on in the workflow, so labels absent from this file are left
+# alone rather than removed. That matters here: 32 closed issues still carry
+# `bug`, `enhancement`, `roadmap`, and `in progress`. Those are legacy — do not
+# apply them to new work.
+
+# --- Type: what is it? ---
+- name: "type:bug"
+  color: d73a4a
+  description: Behaves wrong
+- name: "type:feature"
+  color: a2eeef
+  description: New capability or enhancement
+- name: "type:chore"
+  color: fef2c0
+  description: Tooling, deps, config, housekeeping
+- name: "type:documentation"
+  color: 0075ca
+  description: Docs, specs, or on-site copy
+
+# --- Area: which part of the site? ---
+- name: "area:public"
+  color: 17becf
+  description: Home, publications, credits, privacy, license — signed-out pages
+- name: "area:profile"
+  color: 0e8a16
+  description: Self-service profile, bookings, LOA, email preferences
+- name: "area:roster"
+  color: 1f77b4
+  description: Controllers, roster, staff, controller statistics
+- name: "area:training"
+  color: b57edc
+  description: Training console — sessions, assignments, progressions, OTS
+- name: "area:events"
+  color: 9146ff
+  description: Events pages, event ops, staffing
+- name: "area:forms"
+  color: e99695
+  description: Feedback, incidents, staffing requests, SUA, visitor applications
+- name: "area:admin"
+  color: 5319e7
+  description: Facility admin console
+- name: "area:website-management"
+  color: 7057ff
+  description: Web team console — access, API keys, audit, Discord, emails, jobs
+- name: "area:api-client"
+  color: c5def5
+  description: lib/osmium — client, hooks, query keys, generated schema
+- name: "area:ui"
+  color: fbca04
+  description: Shared components, theme, navigation, DataTable
+- name: "area:infra"
+  color: e4e669
+  description: Build, CI, Docker, deploy, config
+
+# --- Priority: set by the maintainer, never by an agent ---
+- name: "priority:critical"
+  color: 7c0000
+  description: Site broken or data at risk
+- name: "priority:high"
+  color: b60205
+  description: Major or blocking; next up
+- name: "priority:medium"
+  color: fbca04
+  description: Scheduled, not urgent
+- name: "priority:low"
+  color: c2e0c6
+  description: Minor; opportunistic
+- name: "priority:trivial"
+  color: ededed
+  description: Nitpick
+
+# --- Modifiers ---
+- name: "technical-debt"
+  color: d4c5f9
+  description: Pre-existing defect, filed per the four scope tests
+- name: "blocked-by-osmium"
+  color: 5319e7
+  description: Needs an API change before it can be built
+- name: "good first issue"
+  color: 7057ff
+  description: Good for newcomers
+- name: "help wanted"
+  color: 008672
+  description: Extra attention is needed
+
+# --- Dependabot ---
+- name: "dependencies"
+  color: 0366d6
+  description: Dependency updates
+- name: "javascript"
+  color: f1e05a
+  description: JavaScript or TypeScript dependency changes
+- name: "github_actions"
+  color: 000000
+  description: GitHub Actions workflow changes

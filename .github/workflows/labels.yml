@@ -1,0 +1,37 @@
+name: Sync labels
+
+on:
+  push:
+    # `next` is listed alongside `master` so the sync runs while the
+    # osmium-backed rework is still the integration branch. Drop `next` once it
+    # has merged down and `master` is the only place labels.yml changes.
+    branches:
+      - master
+      - next
+    paths:
+      - .github/labels.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run labeler
+        uses: crazy-max/ghaction-github-labeler@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          yaml-file: .github/labels.yml
+          # Labels absent from labels.yml are left alone rather than deleted.
+          # 32 closed issues still carry the legacy `bug` / `enhancement` /
+          # `roadmap` / `in progress` labels; deleting those would strip them
+          # from that history. Flip this only after they have been re-labelled.
+          skip-delete: true
+          dry-run: false
