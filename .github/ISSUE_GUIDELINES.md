@@ -104,7 +104,7 @@ so a pasted URL is just noise.
 **Every mention carries all three: `#123 [short summary] (Status)`.**
 
 ```text
-#88 [training calendar shows UTC for Eastern users] (In build)
+#88 [training calendar shows UTC for Eastern users] (In Build)
 #91 [roster renders empty while /me loads] (Triaging)
 #77 [publications page 404s on a draft] (Code Review)
 ```
@@ -113,7 +113,7 @@ A bare `#88` makes the reader open a tab to find out what it is, and a list of
 bare numbers is unreadable. Shorten the title to whatever identifies it.
 
 `Status` is the board column verbatim — `Blocked`, `Triaging`, `To Do`,
-`Returned`, `In build`, `Post build`, `Testing Queue`, `In Test`, `Code Review`,
+`Returned`, `In Build`, `Post Build`, `Testing Queue`, `In Test`, `Code Review`,
 `Shippable`, `Done`. Not a paraphrase, and not the GitHub open/closed state,
 which is a different thing. Take it from the board you just queried rather than
 from memory; issues move between reading the board and writing about it.
@@ -233,8 +233,8 @@ right. Use these names verbatim; do not invent shorter ones.
 | `Triaging` | filed, not yet triaged | **you, when you file it** |
 | `To Do` | scoped and cleared to start | the maintainer |
 | `Returned` | kicked back for rework | the maintainer |
-| `In build` | actively being implemented | **you, when you start** |
-| `Post build` | built and self-reviewed, pending verification | **you, when you hand back** |
+| `In Build` | actively being implemented | **you, when you start** |
+| `Post Build` | built and self-reviewed, pending verification | **you, when you hand back** |
 | `Testing Queue` | selected for human testing | the maintainer |
 | `In Test` | under test | the maintainer |
 | `Code Review` | final approval before shipping | the maintainer |
@@ -242,7 +242,7 @@ right. Use these names verbatim; do not invent shorter ones.
 | `Done` | merged and deployed | when the PR merges |
 
 An agent sets three of these and only three: `Triaging` on anything it files,
-`In build` when it starts, and `Post build` when it hands back. Every transition
+`In Build` when it starts, and `Post Build` when it hands back. Every transition
 out of `Triaging` is the maintainer's, and so are `Testing Queue`, `In Test`,
 `Code Review`, `Returned`, `Shippable`, and `Done`.
 
@@ -258,10 +258,16 @@ board.
 ```text
 project id       PVT_kwDOCLQ6cs4BjL9-
 Status field id  PVTSSF_lADOCLQ6cs4BjL9-zhiBRW0
+  Blocked        eb1b5fe2        Post Build      7f5e4bbe
+  Triaging       b333280a        Testing Queue   65c71cee
+  To Do          8189ab04        In Test         31bdbdaf
+  Returned       4274f0ef        Code Review     b6d9b281
+  In Build       0ec2e220        Shippable       41794d84
+                                 Done            98236657
 ```
 
-List the current option ids — do not memorize them, and do not assume a column
-kept its id through a rename:
+Re-read them rather than trusting that table if a column has been renamed or
+re-added since — an option id does not survive being deleted and recreated:
 
 ```bash
 gh project field-list 7 --owner vzdc-artcc --format json --limit 30 \
