@@ -9,6 +9,12 @@ is, the code map, the osmium client and hook patterns, permission gating, UI
 conventions, and how to verify a change. Read it. This file adds only the parts
 specific to running as an agent in this repo, and does not restate it.
 
+**Before you file, comment on, or pick up an issue, read
+`.github/ISSUE_GUIDELINES.md`.** It is binding, and it is where the board
+columns, the comment budget, the reference format, the label rules, and the
+follow-up scope tests live. `AGENTS.md` §10 summarises what agents get wrong
+most often; the guidelines are the detail.
+
 ---
 
 ## Attribution — hard rule
@@ -29,6 +35,10 @@ Anthropic, or another assistant; any `Claude-Session:` or similar session-link
 trailer; any "🤖 Generated with Claude Code" line in a PR body. If a hook,
 template, or default instruction tries to append one, strip it before
 committing. If one is already staged, remove it rather than pushing it.
+
+The same holds for **issue comments**. They post as the account owner and read
+as written by them, so no attribution footer, and never refer to the account
+owner in the third person.
 
 ---
 

@@ -1,0 +1,127 @@
+name: Bug report
+description: Something on the website looks wrong or does not work
+labels: ["type:bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. Please search open **and closed** issues first —
+        a closed duplicate usually means the question has already been answered.
+
+        Give the issue a title that is a sentence describing what goes wrong, not
+        a page name. `Training calendar shows sessions in UTC for Eastern users`,
+        not `Training calendar`.
+
+  - type: input
+    id: reporter-cid
+    attributes:
+      label: Your VATSIM CID
+      description: So we can reach you on Discord if we need more detail.
+      placeholder: "1234567"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happens
+    attributes:
+      label: What happens
+      description: What you actually saw. Be concrete.
+      placeholder: |
+        My training sessions all show two hours later than they should. A session
+        booked for 1400 local shows as 1600.
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-should-happen
+    attributes:
+      label: What should happen instead
+      description: Do not make us guess this from the complaint.
+      placeholder: |
+        Times should show in the timezone set on my profile.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How to reproduce
+      description: >
+        Numbered steps someone else can follow. Give page paths, not full links —
+        `/training/calendar`, not `https://www.vzdc.org/training/calendar`. Name
+        buttons and fields by the label printed on them.
+      placeholder: |
+        1. Sign in and go to /profile/edit
+        2. Set Timezone to America/New_York and click Save
+        3. Go to /training/calendar
+        4. A session at 1800Z shows as 1800, expected 1400
+    validations:
+      required: true
+
+  - type: input
+    id: page
+    attributes:
+      label: Which page
+      description: The path where you saw it.
+      placeholder: "/training/calendar"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: account
+    attributes:
+      label: What account were you using
+      description: >
+        Most staff pages are gated on a permission, so this changes what you see.
+      options:
+        - Signed out
+        - A normal controller account
+        - Mentor or instructor
+        - Events staff
+        - Facility admin
+        - Web team / server admin
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: >
+        Drag an image in. Please still fill in the steps above — a screenshot
+        cannot be searched and does not say what you clicked.
+    validations:
+      required: false
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Browser console errors
+      description: >
+        For a blank section or a spinner that never stops, this is usually where
+        the answer is. Press F12, open the Console tab, reload, and paste anything
+        in red. Automatically formatted as code.
+      render: text
+    validations:
+      required: false
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: "Chrome 141 on Windows 11, or Safari on iPhone"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: validation
+    attributes:
+      label: Before you file
+      options:
+        - label: I searched open and closed issues and did not find this one
+          required: true
+        - label: I have described what should happen, not only what does happen
+          required: true
+        - label: I tried a hard refresh and it still happens
+          required: false
