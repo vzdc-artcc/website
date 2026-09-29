@@ -12,6 +12,7 @@ import {
     DeleteSweep,
     EmojiPeople,
     Feedback,
+    FiberNew,
     Folder,
     Home,
     ListAlt,
@@ -197,6 +198,14 @@ export default async function AdminMenu() {
                         <Folder/>
                     </ListItemIcon>
                     <ListItemText primary="File Center"/>
+                </ListItemButton>
+            </Link>
+            <Link href="/admin/innovation" style={{textDecoration: 'none', color: 'inherit',}}>
+                <ListItemButton>
+                    <ListItemIcon>
+                        <FiberNew />
+                    </ListItemIcon>
+                    <ListItemText primary="Innovation Center"/>
                 </ListItemButton>
             </Link>
             <Link href="/admin/stats-prefixes" style={{textDecoration: 'none', color: 'inherit',}}>
