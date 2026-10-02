@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
                     },
                 });
 
-                await addHours(controller as unknown as User, getFacilityType(activePosition.facility || 0), getHoursControlledSinceLastUpdate(now, activePosition.start), controller.log?.months.find((month) => month.month === now.getMonth() && month.year === now.getFullYear()));
+                await addHours(controller as unknown as User, getFacilityType(activePosition.facility || 0), getHoursControlledSinceLastUpdate(now, activePosition.start), now, controller.log?.months.find((month) => month.month === now.getMonth() && month.year === now.getFullYear()));
             }
             continue;
         }
@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
                     end: now,
                 },
             });
-            await addHours(controller as unknown as User, getFacilityType(activePosition.facility || 0), getHoursControlledSinceLastUpdate(now, activePosition.start), controller.log?.months.find((month) => month.month === now.getMonth() && month.year === now.getFullYear()));
+            await addHours(controller as unknown as User, getFacilityType(activePosition.facility || 0), getHoursControlledSinceLastUpdate(now, activePosition.start), now, controller.log?.months.find((month) => month.month === now.getMonth() && month.year === now.getFullYear()));
             await prisma.controllerPosition.create({
                 data: {
                     log: {
@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
                         },
                     },
                     position: vatsimUser.callsign,
-                    start: vatsimUser.logon_time,
+                    start: now,
                     facility: vatsimUser.facility,
                     active: true,
                 },
@@ -160,9 +160,8 @@ const getHoursControlledSinceLastUpdate = (now: Date, then: Date) => {
     return (now.getTime() - then.getTime()) / 1000 / 60 / 60;
 }
 
-const addHours = async (controller: User, facility: string, hours: number, prevLogMonth?: ControllerLogMonth,) => {
+const addHours = async (controller: User, facility: string, hours: number, now: Date, prevLogMonth?: ControllerLogMonth,) => {
 
-    const now = new Date();
     const month = now.getMonth();
     const year = now.getFullYear();
 
@@ -187,11 +186,11 @@ const addHours = async (controller: User, facility: string, hours: number, prevL
             },
         },
         update: {
-            deliveryHours: (prevLogMonth?.deliveryHours || 0) + (facility === 'DEL' ? hours : 0),
-            groundHours: (prevLogMonth?.groundHours || 0) + (facility === 'GND' ? hours : 0),
-            towerHours: (prevLogMonth?.towerHours || 0) + (facility === 'TWR' ? hours : 0),
-            approachHours: (prevLogMonth?.approachHours || 0) + (facility === 'APP' ? hours : 0),
-            centerHours: (prevLogMonth?.centerHours || 0) + (facility === 'CTR' ? hours : 0),
+            deliveryHours: {increment: facility === 'DEL' ? hours : 0},
+            groundHours: {increment: facility === 'GND' ? hours : 0},
+            towerHours: {increment: facility === 'TWR' ? hours : 0},
+            approachHours: {increment: facility === 'APP' ? hours : 0},
+            centerHours: {increment: facility === 'CTR' ? hours : 0},
         },
         where: {
             logId_month_year: {
