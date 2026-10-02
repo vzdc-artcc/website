@@ -13,12 +13,14 @@ export default function InnovationLabProjectForm({project}: { project?: Innovati
 
     const router = useRouter();
     const [name, setName] = useState(project?.name || '');
+    const [alias, setAlias] = useState(project?.alias || '');
     const [description, setDescription] = useState(project?.description || '');
 
     const handleSubmit = async () => {
         const {project: createdProject, errors} = await createOrUpdateInnovationLabProject({
             id: project?.id,
             name,
+            alias,
             description,
         });
 
@@ -40,6 +42,9 @@ export default function InnovationLabProjectForm({project}: { project?: Innovati
             <Stack direction="column" spacing={2}>
                 <TextField fullWidth variant="filled" label="Name" value={name}
                            onChange={(e) => setName(e.target.value)}/>
+                <TextField fullWidth variant="filled" label="Alias" value={alias}
+                           helperText="Must be unique to all projects.  /innovation/:alias will be the URL for this project."
+                           onChange={(e) => setAlias(e.target.value)}/>
                 <MarkdownEditor
                     enableScroll={false}
                     minHeight="400px"

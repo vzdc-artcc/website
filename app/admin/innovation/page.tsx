@@ -54,6 +54,7 @@ export default async function Page() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Name</TableCell>
+                                    <TableCell>Alias</TableCell>
                                     <TableCell>Updated At</TableCell>
                                     <TableCell>Created At</TableCell>
                                     <TableCell>Actions</TableCell>
@@ -63,13 +64,14 @@ export default async function Page() {
                                 {projects.map((project) => (
                                     <TableRow key={project.id}>
                                         <TableCell>{project.name}</TableCell>
+                                        <TableCell>/{project.alias}</TableCell>
                                         <TableCell>{formatZuluDate(project.updatedAt)}</TableCell>
                                         <TableCell>{formatZuluDate(project.createdAt)}</TableCell>
                                         <TableCell>
                                             <Link href={`/admin/innovation/${project.id}`}>
                                                 <IconButton><Edit/></IconButton>
                                             </Link>
-                                            <InnovationLabDeleteButton id={project.id}/>
+                                            <InnovationLabDeleteButton project={project}/>
                                         </TableCell>
                                     </TableRow>
                                 ))}

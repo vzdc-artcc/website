@@ -358,7 +358,6 @@ enum LogModel {
   OPS_PLAN_FILE
 
   INNOVATION_LAB_PROJECT
-  INNOVATION_LAB_PROJECT_UPDATE
 }
 
 model Log {
@@ -1087,6 +1086,7 @@ model OpsPlanFile {
 model InnovationLabProject {
   id          String   @id @default(cuid())
   name        String
+  alias       String   @unique
   order       Int      @default(0)
   description String?
   createdAt   DateTime @default(now())

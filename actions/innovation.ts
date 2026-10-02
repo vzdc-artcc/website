@@ -27,6 +27,7 @@ export const createOrUpdateInnovationLabProject = async (data: Partial<Innovatio
     const projectZ = z.object({
         id: z.string().optional(),
         name: z.string().min(1, "Name is required"),
+        alias: z.string().min(1, "Alias is required"),
         description: z.string().min(1, "Description is required")
     });
 
@@ -36,14 +37,25 @@ export const createOrUpdateInnovationLabProject = async (data: Partial<Innovatio
         return {errors: result.error.errors};
     }
 
+    if (await prisma.innovationLabProject.count({
+        where: {
+            alias: result.data.alias,
+            id: {not: result.data.id || ''}
+        }
+    }) > 0) {
+        return {errors: [{message: "Alias must be unique"}]};
+    }
+
     const project = await prisma.innovationLabProject.upsert({
         where: {id: result.data.id || ''},
         create: {
             name: result.data.name,
+            alias: result.data.alias,
             description: result.data.description,
         },
         update: {
             name: result.data.name,
+            alias: result.data.alias,
             description: result.data.description,
         },
     });
@@ -59,4 +71,16 @@ export const createOrUpdateInnovationLabProject = async (data: Partial<Innovatio
     });
 
     return {project};
+}
+
+export const deleteInnovationLabProject = async (id: string) => {
+    const project = await prisma.innovationLabProject.delete({
+        where: {id},
+    });
+
+    if (project) {
+        await log('DELETE', 'INNOVATION_LAB_PROJECT', `Deleted innovation project ${project.name}`);
+    }
+
+    revalidatePath('/admin/innovation', 'layout');
 }
