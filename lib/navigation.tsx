@@ -8,6 +8,7 @@ import {
     CalendarMonth,
     Chat,
     Event,
+    FiberNew,
     FileOpen,
     Forum,
     Group,
@@ -100,8 +101,21 @@ export const NAVIGATION: NavigationButton[] = [
     },
     {
         label: 'Publications',
-        link: '/publications/downloads',
         icon: <FileOpen/>,
+        dropdown: {
+            buttons: [
+                {
+                    label: 'Publications',
+                    link: '/publications/downloads',
+                    icon: <FileOpen/>,
+                },
+                {
+                    label: 'Innovation Center',
+                    link: '/publications/innovation',
+                    icon: <FiberNew/>,
+                },
+            ],
+        },
     },
     {
         label: 'Events',

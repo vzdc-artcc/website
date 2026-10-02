@@ -139,8 +139,6 @@ model User {
   trainingSessionAdditionalTrainers TrainingSessionAdditionalTrainer[]
 
   trainingAppointmentAdditionalTrainers TrainingAppointmentAdditionalTrainer[]
-
-  innovationLabUpdates InnovationLabProjectUpdate[]
 }
 
 model TrainingAssignment {
@@ -358,6 +356,8 @@ enum LogModel {
   DISCORD_CHANNEL_UPDATE
   DISCORD_CONFIG
   OPS_PLAN_FILE
+
+  INNOVATION_LAB_PROJECT
 }
 
 model Log {
@@ -1086,22 +1086,9 @@ model OpsPlanFile {
 model InnovationLabProject {
   id          String   @id @default(cuid())
   name        String
+  alias       String   @unique
+  order       Int      @default(0)
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  updates InnovationLabProjectUpdate[]
-}
-
-model InnovationLabProjectUpdate {
-  id          String               @id @default(cuid())
-  project     InnovationLabProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String
-  title       String
-  description String?
-
-  createdAt DateTime @default(now())
-
-  createdBy String
-  creator   User   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 }
