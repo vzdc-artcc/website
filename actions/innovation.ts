@@ -21,6 +21,7 @@ export const updateInnovationLabProjectOrder = async (items: OrderItem[]) => {
 
     await log('UPDATE', 'INNOVATION_LAB_PROJECT', 'Updated innovation project order');
     revalidatePath('/admin/innovation', 'layout');
+    revalidatePath("/publications/innovation", 'layout');
 }
 
 export const createOrUpdateInnovationLabProject = async (data: Partial<InnovationLabProject>) => {
@@ -61,6 +62,7 @@ export const createOrUpdateInnovationLabProject = async (data: Partial<Innovatio
     });
 
     revalidatePath('/admin/innovation', 'layout');
+    revalidatePath("/publications/innovation", 'layout');
 
     after(() => {
         if (result.data.id) {
@@ -83,4 +85,5 @@ export const deleteInnovationLabProject = async (id: string) => {
     }
 
     revalidatePath('/admin/innovation', 'layout');
+    revalidatePath("/publications/innovation", 'layout');
 }

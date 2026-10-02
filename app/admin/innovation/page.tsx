@@ -54,7 +54,7 @@ export default async function Page() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Name</TableCell>
-                                    <TableCell>Alias</TableCell>
+                                    <TableCell>Alias (/innovation)</TableCell>
                                     <TableCell>Updated At</TableCell>
                                     <TableCell>Created At</TableCell>
                                     <TableCell>Actions</TableCell>
