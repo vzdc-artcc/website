@@ -139,6 +139,8 @@ model User {
   trainingSessionAdditionalTrainers TrainingSessionAdditionalTrainer[]
 
   trainingAppointmentAdditionalTrainers TrainingAppointmentAdditionalTrainer[]
+
+  innovationLabUpdates InnovationLabProjectUpdate[]
 }
 
 model TrainingAssignment {
