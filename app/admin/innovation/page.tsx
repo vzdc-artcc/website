@@ -3,6 +3,7 @@ import {
     Button,
     Card,
     CardContent,
+    IconButton,
     Stack,
     Table,
     TableBody,
@@ -16,7 +17,8 @@ import React from 'react';
 import prisma from "@/lib/db";
 import {formatZuluDate} from "@/lib/date";
 import Link from "next/link";
-import {Add, Reorder} from "@mui/icons-material";
+import {Add, Edit, Reorder} from "@mui/icons-material";
+import InnovationLabDeleteButton from "@/components/InnovationLab/InnovationLabDeleteButton";
 
 export default async function Page() {
 
@@ -52,6 +54,7 @@ export default async function Page() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Name</TableCell>
+                                    <TableCell>Updated At</TableCell>
                                     <TableCell>Created At</TableCell>
                                     <TableCell>Actions</TableCell>
                                 </TableRow>
@@ -60,7 +63,14 @@ export default async function Page() {
                                 {projects.map((project) => (
                                     <TableRow key={project.id}>
                                         <TableCell>{project.name}</TableCell>
+                                        <TableCell>{formatZuluDate(project.updatedAt)}</TableCell>
                                         <TableCell>{formatZuluDate(project.createdAt)}</TableCell>
+                                        <TableCell>
+                                            <Link href={`/admin/innovation/${project.id}`}>
+                                                <IconButton><Edit/></IconButton>
+                                            </Link>
+                                            <InnovationLabDeleteButton id={project.id}/>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

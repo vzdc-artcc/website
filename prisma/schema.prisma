@@ -139,8 +139,6 @@ model User {
   trainingSessionAdditionalTrainers TrainingSessionAdditionalTrainer[]
 
   trainingAppointmentAdditionalTrainers TrainingAppointmentAdditionalTrainer[]
-
-  innovationLabUpdates InnovationLabProjectUpdate[]
 }
 
 model TrainingAssignment {
@@ -1093,19 +1091,4 @@ model InnovationLabProject {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  updates InnovationLabProjectUpdate[]
-}
-
-model InnovationLabProjectUpdate {
-  id          String               @id @default(cuid())
-  project     InnovationLabProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId   String
-  title       String
-  description String?
-
-  createdAt DateTime @default(now())
-
-  createdBy String
-  creator   User   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 }
