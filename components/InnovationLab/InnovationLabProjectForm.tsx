@@ -2,7 +2,7 @@
 import React, {useState} from 'react';
 import {InnovationLabProject} from "@/generated/prisma/browser";
 import Form from "next/form";
-import {Box, Stack, TextField} from "@mui/material";
+import {Box, Stack, TextField, Typography} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import MarkdownEditor from "@uiw/react-markdown-editor";
 import {createOrUpdateInnovationLabProject} from "@/actions/innovation";
@@ -53,6 +53,9 @@ export default function InnovationLabProjectForm({project}: { project?: Innovati
                 />
                 <Box>
                     <FormSaveButton/>
+                    <br/>
+                    <Typography variant="caption">Notify members by sending a mass email or creating a facility
+                        broadcast.</Typography>
                 </Box>
             </Stack>
         </Form>
