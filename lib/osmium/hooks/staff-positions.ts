@@ -3,8 +3,8 @@ import { osmium } from "@/lib/osmium/client";
 import { useMe } from "@/lib/osmium/hooks/me";
 
 export const STAFF_POSITIONS = [
-    "ATM", "DATM", "TA", "EC", "WM", "FE", "AEC", "AWM", "AFE", "EP", "TMU",
-    "FC", "INS", "MTR",
+    "ATM", "DATM", "TA", "EC", "WM", "FE", "ATA", "AEC", "AWM", "AFE", "EP",
+    "TMU", "FC", "INS", "MTR",
 ] as const;
 
 export type StaffPosition = typeof STAFF_POSITIONS[number];
