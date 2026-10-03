@@ -3456,6 +3456,11 @@ export interface components {
         ControllerPositionItem: {
             /** Format: int64 */
             active_seconds?: number | null;
+            /**
+             * @description The callsign the controller logged in with, or the position's
+             *     configured default callsign for sessions recorded before it was stored.
+             */
+            callsign?: string | null;
             /** Format: date-time */
             ended_at?: string | null;
             facility_name: string;
