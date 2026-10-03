@@ -1,0 +1,38 @@
+name: Sync labels
+
+on:
+  push:
+    # `backend-rework` is the working branch while `master` and `next` are
+    # frozen ahead of the osmium swap-over, so labels.yml changes land there.
+    # Trim this list once the swap-over leaves `master` as the only base.
+    branches:
+      - master
+      - next
+      - backend-rework
+    paths:
+      - .github/labels.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run labeler
+        uses: crazy-max/ghaction-github-labeler@v5
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          yaml-file: .github/labels.yml
+          # Labels absent from labels.yml are left alone rather than deleted.
+          # 32 closed issues still carry the legacy `bug` / `enhancement` /
+          # `roadmap` / `in progress` labels; deleting those would strip them
+          # from that history. Flip this only after they have been re-labelled.
+          skip-delete: true
+          dry-run: false

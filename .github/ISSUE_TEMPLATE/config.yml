@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Issue guidelines
+    url: https://github.com/vzdc-artcc/website/blob/next/.github/ISSUE_GUIDELINES.md
+    about: How issues are structured, labelled, and tracked on the board. Read this before filing by hand.
+  - name: API or data problem
+    url: https://github.com/vzdc-artcc/osmium/issues/new/choose
+    about: Wrong data, a permission problem, or something that saved incorrectly belongs in osmium, the API behind this site.
+  - name: Security vulnerability
+    url: https://github.com/vzdc-artcc/website/security/advisories/new
+    about: Report a vulnerability privately. Do not open a public issue for one.

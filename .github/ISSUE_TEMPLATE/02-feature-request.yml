@@ -1,0 +1,99 @@
+name: Feature request
+description: Something the website should do that it does not do today
+labels: ["type:feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search open **and closed** issues first — this may already be
+        planned or already have been decided against.
+
+        Give the issue a title that is a sentence describing the outcome, not a
+        page name. `Show solo certification expiry on the roster page`, not
+        `Roster page`.
+
+  - type: input
+    id: reporter-cid
+    attributes:
+      label: Your VATSIM CID
+      description: So we can reach you on Discord if we need more detail.
+      placeholder: "1234567"
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: What should the site do
+      description: The outcome you want, described as behaviour rather than as a design.
+      placeholder: |
+        The roster page should show when each controller's solo certification
+        expires, so training staff can see at a glance who is about to lapse.
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why is it needed
+      description: >
+        What situation makes this necessary, who it affects, and what people do
+        today instead.
+      placeholder: |
+        Right now you have to open each controller individually to check. With 24
+        on the roster that is 24 page loads a week, and expiries get missed.
+    validations:
+      required: true
+
+  - type: input
+    id: page
+    attributes:
+      label: Which page would this live on
+      description: A path, or "a new page" if there is nowhere for it yet.
+      placeholder: "/controllers/roster"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Who should be able to see it
+      description: >
+        Access here is always an explicit permission grant, so this matters even
+        for a rough answer.
+      options:
+        - Anyone, signed out included
+        - Any signed-in controller
+        - Mentors and instructors
+        - Events staff
+        - Facility admin
+        - Web team / server admin
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Other ways to solve this, or how another ARTCC's site does it.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Anything else
+      description: Mockups, screenshots from elsewhere, or details we should know.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: validation
+    attributes:
+      label: Before you file
+      options:
+        - label: I searched open and closed issues and did not find this one
+          required: true
+        - label: I have described an outcome, not a preferred implementation
+          required: true
