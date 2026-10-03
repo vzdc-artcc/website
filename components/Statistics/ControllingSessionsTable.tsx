@@ -25,7 +25,14 @@ export default function ControllingSessionsTable({positions}: { positions: Contr
                 <TableBody>
                     {positions.map((position, index) => (
                         <TableRow key={index}>
-                            <TableCell>{position.position_name}</TableCell>
+                            <TableCell>
+                                {position.callsign ?? position.position_name}
+                                {position.callsign && position.callsign !== position.position_name && (
+                                    <Typography variant="body2" color="text.secondary">
+                                        {position.position_name}
+                                    </Typography>
+                                )}
+                            </TableCell>
                             <TableCell>{formatZuluDate(new Date(position.started_at))}</TableCell>
                             <TableCell>{position.ended_at ? formatZuluDate(new Date(position.ended_at)) : 'ACTIVE'}</TableCell>
                             <TableCell>{getDuration(new Date(position.started_at), position.ended_at ? new Date(position.ended_at) : new Date())}</TableCell>
