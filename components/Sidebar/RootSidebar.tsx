@@ -1,19 +1,62 @@
 'use client';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import NavSidebarButtons from "@/components/Sidebar/NavSidebarButtons";
 import LoginButton from "@/components/Navbar/LoginButton";
 import NavSidebar from "@/components/Sidebar/NavSidebar";
 import {Session} from "next-auth";
+import {useAdminSidebar} from "@/components/Admin/AdminSidebarContext";
+import NavSidebarButton from "@/components/Sidebar/NavSidebarButton";
+import {Home, Menu} from "@mui/icons-material";
+import {usePathname, useRouter} from "next/navigation";
+import {Box, Divider} from "@mui/material";
 
 function RootSidebar({session}: { session: Session | null, }) {
 
+    const adminMenu = useAdminSidebar();
+    const [showAdminMenu, setShowAdminMenu] = useState(true);
     const [open, setOpen] = useState(false);
+    const pathname = usePathname();
+    const router = useRouter();
 
+    useEffect(() => {
+        setShowAdminMenu(true);
+    }, [pathname]);
+
+    const adminView = showAdminMenu && !!adminMenu;
+
+    let sidebarData;
+
+    if (adminView) {
+        sidebarData = (
+            <>
+                <Divider/>
+                <NavSidebarButton icon={<Menu/>} text="Main Menu" onClick={() => setShowAdminMenu(false)}/>
+                <Divider/>
+                <Box onClick={(e) => (e.target as HTMLElement).closest('a') && setOpen(false)}>
+                    {adminMenu.children}
+                </Box>
+            </>
+        );
+    } else {
+        sidebarData = (
+            <>
+                <NavSidebarButton icon={<Home/>} text="Home" onClick={() => {
+                    router.push("/");
+                    setOpen(false);
+                }}/>
+                <NavSidebarButtons onButtonClick={() => setOpen(false)}/>
+                <LoginButton session={session} sidebar sidebarButtonClicked={() => setOpen(false)}
+                             sidebarAdminButtonClicked={() => setShowAdminMenu(true)}/>
+            </>
+        );
+    }
     return (
-        <NavSidebar openButton open={open} title="Main Menu" onOpen={() => setOpen(true)}
-                    onClose={() => setOpen(false)}>
-            <NavSidebarButtons onButtonClick={() => setOpen(false)}/>
-            <LoginButton session={session} sidebar sidebarButtonClicked={() => setOpen(false)}/>
+        <NavSidebar openButton open={open} title={adminView ? adminMenu.name : "Main Menu"} onOpen={() => setOpen(true)}
+                    onClose={() => {
+                        setOpen(false);
+                        setShowAdminMenu(true);
+                    }}>
+            {sidebarData}
         </NavSidebar>
     );
 }

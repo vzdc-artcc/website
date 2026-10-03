@@ -1,6 +1,5 @@
 import React from 'react';
-import {Badge, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
-import Link from "next/link";
+import {Badge, ListItemIcon, ListItemText} from "@mui/material";
 import {
     Assignment,
     BorderColor,
@@ -23,17 +22,18 @@ import {
 } from "@mui/icons-material";
 import prisma from "@/lib/db";
 import MenuWrapper from './MenuWrapper';
+import AdminListItemButton from "@/components/Admin/AdminListItemButton";
 
 export default async function TrainingMenu() {
 
     const soloCertifications = await prisma.soloCertification.count();
 
     const homeTrainingRequests = await prisma.trainingAssignmentRequest.count({
-        where: { student: { controllerStatus: "HOME" } },
+        where: {student: {controllerStatus: "HOME"}},
     });
 
     const visitorTrainingRequests = await prisma.trainingAssignmentRequest.count({
-        where: { student: { controllerStatus: "VISITOR" } },
+        where: {student: {controllerStatus: "VISITOR"}},
     });
 
     const trainingReleaseRequests = await prisma.trainerReleaseRequest.count();
@@ -56,176 +56,136 @@ export default async function TrainingMenu() {
 
     return (
         <MenuWrapper title="Training Administration" subheadings={[`TA: ${taName}`]}>
-            <Link href="/training/overview" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Home/>
-                    </ListItemIcon>
-                    <ListItemText primary="Overview"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/your-students" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <School/>
-                    </ListItemIcon>
-                    <ListItemText primary="Your Students & Schedule"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/sessions" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <LocalActivity/>
-                    </ListItemIcon>
-                    <ListItemText primary="Training Sessions"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/history" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <ManageSearch/>
-                    </ListItemIcon>
-                    <ListItemText primary="Training History"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/calendar" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <CalendarMonth/>
-                    </ListItemIcon>
-                    <ListItemText primary="Training Calendar"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/appointments" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Schedule/>
-                    </ListItemIcon>
-                    <ListItemText primary="Training Appointments"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/ots" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Badge color="primary" badgeContent={pendingOtsRecs}>
-                            <BorderColor/>
-                        </Badge>
-                    </ListItemIcon>
-                    <ListItemText primary="OTS Recommendations"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/assignments" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <People/>
-                    </ListItemIcon>
-                    <ListItemText primary="Training Assignments"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/requests/man-request" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
+            <AdminListItemButton href="/training/overview">
+                <ListItemIcon>
+                    <Home/>
+                </ListItemIcon>
+                <ListItemText primary="Overview"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/your-students">
+                <ListItemIcon>
+                    <School/>
+                </ListItemIcon>
+                <ListItemText primary="Your Students & Schedule"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/sessions">
+                <ListItemIcon>
+                    <LocalActivity/>
+                </ListItemIcon>
+                <ListItemText primary="Training Sessions"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/history">
+                <ListItemIcon>
+                    <ManageSearch/>
+                </ListItemIcon>
+                <ListItemText primary="Training History"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/calendar">
+                <ListItemIcon>
+                    <CalendarMonth/>
+                </ListItemIcon>
+                <ListItemText primary="Training Calendar"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/appointments">
+                <ListItemIcon>
+                    <Schedule/>
+                </ListItemIcon>
+                <ListItemText primary="Training Appointments"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/ots">
+                <ListItemIcon>
+                    <Badge color="primary" badgeContent={pendingOtsRecs}>
+                        <BorderColor/>
+                    </Badge>
+                </ListItemIcon>
+                <ListItemText primary="OTS Recommendations"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/assignments">
+                <ListItemIcon>
+                    <People/>
+                </ListItemIcon>
+                <ListItemText primary="Training Assignments"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/requests/man-request">
+                <ListItemIcon>
+                    <PersonAdd/>
+                </ListItemIcon>
+                <ListItemText primary="Manual Trainer Request"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/requests/home">
+                <ListItemIcon>
+                    <Badge color="primary" badgeContent={homeTrainingRequests}>
                         <PersonAdd/>
-                    </ListItemIcon>
-                    <ListItemText primary="Manual Trainer Request"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/requests/home" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Badge color="primary" badgeContent={homeTrainingRequests}>
-                            <PersonAdd/>
-                        </Badge>
-                    </ListItemIcon>
-                    <ListItemText primary="Home Requests"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/requests/visit" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Badge color="primary" badgeContent={visitorTrainingRequests}>
-                            <PersonAdd/>
-                        </Badge>
-                    </ListItemIcon>
-                    <ListItemText primary="Visitor Requests"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/releases" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Badge color="primary" badgeContent={trainingReleaseRequests}>
-                            <Clear/>
-                        </Badge>
-                    </ListItemIcon>
-                    <ListItemText primary="Trainer Release Requests"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/controller" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <MilitaryTech/>
-                    </ListItemIcon>
-                    <ListItemText primary="Certifications"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/solos" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Badge color="primary" badgeContent={soloCertifications}>
-                            <WorkspacePremium/>
-                        </Badge>
-                    </ListItemIcon>
-                    <ListItemText primary="Solo Endorsements"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/lessons" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Class/>
-                    </ListItemIcon>
-                    <ListItemText primary="Lessons"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/indicators" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Checklist/>
-                    </ListItemIcon>
-                    <ListItemText primary="Performance Indicators"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/progressions" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <ViewWeek/>
-                    </ListItemIcon>
-                    <ListItemText primary="Progressions"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/progressions/assignments" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Assignment/>
-                    </ListItemIcon>
-                    <ListItemText primary="Progression Assignments"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/statistics" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <QueryStats/>
-                    </ListItemIcon>
-                    <ListItemText primary="Training Statistics"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/training/logs" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <ListAlt/>
-                    </ListItemIcon>
-                    <ListItemText primary="Logs"/>
-                </ListItemButton>
-            </Link>
+                    </Badge>
+                </ListItemIcon>
+                <ListItemText primary="Home Requests"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/requests/visit">
+                <ListItemIcon>
+                    <Badge color="primary" badgeContent={visitorTrainingRequests}>
+                        <PersonAdd/>
+                    </Badge>
+                </ListItemIcon>
+                <ListItemText primary="Visitor Requests"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/releases">
+                <ListItemIcon>
+                    <Badge color="primary" badgeContent={trainingReleaseRequests}>
+                        <Clear/>
+                    </Badge>
+                </ListItemIcon>
+                <ListItemText primary="Trainer Release Requests"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/controller">
+                <ListItemIcon>
+                    <MilitaryTech/>
+                </ListItemIcon>
+                <ListItemText primary="Certifications"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/solos">
+                <ListItemIcon>
+                    <Badge color="primary" badgeContent={soloCertifications}>
+                        <WorkspacePremium/>
+                    </Badge>
+                </ListItemIcon>
+                <ListItemText primary="Solo Endorsements"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/lessons">
+                <ListItemIcon>
+                    <Class/>
+                </ListItemIcon>
+                <ListItemText primary="Lessons"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/indicators">
+                <ListItemIcon>
+                    <Checklist/>
+                </ListItemIcon>
+                <ListItemText primary="Performance Indicators"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/progressions">
+                <ListItemIcon>
+                    <ViewWeek/>
+                </ListItemIcon>
+                <ListItemText primary="Progressions"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/progressions/assignments">
+                <ListItemIcon>
+                    <Assignment/>
+                </ListItemIcon>
+                <ListItemText primary="Progression Assignments"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/statistics">
+                <ListItemIcon>
+                    <QueryStats/>
+                </ListItemIcon>
+                <ListItemText primary="Training Statistics"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/training/logs">
+                <ListItemIcon>
+                    <ListAlt/>
+                </ListItemIcon>
+                <ListItemText primary="Logs"/>
+            </AdminListItemButton>
         </MenuWrapper>
     );
 }

@@ -2,7 +2,7 @@ import {ReactNode} from "react";
 import type {Metadata} from "next";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v14-appRouter";
 import {Roboto} from 'next/font/google';
-import {Container, CssBaseline, ThemeProvider} from "@mui/material";
+import {CssBaseline, ThemeProvider} from "@mui/material";
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -20,6 +20,8 @@ import {authOptions} from "@/auth/auth";
 import WelcomeMessageDialog from "@/components/WelcomeMessages/WelcomeMessageDialog";
 import prisma from "@/lib/db";
 import StaffTasksAlert from "@/components/Admin/StaffTasksAlert";
+import LayoutContainerResolver from "@/components/Layout/LayoutContainerResolver";
+import {AdminSidebarProvider} from "@/components/Admin/AdminSidebarContext";
 
 export const metadata: Metadata = {
     title: "Virtual Washington ARTCC",
@@ -54,11 +56,13 @@ export default async function RootLayout({
                 {session?.user && <BroadcastViewer user={session.user}/>}
                 {session?.user && session.user.controllerStatus !== 'NONE' && welcomeMessages &&
                     <WelcomeMessageDialog user={session.user} welcomeMessages={welcomeMessages}/>}
-                <Navbar/>
-                <Container maxWidth="xl" sx={{marginTop: 2,}}>
-                    <StaffTasksAlert/>
-                    {children}
-                </Container>
+                <AdminSidebarProvider>
+                    <Navbar/>
+                    <LayoutContainerResolver>
+                        <StaffTasksAlert/>
+                        {children}
+                    </LayoutContainerResolver>
+                </AdminSidebarProvider>
                 <Footer/>
                 <ToastContainer theme="dark"/>
             </div>

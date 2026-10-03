@@ -1,9 +1,9 @@
 import React from 'react';
-import {ListItemButton, ListItemIcon, ListItemText,} from "@mui/material";
-import Link from "next/link";
+import {ListItemIcon, ListItemText,} from "@mui/material";
 import {Home, SettingsApplications,} from "@mui/icons-material";
 import prisma from "@/lib/db";
 import MenuWrapper from './MenuWrapper';
+import AdminListItemButton from "@/components/Admin/AdminListItemButton";
 
 
 export default async function WebSystemAdminMenu() {
@@ -26,22 +26,18 @@ export default async function WebSystemAdminMenu() {
                 `WM: ${wmName}`,
             ]}
         >
-            <Link href="/web-system/overview" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <Home/>
-                    </ListItemIcon>
-                    <ListItemText primary="Overview"/>
-                </ListItemButton>
-            </Link>
-            <Link href="/web-system/discord-configs" style={{textDecoration: 'none', color: 'inherit',}}>
-                <ListItemButton>
-                    <ListItemIcon>
-                        <SettingsApplications/>
-                    </ListItemIcon>
-                    <ListItemText primary="Discord Configuration"/>
-                </ListItemButton>
-            </Link>
+            <AdminListItemButton href="/web-system/overview">
+                <ListItemIcon>
+                    <Home/>
+                </ListItemIcon>
+                <ListItemText primary="Overview"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/web-system/discord-configs">
+                <ListItemIcon>
+                    <SettingsApplications/>
+                </ListItemIcon>
+                <ListItemText primary="Discord Configuration"/>
+            </AdminListItemButton>
         </MenuWrapper>
     );
 }
