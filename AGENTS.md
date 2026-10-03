@@ -142,12 +142,17 @@ When the honest answer is "I do not know yet", that is the finding. Say so.
 
 ## 5. Commands
 
+The root `justfile` wraps the npm scripts; `just --list` shows every recipe.
+The npm commands still work, and `just` is the one entry point.
+
 ```bash
-npm ci --legacy-peer-deps   # install, matching CI
-npm run dev                 # Next dev server with turbopack
-npm run build               # production build — the CI gate
-npm run lint                # eslint (next/core-web-vitals)
-npm run codegen:osmium      # regenerate lib/osmium/generated/schema.d.ts
+just ci          # the full local gate: npm ci --legacy-peer-deps, then build
+just build       # production build with .env.public loaded, as CI does
+just typecheck   # tsc --noEmit, faster than a full build
+just dev         # Next dev server with turbopack on :3000 (just dev-3001 for :3001)
+just install     # npm install --legacy-peer-deps
+just codegen     # regenerate lib/osmium/generated/schema.d.ts (npm run codegen:osmium)
+just lint        # eslint — broken until #180, so not part of just ci
 ```
 
 Local environment: copy `.env.example` to `.env.local` and fill it in.
@@ -170,7 +175,7 @@ CI (`build-test.yml`) runs on pull requests to `master` and `next`:
 `npm ci --legacy-peer-deps`, rename `.env.public` to `.env`, `npm run build`.
 Pushes to those branches build and push a Docker image to GHCR. **Neither
 workflow triggers for `backend-rework` yet**, so a PR into it gets no CI run.
-Run `npm run build` yourself before asking for review, and do not read a
+Run `just ci` yourself before asking for review, and do not read a
 missing check as a passing one.
 
 `npm run lint` is currently broken: Next 16 removed `next lint` and the repo's
@@ -316,7 +321,7 @@ the whole of the verification budget.
 
 Before calling a UI change done:
 
-1. `npm run build` passes with no new warnings you introduced.
+1. `just ci` passes with no new warnings you introduced.
 2. `npm run lint` is clean — once website #180 lands; until then, say it did
    not run.
 3. You loaded the page against a running osmium and a real session.
