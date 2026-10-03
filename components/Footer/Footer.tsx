@@ -59,7 +59,7 @@ export default async function Footer() {
                         <Tooltip title={`Developed by ${config.author}`}>
                             <Box sx={{mt: 2, textAlign: 'center',}}>
                                 {DEV_MODE &&
-                                    <Typography variant="subtitle2" color="limegreen">Development Build</Typography>}
+                                    <Typography variant="subtitle2" color="success">Development Build</Typography>}
                                 {!DEV_MODE && <Typography>v{config.version}</Typography>}
                             </Box>
                         </Tooltip>

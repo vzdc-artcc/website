@@ -332,9 +332,9 @@ export default function EventForm({ event }: { event?: Event, }) {
                                 options={[]}
                                 value={featuredFields}
                                 freeSolo
-                                renderTags={(value: readonly string[], getTagProps) =>
+                                renderValue={(value: readonly string[], getItemProps) =>
                                     value.map((option: string, index: number) => {
-                                        const {key, ...tagProps} = getTagProps({index});
+                                        const {key, ...tagProps} = getItemProps({index});
                                         return (
                                             <Chip variant="filled" label={option} key={key} {...tagProps} />
                                         );

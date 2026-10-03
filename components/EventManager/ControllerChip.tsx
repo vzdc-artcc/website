@@ -51,19 +51,19 @@ export default function ControllerChip({
                                            user,
                                            soloCert,
                                            published,
-                                           eventId,
+                                           // eventId,
                                            eventInfo,
                                        }: {
     user: UserShape;
     soloCert?: SoloCertShape;
     published?: boolean;
-    eventId?: string;
+    // eventId?: string;
     eventInfo?: EventInfo | null;
 }) {
     const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [fetched, setFetched] = useState<EventInfo | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const [loading] = useState(false);
+    const [fetched] = useState<EventInfo | null>(null);
+    const [error] = useState<string | null>(null);
 
     const displayEventInfo = useMemo(() => eventInfo ?? fetched ?? null, [eventInfo, fetched]);
 

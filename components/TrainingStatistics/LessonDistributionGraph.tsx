@@ -1,8 +1,8 @@
 'use client';
-import { AgCharts } from 'ag-charts-react';
-import { useState, useEffect } from 'react';
-import { AgChartOptions } from 'ag-charts-community';
-import { useColorScheme } from '@mui/material/styles';
+import {AgCharts} from 'ag-charts-react';
+import {useEffect, useState} from 'react';
+import {AgCartesianChartOptions} from 'ag-charts-community';
+import {useColorScheme} from '@mui/material/styles';
 
 interface LessonDistributionData {
     lesson: string;
@@ -16,7 +16,7 @@ interface ChartProps {
 
 const LessonDistributionGraph = ({ data }: ChartProps) => {
     const { colorScheme } = useColorScheme();
-    const [chartOptions, setChartOptions] = useState<AgChartOptions>({
+    const [chartOptions, setChartOptions] = useState<AgCartesianChartOptions>({
         data: data,
         theme: colorScheme === 'dark' ? 'ag-polychroma-dark' : 'ag-polychroma',
         title: {
@@ -26,22 +26,22 @@ const LessonDistributionGraph = ({ data }: ChartProps) => {
             { type: 'bar', xKey: 'lesson', yKey: 'passed', stacked: true },
             { type: 'bar', xKey: 'lesson', yKey: 'failed', stacked: true },
         ],
-        axes: [
-            {
+        axes: {
+            x: {
                 type: 'category',
                 position: 'bottom',
                 title: {
                     text: 'Lesson',
                 },
             },
-            {
+            y: {
                 type: 'number',
                 position: 'left',
                 title: {
                     text: 'Number of Lessons',
                 },
             },
-        ],
+        },
         height: 600, // Set the height within the options object
     });
 

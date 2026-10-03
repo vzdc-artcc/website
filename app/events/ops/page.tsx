@@ -6,8 +6,6 @@ import {formatZuluDate} from '@/lib/date';
 import Placeholder from '@/public/img/logo_large.png';
 import {Box, Card, CardContent, Container, Paper, Stack, Typography,} from '@mui/material';
 import Image from "next/image";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
 
 export default async function Page() {
     const events = await prisma.event.findMany({
@@ -19,8 +17,6 @@ export default async function Page() {
             start: 'asc',
         },
     });
-
-    const session = await getServerSession(authOptions);
 
     return (
         <Container maxWidth="lg" sx={{ py: 3 }}>

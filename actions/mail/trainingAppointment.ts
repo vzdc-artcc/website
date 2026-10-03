@@ -20,7 +20,7 @@ export const sendTrainingAppointmentScheduledEmail = async (trainingAppointment:
     };
 
     const {error, value} = createEvent(event);
-    if (error) throw new Error(`Failed to create ICS file: ${error.message}`);
+    if (error || !value) throw new Error(`Failed to create ICS file: ${error?.message}`);
 
     await mailTransport.sendMail({
         from: FROM_EMAIL,
@@ -59,7 +59,7 @@ export const sendTrainingAppointmentUpdatedEmail = async (trainingAppointment: T
     };
 
     const {error, value} = createEvent(event);
-    if (error) throw new Error(`Failed to create ICS file: ${error.message}`);
+    if (error || !value) throw new Error(`Failed to create ICS file: ${error?.message}`);
 
     await mailTransport.sendMail({
         from: FROM_EMAIL,
