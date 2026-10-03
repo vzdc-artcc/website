@@ -6,8 +6,8 @@ export default async function Layout({children}: { children: React.ReactNode }) 
         <Stack direction="column" spacing={1}>
             <Typography
                 variant="subtitle2"
-                color="red"
                 sx={{
+                    color: 'red',
                     fontWeight: "bold",
                     textAlign: "center",
                     border: 1

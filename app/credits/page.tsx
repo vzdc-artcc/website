@@ -25,10 +25,10 @@ export default async function Home() {
                         <Typography variant="h4" gutterBottom>Main Contributors</Typography>
                         <Stack direction="column" spacing={4} sx={{m: 8,}}>
                             <Typography
-                                color="darkred"
                                 variant="h5"
                                 {...fancyFont.style}
                                 sx={{
+                                    color: 'darkred',
                                     fontWeight: "bold",
                                     fontSize: 70,
                                     letterSpacing: 15

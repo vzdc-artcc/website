@@ -30,15 +30,15 @@ export default async function Page() {
                 <AccordionDetails>
                     <Stack direction="column" spacing={2} sx={{mt: 1,}}>
                         <Typography
-                            color="cyan"
                             sx={{
+                                color: 'cyan',
                                 fontWeight: "bold",
                                 p: 1,
                                 border: 1
                             }}>Booking</Typography>
                         <Typography
-                            color="red"
                             sx={{
+                                color: 'red',
                                 fontWeight: "bold",
                                 p: 1,
                                 border: 1

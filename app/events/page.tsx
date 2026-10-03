@@ -90,8 +90,8 @@ export default async function Page() {
                                 border: 1
                             }}>Group Flight</Typography>
                         <Typography
-                            color="darkgray"
                             sx={{
+                                color: 'darkgray',
                                 fontWeight: "bold",
                                 p: 1,
                                 border: 1

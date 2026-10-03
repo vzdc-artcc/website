@@ -71,16 +71,16 @@ export default async function TrainingSessionInformation({id, trainerView}: { id
         <Stack direction="column" spacing={2}>
             <Box>
                 <Typography variant="h5"
-                            color={isOts ? 'red' : 'inherit'}>{isOts ? 'OTS' : 'Training Session'}{trainerView ? ` - ${trainingSession.student.firstName} ${trainingSession.student.lastName} (${trainingSession.student.cid})` : ''}</Typography>
+                            sx={{color: isOts ? 'red' : 'inherit'}}>{isOts ? 'OTS' : 'Training Session'}{trainerView ? ` - ${trainingSession.student.firstName} ${trainingSession.student.lastName} (${trainingSession.student.cid})` : ''}</Typography>
                 {trainerView && <Typography variant="subtitle2" sx={{
                     fontWeight: "bold"
                 }}>{trainingSession.additionalComments &&
                     <span style={{color: 'green'}}>RMK</span>} {trainingSession.trainerComments &&
                     <span style={{color: 'red'}}>RMK TRAINER</span>}</Typography>}
                 {trainerView && trainingSession.student.controllerStatus === 'VISITOR' &&
-                    <Typography variant="subtitle2" color="orange">VISITOR</Typography>}
+                    <Typography variant="subtitle2" sx={{color: 'orange'}}>VISITOR</Typography>}
                 {trainerView && trainingSession.student.controllerStatus === 'NONE' &&
-                    <Typography color="red">NOT ROSTERED</Typography>}
+                    <Typography sx={{color: 'red'}}>NOT ROSTERED</Typography>}
                 <Typography
                     variant="subtitle1">Trainer{trainingSession.additionalTrainers.length > 0 ? 's' : ''}: {trainingSession.instructor.firstName} {trainingSession.instructor.lastName}{trainingSession.additionalTrainers.length > 0 ? `, ${trainingSession.additionalTrainers.map((at) => at.trainer.fullName).join(',')}` : ''}</Typography>
                 <Typography

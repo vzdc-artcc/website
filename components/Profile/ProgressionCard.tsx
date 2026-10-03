@@ -85,7 +85,7 @@ export default async function ProgressionCard({user}: { user: User }) {
                             complete this progression, we strongly encourage you to complete all of the optional steps
                             to reinforce your understanding. The next progression (if applicable) will automatically be
                             assigned.</Typography>
-                        <Typography color="red">You will NOT be able to return to this progression unless it is
+                        <Typography sx={{color: 'red'}}>You will NOT be able to return to this progression unless it is
                             reassigned.</Typography>
                     </Grid>}
                 </Grid>
