@@ -36,11 +36,11 @@ export default function ImpersonateUserCard({ cid, name }: { cid: number; name: 
                     const code = (error as { error?: string } | null)?.error;
                     const message =
                         code === 'forbidden'
-                            ? 'Cannot impersonate this user (server admins cannot be impersonated).'
+                            ? "You can't impersonate this user: you lack auth.impersonate.create, or the target is a server admin."
                             : code === 'bad_request'
                                 ? 'Invalid impersonation target.'
                                 : code === 'unauthorized'
-                                    ? 'You are not authorized to impersonate.'
+                                    ? 'Your session has expired; sign in again.'
                                     : 'Failed to start impersonation.';
                     toast.error(message);
                     setOpen(false);

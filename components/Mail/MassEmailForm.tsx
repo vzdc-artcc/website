@@ -109,9 +109,11 @@ export default function MassEmailForm() {
         } catch (error: unknown) {
             const code = (error as { error?: string } | null)?.error;
             toast(
-                code === 'unauthorized'
+                code === 'forbidden'
                     ? 'You are not authorized to send email (requires emails.send.create).'
-                    : 'Failed to send email.',
+                    : code === 'unauthorized'
+                        ? 'Your session has expired; sign in again.'
+                        : 'Failed to send email.',
                 { type: 'error' },
             );
         }
