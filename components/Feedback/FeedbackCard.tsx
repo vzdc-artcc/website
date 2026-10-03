@@ -18,9 +18,11 @@ export default function FeedbackCard({feedback, admin}: { feedback: Feedback | a
     }
 
     return (
-        (<Card>
+        <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2} sx={{
+                    alignItems: "center"
+                }}>
                     <Typography variant="h5">Controller Feedback</Typography>
                     {admin && <Chip label={feedback.status} color={getStatusColor(feedback.status)}/>}
                 </Stack>
@@ -92,6 +94,6 @@ export default function FeedbackCard({feedback, admin}: { feedback: Feedback | a
                 </Grid>
                 {admin && <FeedbackDecisionForm feedback={feedback}/>}
             </CardContent>
-        </Card>)
+        </Card>
     );
 }

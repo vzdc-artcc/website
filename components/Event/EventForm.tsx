@@ -157,8 +157,10 @@ export default function EventForm({ event }: { event?: Event, }) {
         debouncedUpdateStatus();
     }
 
-    const NextButton = 
-        <Stack direction="row" justifyContent="end" spacing={1}>
+    const NextButton =
+        <Stack direction="row" spacing={1} sx={{
+            justifyContent: "end"
+        }}>
             <Button type="button" color="inherit" onClick={back} disabled={open <= 0}>Back</Button>
             <Button type="button" variant="contained" color="inherit" onClick={forward}>Next</Button>
         </Stack>
@@ -170,7 +172,13 @@ export default function EventForm({ event }: { event?: Event, }) {
                 <Box sx={{ my: 2, }}>
                     <Accordion expanded={open === 0} onChange={handleOpen(0)}>
                         <AccordionSummary expandIcon={<ExpandMore />}>
-                            <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
+                            <Stack
+                                direction="row"
+                                spacing={1}
+                                sx={{
+                                    justifyContent: "space-between",
+                                    alignItems: "center"
+                                }}>
                                 <Typography variant="h6">Basic Information</Typography>
                                 {status[0]}
                             </Stack>
@@ -187,7 +195,10 @@ export default function EventForm({ event }: { event?: Event, }) {
                                     <DateTimePicker sx={{ width: '100%', }} name="end" label="End" value={end} disablePast ampm={false} onChange={setEnd} />
                                 </Grid>
                                 <Grid size={2}>
-                                    <Typography variant="caption" color="text.secondary">All times are in UTC.  Event must be at least 30 minutes long and cannot be before today.</Typography>
+                                    <Typography variant="caption" sx={{
+                                        color: "text.secondary"
+                                    }}>All times are in UTC. Event must be at least 30 minutes long and cannot be before
+                                        today.</Typography>
                                 </Grid>
                                 <Grid size={2}>
                                     <FormControlLabel control={<Switch/>} name="enableBufferTimes"
@@ -204,7 +215,13 @@ export default function EventForm({ event }: { event?: Event, }) {
 
                     <Accordion expanded={open === 1} onChange={handleOpen(1)}>
                         <AccordionSummary expandIcon={<ExpandMore />}>
-                            <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
+                            <Stack
+                                direction="row"
+                                spacing={1}
+                                sx={{
+                                    justifyContent: "space-between",
+                                    alignItems: "center"
+                                }}>
                                 <Typography variant="h6">Event Type</Typography>
                                 {status[1]}
                             </Stack>
@@ -231,7 +248,13 @@ export default function EventForm({ event }: { event?: Event, }) {
 
                     <Accordion expanded={open === 2} onChange={handleOpen(2)}>
                         <AccordionSummary expandIcon={<ExpandMore />}>
-                            <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
+                            <Stack
+                                direction="row"
+                                spacing={1}
+                                sx={{
+                                    justifyContent: "space-between",
+                                    alignItems: "center"
+                                }}>
                                 <Typography variant="h6">Description</Typography>
                                 {status[2]}
                             </Stack>
@@ -252,7 +275,13 @@ export default function EventForm({ event }: { event?: Event, }) {
 
                     <Accordion expanded={open === 3} onChange={handleOpen(3)}>
                         <AccordionSummary expandIcon={<ExpandMore />}>
-                            <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
+                            <Stack
+                                direction="row"
+                                spacing={1}
+                                sx={{
+                                    justifyContent: "space-between",
+                                    alignItems: "center"
+                                }}>
                                 <Typography variant="h6">Banner Image or URL</Typography>
                                 {!!event?.archived ? <CheckCircle color="success" /> : bannerUploadType === 'url' ? status[3] : <Chip label="UPLOAD" size="small" />}
                             </Stack>
@@ -284,7 +313,13 @@ export default function EventForm({ event }: { event?: Event, }) {
 
                     <Accordion expanded={open === 4} onChange={handleOpen(4)}>
                         <AccordionSummary expandIcon={<ExpandMore />}>
-                            <Stack direction="row" spacing={1} justifyContent="space-between" alignItems="center">
+                            <Stack
+                                direction="row"
+                                spacing={1}
+                                sx={{
+                                    justifyContent: "space-between",
+                                    alignItems: "center"
+                                }}>
                                 <Typography variant="h6">Featured Fields</Typography>
                                 {status[4]}
                             </Stack>

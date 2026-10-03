@@ -21,7 +21,9 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2} sx={{
+                    alignItems: "center"
+                }}>
                     <Link href="/admin/certification-types" style={{color: 'inherit',}}>
                         <Tooltip title="Go Back">
                             <IconButton color="inherit">

@@ -294,7 +294,14 @@ export default async function Page() {
         <Stack direction="column" spacing={2}>
             <Card>
                 <CardContent>
-                    <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center" sx={{mb: 1,}}>
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            mb: 1
+                        }}>
                         <Typography variant="h5">Your Upcoming Sessions</Typography>
                         <TrainingAppointmentFormDialog timeZone={session.user.timezone}
                                                        allTrainers={allTrainers as User[]}
@@ -454,7 +461,6 @@ export default async function Page() {
                 </CardContent>
             </Card>
         </Stack>
-
     );
 }
 

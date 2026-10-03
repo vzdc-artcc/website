@@ -26,8 +26,14 @@ export default function NavSidebar({children, title, open, openButton, onOpen, o
             </Tooltip>}
             <Drawer open={open} onClose={closeSidebar} hideBackdrop={!openButton}>
                 <Stack direction="column" spacing={1} sx={{flex: 1, minHeight: 0,}}>
-                    <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between"
-                           sx={{padding: 2,}}>
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: 2
+                        }}>
                         <Box onClick={closeSidebar}>
                             <Logo/>
                         </Box>
@@ -37,7 +43,12 @@ export default function NavSidebar({children, title, open, openButton, onOpen, o
                             </IconButton>
                         </Tooltip>
                     </Stack>
-                    <Typography variant="h6" textAlign="center" sx={{px: 1,}}>{title}</Typography>
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            textAlign: "center",
+                            px: 1
+                        }}>{title}</Typography>
                     <List sx={{overflow: 'auto', flex: 1,}}>
                         {children}
                     </List>

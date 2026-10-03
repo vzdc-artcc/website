@@ -16,14 +16,18 @@ export default async function Layout({children}: { children: React.ReactNode }) 
 
     if (!session) {
         return (
-            <Typography textAlign="center" variant="h5">You must login to view this page.</Typography>
+            <Typography variant="h5" sx={{
+                textAlign: "center"
+            }}>You must login to view this page.</Typography>
         );
     }
 
     if (session.user.roles.length === 0) {
         return (
             <Box>
-                <Typography textAlign="center" variant="h5">You must be a controller to access this
+                <Typography variant="h5" sx={{
+                    textAlign: "center"
+                }}>You must be a controller to access this
                     page.</Typography>
             </Box>
         );

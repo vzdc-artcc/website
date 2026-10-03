@@ -17,8 +17,12 @@ export default async function MenuWrapper({title, subheadings, children,}: {
     return (
         <Stack sx={{flex: 1, minHeight: 0,}}>
             <Box sx={{p: 1,}}>
-                <Typography variant="subtitle1" fontWeight="bold"
-                            sx={{display: permanentSidebarResponsive('none', 'block')}}>{title}</Typography>
+                <Typography
+                    variant="subtitle1"
+                    sx={{
+                        fontWeight: "bold",
+                        display: permanentSidebarResponsive('none', 'block')
+                    }}>{title}</Typography>
                 {subheadings.map((subheading, idx) => (
                     <Typography key={idx} variant="caption" sx={{display: 'block',}}>{subheading}</Typography>
                 ))}

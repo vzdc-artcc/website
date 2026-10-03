@@ -144,12 +144,15 @@ export default async function Page(
         <Stack direction="column" spacing={2}>
             <Card>
                 <CardContent>
-                    <Typography variant="h5" fontWeight="bold" sx={{
-                        p: 2,
-                        border: 4,
-                        borderColor: 'red',
-                        borderRadius: '8px',
-                    }}>Roster Purge Assistant</Typography>
+                    <Typography
+                        variant="h5"
+                        sx={{
+                            fontWeight: "bold",
+                            p: 2,
+                            border: 4,
+                            borderColor: 'red',
+                            borderRadius: '8px'
+                        }}>Roster Purge Assistant</Typography>
                     <RosterPurgeSelectionForm startMonth={parseInt(startMonth)} endMonth={parseInt(endMonth)}
                                               maxHours={parseInt(maxHours)} year={parseInt(year)}
                                               includeLoas={!!includeLoas}/>

@@ -2,6 +2,7 @@ import React from 'react';
 import {Card, CardContent, Container, Stack, Typography} from "@mui/material";
 import {CheckCircle} from "@mui/icons-material";
 import {Metadata} from "next";
+
 export const metadata: Metadata = {
     title: 'Staffing Request Success | vZDC',
     description: 'vZDC staffing request success page',
@@ -13,7 +14,14 @@ export default function Page() {
         <Container maxWidth="md">
             <Card>
                 <CardContent>
-                    <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{mb: 2,}}>
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        sx={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                            mb: 2
+                        }}>
                         <CheckCircle color="success" fontSize="large"/>
                         <Typography variant="h5">Request Submitted</Typography>
                     </Stack>

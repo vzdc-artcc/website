@@ -24,9 +24,11 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     }
 
     return (
-        (<Card>
+        <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2} sx={{
+                    alignItems: "center"
+                }}>
                     <Typography variant="h5">Incident Report</Typography>
                     <Chip label={incident.closed ? 'CLOSED' : 'OPEN'} color={incident.closed ? 'success' : 'warning'}/>
                 </Stack>
@@ -89,6 +91,6 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                     </Grid>}
                 </Grid>
             </CardContent>
-        </Card>)
+        </Card>
     );
 }

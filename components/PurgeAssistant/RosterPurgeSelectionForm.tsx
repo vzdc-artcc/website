@@ -114,7 +114,9 @@ export default function RosterPurgeSelectionForm({
     return (
         <Box sx={{my: 2,}}>
             <form action={handleSubmit}>
-                <Stack direction={{xs: 'column', md: 'row',}} spacing={2} alignItems="center">
+                <Stack direction={{xs: 'column', md: 'row',}} spacing={2} sx={{
+                    alignItems: "center"
+                }}>
                     <TextField
                         id="year"
                         required

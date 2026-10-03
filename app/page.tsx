@@ -105,7 +105,7 @@ export default async function Home() {
     const top3Controllers = getTop3Controllers(top3Logs);
 
     return (
-        (<Grid container columns={8} spacing={4}>
+        <Grid container columns={8} spacing={4}>
             <BackgroundImage/>
             <Grid size={8}>
                 <Card>
@@ -151,7 +151,9 @@ export default async function Home() {
                                 {onlineAtc.length > 0 ? onlineAtc.map(position => (
                                     <Card elevation={0} key={position.position + position.log.userId}>
                                         <CardContent>
-                                            <Stack direction="row" spacing={1} justifyContent="space-between">
+                                            <Stack direction="row" spacing={1} sx={{
+                                                justifyContent: "space-between"
+                                            }}>
                                                 <Typography>{position.position}</Typography>
                                                 <Typography>{getDuration(position.start, new Date())}</Typography>
                                             </Stack>
@@ -180,8 +182,12 @@ export default async function Home() {
                                     return (
                                         <Card elevation={0} key={booking.id}>
                                             <CardContent>
-                                            <Stack direction="row" spacing={1} justifyContent="space-between">
-                                                <Typography fontWeight="bold">{booking.callsign}</Typography>
+                                                <Stack direction="row" spacing={1} sx={{
+                                                    justifyContent: "space-between"
+                                                }}>
+                                                    <Typography sx={{
+                                                        fontWeight: "bold"
+                                                    }}>{booking.callsign}</Typography>
                                                 <Tooltip
                                                 arrow
                                                 title={`${formatZuluDate(new Date(booking.start.replace(" ", "T") + "Z"))} | Duration: ${getDuration(new Date(booking.start.replace(" ", "T") + "Z"), new Date(booking.end.replace(" ", "T") + "Z"))}`}
@@ -223,7 +229,9 @@ export default async function Home() {
                             {top3Controllers.map((controller, idx) => (
                                 <Card elevation={0} key={controller.user.cid}>
                                     <CardContent>
-                                        <Stack direction="row" spacing={1} alignItems="center">
+                                        <Stack direction="row" spacing={1} sx={{
+                                            alignItems: "center"
+                                        }}>
                                             <Typography
                                                 variant="h5">{idx + 1} - {controller.user.preferredName || `${controller.user.firstName} ${controller.user.lastName}`}</Typography>
                                             <Tooltip title="View Statistics for this controller">
@@ -271,6 +279,6 @@ export default async function Home() {
                     </CardContent>
                 </Card>
             </Grid>
-        </Grid>)
+        </Grid>
     );
 }

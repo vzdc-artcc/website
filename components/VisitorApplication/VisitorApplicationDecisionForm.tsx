@@ -31,10 +31,14 @@ export default function VisitorApplicationDecisionForm({application, user}: {
     }
 
     return (
-        <Stack direction={{xs: 'column', md: 'row'}} spacing={2} alignItems="center">
+        <Stack direction={{xs: 'column', md: 'row'}} spacing={2} sx={{
+            alignItems: "center"
+        }}>
             <Box sx={{width: '100%',}}>
                 <form action={handleReject}>
-                    <Stack direction="row" spacing={1} alignItems="center">
+                    <Stack direction="row" spacing={1} sx={{
+                        alignItems: "center"
+                    }}>
                         <TextField variant="filled" rows={4} fullWidth multiline name="reason"
                                    label="Reason for rejection"
                                    helperText="A reason is not required, but is highly encouraged"/>

@@ -72,7 +72,9 @@ export default async function TrainingSessionInformation({id, trainerView}: { id
             <Box>
                 <Typography variant="h5"
                             color={isOts ? 'red' : 'inherit'}>{isOts ? 'OTS' : 'Training Session'}{trainerView ? ` - ${trainingSession.student.firstName} ${trainingSession.student.lastName} (${trainingSession.student.cid})` : ''}</Typography>
-                {trainerView && <Typography variant="subtitle2" fontWeight="bold">{trainingSession.additionalComments &&
+                {trainerView && <Typography variant="subtitle2" sx={{
+                    fontWeight: "bold"
+                }}>{trainingSession.additionalComments &&
                     <span style={{color: 'green'}}>RMK</span>} {trainingSession.trainerComments &&
                     <span style={{color: 'red'}}>RMK TRAINER</span>}</Typography>}
                 {trainerView && trainingSession.student.controllerStatus === 'VISITOR' &&
@@ -101,7 +103,9 @@ export default async function TrainingSessionInformation({id, trainerView}: { id
                     {trainingSession.tickets.map((ticket) => (
                         <Accordion key={ticket.id}>
                             <AccordionSummary expandIcon={<ExpandMore/>}>
-                                <Stack direction="row" spacing={1} alignItems="center">
+                                <Stack direction="row" spacing={1} sx={{
+                                    alignItems: "center"
+                                }}>
                                     <Typography>{ticket.lesson.identifier} - {ticket.lesson.name}</Typography>
                                     <Chip label={ticket.passed ? 'PASS' : 'FAIL'}
                                           color={ticket.passed ? 'success' : 'error'}/>

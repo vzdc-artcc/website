@@ -45,7 +45,9 @@ export default function OpsPlanFileForm({eventId}: { eventId?: string }) {
                         }}>
                         {eventId && <input type="hidden" name="eventId" value={eventId}/>}
 
-                        <Stack direction={{xs: 'column', md: 'row'}} spacing={2} alignItems="center">
+                        <Stack direction={{xs: 'column', md: 'row'}} spacing={2} sx={{
+                            alignItems: "center"
+                        }}>
                             <TextField name="name" label="File name" required sx={{minWidth: 240, flex: 1}}/>
 
                             <Button variant="contained" component="label" startIcon={<UploadFileIcon/>}>
@@ -69,7 +71,11 @@ export default function OpsPlanFileForm({eventId}: { eventId?: string }) {
                 <Typography variant="h6">Existing Files</Typography>
 
                 {files?.length === 0 ? (
-                    <Typography color="text.secondary" sx={{ mt: 1 }}>
+                    <Typography
+                        sx={{
+                            color: "text.secondary",
+                            mt: 1
+                        }}>
                         No files uploaded.
                     </Typography>
                 ) : (
@@ -96,7 +102,13 @@ export default function OpsPlanFileForm({eventId}: { eventId?: string }) {
                                         <TableCell>{fmt(f.updatedAt as Date)}</TableCell>
 
                                         <TableCell align="right">
-                                            <Stack direction="row" spacing={1} justifyContent="flex-end" alignItems="center">
+                                            <Stack
+                                                direction="row"
+                                                spacing={1}
+                                                sx={{
+                                                    justifyContent: "flex-end",
+                                                    alignItems: "center"
+                                                }}>
                                                 <Button
                                                     size="small"
                                                     variant="contained"

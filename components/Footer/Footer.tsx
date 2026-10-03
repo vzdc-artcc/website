@@ -22,17 +22,32 @@ export default async function Footer() {
             <AppBar position="static" color="inherit" variant="outlined" sx={{marginTop: 10,}}>
                 <Toolbar>
                     <Container maxWidth="md" sx={{padding: 5,}}>
-                        <Typography textAlign="center" gutterBottom>&copy; {(new Date()).getFullYear()} Virtual
+                        <Typography gutterBottom sx={{
+                            textAlign: "center"
+                        }}>&copy; {(new Date()).getFullYear()} Virtual
                             Washington Air Route Traffic Control
                             Center, All
                             Rights Reserved.</Typography>
-                        <Typography textAlign="center" gutterBottom>A sub-division of VATUSA, VATNA, and the
+                        <Typography gutterBottom sx={{
+                            textAlign: "center"
+                        }}>A sub-division of VATUSA, VATNA, and the
                             VATSIM network.</Typography>
-                        <Typography textAlign="center" fontWeight={700} sx={{marginTop: 2,}}>NOT FOR REAL WORLD
+                        <Typography
+                            sx={{
+                                textAlign: "center",
+                                fontWeight: 700,
+                                marginTop: 2
+                            }}>NOT FOR REAL WORLD
                             USE
                         </Typography>
-                        <Stack direction={{xs: 'column', lg: 'row',}} spacing={5} justifyContent="center"
-                               alignItems="center" sx={{marginTop: 3,}}>
+                        <Stack
+                            direction={{xs: 'column', lg: 'row',}}
+                            spacing={5}
+                            sx={{
+                                justifyContent: "center",
+                                alignItems: "center",
+                                marginTop: 3
+                            }}>
                             <Link href="https://www.vatusa.net/" target="_blank">
                                 <Image src={vatusa} alt="VATUSA" height={50}/>
                             </Link>
@@ -51,39 +66,60 @@ export default async function Footer() {
                         <Box sx={{textAlign: 'center', my: 2,}}>
                             <DonationButton/>
                         </Box>
-                        <Stack direction="row" spacing={1} sx={{my: 2,}} justifyContent="center">
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            sx={{
+                                justifyContent: "center",
+                                my: 2
+                            }}>
                             <Tooltip title={'vZDC Privacy Policy'}>
                                 <Link href="/privacy" style={{color: 'inherit',}}>
-                                    <Typography textAlign="center">Privacy</Typography>
+                                    <Typography sx={{
+                                        textAlign: "center"
+                                    }}>Privacy</Typography>
                                 </Link>
                             </Tooltip>
                             <Typography>|</Typography>
                             <Tooltip title={'vZDC Website Public Repository'}>
                                 <Link href="https://github.com/vZDC-ARTCC/website" style={{color: 'inherit',}}>
-                                    <Typography textAlign="center">GitHub</Typography>
+                                    <Typography sx={{
+                                        textAlign: "center"
+                                    }}>GitHub</Typography>
                                 </Link>
                             </Tooltip>
                             <Typography>|</Typography>
                             <Tooltip title={'License'}>
                                 <Link href="/license" style={{color: 'inherit',}}>
-                                    <Typography textAlign="center">License</Typography>
+                                    <Typography sx={{
+                                        textAlign: "center"
+                                    }}>License</Typography>
                                 </Link>
                             </Tooltip>
                             <Typography>|</Typography>
                             <Tooltip title={'Credits'}>
                                 <Link href="/credits" style={{color: 'inherit',}}>
-                                    <Typography textAlign="center">Credits</Typography>
+                                    <Typography sx={{
+                                        textAlign: "center"
+                                    }}>Credits</Typography>
                                 </Link>
                             </Tooltip>
                             <Typography>|</Typography>
                             <Tooltip title={'Status'}>
                                 <Link href="https://status.vzdc.org/status/vzdc" style={{color: 'inherit',}}>
-                                    <Typography textAlign="center">Status</Typography>
+                                    <Typography sx={{
+                                        textAlign: "center"
+                                    }}>Status</Typography>
                                 </Link>
                             </Tooltip>
                         </Stack>
                         {session?.user &&
-                            <Typography variant="subtitle1" fontSize={12} textAlign="center">All non-zulu times are
+                            <Typography
+                                variant="subtitle1"
+                                sx={{
+                                    fontSize: 12,
+                                    textAlign: "center"
+                                }}>All non-zulu times are
                                 displayed in <b>{session.user.timezone}</b>. You can change this in &apos;Your
                                 Profile&apos;.</Typography>}
                     </Container>

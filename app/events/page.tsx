@@ -47,17 +47,55 @@ export default async function Page() {
                 </AccordionSummary>
                 <AccordionDetails>
                     <Stack direction="column" spacing={2} sx={{mt: 1,}}>
-                        <Typography color="#f44336" fontWeight="bold" sx={{p: 1, border: 1,}}>Home</Typography>
-                        <Typography color="#cd8dd8" fontWeight="bold"
-                                    sx={{p: 1, border: 1,}}>Support/Optional</Typography>
-                        <Typography color="#834091" fontWeight="bold"
-                                    sx={{p: 1, border: 1,}}>Support/Required</Typography>
-                            <Typography color="#36d1e7" fontWeight="bold"
-                            sx={{p: 1, border: 1,}}>Friday Night Operations</Typography>
-                            <Typography color="#e6af34" fontWeight="bold"
-                            sx={{p: 1, border: 1,}}>Saturday Night Operations</Typography>
-                        <Typography color="#66bb6a" fontWeight="bold" sx={{p: 1, border: 1,}}>Group Flight</Typography>
-                        <Typography color="darkgray" fontWeight="bold" sx={{p: 1, border: 1,}}>Training</Typography>
+                        <Typography
+                            sx={{
+                                color: "#f44336",
+                                fontWeight: "bold",
+                                p: 1,
+                                border: 1
+                            }}>Home</Typography>
+                        <Typography
+                            sx={{
+                                color: "#cd8dd8",
+                                fontWeight: "bold",
+                                p: 1,
+                                border: 1
+                            }}>Support/Optional</Typography>
+                        <Typography
+                            sx={{
+                                color: "#834091",
+                                fontWeight: "bold",
+                                p: 1,
+                                border: 1
+                            }}>Support/Required</Typography>
+                        <Typography
+                            sx={{
+                                color: "#36d1e7",
+                                fontWeight: "bold",
+                                p: 1,
+                                border: 1
+                            }}>Friday Night Operations</Typography>
+                        <Typography
+                            sx={{
+                                color: "#e6af34",
+                                fontWeight: "bold",
+                                p: 1,
+                                border: 1
+                            }}>Saturday Night Operations</Typography>
+                        <Typography
+                            sx={{
+                                color: "#66bb6a",
+                                fontWeight: "bold",
+                                p: 1,
+                                border: 1
+                            }}>Group Flight</Typography>
+                        <Typography
+                            color="darkgray"
+                            sx={{
+                                fontWeight: "bold",
+                                p: 1,
+                                border: 1
+                            }}>Training</Typography>
                     </Stack>
                 </AccordionDetails>
             </Accordion>
@@ -86,7 +124,6 @@ export default async function Page() {
                 ))}
             </Stack>
         </Container>
-
     );
 
 }

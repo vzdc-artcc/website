@@ -67,7 +67,9 @@ export default function TrainingSessionAfterSubmitDialogs({release, rosterChange
                     <ul>
                         {(rosterChanges || []).map((update) => (
                             <li key={update.id}>
-                                <Stack direction="row" spacing={1} alignItems="center">
+                                <Stack direction="row" spacing={1} sx={{
+                                    alignItems: "center"
+                                }}>
                                     <DialogContentText
                                         color="textPrimary">{update.certificationType.name}</DialogContentText>
                                     <ArrowForward/>

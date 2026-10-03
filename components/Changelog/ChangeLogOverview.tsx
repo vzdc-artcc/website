@@ -40,7 +40,9 @@ export default async function ChangeLogOverview() {
         <Stack direction="column" spacing={2}>
             <Card>
                 <CardContent>
-                    <Stack direction="row" spacing={1} justifyContent="space-between">
+                    <Stack direction="row" spacing={1} sx={{
+                        justifyContent: "space-between"
+                    }}>
                         <Typography variant="h5">Website Changelog</Typography>
                         {session!.user.roles.includes("STAFF") ?
                             <Link href="/changelog/new">
@@ -69,7 +71,9 @@ export default async function ChangeLogOverview() {
                     {version.map((version) => (
                         <Accordion key={version.id}>
                             <AccordionSummary expandIcon={<ExpandMore/>}>
-                                <Stack direction="row" spacing={1} alignItems="center">
+                                <Stack direction="row" spacing={1} sx={{
+                                    alignItems: "center"
+                                }}>
                                     <Typography>{version.versionNumber}</Typography>
                                 </Stack>
                             </AccordionSummary>

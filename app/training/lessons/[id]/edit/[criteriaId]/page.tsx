@@ -51,7 +51,9 @@ export default async function Page(props: { params: Promise<{ id: string, criter
     return criteria.rubric.Lesson && (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack direction="row" spacing={1} sx={{
+                    alignItems: "center"
+                }}>
                     <Link href={`/training/lessons/${id}/edit`}>
                         <IconButton size="large">
                             <ArrowBack/>

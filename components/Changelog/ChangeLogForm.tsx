@@ -52,9 +52,13 @@ export default function ChangeLogForm({changeLog, latestVersion,}: {
     }
 
 
-    return(
+    return (
         <form action={handleSubmit}>
-            <Box sx={{}} marginBottom={3} data-color-mode={theme.palette.mode}>
+            <Box
+                data-color-mode={theme.palette.mode}
+                sx={{
+                    marginBottom: 3
+                }}>
                 <TextField 
                     id="outlined-basic" 
                     label="Version Number" 
@@ -74,5 +78,5 @@ export default function ChangeLogForm({changeLog, latestVersion,}: {
             </Box>
             <FormSaveButton/>
         </form>
-    )
+    );
 }

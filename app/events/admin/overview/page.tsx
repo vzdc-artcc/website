@@ -65,7 +65,9 @@ export default async function Page() {
                         <Typography>Next Event</Typography>
                         { upcomingEvents[0] && 
                         <>
-                            <Stack direction="row" alignItems="center">
+                            <Stack direction="row" sx={{
+                                alignItems: "center"
+                            }}>
                                 <Typography variant="h4" sx={{ mr: 1, }}>{upcomingEvents[0].name || 'N/A'}</Typography>
                                 {upcomingEvents[0].hidden ? (
                                     <IconButton disabled>
@@ -146,5 +148,5 @@ export default async function Page() {
                 </Card>
             </Grid>
         </Grid>
-    )
+    );
 }

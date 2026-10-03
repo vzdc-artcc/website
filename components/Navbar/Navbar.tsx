@@ -16,7 +16,9 @@ export default async function Navbar() {
     return (
         <AppBar position="sticky" color="inherit" variant="outlined">
             <Toolbar disableGutters>
-                <Stack direction="row" alignItems="center">
+                <Stack direction="row" sx={{
+                    alignItems: "center"
+                }}>
                     <RootSidebar session={session}/>
                     <NavbarLogo/>
                     <Box sx={{display: {xs: 'none', xl: 'flex',},}}>

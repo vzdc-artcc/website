@@ -3,15 +3,15 @@ import {
     Box,
     Paper,
     Stack,
-    Typography,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
+    Typography,
 } from "@mui/material";
-import { formatZuluDate } from "@/lib/date";
+import {formatZuluDate} from "@/lib/date";
 
 type TmiLike = {
     id?: string;
@@ -54,7 +54,12 @@ export default function OpsPlanTmiTable({ tmis }: { tmis: TmiLike[] }) {
             <Typography variant="h6" sx={{ mb: 1 }}>Traffic Management Initiatives</Typography>
 
             {tmis.length === 0 ? (
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                <Typography
+                    variant="body2"
+                    sx={{
+                        color: "text.secondary",
+                        mt: 1
+                    }}>
                     No TMIs are currently listed for this event.
                 </Typography>
             ) : (
@@ -78,7 +83,9 @@ export default function OpsPlanTmiTable({ tmis }: { tmis: TmiLike[] }) {
                                             {rows.length === 0 ? (
                                                 <TableRow>
                                                     <TableCell colSpan={2}>
-                                                        <Typography variant="body2" color="text.secondary">
+                                                        <Typography variant="body2" sx={{
+                                                            color: "text.secondary"
+                                                        }}>
                                                             No TMIs in this category.
                                                         </Typography>
                                                     </TableCell>
@@ -93,7 +100,9 @@ export default function OpsPlanTmiTable({ tmis }: { tmis: TmiLike[] }) {
                                                             </Typography>
                                                         </TableCell>
                                                         <TableCell>
-                                                            <Typography variant="body2" color="text.secondary">
+                                                            <Typography variant="body2" sx={{
+                                                                color: "text.secondary"
+                                                            }}>
                                                                 {created}
                                                             </Typography>
                                                         </TableCell>

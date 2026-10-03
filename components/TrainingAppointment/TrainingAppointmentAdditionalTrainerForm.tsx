@@ -27,7 +27,9 @@ export default function TrainingAppointmentAdditionalTrainerForm({allTrainers, o
 
     return (
         <Form action={handleSubmit}>
-            <Stack direction="column" alignItems="flex-end" spacing={2}>
+            <Stack direction="column" spacing={2} sx={{
+                alignItems: "flex-end"
+            }}>
                 <Autocomplete
                     fullWidth
                     options={allTrainers}

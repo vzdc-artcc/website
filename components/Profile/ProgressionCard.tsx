@@ -39,8 +39,13 @@ export default async function ProgressionCard({user}: { user: User }) {
                                     xs: 11,
                                     md: 1,
                                 }} key={`progression-arrow-${i}`}>
-                                    <Stack direction="column" justifyContent="center" alignItems="center"
-                                           sx={{height: '100%',}}>
+                                    <Stack
+                                        direction="column"
+                                        sx={{
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            height: '100%'
+                                        }}>
                                         <East fontSize="large" sx={{display: {xs: 'none', md: 'inherit',}}}/>
                                         <South fontSize="large" sx={{display: {md: 'none',}}}/>
                                     </Stack>

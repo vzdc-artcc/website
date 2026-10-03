@@ -15,10 +15,14 @@ export default async function ProfileCard({user, admin, viewOnly}: {
 
     // @ts-ignore
     return (
-        (<Card sx={{height: '100%',}}>
+        <Card sx={{height: '100%',}}>
             <CardContent>
-                <Stack direction="row" justifyContent="space-between" spacing={2}>
-                    <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2} sx={{
+                    justifyContent: "space-between"
+                }}>
+                    <Stack direction="row" spacing={2} sx={{
+                        alignItems: "center"
+                    }}>
                         <Avatar src={user.avatarUrl}/>
                         <Box>
                             <Typography
@@ -100,6 +104,6 @@ export default async function ProfileCard({user, admin, viewOnly}: {
                     </Grid>
                 </Grid>
             </CardContent>
-        </Card>)
+        </Card>
     );
 }

@@ -16,7 +16,9 @@ export default async function AdminLayout({name, sidebar, allowed, children}: {
 
     if (!session || !allowed(session.user)) {
         return (
-            <Typography variant="h5" textAlign="center">You do not have access to this page.</Typography>
+            <Typography variant="h5" sx={{
+                textAlign: "center"
+            }}>You do not have access to this page.</Typography>
         );
     }
 

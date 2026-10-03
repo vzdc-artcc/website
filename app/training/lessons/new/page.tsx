@@ -23,7 +23,13 @@ export default async function Page() {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center" sx={{mb: 1,}}>
+                <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{
+                        alignItems: "center",
+                        mb: 1
+                    }}>
                     <Link href="/training/lessons" style={{color: 'inherit',}}>
                         <Tooltip title="Go Back">
                             <IconButton color="inherit">

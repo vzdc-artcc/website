@@ -103,8 +103,13 @@ export default function TrainingStatsTimeSelector({trainingStaff}: { trainingSta
         <Card>
             <CardContent>
                 <form action={onSubmit}>
-                    <Stack direction={{xs: 'column', md: 'row',}} spacing={2} justifyContent="center"
-                           alignItems="center">
+                    <Stack
+                        direction={{xs: 'column', md: 'row',}}
+                        spacing={2}
+                        sx={{
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
                         <TextField
                             id="month"
                             fullWidth

@@ -13,7 +13,9 @@ export default async function Page() {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} justifyContent="space-between">
+                <Stack direction="row" spacing={2} sx={{
+                    justifyContent: "space-between"
+                }}>
                     <Stack direction="column" spacing={1}>
                         <Typography variant="h5">Active Solo Endorsements</Typography>
                         <Typography>All times are in GMT</Typography>

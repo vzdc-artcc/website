@@ -5,10 +5,14 @@ import {getIconForCertificationOption} from "@/lib/certification";
 
 function RosterLegend() {
     return (
-        <Grid container columns={10} spacing={2} justifyContent="center">
+        <Grid container columns={10} spacing={2} sx={{
+            justifyContent: "center"
+        }}>
             {Object.values(CertificationOption).map((co: CertificationOption, idx) => (
                 <Grid key={idx} size={{xs: 5, sm: 2, lg: 1,}}>
-                    <Stack key={co} direction="column" alignItems="center">
+                    <Stack key={co} direction="column" sx={{
+                        alignItems: "center"
+                    }}>
                         {getIconForCertificationOption(co)}
                         <Typography variant="subtitle2">{co.replace('_', ' ')}</Typography>
                     </Stack>

@@ -48,8 +48,14 @@ export default async function Page() {
             {traconGroups.map((group) => (
                 <Card key={group.id}>
                     <CardContent>
-                        <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center"
-                               sx={{mb: 1,}}>
+                        <Stack
+                            direction="row"
+                            spacing={2}
+                            sx={{
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mb: 1
+                            }}>
                             <Typography variant="h6">{group.name}</Typography>
                             <Box>
                                 <Tooltip title="Add airport">

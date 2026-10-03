@@ -12,28 +12,28 @@ export default function Logo() {
                 component={Image}
                 src={logo}
                 alt="Washington ARTCC Logo"
-                width={250}
-                height={45}
-                sx={(theme) => ({
+                sx={[{
+                    width: 250,
+                    height: 45
+                }, (theme) => ({
                     display: 'block',
                     width: {xs: 140, sm: 250},
                     height: 'auto',
                     ...theme.applyStyles('dark', {display: 'none'}),
-                })}
-            />
+                })]}/>
             <Box
                 component={Image}
                 src={logoLight}
                 alt="Washington ARTCC Logo"
-                width={250}
-                height={45}
-                sx={(theme) => ({
+                sx={[{
+                    width: 250,
+                    height: 45
+                }, (theme) => ({
                     display: 'none',
                     width: {xs: 140, sm: 250},
                     height: 'auto',
                     ...theme.applyStyles('dark', {display: 'block'}),
-                })}
-            />
+                })]}/>
         </Link>
     );
 }

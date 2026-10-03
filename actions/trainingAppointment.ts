@@ -249,7 +249,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
     }
 
     const liveLesson = ta.lessons.find((l => l.location === 1));
-    const booking = ta.atcBookingId && await fetchTrainingBooking(ta.atcBookingId);
+    const booking = ta.atcBookingId && (await fetchTrainingBooking(ta.atcBookingId));
     if (liveLesson) {
         const bookingEnd = new Date(ta.start.getTime() + liveLesson.duration * 60000);
 

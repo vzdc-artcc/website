@@ -76,7 +76,13 @@ export default async function Page(props: { params: Promise<{ id: string, }>, })
             <Grid size={2}>
                 <Card>
                     <CardContent>
-                        <Stack direction="row" spacing={2} alignItems="center" sx={{mb: 2,}}>
+                        <Stack
+                            direction="row"
+                            spacing={2}
+                            sx={{
+                                alignItems: "center",
+                                mb: 2
+                            }}>
                             <Link href={`/training/lessons/`}
                                   style={{color: 'inherit',}}>
                                 <Tooltip title="Go Back">
