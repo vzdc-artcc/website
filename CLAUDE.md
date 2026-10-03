@@ -94,7 +94,7 @@ invent it.
 `npm run build` is the only mechanical gate this repo has, so know whether it
 was green before you touched anything.
 
-1. Run `npm run build` on a clean tree first if you are about to make a
+1. Run `just ci` on a clean tree first if you are about to make a
    non-trivial change.
 2. Classify any failure as pre-existing or introduced *before* starting work,
    and never conflate the two in a report.
@@ -103,7 +103,7 @@ was green before you touched anything.
 
 ## Before you say it is done
 
-- `npm run build` passes.
+- `just ci` passes.
 - `npm run lint` is clean — or, while website #180 is open, you say it did not
   run.
 - Every new API call goes through a hook in `lib/osmium/hooks/`, with a query
