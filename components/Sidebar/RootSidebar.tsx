@@ -4,15 +4,15 @@ import NavSidebarButtons from "@/components/Sidebar/NavSidebarButtons";
 import LoginButton from "@/components/Navbar/LoginButton";
 import NavSidebar from "@/components/Sidebar/NavSidebar";
 import {Session} from "next-auth";
-import {useAdminSidebar} from "@/components/Admin/AdminSidebarContext";
+import {useAdminMetadata} from "@/components/Admin/AdminSidebarContext";
 import NavSidebarButton from "@/components/Sidebar/NavSidebarButton";
-import {Home, Menu} from "@mui/icons-material";
+import {ArrowBack, Home, Menu} from "@mui/icons-material";
 import {usePathname, useRouter} from "next/navigation";
 import {Box, Divider} from "@mui/material";
 
 function RootSidebar({session}: { session: Session | null, }) {
 
-    const adminMenu = useAdminSidebar();
+    const adminMenu = useAdminMetadata();
     const [showAdminMenu, setShowAdminMenu] = useState(true);
     const [open, setOpen] = useState(false);
     const pathname = usePathname();
@@ -40,6 +40,14 @@ function RootSidebar({session}: { session: Session | null, }) {
     } else {
         sidebarData = (
             <>
+                {adminMenu ?
+                    <>
+                        <Divider/>
+                        <NavSidebarButton icon={<ArrowBack/>} text={adminMenu.name}
+                                          onClick={() => setShowAdminMenu(true)}/>
+                        <Divider/>
+                    </>
+                    : <></>}
                 <NavSidebarButton icon={<Home/>} text="Home" onClick={() => {
                     router.push("/");
                     setOpen(false);

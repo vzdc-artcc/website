@@ -2,7 +2,7 @@ import {ReactNode} from "react";
 import type {Metadata} from "next";
 import {AppRouterCacheProvider} from "@mui/material-nextjs/v14-appRouter";
 import {Roboto} from 'next/font/google';
-import {CssBaseline, ThemeProvider} from "@mui/material";
+import {Box, CssBaseline, Stack, ThemeProvider} from "@mui/material";
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
@@ -48,22 +48,26 @@ export default async function RootLayout({
   return (
       <html lang="en" suppressHydrationWarning>
       <body className={roboto.variable}>
-    <AppRouterCacheProvider>
+      <InitColorSchemeScript attribute="class"/>
+      <AppRouterCacheProvider>
         <ThemeProvider theme={theme}>
             <CssBaseline/>
-            <InitColorSchemeScript attribute="class" defaultMode="system"/>
             <div>
                 {session?.user && <BroadcastViewer user={session.user}/>}
                 {session?.user && session.user.controllerStatus !== 'NONE' && welcomeMessages &&
                     <WelcomeMessageDialog user={session.user} welcomeMessages={welcomeMessages}/>}
                 <AdminSidebarProvider>
-                    <Navbar/>
-                    <LayoutContainerResolver>
-                        <StaffTasksAlert/>
-                        {children}
-                    </LayoutContainerResolver>
+                    <Stack direction="column" sx={{minHeight: '100dvh',}}>
+                        <Navbar/>
+                        <Box component="main" sx={{flex: 1,}}>
+                            <LayoutContainerResolver>
+                                <StaffTasksAlert/>
+                                {children}
+                            </LayoutContainerResolver>
+                        </Box>
+                        <Footer/>
+                    </Stack>
                 </AdminSidebarProvider>
-                <Footer/>
                 <ToastContainer theme="dark"/>
             </div>
         </ThemeProvider>

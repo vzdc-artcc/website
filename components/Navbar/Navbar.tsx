@@ -14,7 +14,7 @@ export default async function Navbar() {
     const session = await getServerSession(authOptions);
 
     return (
-        <AppBar position="sticky" sx={{backgroundColor: '#f5f5f5', color: 'black',}}>
+        <AppBar position="sticky" color="inherit">
             <Toolbar>
                 <Stack direction="row" spacing={3} alignItems="center">
                     <RootSidebar session={session}/>

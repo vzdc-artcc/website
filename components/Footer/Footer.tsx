@@ -19,7 +19,7 @@ export default async function Footer() {
 
     return (
         <FooterAdminSidebarAdjuster>
-            <AppBar position="static" elevation={1} sx={{backgroundColor: '#f5f5f5', color: 'black', marginTop: 20,}}>
+            <AppBar position="static" color="inherit" variant="outlined" sx={{marginTop: 10,}}>
                 <Toolbar>
                     <Container maxWidth="md" sx={{padding: 5,}}>
                         <Typography textAlign="center" gutterBottom>&copy; {(new Date()).getFullYear()} Virtual

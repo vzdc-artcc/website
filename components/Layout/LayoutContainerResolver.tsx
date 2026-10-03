@@ -1,14 +1,13 @@
 'use client';
 import React from 'react';
-import {usePathname} from "next/navigation";
-import {isAdminPath} from "@/lib/adminPaths";
 import {Box, Container} from "@mui/material";
+import {useAdminMetadata} from "@/components/Admin/AdminSidebarContext";
 
 export default function LayoutContainerResolver({children,}: { children: React.ReactNode }) {
 
-    const f = isAdminPath(usePathname());
+    const adminMenu = useAdminMetadata();
 
-    if (f) {
+    if (adminMenu) {
         return (
             <Box sx={{m: 2,}}>
                 {children}

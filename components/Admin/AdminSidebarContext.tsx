@@ -29,4 +29,4 @@ export function RegisterAdminSidebar({name, children}: { name: string, children:
     return null;
 }
 
-export const useAdminSidebar = () => useContext(MenuCtx);
+export const useAdminMetadata = () => useContext(MenuCtx);

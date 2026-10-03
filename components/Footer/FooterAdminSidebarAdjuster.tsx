@@ -1,16 +1,15 @@
 'use client';
 import React from 'react';
-import {usePathname} from "next/navigation";
 import {Box} from "@mui/material";
 import {ADMIN_SIDEBAR_WIDTH, permanentSidebarResponsive} from "@/lib/adminSidebar";
-import {isAdminPath} from "@/lib/adminPaths";
+import {useAdminMetadata} from "@/components/Admin/AdminSidebarContext";
 
 export default function FooterAdminSidebarAdjuster({children}: { children: React.ReactNode }) {
 
-    const f = isAdminPath(usePathname());
+    const adminMenu = useAdminMetadata();
 
     return (
-        <Box sx={{ml: f ? permanentSidebarResponsive(0, ADMIN_SIDEBAR_WIDTH) : 0}}>
+        <Box sx={{ml: adminMenu ? permanentSidebarResponsive(0, ADMIN_SIDEBAR_WIDTH) : 0}}>
             {children}
         </Box>
     );
