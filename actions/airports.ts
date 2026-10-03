@@ -22,7 +22,7 @@ export const upsertInstruction = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const instruction = await prisma.runwayInstruction.upsert({
@@ -65,7 +65,7 @@ export const upsertRunway = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const runway = await prisma.runway.upsert({
@@ -109,7 +109,7 @@ export const upsertAirport = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const airport = await prisma.airport.upsert({
@@ -150,7 +150,7 @@ export const upsertTraconGroup = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const traconGroup = await prisma.traconGroup.upsert({

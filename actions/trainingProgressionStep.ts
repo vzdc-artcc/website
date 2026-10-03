@@ -25,7 +25,7 @@ export const createOrUpdateTrainingProgressionStep = async (formData: FormData) 
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const matchingStep = await prisma.trainingProgressionStep.findFirst({

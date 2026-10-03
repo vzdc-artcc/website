@@ -21,7 +21,7 @@ export const createOrUpdatePerformanceIndicatorCategory = async (formData: FormD
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const pic = await prisma.performanceIndicatorCriteriaCategory.upsert({

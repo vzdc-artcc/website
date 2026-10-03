@@ -40,7 +40,7 @@ export default function ProfileEditCard({user, sessionUser, admin = false}: {
         });
 
         if (!result.success) {
-            toast(result.error.errors.map((e) => e.message).join(".  "), {type: 'error'})
+            toast(result.error.issues.map((e) => e.message).join(".  "), {type: 'error'})
             return;
         }
 

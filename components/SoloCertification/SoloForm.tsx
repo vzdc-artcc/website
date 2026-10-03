@@ -22,9 +22,10 @@ export default function SoloForm({controllers, certificationTypes,}: {
 
     const handleSubmit = async (formData: FormData) => {
 
-        const error = await addSolo(formData);
-        if (error) {
-            toast(error.errors.map((e) => e.message).join(".  "), {type: 'error'})
+        const res = await addSolo(formData);
+        if (res?.errors) {
+            toast(res.errors.map((e) => e.message).join(".  "), {type: 'error'});
+            return;
         }
 
         toast('Solo endorsement added', {type: 'success'});

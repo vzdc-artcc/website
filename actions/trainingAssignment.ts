@@ -126,7 +126,7 @@ export const saveTrainingAssignment = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const {id, trainingRequestId, student, primaryTrainer, otherTrainers} = result.data;

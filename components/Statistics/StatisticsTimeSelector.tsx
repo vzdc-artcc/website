@@ -81,7 +81,9 @@ export default function StatisticsTimeSelector({controllers}: { controllers: Use
 
         const timeframeZ = z.object({
             month: z.number().min(-2, "Month is invalid").max(11, "Month is invalid"),
-            year: z.number({required_error: "Year is required"}).min(2000, "Year must be higher than 2000").max(new Date().getFullYear(), "Year cannot be after this year"),
+            year: z.number({
+                error: (issue) => issue.input === undefined ? "Year is required" : undefined
+            }).min(2000, "Year must be higher than 2000").max(new Date().getFullYear(), "Year cannot be after this year"),
             cid: z.number().optional()
         });
 
@@ -92,7 +94,7 @@ export default function StatisticsTimeSelector({controllers}: { controllers: Use
         });
 
         if (!timeframe.success) {
-            toast(timeframe.error.errors.map((e) => e.message).join(".  "), {type: 'error'})
+            toast(timeframe.error.issues.map((e) => e.message).join(".  "), {type: 'error'})
             return;
         }
 
