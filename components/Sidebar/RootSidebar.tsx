@@ -12,7 +12,7 @@ import {Box, Divider} from "@mui/material";
 
 function RootSidebar({session}: { session: Session | null, }) {
 
-    const adminMenu = useAdminMetadata();
+    const adminMeta = useAdminMetadata();
     const [showAdminMenu, setShowAdminMenu] = useState(true);
     const [open, setOpen] = useState(false);
     const pathname = usePathname();
@@ -22,7 +22,7 @@ function RootSidebar({session}: { session: Session | null, }) {
         setShowAdminMenu(true);
     }, [pathname]);
 
-    const adminView = showAdminMenu && !!adminMenu;
+    const adminView = showAdminMenu && !!adminMeta;
 
     let sidebarData;
 
@@ -33,17 +33,17 @@ function RootSidebar({session}: { session: Session | null, }) {
                 <NavSidebarButton icon={<Menu/>} text="Main Menu" onClick={() => setShowAdminMenu(false)}/>
                 <Divider/>
                 <Box onClick={(e) => (e.target as HTMLElement).closest('a') && setOpen(false)}>
-                    {adminMenu.children}
+                    {adminMeta.children}
                 </Box>
             </>
         );
     } else {
         sidebarData = (
             <>
-                {adminMenu ?
+                {adminMeta ?
                     <>
                         <Divider/>
-                        <NavSidebarButton icon={<ArrowBack/>} text={adminMenu.name}
+                        <NavSidebarButton icon={<ArrowBack/>} text={adminMeta.name}
                                           onClick={() => setShowAdminMenu(true)}/>
                         <Divider/>
                     </>
@@ -59,7 +59,7 @@ function RootSidebar({session}: { session: Session | null, }) {
         );
     }
     return (
-        <NavSidebar openButton open={open} title={adminView ? adminMenu.name : "Main Menu"} onOpen={() => setOpen(true)}
+        <NavSidebar openButton open={open} title={adminView ? adminMeta.name : "Main Menu"} onOpen={() => setOpen(true)}
                     onClose={() => {
                         setOpen(false);
                         setShowAdminMenu(true);

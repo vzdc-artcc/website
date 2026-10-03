@@ -19,7 +19,7 @@ export const containsOnlyFilterOperator = getGridStringOperators().filter((opera
 export default function DataTable<T>(
     {
         columns,
-        initialPagination = {page: 0, pageSize: 10},
+        initialPagination = {page: 0, pageSize: 20},
         pageSizeOptions = [5, 10, 20],
         initialFilter,
         initialSort,

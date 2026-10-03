@@ -5,9 +5,9 @@ import {useAdminMetadata} from "@/components/Admin/AdminSidebarContext";
 
 export default function LayoutContainerResolver({children,}: { children: React.ReactNode }) {
 
-    const adminMenu = useAdminMetadata();
+    const adminMeta = useAdminMetadata();
 
-    if (adminMenu) {
+    if (adminMeta) {
         return (
             <Box sx={{m: 2,}}>
                 {children}
