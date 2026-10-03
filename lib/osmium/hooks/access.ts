@@ -74,14 +74,14 @@ export const BASELINE_PERMISSIONS: string[] = [
     "auth.teamspeak_uids.create",
     "auth.teamspeak_uids.delete",
     "auth.sessions.delete",
-    "users.vatusa_refresh.self.request",
+    "users.vatusa_refresh_self.request",
     "users.visit_artcc.request",
-    "users.visitor_applications.self.read",
-    "users.visitor_applications.self.request",
+    "users.visitor_applications_self.read",
+    "users.visitor_applications_self.request",
     "users.directory.read",
     "feedback.items_self.read",
     "feedback.items.create",
-    "events.positions.self.request",
+    "events.positions_self.request",
 ];
 
 export function useAccessCatalog() {
