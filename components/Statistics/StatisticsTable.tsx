@@ -1,5 +1,6 @@
 import React from 'react';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
+import {formatHours} from "@/lib/number";
 
 export default function StatisticsTable({heading, logs,}: {
     heading: string, logs: {
@@ -37,12 +38,12 @@ export default function StatisticsTable({heading, logs,}: {
                     {logs.map(log => (
                         <TableRow key={log.title}>
                             <TableCell>{log.title}</TableCell>
-                            <TableCell>{log.delivery_hours.toPrecision(3)}</TableCell>
-                            <TableCell>{log.ground_hours.toPrecision(3)}</TableCell>
-                            <TableCell>{log.tower_hours.toPrecision(3)}</TableCell>
-                            <TableCell>{log.tracon_hours.toPrecision(3)}</TableCell>
-                            <TableCell>{log.center_hours.toPrecision(3)}</TableCell>
-                            <TableCell sx={{border: 1,}}>{log.total_hours.toPrecision(3)}</TableCell>
+                            <TableCell>{formatHours(log.delivery_hours)}</TableCell>
+                            <TableCell>{formatHours(log.ground_hours)}</TableCell>
+                            <TableCell>{formatHours(log.tower_hours)}</TableCell>
+                            <TableCell>{formatHours(log.tracon_hours)}</TableCell>
+                            <TableCell>{formatHours(log.center_hours)}</TableCell>
+                            <TableCell sx={{border: 1,}}>{formatHours(log.total_hours)}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

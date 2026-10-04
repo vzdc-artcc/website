@@ -24,6 +24,7 @@ import {useReceivedFeedback} from "@/lib/osmium/hooks/feedback";
 import {useUserEventPositions} from "@/lib/osmium/hooks/events";
 import {useCertificationTypes, useUserCertifications, useUserSoloCertifications} from "@/lib/osmium/hooks/certifications";
 import {useControllerTotals, useControllerPositions} from "@/lib/osmium/hooks/stats";
+import {formatHours} from "@/lib/number";
 
 // Big events (100+ attendees) — event_type values that count toward big-event hours.
 const BIG_EVENT_TYPES = ['HOME', 'FRIDAY_NIGHT_OPERATIONS', 'SUPPORT_REQUIRED'];
@@ -114,9 +115,9 @@ export default function EventStatisticsInformation({cid,}: { cid: string, }) {
                     <CardContent>
                         <Typography variant="h6" gutterBottom>Events</Typography>
                         <Typography>Published event hours:</Typography>
-                        <Typography variant="subtitle2" gutterBottom>{eventHours.toFixed(3)}</Typography>
+                        <Typography variant="subtitle2" gutterBottom>{formatHours(eventHours)}</Typography>
                         <Typography>Published big* event hours:</Typography>
-                        <Typography variant="subtitle2" gutterBottom>{eventHoursBigEvents.toFixed(3)}</Typography>
+                        <Typography variant="subtitle2" gutterBottom>{formatHours(eventHoursBigEvents)}</Typography>
                         <Typography>Published positions in last 60 days:</Typography>
                         <Typography variant="subtitle2" gutterBottom>{eventPositionLast60Days.length}</Typography>
                         <Typography>Published positions all time:</Typography>
@@ -190,22 +191,22 @@ export default function EventStatisticsInformation({cid,}: { cid: string, }) {
                             <Card variant="outlined" sx={{width: '100%', height: '100%',}}>
                                 <CardContent>
                                     <Typography gutterBottom fontWeight="bold">Last 60
-                                        days: {(totals60?.active_hours ?? 0).toFixed(3)}</Typography>
-                                    <Typography>Delivery: {(totals60?.delivery_hours ?? 0).toFixed(3)}</Typography>
-                                    <Typography>Ground: {(totals60?.ground_hours ?? 0).toFixed(3)}</Typography>
-                                    <Typography>Tower: {(totals60?.tower_hours ?? 0).toFixed(3)}</Typography>
-                                    <Typography>Approach: {(totals60?.tracon_hours ?? 0).toFixed(3)}</Typography>
-                                    <Typography>Center: {(totals60?.center_hours ?? 0).toFixed(3)}</Typography>
+                                        days: {formatHours(totals60?.active_hours ?? 0)}</Typography>
+                                    <Typography>Delivery: {formatHours(totals60?.delivery_hours ?? 0)}</Typography>
+                                    <Typography>Ground: {formatHours(totals60?.ground_hours ?? 0)}</Typography>
+                                    <Typography>Tower: {formatHours(totals60?.tower_hours ?? 0)}</Typography>
+                                    <Typography>Approach: {formatHours(totals60?.tracon_hours ?? 0)}</Typography>
+                                    <Typography>Center: {formatHours(totals60?.center_hours ?? 0)}</Typography>
                                 </CardContent>
                             </Card>
                             <Card variant="outlined" sx={{width: '100%', height: '100%',}}>
                                 <CardContent>
-                                    <Typography gutterBottom fontWeight="bold">ALL: {(totalsAll?.active_hours ?? 0).toFixed(3)}</Typography>
-                                    <Typography>Delivery: {(totalsAll?.delivery_hours ?? 0).toFixed(3)}</Typography>
-                                    <Typography>Ground: {(totalsAll?.ground_hours ?? 0).toFixed(3)}</Typography>
-                                    <Typography>Tower: {(totalsAll?.tower_hours ?? 0).toFixed(3)}</Typography>
-                                    <Typography>Approach: {(totalsAll?.tracon_hours ?? 0).toFixed(3)}</Typography>
-                                    <Typography>Center: {(totalsAll?.center_hours ?? 0).toFixed(3)}</Typography>
+                                    <Typography gutterBottom fontWeight="bold">ALL: {formatHours(totalsAll?.active_hours ?? 0)}</Typography>
+                                    <Typography>Delivery: {formatHours(totalsAll?.delivery_hours ?? 0)}</Typography>
+                                    <Typography>Ground: {formatHours(totalsAll?.ground_hours ?? 0)}</Typography>
+                                    <Typography>Tower: {formatHours(totalsAll?.tower_hours ?? 0)}</Typography>
+                                    <Typography>Approach: {formatHours(totalsAll?.tracon_hours ?? 0)}</Typography>
+                                    <Typography>Center: {formatHours(totalsAll?.center_hours ?? 0)}</Typography>
                                 </CardContent>
                             </Card>
                         </Stack>

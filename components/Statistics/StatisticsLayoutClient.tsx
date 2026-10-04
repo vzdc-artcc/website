@@ -3,6 +3,7 @@ import React from 'react';
 import {Card, CardContent, Container, Grid, Stack, Typography} from "@mui/material";
 import StatisticsTimeSelector from "@/components/Statistics/StatisticsTimeSelector";
 import {useArtccStats} from "@/lib/osmium/hooks/stats";
+import {formatHours} from "@/lib/number";
 
 export default function StatisticsLayoutClient({children}: { children: React.ReactNode }) {
 
@@ -32,7 +33,7 @@ export default function StatisticsLayoutClient({children}: { children: React.Rea
                         <Card>
                             <CardContent>
                                 <Typography>All-Time Hours</Typography>
-                                <Typography variant="h6">{allTimeHours.toFixed(3)} hours</Typography>
+                                <Typography variant="h6">{formatHours(allTimeHours)} hours</Typography>
                             </CardContent>
                         </Card>
                     </Grid>
