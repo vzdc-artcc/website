@@ -6,7 +6,9 @@ export default function NotFound() {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack direction="row" spacing={1} sx={{
+                    alignItems: "center"
+                }}>
                     <Info color="error"/>
                     <Typography>Airport not found. Make sure the ICAO code is spelled correctly and is present in our
                         airport database.</Typography>

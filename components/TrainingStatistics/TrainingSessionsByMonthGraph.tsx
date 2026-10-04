@@ -1,8 +1,8 @@
 'use client';
-import { AgCharts } from 'ag-charts-react';
-import { useState, useEffect } from 'react';
-import { AgCartesianChartOptions } from 'ag-charts-community';
-import { useColorScheme } from '@mui/material/styles';
+import {AgCharts} from 'ag-charts-react';
+import {useEffect, useState} from 'react';
+import {AgCartesianChartOptions} from 'ag-charts-community';
+import {useColorScheme} from '@mui/material/styles';
 
 interface TrainingSessionChartData {
     month: string;
@@ -22,22 +22,22 @@ const TrainingSessionsByMonthGraph = ({ data }: ChartProps) => {
         title: {
             text: 'Number of Training Sessions per Month',
         },
-        axes: [
-            {
+        axes: {
+            x: {
                 type: 'category',
                 position: 'bottom',
                 title: {
                     text: 'Month',
                 },
             },
-            {
+            y: {
                 type: 'number',
                 position: 'left',
                 title: {
                     text: 'Number of Sessions',
                 },
             },
-        ],
+        },
     });
 
     useEffect(() => {

@@ -37,7 +37,7 @@ export const createOrUpdateOpsPlanFile = async (formData: FormData) => {
     });
 
     if (!parsed.success) {
-        return { errors: parsed.error.errors };
+        return {errors: parsed.error.issues};
     }
 
     const inputFile = formData.get('file') as File | null;

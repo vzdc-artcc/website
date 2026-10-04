@@ -13,14 +13,20 @@ import {LOAStatus, Prisma} from "@/generated/prisma/client";
 export const createOrUpdateLoa = async (formData: FormData) => {
     const loaZ = z.object({
         loaId: z.string().optional(),
-        start: z.date({required_error: "You must select a start date."}),
-        end: z.date({required_error: "You must select an end date."}).refine(end => {
+        start: z.date({
+            error: (issue) => issue.input === undefined ? "You must select a start date." : undefined
+        }),
+        end: z.date({
+            error: (issue) => issue.input === undefined ? "You must select an end date." : undefined
+        }).refine(end => {
             const dateStart = new Date(formData.get("start") as string);
             const dateEnd = new Date(end);
             const diffTime = Math.abs(dateEnd.getTime() - dateStart.getTime());
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             return diffDays >= 7;
-        }, {message: "End date must be at least 7 days after start date."}),
+        }, {
+            error: "End date must be at least 7 days after start date."
+        }),
         reason: z.string().min(1, "Reason is required"),
     });
 
@@ -32,7 +38,7 @@ export const createOrUpdateLoa = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const session = await getServerSession(authOptions);

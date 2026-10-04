@@ -28,13 +28,6 @@ const theme = createTheme({
     typography: {
         fontFamily: 'var(--font-roboto)',
     },
-    palette: {
-        mode: 'dark',
-        primary: {
-            main: '#500E0E',
-            contrastText: '#EDEDF5',
-        }
-    }
 });
 
 export default theme;

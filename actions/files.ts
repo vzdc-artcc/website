@@ -22,7 +22,7 @@ export const createOrUpdateFileCategory = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const fileCategory = await prisma.fileCategory.upsert({
@@ -108,7 +108,7 @@ export const createOrUpdateFile = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const fileExists = await prisma.file.findUnique({

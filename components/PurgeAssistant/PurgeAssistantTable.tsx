@@ -121,7 +121,13 @@ export default function PurgeAssistantTable({controllers, user}: {
                 p: 2,
                 my: 1,
             }}><b>{selectedRoster.toUpperCase()}</b> ROSTER PURGE ONLY</Typography>
-            <Stack direction="row" spacing={2} alignItems="center" sx={{mt: 2,}}>
+            <Stack
+                direction="row"
+                spacing={2}
+                sx={{
+                    alignItems: "center",
+                    mt: 2
+                }}>
                 <Button variant="contained" color="error"
                         disabled={disabled || selectedIds.length === 0 || !user.staffPositions.some((sp) => ["ATM", "DATM"].includes(sp))}
                         size="large"

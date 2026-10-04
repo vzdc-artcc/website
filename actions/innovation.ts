@@ -35,15 +35,15 @@ export const createOrUpdateInnovationLabProject = async (data: Partial<Innovatio
     const result = projectZ.safeParse(data);
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
-    if (await prisma.innovationLabProject.count({
+    if ((await prisma.innovationLabProject.count({
         where: {
             alias: result.data.alias,
             id: {not: result.data.id || ''}
         }
-    }) > 0) {
+    })) > 0) {
         return {errors: [{message: "Alias must be unique"}]};
     }
 

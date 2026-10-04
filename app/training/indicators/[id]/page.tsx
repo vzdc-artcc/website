@@ -67,7 +67,14 @@ export default async function Page({params}: { params: Promise<{ id: string }> }
             </Card>
             <Card>
                 <CardContent>
-                    <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center" sx={{mb: 1,}}>
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            mb: 1
+                        }}>
                         <Typography variant="h6">General Information</Typography>
                         <Link href={`/training/indicators/${performanceIndicator.id}/order`}
                               style={{color: 'inherit',}}>
@@ -82,7 +89,13 @@ export default async function Page({params}: { params: Promise<{ id: string }> }
             {performanceIndicator.categories.map((category, idx) => (
                 <Card key={category.id}>
                     <CardContent>
-                        <Stack direction="row" spacing={1} justifyContent="space-between" sx={{mb: 1,}}>
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            sx={{
+                                justifyContent: "space-between",
+                                mb: 1
+                            }}>
                             <Typography variant="h6">{++idx} - {category.name}</Typography>
                             <Box>
                                 <Link href={`/training/indicators/${performanceIndicator.id}/${category.id}/order`}

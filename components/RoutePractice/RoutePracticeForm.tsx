@@ -114,148 +114,154 @@ export default function RoutePracticeForm({
   return (
     <Box>
         <Grid
-        container
-        spacing={2}
-        columns={8}
-        style={{
-          paddingBottom: 20,
-          background: backgroundColor,
-          paddingTop: 20,
-        }}
-      >
+            container
+            spacing={2}
+            columns={8}
+            style={{
+                paddingBottom: 20,
+                background: backgroundColor,
+                paddingTop: 20,
+            }}
+        >
             <Grid size={1}>
-          <Typography align="center">AID</Typography>
-          <Typography align="center" style={{ color: textColor }}>
-            {flightPlan.callsign}
-          </Typography>
+                <Typography align="center">AID</Typography>
+                <Typography align="center" style={{color: textColor}}>
+                    {flightPlan.callsign}
+                </Typography>
             </Grid>
             <Grid size={0.5}>
-          <Typography align="center">CID</Typography>
-          <TextField
-            value={flightPlan.cid}
-            sx={{
-              "& .MuiInputBase-input": {
-                textAlign: "center",
-                color: textColor,
-              },
-            }}
-          />
+                <Typography align="center">CID</Typography>
+                <TextField
+                    value={flightPlan.cid}
+                    sx={{
+                        "& .MuiInputBase-input": {
+                            textAlign: "center",
+                            color: textColor,
+                        },
+                    }}
+                />
             </Grid>
             <Grid size={0.75}>
-          <Typography align="center">BCN</Typography>
-          <TextField
-            value={flightPlan.bcn}
-            sx={{
-              "& .MuiInputBase-input": {
-                textAlign: "center",
-                color: textColor,
-              },
-            }}
-          />
+                <Typography align="center">BCN</Typography>
+                <TextField
+                    value={flightPlan.bcn}
+                    sx={{
+                        "& .MuiInputBase-input": {
+                            textAlign: "center",
+                            color: textColor,
+                        },
+                    }}
+                />
             </Grid>
             <Grid size={1}>
-          <Typography align="center">TYP</Typography>
-          <TextField
-            value={flightPlan.typ}
-            sx={{
-              "& .MuiInputBase-input": {
-                textAlign: "center",
-                color: textColor,
-              },
-            }}
-          />
+                <Typography align="center">TYP</Typography>
+                <TextField
+                    value={flightPlan.typ}
+                    sx={{
+                        "& .MuiInputBase-input": {
+                            textAlign: "center",
+                            color: textColor,
+                        },
+                    }}
+                />
             </Grid>
             <Grid size={0.5}>
-          <Typography align="center">EQ</Typography>
-          <TextField
-            value={flightPlan.eq}
-            sx={{
-              "& .MuiInputBase-input": {
-                textAlign: "center",
-                color: textColor,
-              },
-            }}
-          />
+                <Typography align="center">EQ</Typography>
+                <TextField
+                    value={flightPlan.eq}
+                    sx={{
+                        "& .MuiInputBase-input": {
+                            textAlign: "center",
+                            color: textColor,
+                        },
+                    }}
+                />
             </Grid>
             <Grid size={1}>
-          <Typography align="center">DEP</Typography>
-          <TextField
-            value={flightPlan.dep}
-            sx={{
-              "& .MuiInputBase-input": {
-                textAlign: "center",
-                color: textColor,
-              },
-            }}
-          />
+                <Typography align="center">DEP</Typography>
+                <TextField
+                    value={flightPlan.dep}
+                    sx={{
+                        "& .MuiInputBase-input": {
+                            textAlign: "center",
+                            color: textColor,
+                        },
+                    }}
+                />
             </Grid>
             <Grid size={1}>
-          <Typography align="center">DEST</Typography>
-          <TextField
-            value={flightPlan.dest}
-            sx={{
-              "& .MuiInputBase-input": {
-                textAlign: "center",
-                color: textColor,
-              },
-            }}
-          />
+                <Typography align="center">DEST</Typography>
+                <TextField
+                    value={flightPlan.dest}
+                    sx={{
+                        "& .MuiInputBase-input": {
+                            textAlign: "center",
+                            color: textColor,
+                        },
+                    }}
+                />
             </Grid>
             <Grid size={1}>
-          <Typography align="center">SPD</Typography>
-          <TextField
-            value={flightPlan.spd}
-            sx={{
-              "& .MuiInputBase-input": {
-                textAlign: "center",
-                color: textColor,
-              },
-            }}
-          />
+                <Typography align="center">SPD</Typography>
+                <TextField
+                    value={flightPlan.spd}
+                    sx={{
+                        "& .MuiInputBase-input": {
+                            textAlign: "center",
+                            color: textColor,
+                        },
+                    }}
+                />
             </Grid>
             <Grid size={1}>
-          <Typography align="center">ALT</Typography>
-          <TextField
-            value={flightPlan.alt}
-            sx={{
-              "& .MuiInputBase-input": {
-                textAlign: "center",
-                color: textColor,
-              },
-            }}
-          />
+                <Typography align="center">ALT</Typography>
+                <TextField
+                    value={flightPlan.alt}
+                    sx={{
+                        "& .MuiInputBase-input": {
+                            textAlign: "center",
+                            color: textColor,
+                        },
+                    }}
+                />
             </Grid>
             <Grid size={0.75}>
-          <Typography align="right">RTE</Typography>
+                <Typography align="right">RTE</Typography>
             </Grid>
             <Grid size={7}>
-          <TextField
-            fullWidth
-            multiline
-            value={flightPlan.rte}
-            sx={{
-              "& .MuiInputBase-input": {
-                color: textColor,
-              },
-            }}
-          />
+                <TextField
+                    fullWidth
+                    multiline
+                    value={flightPlan.rte}
+                    sx={{
+                        "& .MuiInputBase-input": {
+                            color: textColor,
+                        },
+                    }}
+                />
             </Grid>
             <Grid size={0.75}>
-          <Typography align="right">RMK</Typography>
+                <Typography align="right">RMK</Typography>
             </Grid>
             <Grid size={7}>
-          <TextField
-            fullWidth
-            value={"FOR TRAINING USE ONLY"}
-            sx={{
-              "& .MuiInputBase-input": {
-                color: textColor,
-              },
-            }}
-          />
+                <TextField
+                    fullWidth
+                    value={"FOR TRAINING USE ONLY"}
+                    sx={{
+                        "& .MuiInputBase-input": {
+                            color: textColor,
+                        },
+                    }}
+                />
             </Grid>
         </Grid>
-      <Box display="flex" flexDirection="column" alignItems="flex-end" mt={2}>
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+                mt: 2
+            }}>
         <FormControl component="fieldset" variant="standard">
           <FormLabel
             sx={{
@@ -301,7 +307,12 @@ export default function RoutePracticeForm({
           </FormGroup>
         </FormControl>
 
-        <Box display="flex" gap={2} mt={2}>
+            <Box
+                sx={{
+                    display: "flex",
+                    gap: 2,
+                    mt: 2
+                }}>
           <Button
             variant="contained"
             color="success"
@@ -352,7 +363,12 @@ export default function RoutePracticeForm({
           />
         </Box>
 
-        <Box display="flex" justifyContent="space-between" mt={1}>
+          <Box
+              sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  mt: 1
+              }}>
           <Typography variant="body2" sx={{ color: "success.main" }}>
             Correct: {correct}
           </Typography>

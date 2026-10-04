@@ -27,7 +27,7 @@ export const addSolo = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return result.error;
+        return {errors: result.error.issues};
     }
 
     const data = await prisma.soloCertification.create({

@@ -83,7 +83,12 @@ export default async function FeedbackCard({user}: { user: User, }) {
                         </TableBody>
                     </Table>
                 </TableContainer>}
-                {feedbackCount > 3 && <Stack direction="row" justifyContent="flex-end" sx={{mt: 1,}}>
+                {feedbackCount > 3 && <Stack
+                    direction="row"
+                    sx={{
+                        justifyContent: "flex-end",
+                        mt: 1
+                    }}>
                     <Link href="/profile/feedback" style={{color: 'inherit', textDecoration: 'none',}}>
                         <Button color="inherit" endIcon={<KeyboardArrowRight/>}>View all Feedback</Button>
                     </Link>

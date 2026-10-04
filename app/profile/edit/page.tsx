@@ -28,7 +28,9 @@ export default async function Page() {
 
     return user && (
         <Stack direction="column" spacing={2}>
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={2} sx={{
+                alignItems: "center"
+            }}>
                 <Link href="/profile/overview" style={{color: 'inherit',}}>
                     <Tooltip title="Go Back">
                         <IconButton color="inherit">

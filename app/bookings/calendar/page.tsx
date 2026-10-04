@@ -29,9 +29,20 @@ export default async function Page() {
                 </AccordionSummary>
                 <AccordionDetails>
                     <Stack direction="column" spacing={2} sx={{mt: 1,}}>
-                        <Typography color="cyan" fontWeight="bold" sx={{p: 1, border: 1,}}>Booking</Typography>
-                        <Typography color="red" fontWeight="bold"
-                                    sx={{p: 1, border: 1,}}>Training</Typography>
+                        <Typography
+                            sx={{
+                                color: 'cyan',
+                                fontWeight: "bold",
+                                p: 1,
+                                border: 1
+                            }}>Booking</Typography>
+                        <Typography
+                            sx={{
+                                color: 'red',
+                                fontWeight: "bold",
+                                p: 1,
+                                border: 1
+                            }}>Training</Typography>
                     </Stack>
                 </AccordionDetails>
             </Accordion>
@@ -42,5 +53,5 @@ export default async function Page() {
                 </CardContent>
             </Card>
         </Container>
-    )
+    );
 }

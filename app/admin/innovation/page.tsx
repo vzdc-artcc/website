@@ -32,7 +32,9 @@ export default async function Page() {
         <Stack direction="column" spacing={2}>
             <Card>
                 <CardContent>
-                    <Stack direction={{xs: 'column', md: 'row',}} spacing={2} justifyContent="space-between">
+                    <Stack direction={{xs: 'column', md: 'row',}} spacing={2} sx={{
+                        justifyContent: "space-between"
+                    }}>
                         <Typography variant="h5">Innovation Lab</Typography>
                         <Box>
                             <Link href="/admin/innovation/order" style={{color: 'inherit',}}>
@@ -82,6 +84,5 @@ export default async function Page() {
             </Card>
 
         </Stack>
-
     );
 }

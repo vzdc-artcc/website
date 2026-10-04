@@ -85,16 +85,24 @@ export const createOrUpdateTrainingSession = async (
 
     const trainingSessionZ = z.object({
         id: z.string().optional(),
-        student: z.string().min(1, {message: "You must select a student."}),
-        start: z.date({required_error: "You must select a start date."}),
-        end: z.date({required_error: "You must select an end date."}).refine(end => {
+        student: z.string().min(1, {
+            error: "You must select a student."
+        }),
+        start: z.date({
+            error: (issue) => issue.input === undefined ? "You must select a start date." : undefined
+        }),
+        end: z.date({
+            error: (issue) => issue.input === undefined ? "You must select an end date." : undefined
+        }).refine(end => {
             const dateStart = new Date(start);
             const diffInMinutes = (end.getTime() - dateStart.getTime()) / (1000 * 60);
             return diffInMinutes >= 5 && diffInMinutes <= 12 * 60;
-        }, {message: "Session must be between 5 minutes and 12 hours long."}),
+        }, {
+            error: "Session must be between 5 minutes and 12 hours long."
+        }),
         additionalComments: z.string().optional(),
         trainerComments: z.string().optional(),
-        trainingTickets: z.array(z.object({
+        trainingTickets: z.tuple([z.object({
             lesson: z.object({
                 id: z.string(),
             }),
@@ -104,11 +112,25 @@ export const createOrUpdateTrainingSession = async (
                 passed: z.boolean(),
             })),
             passed: z.boolean(),
-        })).nonempty("You must add at least one training ticket."),
+        })], z.object({
+            lesson: z.object({
+                id: z.string(),
+            }),
+            scores: z.array(z.object({
+                criteriaId: z.string(),
+                cellId: z.string(),
+                passed: z.boolean(),
+            })),
+            passed: z.boolean(),
+        })),
         additionalTrainers: z.array(z.object({
             // sessionId: z.string().optional(),
-            trainerId: z.string().min(1, {message: "You must select an additional trainer."}),
-            description: z.string().min(1, {message: "You must provide a description for the additional trainer."}),
+            trainerId: z.string().min(1, {
+                error: "You must select an additional trainer."
+            }),
+            description: z.string().min(1, {
+                error: "You must provide a description for the additional trainer."
+            }),
         })),
         enableMarkdown: z.boolean().optional(),
     });
@@ -126,7 +148,7 @@ export const createOrUpdateTrainingSession = async (
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const firstLesson = trainingTickets[0].lesson;

@@ -11,14 +11,18 @@ export default async function Page() {
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user.roles.includes("STAFF")) {
-        return <Card>
-            <CardContent>
-                <Stack direction="row" spacing={1} alignItems="center">
-                    <Info color="error"/>
-                    <Typography>You do not have access to this page.</Typography>
-                </Stack>
-            </CardContent>
-        </Card>;
+        return (
+            <Card>
+                <CardContent>
+                    <Stack direction="row" spacing={1} sx={{
+                        alignItems: "center"
+                    }}>
+                        <Info color="error"/>
+                        <Typography>You do not have access to this page.</Typography>
+                    </Stack>
+                </CardContent>
+            </Card>
+        );
     }
 
     const allProgressions = await prisma.trainingProgression.findMany({

@@ -22,7 +22,9 @@ export default function TrainingSessionSearch({trainer, student}: { trainer?: st
 
     return (
         <form action={handleSubmit}>
-            <Stack direction={{xs: 'column', md: 'row'}} spacing={1} alignItems="center">
+            <Stack direction={{xs: 'column', md: 'row'}} spacing={1} sx={{
+                alignItems: "center"
+            }}>
                 <FormControl fullWidth>
                     <InputLabel id="user-select-label">User</InputLabel>
                     <Select

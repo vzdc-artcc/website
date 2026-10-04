@@ -186,7 +186,12 @@ export default function TmiForm({ admin, event, eventPosition }: Props) {
             ) : rows && rows.length === 0 ? (
                 <Box sx={{ p: 1, borderRadius: 1, bgcolor: "background.paper", boxShadow: 1 }}>
                     <Typography variant="h6">No Traffic Management Initiatives</Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            color: "text.secondary",
+                            mt: 1
+                        }}>
                         This event does not have any Traffic Management Initiatives added. Please add one or more below.
                     </Typography>
                 </Box>

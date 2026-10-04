@@ -27,7 +27,7 @@ export const saveStaffPositions = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const roles = result.data.roles;
@@ -70,7 +70,7 @@ export const saveRoles = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const session = await getServerSession(authOptions);

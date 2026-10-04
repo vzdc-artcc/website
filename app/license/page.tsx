@@ -20,13 +20,38 @@ export default async function Home() {
                 <Card>
                     <CardContent>
                         <Typography variant="h5" sx={{mb: 1,}}>Permissions</Typography>
-                        <Typography variant="body1" color="green" sx={{display: 'flex', gap: 1, alignItems: 'center',}}><Check/> Commercial
+                        <Typography variant="body1" sx={{
+                            color: 'green',
+                            display: 'flex',
+                            gap: 1,
+                            alignItems: 'center',
+                        }}><Check/> Commercial
                             use</Typography>
-                        <Typography variant="body1" color="green" sx={{display: 'flex', gap: 1, alignItems: 'center',}}><Check/> Modification</Typography>
-                        <Typography variant="body1" color="green" sx={{display: 'flex', gap: 1, alignItems: 'center',}}><Check/> Distribution</Typography>
-                        <Typography variant="body1" color="green" sx={{display: 'flex', gap: 1, alignItems: 'center',}}><Check/> Patent
+                        <Typography variant="body1" sx={{
+                            color: 'green',
+                            display: 'flex',
+                            gap: 1,
+                            alignItems: 'center',
+                        }}><Check/> Modification</Typography>
+                        <Typography variant="body1" sx={{
+                            color: 'green',
+                            display: 'flex',
+                            gap: 1,
+                            alignItems: 'center',
+                        }}><Check/> Distribution</Typography>
+                        <Typography variant="body1" sx={{
+                            color: 'green',
+                            display: 'flex',
+                            gap: 1,
+                            alignItems: 'center',
+                        }}><Check/> Patent
                             use</Typography>
-                        <Typography variant="body1" color="green" sx={{display: 'flex', gap: 1, alignItems: 'center',}}><Check/> Private
+                        <Typography variant="body1" sx={{
+                            color: 'green',
+                            display: 'flex',
+                            gap: 1,
+                            alignItems: 'center',
+                        }}><Check/> Private
                             use</Typography>
                     </CardContent>
                 </Card>
@@ -35,8 +60,8 @@ export default async function Home() {
                 <Card>
                     <CardContent>
                         <Typography variant="h5" sx={{mb: 1,}}>Limitations</Typography>
-                        <Typography variant="body1" color="red"
-                                    sx={{display: 'flex', gap: 1, alignItems: 'center',}}><Close/>Private
+                        <Typography variant="body1"
+                                    sx={{color: 'red', display: 'flex', gap: 1, alignItems: 'center',}}><Close/>Private
                             use</Typography>
                     </CardContent>
                 </Card>
@@ -45,11 +70,21 @@ export default async function Home() {
                 <Card>
                     <CardContent>
                         <Typography variant="h5" sx={{mb: 1,}}>Conditions</Typography>
-                        <Typography variant="body1" color="lightblue"
-                                    sx={{display: 'flex', gap: 1, alignItems: 'center',}}><Info/> License and copyright
+                        <Typography variant="body1"
+                                    sx={{
+                                        color: 'lightblue',
+                                        display: 'flex',
+                                        gap: 1,
+                                        alignItems: 'center',
+                                    }}><Info/> License and copyright
                             notice</Typography>
-                        <Typography variant="body1" color="lightblue"
-                                    sx={{display: 'flex', gap: 1, alignItems: 'center',}}><Info/> State
+                        <Typography variant="body1"
+                                    sx={{
+                                        color: 'lightblue',
+                                        display: 'flex',
+                                        gap: 1,
+                                        alignItems: 'center',
+                                    }}><Info/> State
                             changes</Typography>
                     </CardContent>
                 </Card>

@@ -11,7 +11,7 @@ export const createOrUpdateLessonRosterChange = async (formData: FormData) => {
         id: z.string().optional(),
         lessonId: z.string(),
         certificationTypeId: z.string(),
-        certificationOption: z.nativeEnum(CertificationOption),
+        certificationOption: z.enum(CertificationOption),
         dossierMessage: z.string().min(1, "Dossier message is required").max(200, "Dossier message cannot be longer than 200 characters"),
     });
 
@@ -24,7 +24,7 @@ export const createOrUpdateLessonRosterChange = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const lessonRosterChange = await prisma.lessonRosterChange.upsert({

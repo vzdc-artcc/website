@@ -26,7 +26,9 @@ export default async function Page() {
         <Stack direction="column" spacing={2}>
             <Card>
                 <CardContent>
-                    <Stack direction={{xs: 'column', md: 'row',}} justifyContent="space-between">
+                    <Stack direction={{xs: 'column', md: 'row',}} sx={{
+                        justifyContent: "space-between"
+                    }}>
                         <Typography variant="h5">File Center</Typography>
                         <Link href="/admin/files/order" style={{color: 'inherit',}}>
                             <Button variant="outlined" color="inherit" size="small" startIcon={<Reorder/>}
@@ -38,7 +40,13 @@ export default async function Page() {
             {fileCategories.map((fileCategory) => (
                 <Card key={fileCategory.id}>
                     <CardContent>
-                        <Stack direction="row" spacing={1} justifyContent="space-between" sx={{mb: 1,}}>
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            sx={{
+                                justifyContent: "space-between",
+                                mb: 1
+                            }}>
                             <Typography variant="h6">{fileCategory.name}</Typography>
                             <Box>
                                 <Link href={`/admin/files/${fileCategory.id}/order`} style={{color: 'inherit',}}>

@@ -33,7 +33,9 @@ export default async function Page() {
     return (
         <Card>
             <CardContent>
-                <Stack direction={{xs: 'column', md: 'row',}} spacing={2} justifyContent="space-between">
+                <Stack direction={{xs: 'column', md: 'row',}} spacing={2} sx={{
+                    justifyContent: "space-between"
+                }}>
                     <Typography variant="h5">Certification Types</Typography>
                     <Box>
                         <Link href="/admin/certification-types/order" style={{color: 'inherit',}}>

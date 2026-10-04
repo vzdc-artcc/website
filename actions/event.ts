@@ -5,7 +5,7 @@ import {log} from "./log";
 import {after} from "next/server";
 import {GridFilterItem, GridPaginationModel, GridSortModel} from "@mui/x-data-grid";
 import {EventType, Prisma} from "@/generated/prisma/client";
-import {SafeParseReturnType, z} from "zod";
+import {z, ZodSafeParseResult} from "zod";
 import {UTApi} from "uploadthing/server";
 import {revalidatePath} from "next/cache";
 import {sendEventPositionRemovalEmail} from "./mail/event";
@@ -74,7 +74,9 @@ const getWhere = (filter?: GridFilterItem, archived?: boolean): Prisma.EventWher
     }
 }
 
-export const validateEvent = async (input: { [key: string]: any }, zodResponse?: boolean): Promise<ZodErrorSlimResponse | SafeParseReturnType<any, any>> => {
+export const validateEvent = async (input: {
+    [key: string]: any
+}, zodResponse?: boolean): Promise<ZodErrorSlimResponse | ZodSafeParseResult<any>> => {
     
     const isAfterToday = (date: Date) => {
         const today = new Date();
@@ -109,25 +111,43 @@ export const validateEvent = async (input: { [key: string]: any }, zodResponse?:
 
     const eventZ = z.object({
         id: z.string().optional(),
-        name: z.string().min(3, { message: "Name must be between 3 and 255 characters" }).max(255, { message: "Name must be between 3 and 255 characters" }),
-        host: z.string().min(1, {message: "Host is required"}).max(100, {message: "Host must be less than 100 characters"}),
-        start: z.date({ required_error: 'Start date is required' }).refine(isAfterToday, { message: "Start date must be after today" }),
-        end: z.date({ required_error: 'End date is required' }),
+        name: z.string().min(3, {
+            error: "Name must be between 3 and 255 characters"
+        }).max(255, {
+            error: "Name must be between 3 and 255 characters"
+        }),
+        host: z.string().min(1, {
+            error: "Host is required"
+        }).max(100, {
+            error: "Host must be less than 100 characters"
+        }),
+        start: z.date({
+            error: (issue) => issue.input === undefined ? 'Start date is required' : undefined
+        }).refine(isAfterToday, {
+            error: "Start date must be after today"
+        }),
+        end: z.date({
+            error: (issue) => issue.input === undefined ? 'End date is required' : undefined
+        }),
         enableBufferTimes: z.boolean().optional(),
-        type: z.nativeEnum(EventType, { required_error: 'Type is required' }),
-        description: z.string().min(10, { message: "Description must be at least 10 characters." }),
+        type: z.enum(EventType, {
+            error: (issue) => issue.input === undefined ? 'Type is required' : undefined
+        }),
+        description: z.string().min(10, {
+            error: "Description must be at least 10 characters."
+        }),
         bannerImage: z.any().optional(),
         bannerUrl: z.string().optional(),
         featuredFields: z.array(z.string()),
     }).refine(data => isLongerThan30Minutes(data.start, data.end), {
-        message: "Event duration must be longer than 30 minutes.",
         path: ["end"],
+        error: "Event duration must be longer than 30 minutes."
     }).refine(data => isBeforeEndDate(data.start, data.end), {
-        message: "Start date must be before the end date.",
         path: ["start"],
+        error: "Start date must be before the end date."
     }).refine(bannerImageOrUrlExists, {
-        message: "Either banner image or a VALID banner URL must exist.",
         path: ["bannerImage", "bannerUrl"],
+        error: "Either banner image or a VALID banner URL must exist."
     })
 
     const data = eventZ.safeParse(input);
@@ -138,7 +158,7 @@ export const validateEvent = async (input: { [key: string]: any }, zodResponse?:
     
     return {
         success: data.success,
-        errors: data.error ? data.error.errors.map((e) => ({
+        errors: data.error ? data.error.issues.map((e) => ({
             path: e.path.join('.'),
             message: e.message,
         })) : [],
@@ -159,10 +179,10 @@ export const upsertEvent = async (formData: FormData) => {
         bannerImage: formData.get('bannerImage') as File,
         bannerUrl: (formData.get('bannerUrl') as string) || undefined,
         featuredFields: JSON.parse(formData.get('featuredFields') as string),
-    }, true) as SafeParseReturnType<any, any>;
+    }, true) as ZodSafeParseResult<any>;
 
     if (!result.success) {
-        return { errors: result.error.errors };
+        return {errors: result.error.issues};
     }
 
     const { data } = result;

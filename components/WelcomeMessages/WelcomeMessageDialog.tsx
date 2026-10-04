@@ -26,7 +26,9 @@ export default function WelcomeMessageDialog({user, welcomeMessages}: {
                 <Box sx={{textAlign: 'center', mb: 1,}}>
                     <Logo/>
                 </Box>
-                <Typography textAlign="center" variant="h5" gutterBottom>Welcome to the Virtual Washington
+                <Typography variant="h5" gutterBottom sx={{
+                    textAlign: "center"
+                }}>Welcome to the Virtual Washington
                     ARTCC!</Typography>
                 {user.controllerStatus === 'HOME' ? <Markdown>{welcomeMessages.homeText}</Markdown> : <></>}
                 {user.controllerStatus === 'VISITOR' ? <Markdown>{welcomeMessages.visitorText}</Markdown> : <></>}

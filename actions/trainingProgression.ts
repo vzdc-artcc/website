@@ -10,7 +10,9 @@ import {revalidatePath} from "next/cache";
 export const createOrUpdateTrainingProgression = async (formData: FormData) => {
     const trainingProgressionZ = z.object({
         id: z.string().optional(),
-        name: z.string().min(1, {message: "Name is required"}),
+        name: z.string().min(1, {
+            error: "Name is required"
+        }),
         autoAssignNewHomeObs: z.boolean(),
         autoAssignNewVisitor: z.boolean(),
         nextProgressionId: z.string().optional(),
@@ -25,7 +27,7 @@ export const createOrUpdateTrainingProgression = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     if (result.data.id && result.data.id === result.data.nextProgressionId) {

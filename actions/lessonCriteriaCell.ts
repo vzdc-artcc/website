@@ -23,7 +23,7 @@ export const createOrUpdateLessonCriteriaCell = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const samePointsCell = await prisma.lessonRubricCell.count({

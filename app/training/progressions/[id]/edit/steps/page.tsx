@@ -30,8 +30,12 @@ export default async function Page({params}: { params: Promise<{ id: string }> }
     return (
         <Card>
             <CardContent>
-                <Stack direction={{xs: 'column', md: 'row',}} justifyContent="space-between">
-                    <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction={{xs: 'column', md: 'row',}} sx={{
+                    justifyContent: "space-between"
+                }}>
+                    <Stack direction="row" spacing={2} sx={{
+                        alignItems: "center"
+                    }}>
                         <Link href={`/training/progressions/`}
                               style={{color: 'inherit',}}>
                             <Tooltip title="Go Back">

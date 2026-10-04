@@ -1,9 +1,7 @@
 import React from 'react';
-import {Grid, Typography} from "@mui/material";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
 import {Metadata} from "next";
 import WebSystemAdminMenu from "@/components/Admin/WebSystemAdminMenu";
+import AdminLayout from "@/components/Admin/AdminLayout";
 
 export const metadata: Metadata = {
     title: 'Webmaster | vZDC',
@@ -11,27 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default async function Layout({children}: { children: React.ReactNode }) {
-
-    const session = await getServerSession(authOptions);
-
-    if (!session || (!session.user.staffPositions.includes("WM") && !session.user.roles.includes("WEB_TEAM"))) {
-        return (
-            <Typography variant="h5" textAlign="center">You do not have access to this page.</Typography>
-        );
-    }
-
     return (
-        (<Grid container columns={9} spacing={2}>
-            <Grid
-                size={{
-                    xs: 9,
-                    lg: 2
-                }}>
-                <WebSystemAdminMenu/>
-            </Grid>
-            <Grid size="grow">
-                {children}
-            </Grid>
-        </Grid>)
+        <AdminLayout name="Web System Administration" sidebar={<WebSystemAdminMenu/>}
+                     allowed={(user) => user.staffPositions.includes("WM") || user.roles.some(r => ["WEB_TEAM"].includes(r))}>
+            {children}
+        </AdminLayout>
     );
 }
