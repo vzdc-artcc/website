@@ -153,6 +153,17 @@ Local environment: copy `.env.example` to `.env.local` and fill it in.
 `.env.public` holds the committed public values used by the CI build and
 deployments.
 
+**`NEXT_PUBLIC_*` values are inlined by `npm run build`, inside the Docker
+build, which reads only the committed `.env.public`.** The Dockerfile takes no
+build arguments. So a new `NEXT_PUBLIC_*` variable needs a real path into the
+build: commit it to `.env.public` if it's public, or add a Docker build
+argument the workflow passes. Setting it on the running container doesn't
+work. The client bundle keeps the build-time value while the server reads the
+live one, which breaks hydration. Check every deploy instruction you write
+against `Dockerfile` and `.github/workflows/` before handing it over;
+"set it in the build environment" is only an instruction if that environment
+exists.
+
 Two local-dev details that will cost you an hour if you miss them:
 
 - **Osmium's default port is also 3000**, which collides with Next's dev
