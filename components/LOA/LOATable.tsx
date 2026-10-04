@@ -79,7 +79,7 @@ export default function LoaTable() {
     ];
 
     return (
-        <DataTable columns={columns} initialSort={[{field: 'status', sort: 'asc',}]}
+        <DataTable queryKey={["osmium", "loas", "table"]} columns={columns} initialSort={[{field: 'status', sort: 'asc',}]}
                    fetchData={async (pagination, sortModel, filter) => {
                        let cid: number | undefined;
                        let displayName: string | undefined;

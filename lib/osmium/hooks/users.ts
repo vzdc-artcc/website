@@ -205,6 +205,8 @@ export function useUpdateUserFlags() {
         },
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ["osmium", "users", variables.cid, "flags"] });
+            // The flags change is recorded as a dossier entry.
+            queryClient.invalidateQueries({ queryKey: ["osmium", "users", "dossier", variables.cid] });
         },
     });
 }
