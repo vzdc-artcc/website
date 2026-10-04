@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, CardContent, Container, Typography} from "@mui/material";
+import {Alert, Card, CardContent, Container, Typography} from "@mui/material";
 import SuaRequestForm from "@/components/SuaRequest/SuaRequestForm";
 import RequireAuth from "@/components/Access/RequireAuth";
 import {Metadata} from "next";
@@ -14,7 +14,11 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default function Page() {
-    const allSuas = (process.env['SUAS'] as string || '').split(',');
+    const allSuas = (process.env['SUAS'] || '')
+        .split(',')
+        .map((sua) => sua.trim())
+        .filter((sua) => sua.length > 0)
+        .sort((a, b) => a.localeCompare(b));
 
     return (
         <RequireAuth>
@@ -22,7 +26,9 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography variant="h5" sx={{mb: 2,}}>vSOA Scheduling Request</Typography>
-                        <SuaRequestForm allSuas={allSuas.sort((a, b) => a.localeCompare(b))}/>
+                        {allSuas.length > 0
+                            ? <SuaRequestForm allSuas={allSuas}/>
+                            : <Alert severity="info">No SUAs are configured for scheduling. Contact the webmaster.</Alert>}
                     </CardContent>
                 </Card>
             </Container>
