@@ -67,7 +67,7 @@ export default function TrainingSessionStudentTable({cid, timezone, take}: { cid
                                 </Stack>
                             </TableCell>
                             <TableCell>
-                                <Link href={`/profile/training/${trainingSession.id}`} passHref>
+                                <Link prefetch={false} href={`/profile/training/${trainingSession.id}`} passHref>
                                     <IconButton size="small">
                                         <Visibility/>
                                     </IconButton>

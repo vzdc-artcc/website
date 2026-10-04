@@ -54,7 +54,7 @@ export default function Page() {
                                 return inUse ? (
                                     <Grid key={initials} size={{xs: 4, sm: 3, md: 2, lg: 1}}>
                                         <Tooltip title={`${inUse.firstName} ${inUse.lastName} - ${inUse.cid}`}>
-                                            <Link href={`/admin/controller/${inUse.cid}`} target="_blank"
+                                            <Link prefetch={false} href={`/admin/controller/${inUse.cid}`} target="_blank"
                                                   style={{textDecoration: 'none',}}>
                                                 <Box sx={{
                                                     border: 2,

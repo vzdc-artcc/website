@@ -119,12 +119,13 @@ export function useDeleteTrainingAssignment() {
 
 // --- Training assignment requests ---
 
-export function useTrainingAssignmentRequests(query: { page?: number; pageSize?: number } = {}) {
+export function useTrainingAssignmentRequests(query: { page?: number; pageSize?: number; studentControllerStatus?: 'HOME' | 'VISITOR' } = {}) {
+    const pageSize = query.pageSize ?? 200;
     return useQuery({
-        queryKey: ["osmium", "training", "assignment-requests", "list", query.page, query.pageSize],
+        queryKey: ["osmium", "training", "assignment-requests", "list", query.page, pageSize, query.studentControllerStatus],
         queryFn: async () => {
             const { data, error } = await osmium.GET("/api/v1/training/assignment-requests", {
-                params: { query: { page: query.page, page_size: query.pageSize ?? 200 } },
+                params: { query: { page: query.page, page_size: pageSize, student_controller_status: query.studentControllerStatus } },
             });
             if (error) throw error;
             return data;
@@ -211,12 +212,13 @@ export function useRemoveAssignmentRequestInterest() {
 
 // --- Trainer release requests ---
 
-export function useTrainerReleaseRequests(query: { page?: number; pageSize?: number } = {}) {
+export function useTrainerReleaseRequests(query: { page?: number; pageSize?: number; status?: 'PENDING' | 'APPROVED' | 'DENIED' } = {}) {
+    const pageSize = query.pageSize ?? 200;
     return useQuery({
-        queryKey: ["osmium", "training", "release-requests", "list", query.page, query.pageSize],
+        queryKey: ["osmium", "training", "release-requests", "list", query.page, pageSize, query.status],
         queryFn: async () => {
             const { data, error } = await osmium.GET("/api/v1/training/trainer-release-requests", {
-                params: { query: { page: query.page, page_size: query.pageSize ?? 200 } },
+                params: { query: { page: query.page, page_size: pageSize, status: query.status } },
             });
             if (error) throw error;
             return data;
@@ -275,12 +277,13 @@ export function useDeleteTrainerReleaseRequest() {
 
 // --- OTS recommendations ---
 
-export function useOtsRecommendations(query: { page?: number; pageSize?: number } = {}) {
+export function useOtsRecommendations(query: { page?: number; pageSize?: number; assigned?: boolean } = {}) {
+    const pageSize = query.pageSize ?? 200;
     return useQuery({
-        queryKey: ["osmium", "training", "ots-recommendations", "list", query.page, query.pageSize],
+        queryKey: ["osmium", "training", "ots-recommendations", "list", query.page, pageSize, query.assigned],
         queryFn: async () => {
             const { data, error } = await osmium.GET("/api/v1/training/ots-recommendations", {
-                params: { query: { page: query.page, page_size: query.pageSize ?? 200 } },
+                params: { query: { page: query.page, page_size: pageSize, assigned: query.assigned } },
             });
             if (error) throw error;
             return data;
@@ -542,22 +545,28 @@ interface TrainingAppointmentsQuery {
     userId?: string;
     sortField?: string;
     sortOrder?: string;
+    upcoming?: boolean;
+    doubleBooking?: boolean;
 }
 
 export function useTrainingAppointments(query: TrainingAppointmentsQuery = {}) {
+    const pageSize = query.pageSize ?? 200;
     return useQuery({
-        queryKey: ["osmium", "training", "appointments", "list", query.page, query.pageSize, query.trainerId, query.studentId, query.userId, query.sortField, query.sortOrder],
+        // Keyed on the resolved page size so `()` and `({pageSize: 200})` share one cache entry.
+        queryKey: ["osmium", "training", "appointments", "list", query.page, pageSize, query.trainerId, query.studentId, query.userId, query.sortField, query.sortOrder, query.upcoming, query.doubleBooking],
         queryFn: async () => {
             const { data, error } = await osmium.GET("/api/v1/training/appointments", {
                 params: {
                     query: {
                         page: query.page,
-                        page_size: query.pageSize ?? 200,
+                        page_size: pageSize,
                         trainer_id: query.trainerId,
                         student_id: query.studentId,
                         user_id: query.userId,
                         sort_field: query.sortField,
                         sort_order: query.sortOrder,
+                        upcoming: query.upcoming,
+                        double_booking: query.doubleBooking,
                     },
                 },
             });

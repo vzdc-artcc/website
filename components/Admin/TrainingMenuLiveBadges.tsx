@@ -10,14 +10,11 @@ import {
 } from "@/lib/osmium/hooks/training";
 
 export default function TrainingMenuLiveBadges() {
-    const {data: otsData} = useOtsRecommendations();
-    const {data: requestsData} = useTrainingAssignmentRequests();
-    const {data: releasesData} = useTrainerReleaseRequests();
-
-    const pendingOtsRecs = (otsData?.items ?? []).filter((o) => !o.assigned_instructor_id).length;
-    const homeTrainingRequests = (requestsData?.items ?? []).filter((r) => r.student_controller_status === 'HOME').length;
-    const visitorTrainingRequests = (requestsData?.items ?? []).filter((r) => r.student_controller_status === 'VISITOR').length;
-    const pendingReleaseRequests = (releasesData?.items ?? []).filter((r) => r.status === 'PENDING').length;
+    // Counts only: one row per request, reading the filtered `total`.
+    const pendingOtsRecs = useOtsRecommendations({pageSize: 1, assigned: false}).data?.total ?? 0;
+    const homeTrainingRequests = useTrainingAssignmentRequests({pageSize: 1, studentControllerStatus: 'HOME'}).data?.total ?? 0;
+    const visitorTrainingRequests = useTrainingAssignmentRequests({pageSize: 1, studentControllerStatus: 'VISITOR'}).data?.total ?? 0;
+    const pendingReleaseRequests = useTrainerReleaseRequests({pageSize: 1, status: 'PENDING'}).data?.total ?? 0;
 
     return (
         <>

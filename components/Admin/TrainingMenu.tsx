@@ -28,8 +28,8 @@ import {useAdminSoloCertifications} from "@/lib/osmium/hooks/certifications";
 
 export default function TrainingMenu() {
 
-    const {data: soloData} = useAdminSoloCertifications();
-    const soloCertifications = soloData?.items?.length ?? 0;
+    const {data: soloData} = useAdminSoloCertifications({pageSize: 1});
+    const soloCertifications = soloData?.total ?? 0;
 
     const taName = useStaffPositionHolderName("TA");
 

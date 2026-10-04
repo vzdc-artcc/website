@@ -153,12 +153,13 @@ export function useUserSoloCertifications(cid: number | undefined) {
     });
 }
 
-export function useAdminSoloCertifications(query: { cid?: number } = {}) {
+export function useAdminSoloCertifications(query: { cid?: number; pageSize?: number } = {}) {
+    const pageSize = query.pageSize ?? 200;
     return useQuery({
-        queryKey: ["osmium", "admin", "solo-certifications", "list", query.cid],
+        queryKey: ["osmium", "admin", "solo-certifications", "list", query.cid, pageSize],
         queryFn: async () => {
             const { data, error } = await osmium.GET("/api/v1/admin/solo-certifications", {
-                params: { query: { page_size: 200, cid: query.cid } },
+                params: { query: { page_size: pageSize, cid: query.cid } },
             });
             if (error) throw error;
             return data;

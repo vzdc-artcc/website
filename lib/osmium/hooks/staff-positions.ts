@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { osmium } from "@/lib/osmium/client";
 import { useMe } from "@/lib/osmium/hooks/me";
 
@@ -41,6 +41,33 @@ export function useStaffPositionHolders(position: string) {
     });
 }
 
+/**
+ * Every controller's held staff positions, keyed by CID, from one holders
+ * request per position. For lists that would otherwise fetch positions per row.
+ */
+export function useStaffPositionsByCid(): Map<number, string[]> {
+    const results = useQueries({
+        queries: STAFF_POSITIONS.map((position) => ({
+            queryKey: ["osmium", "staff-positions", position, "holders"],
+            queryFn: async () => {
+                const { data, error } = await osmium.GET("/api/v1/staff-positions/{position}/holders", {
+                    params: { path: { position } },
+                });
+                if (error) throw error;
+                return data;
+            },
+        })),
+    });
+
+    const byCid = new Map<number, string[]>();
+    results.forEach((result, index) => {
+        for (const holder of result.data?.holders ?? []) {
+            byCid.set(holder.cid, [...(byCid.get(holder.cid) ?? []), STAFF_POSITIONS[index]]);
+        }
+    });
+    return byCid;
+}
+
 /** The display name of the first holder of a staff position, or 'N/A'. */
 export function useStaffPositionHolderName(position: string): string {
     const { data } = useStaffPositionHolders(position);
@@ -76,6 +103,7 @@ export function useAssignStaffPosition() {
         },
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: staffPositionsKey(variables.cid) });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "staff-positions", variables.position, "holders"] });
         },
     });
 }
@@ -92,6 +120,7 @@ export function useRevokeStaffPosition() {
         },
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: staffPositionsKey(variables.cid) });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "staff-positions", variables.position, "holders"] });
         },
     });
 }

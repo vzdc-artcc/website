@@ -32,7 +32,7 @@ export default function ProgressionAssignmentsTable() {
 
                 return (
                     <Tooltip title={status ?? ''}>
-                        <Link href={`/training/controller/${params.row.cid}`} target="_blank"
+                        <Link prefetch={false} href={`/training/controller/${params.row.cid}`} target="_blank"
                               style={{textDecoration: 'none',}}>
                             <Chip
                                 label={params.row.display_name || 'Unknown'}
