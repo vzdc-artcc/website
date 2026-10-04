@@ -26,6 +26,7 @@ import {getTimeAgo} from "@/lib/date";
 import {auditActionColor} from "@/lib/audit";
 import {AuditDomain, domainResourceTypes} from "@/lib/auditLog";
 import StatePanel, {MONO} from "@/components/Logs/StatePanel";
+import AuditDiffTable from "@/components/Logs/AuditDiffTable";
 
 /**
  * The standardized audit-log table, reused by every section. `domain` scopes the
@@ -35,7 +36,7 @@ import StatePanel, {MONO} from "@/components/Logs/StatePanel";
 export default function AuditLogTable({
     domain,
     title = 'Activity Log',
-    description = 'Every action in this area, newest first. Click a row for before/after state.',
+    description = 'Every action in this area, newest first. Click a row to see what changed.',
     pageSize = 25,
     showResourceTypeSearch = false,
 }: {
@@ -48,6 +49,7 @@ export default function AuditLogTable({
     const [page, setPage] = useState(1);
     const [resourceType, setResourceType] = useState('');
     const [expanded, setExpanded] = useState<string | null>(null);
+    const [showSnapshots, setShowSnapshots] = useState(false);
     const {data, isLoading, isError} = useAuditLogs({
         page,
         pageSize,
@@ -130,6 +132,8 @@ export default function AuditLogTable({
                                                         ) : (
                                                             <Typography variant="body2" fontWeight={500}>
                                                                 {item.actor_display_name || item.actor_id}
+                                                                {item.actor_type === 'service_account' &&
+                                                                    <Chip label="service account" size="small" variant="outlined" sx={{ml: 1}}/>}
                                                             </Typography>
                                                         )}
                                                     </TableCell>
@@ -155,10 +159,15 @@ export default function AuditLogTable({
                                                 {isOpen && (
                                                     <TableRow selected>
                                                         <TableCell colSpan={detailColSpan} sx={{py: 2}}>
-                                                            <Stack direction={{xs: 'column', md: 'row'}} spacing={2}>
-                                                                <StatePanel label="Before" value={item.before_state}/>
-                                                                <StatePanel label="After" value={item.after_state}/>
-                                                            </Stack>
+                                                            <AuditDiffTable before={item.before_state} after={item.after_state}/>
+                                                            <Button size="small" sx={{mt: 1}} onClick={() => setShowSnapshots(!showSnapshots)}>
+                                                                {showSnapshots ? 'Hide full snapshots' : 'Show full snapshots'}
+                                                            </Button>
+                                                            {showSnapshots &&
+                                                                <Stack direction={{xs: 'column', md: 'row'}} spacing={2} sx={{mt: 1}}>
+                                                                    <StatePanel label="Before" value={item.before_state}/>
+                                                                    <StatePanel label="After" value={item.after_state}/>
+                                                                </Stack>}
                                                         </TableCell>
                                                     </TableRow>
                                                 )}
