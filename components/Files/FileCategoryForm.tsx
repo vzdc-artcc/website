@@ -8,6 +8,7 @@ import {
     useCreatePublicationCategory,
     useUpdatePublicationCategory,
 } from "@/lib/osmium/hooks/publications";
+import {categoryErrorMessage} from "@/components/Files/categoryErrorMessage";
 
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
@@ -31,8 +32,9 @@ export default function FileCategoryForm({fileCategory}: { fileCategory?: Public
                 await create.mutateAsync({key: finalKey, name});
             }
             toast(`File category ${name} saved successfully!`, {type: 'success'});
-        } catch {
-            toast.error('Failed to save category (the key may already be in use).');
+        } catch (error) {
+            toast.error(categoryErrorMessage(error, 'Failed to save category.',
+                'Failed to save category (the key may already be in use).'));
         }
     }
 
