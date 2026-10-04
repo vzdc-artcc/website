@@ -10,6 +10,7 @@ import {useTrainingStats} from "@/lib/osmium/hooks/training";
 import {useUserByCid} from "@/lib/osmium/hooks/users";
 import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
 import TrainingSessionsByMonthGraph from "@/components/TrainingStatistics/TrainingSessionsByMonthGraph";
+import {formatHours} from "@/lib/number";
 
 export default function Page() {
     const params = useParams();
@@ -100,7 +101,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>Training Hours</Typography>
-                        <Typography variant="h4">{stats.total_hours.toFixed(3)}</Typography>
+                        <Typography variant="h4">{formatHours(stats.total_hours)}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
