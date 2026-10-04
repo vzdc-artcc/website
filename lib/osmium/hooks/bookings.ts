@@ -24,9 +24,10 @@ function bookingErrorMessage(error: unknown): string {
     return "Something went wrong with the ATC booking service.";
 }
 
-export function useAtcBookings(cid?: number) {
+export function useAtcBookings(cid?: number, options?: { enabled?: boolean }) {
     return useQuery({
         queryKey: ["osmium", "bookings", "list", cid ?? "all"],
+        enabled: options?.enabled ?? true,
         queryFn: async () => {
             const { data, error } = await osmium.GET("/api/v1/bookings", {
                 params: { query: { cid } },

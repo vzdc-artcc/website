@@ -544,8 +544,9 @@ interface TrainingAppointmentsQuery {
     sortOrder?: string;
 }
 
-export function useTrainingAppointments(query: TrainingAppointmentsQuery = {}) {
+export function useTrainingAppointments(query: TrainingAppointmentsQuery = {}, options?: { enabled?: boolean }) {
     return useQuery({
+        enabled: options?.enabled ?? true,
         queryKey: ["osmium", "training", "appointments", "list", query.page, query.pageSize, query.trainerId, query.studentId, query.userId, query.sortField, query.sortOrder],
         queryFn: async () => {
             const { data, error } = await osmium.GET("/api/v1/training/appointments", {

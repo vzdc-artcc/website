@@ -7,13 +7,19 @@ import {formatZuluDate, getDuration, getTimeIn} from "@/lib/date";
 import {useAtcBookings} from "@/lib/osmium/hooks/bookings";
 import {useRosterControllers} from "@/lib/osmium/hooks/users";
 import {useTrainingAppointments} from "@/lib/osmium/hooks/training";
+import {useMe} from "@/lib/osmium/hooks/me";
+import {useHasPermission} from "@/lib/osmium/permissions";
 
 const toDate = (s: string) => new Date(s.replace(" ", "T") + "Z");
 
 export default function UpcomingAtcCard() {
-    const {data: bookingsData} = useAtcBookings();
+    // Bookings need a session, and appointments (only used to name a training
+    // booking's student) need training access, so neither is requested without them.
+    const {data: me} = useMe();
+    const {allowed: canReadAppointments} = useHasPermission('training.appointments.read');
+    const {data: bookingsData} = useAtcBookings(undefined, {enabled: !!me});
     const {data: rosterData} = useRosterControllers();
-    const {data: appointmentsData} = useTrainingAppointments();
+    const {data: appointmentsData} = useTrainingAppointments({}, {enabled: canReadAppointments});
 
     const bookings = bookingsData?.items ?? [];
     const roster = rosterData?.items ?? [];
@@ -32,7 +38,7 @@ export default function UpcomingAtcCard() {
                     </Link>
                 </Typography>
                 <Stack direction="column" spacing={1}>
-                    {upcoming.length > 0 ? upcoming.map((booking) => {
+                    {!me ? <Typography>Sign in to see upcoming ATC bookings.</Typography> : upcoming.length > 0 ? upcoming.map((booking) => {
                         const booker = roster.find((u) => u.basic.cid === booking.cid);
                         const appointment = booking.type === 'training'
                             ? appointments.find((a) => a.atc_booking_id === String(booking.id))
