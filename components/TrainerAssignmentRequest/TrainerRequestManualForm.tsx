@@ -38,8 +38,13 @@ export default function TrainerRequestManualForm() {
             toast.success('Successfully created training assignment request.');
             setStudent('');
             setSubmittedTime(dayjs.utc(new Date()));
-        } catch {
-            toast.error('Failed to create training assignment request.');
+        } catch (error) {
+            // osmium allows one pending request per student and answers a second with 409.
+            if ((error as { error?: string })?.error === 'conflict') {
+                toast.error('This student already has a pending trainer request.');
+            } else {
+                toast.error('Failed to create training assignment request.');
+            }
         }
     }
 
