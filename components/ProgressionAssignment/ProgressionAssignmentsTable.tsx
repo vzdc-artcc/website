@@ -4,6 +4,7 @@ import {Box, Chip, Tooltip} from "@mui/material";
 import {DataGrid, GridActionsCellItem, GridColDef} from "@mui/x-data-grid";
 import Link from "next/link";
 import ProgressionAssignmentDeleteButton from "@/components/ProgressionAssignment/ProgressionAssignmentDeleteButton";
+import ProgressionAssignmentStatusButton from "@/components/ProgressionAssignment/ProgressionAssignmentStatusButton";
 import {Edit} from "@mui/icons-material";
 import {useRouter} from "next/navigation";
 import {useProgressionAssignments} from "@/lib/osmium/hooks/training";
@@ -62,6 +63,10 @@ export default function ProgressionAssignmentsTable() {
             type: 'actions',
             flex: 1,
             getActions: (params) => [
+                params.row.cid ? (
+                    <ProgressionAssignmentStatusButton key={`${params.row.user_id}-status`} cid={params.row.cid}
+                                                       name={params.row.display_name ?? String(params.row.cid)}/>
+                ) : <></>,
                 allowEdit ? (
                     <Tooltip title="Edit" key={`${params.row.user_id}-edit`}>
                         <GridActionsCellItem
