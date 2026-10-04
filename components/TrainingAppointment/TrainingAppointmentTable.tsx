@@ -9,13 +9,13 @@ import TrainingAppointmentInformationDialog
     from "@/components/TrainingAppointment/TrainingAppointmentInformationDialog";
 import {useTrainingAppointments} from "@/lib/osmium/hooks/training";
 import {useMe} from "@/lib/osmium/hooks/me";
-import {useHasStaffPosition} from "@/lib/osmium/hooks/staff-positions";
+import {useHasPermission} from "@/lib/osmium/permissions";
 
 export default function TrainingAppointmentTable() {
 
     const {data: me} = useMe();
     const timeZone = me?.profile.timezone ?? 'America/New_York';
-    const {has: isTrainingStaff} = useHasStaffPosition(['TA', 'ATA']);
+    const {allowed: canDelete} = useHasPermission('training.appointments.delete');
     const {data, isLoading} = useTrainingAppointments();
     const rows = data?.items ?? [];
 
@@ -81,8 +81,8 @@ export default function TrainingAppointmentTable() {
             getActions: (params) => [
                 <TrainingAppointmentInformationDialog timeZone={timeZone} trainingAppointment={params.row}
                                                       key={params.id}
-                                                      isTrainingStaff={isTrainingStaff}/>,
-                isTrainingStaff || String(me?.cid) === String(params.row.trainer_cid) ?
+                                                      canDelete={canDelete}/>,
+                canDelete ?
                     <TrainingAppointmentDeleteButton trainingAppointment={params.row} fromAdmin key={`delete-${params.id}`}/>
                     : <></>,
             ],

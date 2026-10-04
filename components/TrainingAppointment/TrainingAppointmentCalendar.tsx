@@ -12,7 +12,7 @@ import timezone from "dayjs/plugin/timezone";
 import {useTrainingAppointments} from "@/lib/osmium/hooks/training";
 import {useRosterControllers} from "@/lib/osmium/hooks/users";
 import {useMe} from "@/lib/osmium/hooks/me";
-import {useHasStaffPosition} from "@/lib/osmium/hooks/staff-positions";
+import {useHasPermission} from "@/lib/osmium/permissions";
 import {CircularProgress} from "@mui/material";
 
 export default function TrainingAppointmentCalendar({onlyMine}: {
@@ -24,7 +24,7 @@ export default function TrainingAppointmentCalendar({onlyMine}: {
 
     const {data: me} = useMe();
     const timeZone = me?.profile.timezone ?? 'America/New_York';
-    const {has: isTrainingStaff} = useHasStaffPosition(['TA', 'ATA']);
+    const {allowed: canDelete} = useHasPermission('training.appointments.delete');
     const onlyForCid = onlyMine && me ? String(me.cid) : undefined;
 
     const [openId, setOpenId] = React.useState<string | null>(null);
@@ -47,7 +47,7 @@ export default function TrainingAppointmentCalendar({onlyMine}: {
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
             {openId && <TrainingAppointmentInformationDialog
                 timeZone={timeZone}
-                isTrainingStaff={isTrainingStaff}
+                canDelete={canDelete}
                 trainingAppointment={appointments.find(a => a.id === openId)!} manualOpen
                 onClose={() => setOpenId(null)}/>}
             <FullCalendar

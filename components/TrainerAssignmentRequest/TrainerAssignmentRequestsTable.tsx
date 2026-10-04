@@ -9,13 +9,13 @@ import TrainerAssignmentRequestDeleteButton
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 import {useTrainingAssignmentRequests} from "@/lib/osmium/hooks/training";
-import {useHasStaffPosition} from "@/lib/osmium/hooks/staff-positions";
+import {useHasPermission} from "@/lib/osmium/permissions";
 
 export default function TrainerAssignmentRequestsTable({controllerStatus}: {
     controllerStatus: 'HOME' | 'VISITOR',
 }) {
 
-    const {has: manageMode} = useHasStaffPosition(['TA', 'ATA', 'WM']);
+    const {allowed: canDelete} = useHasPermission('training.assignment_requests.delete');
     const router = useRouter();
     const {data, isLoading} = useTrainingAssignmentRequests();
     const rows = (data?.items ?? []).filter((r) => r.student_controller_status === controllerStatus);
@@ -104,7 +104,7 @@ export default function TrainerAssignmentRequestsTable({controllerStatus}: {
                     label="View Request"
                     onClick={() => router.push(`/training/requests/${params.row.id}`)}
                 />,
-                manageMode
+                canDelete
                     ? <TrainerAssignmentRequestDeleteButton key={`delete-${params.row.id}`} request={params.row}/>
                     : <></>,
             ],
