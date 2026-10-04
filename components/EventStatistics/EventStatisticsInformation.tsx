@@ -21,7 +21,7 @@ import {getIconForCertificationOption} from "@/lib/certification";
 import EventStatisticsOnlinePositionTable from "@/components/EventStatistics/EventStatisticsOnlinePositionTable";
 import {useUserByCid} from "@/lib/osmium/hooks/users";
 import {useReceivedFeedback} from "@/lib/osmium/hooks/feedback";
-import {useUserEventPositions} from "@/lib/osmium/hooks/events";
+import {useAllUserEventPositions} from "@/lib/osmium/hooks/events";
 import {useCertificationTypes, useUserCertifications, useUserSoloCertifications} from "@/lib/osmium/hooks/certifications";
 import {useControllerTotals, useControllerPositions} from "@/lib/osmium/hooks/stats";
 
@@ -36,7 +36,7 @@ export default function EventStatisticsInformation({cid,}: { cid: string, }) {
 
     const {data: resolvedUser, isLoading: userLoading} = useUserByCid(numCid);
     const {data: feedbackData} = useReceivedFeedback(numCid, {status: 'RELEASED', pageSize: 200});
-    const {data: eventPositionsData} = useUserEventPositions(numCid);
+    const {data: eventPositionsData} = useAllUserEventPositions(numCid);
     const {data: certTypesData} = useCertificationTypes();
     const {data: certificationsData} = useUserCertifications(numCid);
     const {data: soloData} = useUserSoloCertifications(numCid);

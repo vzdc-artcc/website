@@ -22,7 +22,7 @@ import {useUserEventPositions} from "@/lib/osmium/hooks/events";
 
 export default function EventsCard({cid, timezone}: { cid: number, timezone: string, }) {
 
-    const {data, isLoading} = useUserEventPositions(cid);
+    const {data, isLoading} = useUserEventPositions(cid, {pageSize: 5});
     const positions = data?.items ?? [];
 
     if (isLoading) {

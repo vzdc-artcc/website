@@ -12,14 +12,14 @@ import {
     Typography
 } from "@mui/material";
 import {formatTimezoneDate} from "@/lib/date";
-import {useUserEventPositions} from "@/lib/osmium/hooks/events";
+import {useAllUserEventPositions} from "@/lib/osmium/hooks/events";
 import {useMe} from "@/lib/osmium/hooks/me";
 
 export default function ProfileEventsTable() {
 
     const {data: me} = useMe();
     const timezone = me?.profile.timezone ?? 'America/New_York';
-    const {data} = useUserEventPositions(me?.cid ?? NaN);
+    const {data} = useAllUserEventPositions(me?.cid ?? NaN);
     const events = data?.items ?? [];
 
     return (
