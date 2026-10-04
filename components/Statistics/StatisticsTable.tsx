@@ -1,8 +1,11 @@
 import React from 'react';
 import {Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
 
-export default function StatisticsTable({heading, logs,}: {
-    heading: string, logs: {
+export default function StatisticsTable({heading, logs, sortByTotal = false}: {
+    heading: string,
+    // Leaderboards rank by total; month tables keep the calendar order osmium returns.
+    sortByTotal?: boolean,
+    logs: {
         title: string,
         delivery_hours: number,
         ground_hours: number,
@@ -17,7 +20,7 @@ export default function StatisticsTable({heading, logs,}: {
         return <Typography sx={{my: 1,}}>No data for this time period</Typography>
     }
 
-    logs.sort((a, b) => b.total_hours - a.total_hours);
+    const rows = sortByTotal ? [...logs].sort((a, b) => b.total_hours - a.total_hours) : logs;
 
     return (
         <TableContainer sx={{maxHeight: 600,}}>
@@ -34,7 +37,7 @@ export default function StatisticsTable({heading, logs,}: {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {logs.map(log => (
+                    {rows.map(log => (
                         <TableRow key={log.title}>
                             <TableCell>{log.title}</TableCell>
                             <TableCell>{log.delivery_hours.toPrecision(3)}</TableCell>
