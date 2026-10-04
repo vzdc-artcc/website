@@ -5034,7 +5034,11 @@ export interface components {
             assigned_by_actor_id?: string | null;
             /** Format: int64 */
             cid?: number | null;
+            /** @description The name the user chose to display, which can be a preferred name. */
             display_name?: string | null;
+            /** @description The student's legal name, which staff lists show. */
+            first_name?: string | null;
+            last_name?: string | null;
             progression_id: string;
             progression_name?: string | null;
             user_id: string;

@@ -9,6 +9,7 @@ import {useRouter} from "next/navigation";
 import {useProgressionAssignments} from "@/lib/osmium/hooks/training";
 import {useRosterControllers} from "@/lib/osmium/hooks/users";
 import {useCoarseRoles} from "@/lib/osmium/coarseRoles";
+import {studentName} from "@/components/ProgressionAssignment/studentName";
 
 export default function ProgressionAssignmentsTable() {
 
@@ -26,6 +27,7 @@ export default function ProgressionAssignmentsTable() {
             field: 'display_name',
             flex: 1,
             headerName: 'Student',
+            valueGetter: (_value, row) => studentName(row),
             renderCell: (params) => {
                 const status = params.row.cid ? controllerStatusByCid.get(params.row.cid) : undefined;
                 const color = status === "HOME" ? 'default' : 'secondary';
@@ -35,7 +37,7 @@ export default function ProgressionAssignmentsTable() {
                         <Link href={`/training/controller/${params.row.cid}`} target="_blank"
                               style={{textDecoration: 'none',}}>
                             <Chip
-                                label={params.row.display_name || 'Unknown'}
+                                label={studentName(params.row)}
                                 size="small"
                                 color={color}
                             />
