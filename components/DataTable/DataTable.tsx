@@ -150,7 +150,7 @@ export default function DataTable<T>(
         <Box sx={{boxSizing: 'border-box', width: '100%',}}>
             <DataGrid
                 sx={{mt: 2,}}
-                loading={!result}
+                loading={!result && !isError}
                 rows={result?.data ?? []}
                 autoHeight
                 columns={columns}
