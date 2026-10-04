@@ -15,7 +15,7 @@ const toDate = (s: string) => new Date(s.replace(" ", "T") + "Z");
 export default function UpcomingAtcCard() {
     // Bookings need a session, and appointments (only used to name a training
     // booking's student) need training access, so neither is requested without them.
-    const {data: me} = useMe();
+    const {data: me, isLoading: meLoading} = useMe();
     const {allowed: canReadAppointments} = useHasPermission('training.appointments.read');
     const {data: bookingsData} = useAtcBookings(undefined, {enabled: !!me});
     const {data: rosterData} = useRosterControllers();
@@ -38,7 +38,7 @@ export default function UpcomingAtcCard() {
                     </Link>
                 </Typography>
                 <Stack direction="column" spacing={1}>
-                    {!me ? <Typography>Sign in to see upcoming ATC bookings.</Typography> : upcoming.length > 0 ? upcoming.map((booking) => {
+                    {meLoading ? null : !me ? <Typography>Sign in to see upcoming ATC bookings.</Typography> : upcoming.length > 0 ? upcoming.map((booking) => {
                         const booker = roster.find((u) => u.basic.cid === booking.cid);
                         const appointment = booking.type === 'training'
                             ? appointments.find((a) => a.atc_booking_id === String(booking.id))
