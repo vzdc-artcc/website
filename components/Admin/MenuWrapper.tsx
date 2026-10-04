@@ -1,10 +1,11 @@
 import { ExpandMore } from "@mui/icons-material";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Card, CardContent, Divider, List, Typography } from "@mui/material";
+import { NAVBAR_HEIGHT } from "@/components/Navbar/height";
 
 export default function MenuWrapper({ title, subheadings, children }: { title: string, subheadings: string[], children: React.ReactNode }) {
     return (
         <>
-            <Box sx={{ display: { xs: 'none', lg: 'inherit', }, position: 'sticky', top: 16 }}>
+            <Box sx={{ display: { xs: 'none', lg: 'inherit', }, position: 'sticky', top: NAVBAR_HEIGHT + 16 }}>
                 <Card>
                     <CardContent>
                         <Typography variant="h6" textAlign="center" fontWeight={700}>{title}</Typography>

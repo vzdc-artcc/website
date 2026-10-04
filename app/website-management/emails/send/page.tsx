@@ -23,6 +23,7 @@ import {
 import {toast} from "react-toastify";
 import {useEmailTemplates, usePreviewEmail, useSendEmail} from "@/lib/osmium/hooks/emails";
 import EmailSchemaForm, {EmailPayload, EmailTemplateSchema} from "@/components/Mail/EmailSchemaForm";
+import {NAVBAR_HEIGHT} from "@/components/Navbar/height";
 
 export default function Page() {
     const {data: templates, isLoading: templatesLoading} = useEmailTemplates();
@@ -235,7 +236,7 @@ export default function Page() {
 
                 {/* ---- Right: live preview ---- */}
                 <Grid size={{xs: 12, md: 6}}>
-                    <Card sx={{position: {md: 'sticky'}, top: {md: 16}}}>
+                    <Card sx={{position: {md: 'sticky'}, top: {md: NAVBAR_HEIGHT + 16}}}>
                         <CardContent>
                             <Typography variant="h6" gutterBottom>Live Preview</Typography>
                             {!templateId && <Typography variant="body2" color="text.secondary">Select a template to begin.</Typography>}
