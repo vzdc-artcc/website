@@ -3,6 +3,7 @@ import React from 'react';
 import {Card, CardContent, CircularProgress, Typography} from "@mui/material";
 import ProgressionAssignmentForm from "@/components/ProgressionAssignment/ProgressionAssignmentForm";
 import {useProgressionAssignments} from "@/lib/osmium/hooks/training";
+import {studentName} from "@/components/ProgressionAssignment/studentName";
 
 export default function ProgressionAssignmentEditView({cid}: { cid: string }) {
 
@@ -28,11 +29,11 @@ export default function ProgressionAssignmentEditView({cid}: { cid: string }) {
         <Card>
             <CardContent>
                 <Typography variant="h5" gutterBottom>Progression Assignment
-                    - {assignment.display_name} ({assignment.cid})</Typography>
+                    - {studentName(assignment)} ({assignment.cid})</Typography>
                 <ProgressionAssignmentForm currentAssignment={{
                     userId: assignment.user_id,
                     cid: assignment.cid!,
-                    displayName: assignment.display_name ?? 'Unknown',
+                    displayName: studentName(assignment),
                     progressionId: assignment.progression_id,
                 }}/>
             </CardContent>
