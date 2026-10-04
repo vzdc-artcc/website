@@ -59,6 +59,15 @@ thing, check whether osmium should be returning it instead.
 `docs/staff-permissions-editor.md` is an example of how a cross-repo feature is
 specified: the osmium change and the website change written up together.
 
+**Restoring behaviour from the old site means restoring what it did to the
+data, not copying its buttons.** The `master` branch still holds the legacy
+Prisma app (`actions/`, `prisma/schema.prisma`). Before you copy a legacy UI
+rule, read what the legacy action did to the row, then check how osmium stores
+the same record. A legacy Approve that *deleted* the request never left a
+decided row behind. In osmium the decided row stays, and if the table has a
+unique key, hiding its Delete button can leave a user unable to make a new
+request. Copy the outcome, adjusted for osmium's data model.
+
 ---
 
 ## 3. Code map
