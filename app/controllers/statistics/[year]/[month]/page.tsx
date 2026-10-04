@@ -159,7 +159,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Controller Totals</Typography>
-                        <StatisticsTable heading="Controller" logs={controllerLog}/>
+                        <StatisticsTable heading="Controller" logs={controllerLog} sortByTotal/>
                     </CardContent>
                 </Card>
             </Grid>
