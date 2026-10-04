@@ -13,7 +13,12 @@ export default function BroadcastDeleteButton({broadcast}: { broadcast: { id: st
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteBroadcast.mutateAsync(broadcast.id);
+            try {
+                await deleteBroadcast.mutateAsync(broadcast.id);
+            } catch {
+                toast(`Failed to delete broadcast.`, {type: 'error'});
+                return;
+            }
             toast(`Broadcast '${broadcast.title}' deleted successfully!`, {type: 'success'});
         } else {
             toast.warn(`Deleting this broadcast will remove it from all selected users.  Click again to confirm.`);
