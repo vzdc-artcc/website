@@ -53,7 +53,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Air Traffic Manager (ATM)</Typography>
-                        <Typography variant="h3">{atm?.name}</Typography>
+                        <Typography variant="h3">{atm?.name ?? 'N/A'}</Typography>
                         <Typography>atm@vzdc.org</Typography>
                     </CardContent>
                 </Card>
@@ -62,7 +62,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Deputy Air Traffic Manager (DATM)</Typography>
-                        <Typography variant="h3">{datm?.name}</Typography>
+                        <Typography variant="h3">{datm?.name ?? 'N/A'}</Typography>
                         <Typography>datm@vzdc.org</Typography>
                     </CardContent>
                 </Card>
@@ -71,7 +71,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Training Administrator (TA)</Typography>
-                        <Typography variant="h4">{ta?.name}</Typography>
+                        <Typography variant="h4">{ta?.name ?? 'N/A'}</Typography>
                         <Typography>ta@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Training Administrators (ATAs)</Typography>
                         {getAssistantTable(atas)}
@@ -82,7 +82,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Event Coordinator (EC)</Typography>
-                        <Typography variant="h4">{ec?.name}</Typography>
+                        <Typography variant="h4">{ec?.name ?? 'N/A'}</Typography>
                         <Typography>ec@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Event Coordinators (AECs)</Typography>
                         {getAssistantTable(aecs)}
@@ -93,7 +93,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Facility Engineer (FE)</Typography>
-                        <Typography variant="h4">{fe?.name}</Typography>
+                        <Typography variant="h4">{fe?.name ?? 'N/A'}</Typography>
                         <Typography>fe@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Facility Engineers (AFEs)</Typography>
                         {getAssistantTable(afes)}
@@ -104,7 +104,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Webmaster (WM)</Typography>
-                        <MatrixName firstName={wm?.name ?? ''} lastName={''}/>
+                        <MatrixName firstName={wm?.name ?? 'N/A'} lastName={''}/>
                         <Typography>wm@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Webmasters (AWMs)</Typography>
                         {getAssistantTable(awms)}
