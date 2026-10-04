@@ -6024,7 +6024,7 @@ export interface components {
             final_start_time?: string | null;
             id: string;
         };
-        UserEventPositionListResponse: {
+        UserEventPositionListResponse: components["schemas"]["PaginationMeta"] & {
             items: components["schemas"]["UserEventPositionItem"][];
         };
         UserFeedbackListResponse: components["schemas"]["PaginationMeta"] & {
@@ -16390,7 +16390,12 @@ export interface operations {
     };
     get_user_event_positions: {
         parameters: {
-            query?: never;
+            query?: {
+                page?: number | null;
+                page_size?: number | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
             header?: never;
             path: {
                 /** @description User CID */

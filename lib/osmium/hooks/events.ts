@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { osmium } from "@/lib/osmium/client";
+import type { components } from "@/lib/osmium/generated/schema";
 
 // --- Events ---
 
@@ -131,16 +132,42 @@ export function useEventPositions(eventId: string | undefined, query: EventPosit
     });
 }
 
-export function useUserEventPositions(cid: number | undefined) {
+/** One page of a user's published event positions, most recent event first. */
+export function useUserEventPositions(cid: number | undefined, query: { page?: number; pageSize?: number } = {}) {
+    const pageSize = query.pageSize ?? 25;
     return useQuery({
-        queryKey: ["osmium", "users", "event-positions", cid],
+        queryKey: ["osmium", "users", "event-positions", cid, query.page, pageSize],
         enabled: !!cid,
         queryFn: async () => {
             const { data, error } = await osmium.GET("/api/v1/users/{cid}/event-positions", {
-                params: { path: { cid: cid! } },
+                params: { path: { cid: cid! }, query: { page: query.page, page_size: pageSize } },
             });
             if (error) throw error;
             return data;
+        },
+    });
+}
+
+/**
+ * A user's entire published event history, paging through the 200-row cap.
+ * For views that total or list everything (event statistics, /profile/events).
+ */
+export function useAllUserEventPositions(cid: number | undefined) {
+    return useQuery({
+        queryKey: ["osmium", "users", "event-positions", cid, "all"],
+        enabled: !!cid,
+        queryFn: async () => {
+            const items: components["schemas"]["UserEventPositionItem"][] = [];
+            // Hard cap the loop so a bad `has_next` can never spin forever.
+            for (let page = 1; page <= 50; page++) {
+                const { data, error } = await osmium.GET("/api/v1/users/{cid}/event-positions", {
+                    params: { path: { cid: cid! }, query: { page, page_size: 200 } },
+                });
+                if (error) throw error;
+                items.push(...(data?.items ?? []));
+                if (!data?.has_next) break;
+            }
+            return { items };
         },
     });
 }

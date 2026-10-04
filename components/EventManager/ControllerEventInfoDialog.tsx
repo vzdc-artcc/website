@@ -60,7 +60,7 @@ export default function ControllerEventInfoDialog({open, onClose, info}: {
     const {data: certsData} = useUserCertifications(cid);
     const {data: typesData} = useCertificationTypes();
     const {data: soloData} = useUserSoloCertifications(cid);
-    const {data: eventPositions} = useUserEventPositions(cid);
+    const {data: eventPositions} = useUserEventPositions(cid, {pageSize: 1});
 
     const rating = user?.basic?.rating ?? '';
     const controllerStatus = user?.full?.profile?.controller_status ?? 'N/A';
