@@ -4,6 +4,7 @@ import {Card, CardContent, IconButton, Stack, Tooltip, Typography} from "@mui/ma
 import Link from "next/link";
 import {StackedLineChart} from "@mui/icons-material";
 import {useArtccStats} from "@/lib/osmium/hooks/stats";
+import {formatHours} from "@/lib/number";
 
 export default function TopControllersCard() {
     const now = new Date();
@@ -31,7 +32,7 @@ export default function TopControllersCard() {
                                 </Stack>
                                 {/* online_hours = connected time, the same metric the leaderboard is ranked by,
                                     so the number matches the rank (matches the current site's behavior). */}
-                                <Typography variant="subtitle2">{controller.online_hours.toPrecision(3)} hours</Typography>
+                                <Typography variant="subtitle2">{formatHours(controller.online_hours)} hours</Typography>
                             </CardContent>
                         </Card>
                     ))}
