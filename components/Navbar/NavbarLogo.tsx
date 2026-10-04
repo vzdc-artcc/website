@@ -10,7 +10,7 @@ export default function NavbarLogo() {
     const adminMeta = useAdminMetadata();
 
     if (adminMeta) {
-        return (<Box sx={{width: permanentSidebarResponsive('auto', ADMIN_SIDEBAR_WIDTH), height: '100%', mr: 2,}}>
+        return (<Box sx={{width: permanentSidebarResponsive('auto', ADMIN_SIDEBAR_WIDTH), height: '100%', mx: 2,}}>
             <Box sx={{display: permanentSidebarResponsive('block', 'none')}}><Logo/></Box>
         </Box>);
     } else {
