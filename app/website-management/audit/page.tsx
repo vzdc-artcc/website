@@ -7,7 +7,7 @@ export default function Page() {
             domain="all"
             showResourceTypeSearch
             title="Audit Log"
-            description="Every privileged action across the site, newest first. Click a row for before/after state."
+            description="Every privileged action across the site, newest first. Click a row to see what changed."
         />
     );
 }
