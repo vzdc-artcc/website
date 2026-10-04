@@ -25,7 +25,7 @@ export default function TrainingAppointmentTable() {
             flex: 1,
             headerName: 'Student',
             renderCell: (params) => (
-                <Link href={`/training/history/${params.row.student_cid}`} target="_blank"
+                <Link prefetch={false} href={`/training/history/${params.row.student_cid}`} target="_blank"
                       style={{textDecoration: 'none',}}>
                     <Chip label={params.row.student_name} size="small"/>
                 </Link>

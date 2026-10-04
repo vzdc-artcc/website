@@ -22,7 +22,7 @@ export default function TrainerReleaseRequestTable() {
             headerName: 'Student',
             renderCell: (params) => (
                 <Tooltip title={params.row.student_controller_status}>
-                    <Link href={`/training/controller/${params.row.student_cid}`} target="_blank"
+                    <Link prefetch={false} href={`/training/controller/${params.row.student_cid}`} target="_blank"
                           style={{textDecoration: 'none',}}>
                         <Chip label={params.row.student_name} size="small"/>
                     </Link>

@@ -27,7 +27,7 @@ export default function TrainerAssignmentRequestsTable({controllerStatus}: {
             headerName: 'Student',
             renderCell: (params) => (
                 <Tooltip title={params.row.student_controller_status}>
-                    <Link href={`/training/controller/${params.row.student_cid}`} target="_blank"
+                    <Link prefetch={false} href={`/training/controller/${params.row.student_cid}`} target="_blank"
                           style={{textDecoration: 'none',}}>
                         <Chip label={params.row.student_name} size="small"/>
                     </Link>
@@ -79,7 +79,7 @@ export default function TrainerAssignmentRequestsTable({controllerStatus}: {
             renderCell: (params) => (
                 <Stack direction="row" spacing={1}>
                     {params.row.interested_trainers.map((trainer: { id: string, cid: number, name: string }) => (
-                        <Link key={trainer.id} href={`/training/controller/${trainer.cid}`} target="_blank">
+                        <Link prefetch={false} key={trainer.id} href={`/training/controller/${trainer.cid}`} target="_blank">
                             <Chip label={trainer.name} size="small"/>
                         </Link>
                     ))}

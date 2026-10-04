@@ -5,7 +5,8 @@ import {Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
 import {useQuery} from "@tanstack/react-query";
 import {getIconForCertificationOption} from "@/lib/certification";
 import {getRating} from "@/lib/vatsim";
-import UserStaffPositionChips from "@/components/StaffPositions/UserStaffPositionChips";
+import StaffPositionChips from "@/components/StaffPositions/StaffPositionChips";
+import {useStaffPositionsByCid} from "@/lib/osmium/hooks/staff-positions";
 import Link from "next/link";
 import {useRosterControllers} from "@/lib/osmium/hooks/users";
 import {useCertificationTypes, useRosterCertifications} from "@/lib/osmium/hooks/certifications";
@@ -50,6 +51,8 @@ export default function RosterTable({membership, search, includeVatusa,}: {
 
     const {data: certTypes} = useCertificationTypes();
     const {data: rosterCerts} = useRosterCertifications();
+    // One holders request per position instead of one positions request per row.
+    const staffPositionsByCid = useStaffPositionsByCid();
 
     const {data: vatusaExtra} = useQuery({
         queryKey: ['vatusa-roster-merge', membership, cids.join(',')],
@@ -98,7 +101,7 @@ export default function RosterTable({membership, search, includeVatusa,}: {
                         return (
                             <TableRow key={item.basic.cid}>
                                 <TableCell>
-                                    <Link href={`/controllers/${item.basic.cid}`}
+                                    <Link prefetch={false} href={`/controllers/${item.basic.cid}`}
                                           style={{color: 'inherit', textDecoration: 'none',}}>
                                         <Typography fontWeight="bold">
                                             {displayName}
@@ -114,7 +117,8 @@ export default function RosterTable({membership, search, includeVatusa,}: {
                                         {item.basic.rating ?? 'Unknown'} • {item.basic.cid}
                                     </Typography>
                                     {profile?.controller_status === "HOME" &&
-                                        <UserStaffPositionChips cid={item.basic.cid}/>}
+                                        (staffPositionsByCid.get(item.basic.cid)?.length ?? 0) > 0 &&
+                                        <StaffPositionChips positions={staffPositionsByCid.get(item.basic.cid) ?? []} size="small"/>}
                                     {profile?.controller_status === "VISITOR" &&
                                         <Typography>{profile.artcc}</Typography>}
                                 </TableCell>

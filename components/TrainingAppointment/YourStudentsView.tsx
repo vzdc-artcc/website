@@ -366,7 +366,7 @@ const getTable = (students: StudentRow[], timezone: string) => (
                         {student.nextAppointment ? (
                             <Tooltip
                                 title={`${formatTimezoneDate(new Date(student.nextAppointment.start), timezone)} with ${student.nextAppointment.trainerName}: ${student.nextAppointment.lessonIdentifiers.join(', ')}`}>
-                                <Link
+                                <Link prefetch={false}
                                     href={`/training/appointments?sortField=start&sortDirection=asc&filterField=student&filterValue=${student.cid}&filterOperator=equals`}>
                                     <Chip
                                         label={getTimeIn(new Date(student.nextAppointment.start))}
@@ -380,7 +380,7 @@ const getTable = (students: StudentRow[], timezone: string) => (
                     <TableCell>
                         {student.lastSession ? (
                             <Tooltip title="View Last Training Session">
-                                <Link href={`/training/sessions/${student.lastSession.id}`} target="_blank">
+                                <Link prefetch={false} href={`/training/sessions/${student.lastSession.id}`} target="_blank">
                                     <IconButton>
                                         <LocalActivity/>
                                     </IconButton>
@@ -388,14 +388,14 @@ const getTable = (students: StudentRow[], timezone: string) => (
                             </Tooltip>
                         ) : null}
                         <Tooltip title="View Certifications">
-                            <Link href={`/training/controller/${student.cid}`} target="_blank">
+                            <Link prefetch={false} href={`/training/controller/${student.cid}`} target="_blank">
                                 <IconButton>
                                     <MilitaryTech/>
                                 </IconButton>
                             </Link>
                         </Tooltip>
                         <Tooltip title="View Training Assignment">
-                            <Link href={`/training/assignments/${student.assignmentId}`} target="_blank">
+                            <Link prefetch={false} href={`/training/assignments/${student.assignmentId}`} target="_blank">
                                 <IconButton>
                                     <People/>
                                 </IconButton>

@@ -25,7 +25,7 @@ export default function TrainingAssignmentTable() {
                 const color = params.row.student_controller_status === "HOME" ? 'default' : 'secondary';
                 return (
                     <Tooltip title={params.row.student_controller_status}>
-                        <Link href={`/training/controller/${params.row.student_cid}`} target="_blank"
+                        <Link prefetch={false} href={`/training/controller/${params.row.student_cid}`} target="_blank"
                               style={{textDecoration: 'none',}}>
                             <Chip label={params.row.student_name} size="small" color={color}/>
                         </Link>
@@ -38,7 +38,7 @@ export default function TrainingAssignmentTable() {
             field: 'primaryTrainer',
             headerName: 'Primary Trainer',
             renderCell: (params) => (
-                <Link href={`/training/controller/${params.row.primary_trainer_cid}`} target="_blank">
+                <Link prefetch={false} href={`/training/controller/${params.row.primary_trainer_cid}`} target="_blank">
                     <Chip label={params.row.primary_trainer_name} size="small"/>
                 </Link>
             ),
@@ -51,7 +51,7 @@ export default function TrainingAssignmentTable() {
             renderCell: (params) => (
                 <Stack direction="row" spacing={1}>
                     {params.row.other_trainers.map((trainer: { id: string, cid: number, name: string }) => (
-                        <Link key={trainer.id} href={`/training/controller/${trainer.cid}`} target="_blank">
+                        <Link prefetch={false} key={trainer.id} href={`/training/controller/${trainer.cid}`} target="_blank">
                             <Chip label={trainer.name} size="small"/>
                         </Link>
                     ))}

@@ -16,6 +16,11 @@ export default function OsmiumQueryProvider({ children }: { children: ReactNode 
                 // than retrying a request that will never succeed.
                 networkMode: "always",
                 retry: false,
+                // Without these, every mounted query refetches on each mount
+                // and every tab switch, which on list pages means dozens of
+                // requests for data that has not changed.
+                staleTime: 60_000,
+                refetchOnWindowFocus: false,
             },
             mutations: {
                 networkMode: "always",
