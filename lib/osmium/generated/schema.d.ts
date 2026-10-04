@@ -4685,7 +4685,33 @@ export interface components {
             status?: string | null;
             template_id?: string | null;
         };
+        ListOtsRecommendationsQuery: {
+            /** @description `true` keeps recommendations with an assigned instructor; `false` keeps unassigned ones. */
+            assigned?: boolean | null;
+            /** Format: int64 */
+            limit?: number | null;
+            /** Format: int64 */
+            offset?: number | null;
+            /** Format: int64 */
+            page?: number | null;
+            /** Format: int64 */
+            page_size?: number | null;
+        };
+        ListTrainerReleaseRequestsQuery: {
+            /** Format: int64 */
+            limit?: number | null;
+            /** Format: int64 */
+            offset?: number | null;
+            /** Format: int64 */
+            page?: number | null;
+            /** Format: int64 */
+            page_size?: number | null;
+            /** @description `PENDING`, `APPROVED`, or `DENIED` (case-insensitive). */
+            status?: string | null;
+        };
         ListTrainingAppointmentsQuery: {
+            /** @description Filter on the appointment's `double_booking` flag. */
+            double_booking?: boolean | null;
             /** Format: int64 */
             limit?: number | null;
             /** Format: int64 */
@@ -4698,7 +4724,21 @@ export interface components {
             sort_order?: string | null;
             student_id?: string | null;
             trainer_id?: string | null;
+            /** @description `true` keeps appointments starting now or later; `false` keeps those that already started. */
+            upcoming?: boolean | null;
             user_id?: string | null;
+        };
+        ListTrainingAssignmentRequestsQuery: {
+            /** Format: int64 */
+            limit?: number | null;
+            /** Format: int64 */
+            offset?: number | null;
+            /** Format: int64 */
+            page?: number | null;
+            /** Format: int64 */
+            page_size?: number | null;
+            /** @description `HOME` or `VISITOR` (case-insensitive); matches the response's `student_controller_status`. */
+            student_controller_status?: string | null;
         };
         ListTrainingSessionsQuery: {
             filter_field?: string | null;
@@ -14229,6 +14269,10 @@ export interface operations {
                 trainer_id?: string | null;
                 student_id?: string | null;
                 user_id?: string | null;
+                /** @description `true` keeps appointments starting now or later; `false` keeps those that already started. */
+                upcoming?: boolean | null;
+                /** @description Filter on the appointment's `double_booking` flag. */
+                double_booking?: boolean | null;
             };
             header?: never;
             path?: never;
@@ -14426,6 +14470,8 @@ export interface operations {
                 page_size?: number | null;
                 limit?: number | null;
                 offset?: number | null;
+                /** @description `HOME` or `VISITOR` (case-insensitive); matches the response's `student_controller_status`. */
+                student_controller_status?: string | null;
             };
             header?: never;
             path?: never;
@@ -14441,6 +14487,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TrainingAssignmentRequestListResponse"];
                 };
+            };
+            /** @description Unknown student_controller_status value */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Not authorized */
             401: {
@@ -15457,6 +15510,8 @@ export interface operations {
                 page_size?: number | null;
                 limit?: number | null;
                 offset?: number | null;
+                /** @description `true` keeps recommendations with an assigned instructor; `false` keeps unassigned ones. */
+                assigned?: boolean | null;
             };
             header?: never;
             path?: never;
@@ -15876,6 +15931,8 @@ export interface operations {
                 page_size?: number | null;
                 limit?: number | null;
                 offset?: number | null;
+                /** @description `PENDING`, `APPROVED`, or `DENIED` (case-insensitive). */
+                status?: string | null;
             };
             header?: never;
             path?: never;
@@ -15891,6 +15948,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TrainerReleaseRequestListResponse"];
                 };
+            };
+            /** @description Unknown status value */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Not authorized */
             401: {

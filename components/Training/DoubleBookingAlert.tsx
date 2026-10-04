@@ -4,11 +4,8 @@ import {Alert} from "@mui/material";
 import {useTrainingAppointments} from "@/lib/osmium/hooks/training";
 
 export default function DoubleBookingAlert({bufferTimeMinutes}: { bufferTimeMinutes?: string }) {
-    const {data} = useTrainingAppointments({pageSize: 200});
-    const now = new Date();
-    const numDoubleBookedAppointments = (data?.items ?? [])
-        .filter((appointment) => new Date(appointment.start) >= now && appointment.double_booking)
-        .length;
+    const {data} = useTrainingAppointments({pageSize: 1, upcoming: true, doubleBooking: true});
+    const numDoubleBookedAppointments = data?.total ?? 0;
 
     if (numDoubleBookedAppointments === 0) {
         return null;
