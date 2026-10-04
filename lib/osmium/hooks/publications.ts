@@ -96,8 +96,10 @@ export function useCreatePublication() {
             if (error) throw error;
             return data;
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["osmium", "publication"] }).then(() =>
-            queryClient.invalidateQueries({ queryKey: ["osmium", "admin", "publications"] })),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["osmium", "publications"] });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "admin", "publications"] });
+        },
     });
 }
 
@@ -112,7 +114,11 @@ export function useUpdatePublication() {
             if (error) throw error;
             return data;
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["osmium", "admin", "publications"] }),
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["osmium", "publications"] });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "publication", variables.publicationId] });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "admin", "publications"] });
+        },
     });
 }
 
@@ -125,7 +131,11 @@ export function useDeletePublication() {
             });
             if (error) throw error;
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ["osmium", "admin", "publications"] }),
+        onSuccess: (_data, publicationId) => {
+            queryClient.invalidateQueries({ queryKey: ["osmium", "publications"] });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "publication", publicationId] });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "admin", "publications"] });
+        },
     });
 }
 

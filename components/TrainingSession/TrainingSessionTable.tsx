@@ -161,7 +161,7 @@ export default function TrainingSessionTable({admin, studentCid, selfView}: {
 
     return (
         <>
-            <DataTable
+            <DataTable queryKey={["osmium", "training", "sessions", "table", {admin, studentCid, selfView, scopedStudentId}]}
                 columns={columns}
                 initialSort={[{field: 'start', sort: 'desc',}]}
                 fetchData={async (pagination, sortModel, filter) => {

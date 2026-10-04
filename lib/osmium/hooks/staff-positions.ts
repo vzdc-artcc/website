@@ -76,6 +76,7 @@ export function useAssignStaffPosition() {
         },
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: staffPositionsKey(variables.cid) });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "staff-positions"] });
         },
     });
 }
@@ -92,6 +93,7 @@ export function useRevokeStaffPosition() {
         },
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: staffPositionsKey(variables.cid) });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "staff-positions"] });
         },
     });
 }

@@ -65,7 +65,7 @@ export default function BroadcastTable() {
     ];
 
     return (
-        <DataTable columns={columns} initialSort={[{field: 'timestamp', sort: 'desc',}]}
+        <DataTable queryKey={["osmium", "broadcasts", "table"]} columns={columns} initialSort={[{field: 'timestamp', sort: 'desc',}]}
                    fetchData={async (pagination, sortModel, filter) => {
                        let title: string | undefined;
                        let exemptStaff: boolean | undefined;

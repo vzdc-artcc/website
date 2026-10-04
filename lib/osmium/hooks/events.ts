@@ -177,6 +177,7 @@ export function useCreateEventPosition(eventId: string) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["osmium", "events", "positions", eventId] });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "users", "event-positions"] });
         },
     });
 }
