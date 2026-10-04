@@ -64,7 +64,10 @@ export default function AuditLogTable({
     // Model, Message, and IP only when shown.
     const detailColSpan = showIp ? 7 : 6;
 
-    const toggleExpanded = (id: string) => setExpanded(expanded === id ? null : id);
+    const toggleExpanded = (id: string) => {
+        setExpanded(expanded === id ? null : id);
+        setShowSnapshots(false);
+    };
 
     return (
         <Stack direction="column" spacing={2}>

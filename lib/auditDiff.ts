@@ -8,7 +8,10 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/** Flattens nested objects to dot paths; arrays and scalars are leaves. */
+/**
+ * Flattens nested objects to dot paths; arrays and scalars are leaves. A snapshot
+ * that is itself an array or scalar becomes a single "(value)" leaf.
+ */
 function flatten(value: unknown, prefix = '', out: Map<string, unknown> = new Map()): Map<string, unknown> {
     if (isPlainObject(value)) {
         for (const [key, child] of Object.entries(value)) {
@@ -16,6 +19,8 @@ function flatten(value: unknown, prefix = '', out: Map<string, unknown> = new Ma
         }
     } else if (prefix) {
         out.set(prefix, value);
+    } else if (value !== null && value !== undefined) {
+        out.set('(value)', value);
     }
     return out;
 }
