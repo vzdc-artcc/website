@@ -17,13 +17,15 @@ import Link from "next/link";
 import { Add } from "@mui/icons-material";
 import { useOtsRecommendations } from "@/lib/osmium/hooks/training";
 import { useUsersByRole } from "@/lib/osmium/hooks/users";
-import { useHasStaffPosition } from "@/lib/osmium/hooks/staff-positions";
+import { useHasPermission } from "@/lib/osmium/permissions";
 import InstructorDropdown from "./InstructorDropdown";
 import OtsRecommendationDeleteButton from "./OtsRecommendationDeleteButton";
 
 export default function OtsRecommendationsView() {
 
-    const { has: canModify } = useHasStaffPosition(['TA', 'WM']);
+    const { allowed: canCreate } = useHasPermission('training.ots_recommendations.create');
+    const { allowed: canUpdate } = useHasPermission('training.ots_recommendations.update');
+    const { allowed: canDelete } = useHasPermission('training.ots_recommendations.delete');
     const { data: recommendations, isLoading } = useOtsRecommendations();
     const { data: instructorsData } = useUsersByRole('INS');
 
@@ -42,7 +44,7 @@ export default function OtsRecommendationsView() {
             <CardContent>
                 <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ mb: 2 }}>
                     <Typography variant="h5">OTS Recommendations</Typography>
-                    {canModify && <Link href="/training/ots/new">
+                    {canCreate && <Link href="/training/ots/new">
                         <Button variant="contained" size="large" startIcon={<Add />}>New OTS Recommendation</Button>
                     </Link>}
                 </Stack>
@@ -63,13 +65,13 @@ export default function OtsRecommendationsView() {
                                     <TableRow key={rec.id}>
                                         <TableCell>{rec.student_name} ({rec.student_cid})</TableCell>
                                         <TableCell>
-                                            {canModify
+                                            {canUpdate
                                                 ? <InstructorDropdown recommendationId={rec.id} instructors={instructors} assignedInstructorId={rec.assigned_instructor_id} />
                                                 : (rec.assigned_instructor_name ?? 'Unassigned')}
                                         </TableCell>
                                         <TableCell>{rec.notes}</TableCell>
                                         <TableCell>
-                                            {canModify && <OtsRecommendationDeleteButton recommendationId={rec.id} />}
+                                            {canDelete && <OtsRecommendationDeleteButton recommendationId={rec.id} />}
                                         </TableCell>
                                     </TableRow>
                                 ))}

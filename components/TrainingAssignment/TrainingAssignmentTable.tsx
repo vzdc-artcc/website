@@ -7,11 +7,11 @@ import TrainingAssignmentDeleteButton from "@/components/TrainingAssignment/Trai
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 import {useTrainingAssignments} from "@/lib/osmium/hooks/training";
-import {useHasStaffPosition} from "@/lib/osmium/hooks/staff-positions";
+import {useHasPermission} from "@/lib/osmium/permissions";
 
 export default function TrainingAssignmentTable() {
 
-    const {has: manageMode} = useHasStaffPosition(['TA', 'ATA', 'WM']);
+    const {allowed: canDelete} = useHasPermission('training.assignments.delete');
     const router = useRouter();
     const {data, isLoading} = useTrainingAssignments();
     const rows = data?.items ?? [];
@@ -71,7 +71,7 @@ export default function TrainingAssignmentTable() {
                     label="View/Edit Assignment"
                     onClick={() => router.push(`/training/assignments/${params.row.id}`)}
                 />,
-                manageMode
+                canDelete
                     ? <TrainingAssignmentDeleteButton key={`delete-${params.row.id}`} assignment={params.row}/>
                     : <></>,
             ],

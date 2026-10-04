@@ -7,11 +7,12 @@ import TrainerReleaseRequestApproveButton from "@/components/TrainerReleaseReque
 import TrainerReleaseDeleteButton from "@/components/TrainerReleaseRequest/TrainerReleaseDeleteButton";
 import Link from "next/link";
 import {useTrainerReleaseRequests} from "@/lib/osmium/hooks/training";
-import {useHasStaffPosition} from "@/lib/osmium/hooks/staff-positions";
+import {useHasPermission} from "@/lib/osmium/permissions";
 
 export default function TrainerReleaseRequestTable() {
 
-    const {has: manageMode} = useHasStaffPosition(['TA', 'ATA', 'WM']);
+    const {allowed: canApprove} = useHasPermission('training.release_requests.decide');
+    const {allowed: canDelete} = useHasPermission('training.release_requests.delete');
     const {data, isLoading} = useTrainerReleaseRequests();
     const rows = data?.items ?? [];
 
@@ -45,10 +46,10 @@ export default function TrainerReleaseRequestTable() {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',
-            getActions: (params) => manageMode ? [
-                <TrainerReleaseRequestApproveButton key={`approve-${params.row.id}`} requestId={params.row.id}/>,
-                <TrainerReleaseDeleteButton key={`delete-${params.row.id}`} requestId={params.row.id}/>,
-            ] : [],
+            getActions: (params) => [
+                ...(canApprove ? [<TrainerReleaseRequestApproveButton key={`approve-${params.row.id}`} requestId={params.row.id}/>] : []),
+                ...(canDelete ? [<TrainerReleaseDeleteButton key={`delete-${params.row.id}`} requestId={params.row.id}/>] : []),
+            ],
             flex: 1,
         },
     ];
