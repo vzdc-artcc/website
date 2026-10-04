@@ -296,6 +296,14 @@ posts to `/api/v1/auth/logout`. There is no NextAuth session in this repo, and
   refuses upstreams resolving to a private IP.
 - **Zod** schemas in `types/zod.ts` validate form input before submission.
   Client validation is a courtesy; osmium validates for real.
+- **Loading, error and empty are three different states.** Show an empty-state
+  marker (`N/A`, "no rows", "nobody") only once the request has succeeded and
+  come back empty. A hook that returns `data ?? []` turns "still loading" and
+  "request failed" into "nothing here", and the page then makes a false
+  statement. Also check any component that captures its first props (initial
+  `useState`, a text-scramble effect like `MatrixName`): if it mounts before
+  the data arrives it can keep showing the placeholder. Verify with the data
+  present, not only with it absent.
 
 ---
 
