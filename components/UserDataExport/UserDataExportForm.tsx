@@ -2,7 +2,7 @@
 import React from 'react';
 import {
     Alert,
-    Box,
+    Autocomplete,
     Button,
     Chip,
     Stack,
@@ -15,7 +15,7 @@ import {
     TextField,
     Typography
 } from "@mui/material";
-import {Download, Search} from "@mui/icons-material";
+import {Download, Refresh} from "@mui/icons-material";
 import {toast} from "react-toastify";
 import {stringify} from "csv-stringify";
 import {exportUserData} from "@/actions/userDataExport";
@@ -62,20 +62,26 @@ const downloadCsv = async (rows: Record<string, unknown>[], filename: string) =>
 
 const attendanceColor = (attendance: string) => attendance === 'NO_SHOW' ? 'error' : attendance === 'CONNECTED' ? 'success' : 'default';
 
-export default function UserDataExportForm() {
+export type ExportableUser = {
+    cid: string,
+    firstName: string | null,
+    lastName: string | null,
+    controllerStatus: string,
+};
+
+const userLabel = (user: ExportableUser) =>
+    `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() + ` (${user.cid})${user.controllerStatus === 'NONE' ? ' - Not on roster' : ''}`;
+
+export default function UserDataExportForm({users}: { users: ExportableUser[] }) {
 
     const [cid, setCid] = React.useState('');
     const [loading, setLoading] = React.useState(false);
     const [data, setData] = React.useState<ExportData | null>(null);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!/^\d+$/.test(cid.trim())) {
-            toast.error('Enter a numeric CID.');
-            return;
-        }
+    const generate = async (selectedCid: string) => {
+        if (!selectedCid) return;
         setLoading(true);
-        const result = await exportUserData(cid);
+        const result = await exportUserData(selectedCid);
         setLoading(false);
         if (result.error || !result.data) {
             toast.error(result.error || 'Failed to generate export.');
@@ -93,14 +99,25 @@ export default function UserDataExportForm() {
 
     return (
         <Stack direction="column" spacing={2}>
-            <Box component="form" onSubmit={handleSubmit}>
-                <Stack direction={{xs: 'column', sm: 'row'}} spacing={2}>
-                    <TextField label="CID" value={cid} onChange={(e) => setCid(e.target.value)} size="small"/>
-                    <Button type="submit" variant="contained" startIcon={<Search/>} disabled={loading}>
-                        {loading ? 'Generating...' : 'Generate Export'}
-                    </Button>
-                </Stack>
-            </Box>
+            <Stack direction={{xs: 'column', sm: 'row'}} spacing={2}>
+                <Autocomplete
+                    fullWidth
+                    options={users}
+                    getOptionLabel={userLabel}
+                    value={users.find((u) => u.cid === cid) || null}
+                    onChange={(event, newValue) => {
+                        setCid(newValue ? newValue.cid : '');
+                        if (newValue) generate(newValue.cid);
+                    }}
+                    disabled={loading}
+                    renderInput={(params) => <TextField {...params} variant="filled" label="User"
+                                                        helperText="Anyone who has ever signed in, on the roster or not."/>}
+                />
+                <Button variant="contained" startIcon={<Refresh/>} disabled={loading || !cid}
+                        onClick={() => generate(cid)} sx={{alignSelf: {sm: 'flex-start'}, mt: {sm: 1}}}>
+                    {loading ? 'Generating...' : 'Regenerate'}
+                </Button>
+            </Stack>
             {data && <>
                 <Typography variant="h6">{data.profile.firstName} {data.profile.lastName} ({data.profile.cid})</Typography>
                 {data.notes.map((note) => <Alert key={note} severity="info">{note}</Alert>)}
