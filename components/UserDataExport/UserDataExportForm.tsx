@@ -5,7 +5,10 @@ import {
     Autocomplete,
     Button,
     Chip,
+    FormControlLabel,
+    IconButton,
     Stack,
+    Switch,
     Table,
     TableBody,
     TableCell,
@@ -13,15 +16,25 @@ import {
     TableHead,
     TableRow,
     TextField,
+    Tooltip,
     Typography
 } from "@mui/material";
 import {Download, Refresh} from "@mui/icons-material";
 import {toast} from "react-toastify";
 import {stringify} from "csv-stringify";
 import {exportUserData} from "@/actions/userDataExport";
-import {formatZuluDate} from "@/lib/date";
 
 type ExportData = NonNullable<Awaited<ReturnType<typeof exportUserData>>['data']>;
+
+export type ExportableUser = {
+    cid: string,
+    firstName: string | null,
+    lastName: string | null,
+    controllerStatus: string,
+};
+
+const userLabel = (user: ExportableUser) =>
+    `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() + ` (${user.cid})${user.controllerStatus === 'NONE' ? ' - Not on roster' : ''}`;
 
 const toCell = (value: unknown) => {
     if (value === null || value === undefined) return '';
@@ -47,7 +60,7 @@ const downloadCsv = async (rows: Record<string, unknown>[], filename: string) =>
         toast.info('Nothing to export.');
         return;
     }
-    const columns = Object.keys(rows[0]);
+    const columns = [...new Set(rows.flatMap((row) => Object.keys(row)))];
     const csvContent = await new Promise<string>((resolve, reject) => {
         stringify(rows.map((row) => columns.map((column) => toCell(row[column]))), {
             header: true,
@@ -60,28 +73,17 @@ const downloadCsv = async (rows: Record<string, unknown>[], filename: string) =>
     download(csvContent, 'text/csv;charset=utf-8;', filename);
 }
 
-const attendanceColor = (attendance: string) => attendance === 'NO_SHOW' ? 'error' : attendance === 'CONNECTED' ? 'success' : 'default';
-
-export type ExportableUser = {
-    cid: string,
-    firstName: string | null,
-    lastName: string | null,
-    controllerStatus: string,
-};
-
-const userLabel = (user: ExportableUser) =>
-    `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() + ` (${user.cid})${user.controllerStatus === 'NONE' ? ' - Not on roster' : ''}`;
-
 export default function UserDataExportForm({users}: { users: ExportableUser[] }) {
 
     const [cid, setCid] = React.useState('');
+    const [redact, setRedact] = React.useState(true);
     const [loading, setLoading] = React.useState(false);
     const [data, setData] = React.useState<ExportData | null>(null);
 
-    const generate = async (selectedCid: string) => {
+    const generate = async (selectedCid: string, redactThirdParties: boolean) => {
         if (!selectedCid) return;
         setLoading(true);
-        const result = await exportUserData(selectedCid);
+        const result = await exportUserData(selectedCid, redactThirdParties);
         setLoading(false);
         if (result.error || !result.data) {
             toast.error(result.error || 'Failed to generate export.');
@@ -92,10 +94,11 @@ export default function UserDataExportForm({users}: { users: ExportableUser[] })
         toast.success('Export generated.');
     }
 
-    const prefix = data ? `${data.profile.cid}_${new Date().toISOString().slice(0, 10)}` : '';
-    const noShows = data?.eventSignups.filter((s) => s.attendance === 'NO_SHOW').length ?? 0;
-    const attended = data?.eventSignups.filter((s) => s.attendance === 'CONNECTED').length ?? 0;
-    const staffDeletes = data?.auditLog.filter((l) => l.model === 'EVENT_POSITION' && l.type === 'DELETE' && l.relation === 'ABOUT_USER').length ?? 0;
+    const prefix = data ? `${data.subject.cid}_${new Date().toISOString().slice(0, 10)}` : '';
+    const signups = data?.sections.find((s) => s.key === 'event_signups')?.rows ?? [];
+    const attended = signups.filter((s) => s.attendance === 'CONNECTED').length;
+    const noShows = signups.filter((s) => s.attendance === 'NO_SHOW').length;
+    const totalRecords = data?.sections.reduce((sum, s) => sum + s.rows.length, 0) ?? 0;
 
     return (
         <Stack direction="column" spacing={2}>
@@ -107,70 +110,68 @@ export default function UserDataExportForm({users}: { users: ExportableUser[] })
                     value={users.find((u) => u.cid === cid) || null}
                     onChange={(event, newValue) => {
                         setCid(newValue ? newValue.cid : '');
-                        if (newValue) generate(newValue.cid);
+                        if (newValue) generate(newValue.cid, redact);
                     }}
                     disabled={loading}
                     renderInput={(params) => <TextField {...params} variant="filled" label="User"
                                                         helperText="Anyone who has ever signed in, on the roster or not."/>}
                 />
                 <Button variant="contained" startIcon={<Refresh/>} disabled={loading || !cid}
-                        onClick={() => generate(cid)} sx={{alignSelf: {sm: 'flex-start'}, mt: {sm: 1}}}>
+                        onClick={() => generate(cid, redact)} sx={{alignSelf: {sm: 'flex-start'}, mt: {sm: 1}}}>
                     {loading ? 'Generating...' : 'Regenerate'}
                 </Button>
             </Stack>
+            <FormControlLabel
+                control={<Switch checked={redact} disabled={loading} onChange={(e) => {
+                    setRedact(e.target.checked);
+                    if (cid) generate(cid, e.target.checked);
+                }}/>}
+                label="Redact other people's identities (leave on for GDPR requests)"
+            />
             {data && <>
-                <Typography variant="h6">{data.profile.firstName} {data.profile.lastName} ({data.profile.cid})</Typography>
+                <Typography variant="h6">{data.subject.name} ({data.subject.cid})</Typography>
                 {data.notes.map((note) => <Alert key={note} severity="info">{note}</Alert>)}
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    <Chip label={`${data.eventSignups.length} signups on record`}/>
+                    <Chip label={`${totalRecords} records`}/>
+                    <Chip label={`${data.sections.filter((s) => s.rows.length > 0).length}/${data.sections.length} sections with data`}/>
+                    <Chip label={`${signups.length} event signups`}/>
                     <Chip label={`${attended} attended`} color="success"/>
                     <Chip label={`${noShows} no-shows`} color="error"/>
-                    <Chip label={`${staffDeletes} staff deletions logged`} color="warning"/>
-                    <Chip label={`${data.auditLog.length} audit log entries`}/>
-                    <Chip label={`${data.controllerSessions.length} controller sessions`}/>
+                    <Chip label={data.thirdPartiesRedacted ? 'Third parties redacted' : 'Third parties NOT redacted'}
+                          color={data.thirdPartiesRedacted ? 'default' : 'warning'}/>
                 </Stack>
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                     <Button variant="outlined" color="inherit" startIcon={<Download/>}
                             onClick={() => download(JSON.stringify(data, null, 2), 'application/json', `user_export_${prefix}.json`)}>
                         Full Export (JSON)
                     </Button>
-                    <Button variant="outlined" color="inherit" startIcon={<Download/>}
-                            onClick={() => downloadCsv(data.eventSignups, `event_signups_${prefix}.csv`)}>
-                        Event Signups (CSV)
-                    </Button>
-                    <Button variant="outlined" color="inherit" startIcon={<Download/>}
-                            onClick={() => downloadCsv(data.auditLog, `audit_log_${prefix}.csv`)}>
-                        Audit Log (CSV)
-                    </Button>
-                    <Button variant="outlined" color="inherit" startIcon={<Download/>}
-                            onClick={() => downloadCsv(data.controllerSessions, `controller_sessions_${prefix}.csv`)}>
-                        Controller Sessions (CSV)
-                    </Button>
                 </Stack>
                 <TableContainer>
                     <Table size="small">
                         <TableHead>
                             <TableRow>
-                                <TableCell>Event</TableCell>
-                                <TableCell>Submitted</TableCell>
-                                <TableCell>Requested</TableCell>
-                                <TableCell>Final</TableCell>
-                                <TableCell>Published</TableCell>
-                                <TableCell>Attendance</TableCell>
-                                <TableCell>Connected</TableCell>
+                                <TableCell>Section</TableCell>
+                                <TableCell>Description</TableCell>
+                                <TableCell align="right">Records</TableCell>
+                                <TableCell align="right">CSV</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {data.eventSignups.map((signup) => (
-                                <TableRow key={signup.eventId}>
-                                    <TableCell>{signup.event}<br/>{formatZuluDate(signup.eventStart)}</TableCell>
-                                    <TableCell>{formatZuluDate(signup.submittedAt)}</TableCell>
-                                    <TableCell>{signup.requestedPosition}</TableCell>
-                                    <TableCell>{signup.finalPosition || '-'}</TableCell>
-                                    <TableCell>{signup.published ? 'Yes' : 'No'}</TableCell>
-                                    <TableCell><Chip size="small" label={signup.attendance}
-                                                     color={attendanceColor(signup.attendance)}/></TableCell>
-                                    <TableCell>{signup.minutesConnectedInSlot}/{signup.slotMinutes}m {signup.callsignsUsed}</TableCell>
+                            {data.sections.map((section) => (
+                                <TableRow key={section.key}>
+                                    <TableCell>{section.title}</TableCell>
+                                    <TableCell>{section.description}</TableCell>
+                                    <TableCell align="right">{section.rows.length}</TableCell>
+                                    <TableCell align="right">
+                                        <Tooltip title={`Download ${section.title} CSV`}>
+                                            <span>
+                                                <IconButton size="small" disabled={section.rows.length === 0}
+                                                            onClick={() => downloadCsv(section.rows, `${section.key}_${prefix}.csv`)}>
+                                                    <Download fontSize="small"/>
+                                                </IconButton>
+                                            </span>
+                                        </Tooltip>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
