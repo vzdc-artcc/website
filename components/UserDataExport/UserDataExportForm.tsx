@@ -113,19 +113,19 @@ export default function UserDataExportForm() {
                     <Chip label={`${data.controllerSessions.length} controller sessions`}/>
                 </Stack>
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    <Button variant="outlined" startIcon={<Download/>}
+                    <Button variant="outlined" color="inherit" startIcon={<Download/>}
                             onClick={() => download(JSON.stringify(data, null, 2), 'application/json', `user_export_${prefix}.json`)}>
                         Full Export (JSON)
                     </Button>
-                    <Button variant="outlined" startIcon={<Download/>}
+                    <Button variant="outlined" color="inherit" startIcon={<Download/>}
                             onClick={() => downloadCsv(data.eventSignups, `event_signups_${prefix}.csv`)}>
                         Event Signups (CSV)
                     </Button>
-                    <Button variant="outlined" startIcon={<Download/>}
+                    <Button variant="outlined" color="inherit" startIcon={<Download/>}
                             onClick={() => downloadCsv(data.auditLog, `audit_log_${prefix}.csv`)}>
                         Audit Log (CSV)
                     </Button>
-                    <Button variant="outlined" startIcon={<Download/>}
+                    <Button variant="outlined" color="inherit" startIcon={<Download/>}
                             onClick={() => downloadCsv(data.controllerSessions, `controller_sessions_${prefix}.csv`)}>
                         Controller Sessions (CSV)
                     </Button>
