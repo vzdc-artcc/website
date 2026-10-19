@@ -1,6 +1,6 @@
 import React from 'react';
 import {ListItemIcon, ListItemText,} from "@mui/material";
-import {Home, SettingsApplications,} from "@mui/icons-material";
+import {Home, PersonSearch, SettingsApplications,} from "@mui/icons-material";
 import prisma from "@/lib/db";
 import MenuWrapper from './MenuWrapper';
 import AdminListItemButton from "@/components/Admin/AdminListItemButton";
@@ -37,6 +37,12 @@ export default async function WebSystemAdminMenu() {
                     <SettingsApplications/>
                 </ListItemIcon>
                 <ListItemText primary="Discord Configuration"/>
+            </AdminListItemButton>
+            <AdminListItemButton href="/web-system/user-export">
+                <ListItemIcon>
+                    <PersonSearch/>
+                </ListItemIcon>
+                <ListItemText primary="User Data Export"/>
             </AdminListItemButton>
         </MenuWrapper>
     );
