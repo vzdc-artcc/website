@@ -131,13 +131,27 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
 
     const trainingAppointmentZ = z.object({
         id: z.string().optional(),
-        studentId: z.string().min(1, {message: "Student is required"}),
-        start: z.date({required_error: 'Start date is required'}).refine(isAtLeastOneHourFromNow, {message: "Start date must be at least one hour from now"}),
-        lessonIds: z.array(z.string()).min(1, {message: "At least one lesson is required"}).max(5, {message: "A maximum of 5 lessons is allowed"}),
+        studentId: z.string().min(1, {
+            error: "Student is required"
+        }),
+        start: z.date({
+            error: (issue) => issue.input === undefined ? 'Start date is required' : undefined
+        }).refine(isAtLeastOneHourFromNow, {
+            error: "Start date must be at least one hour from now"
+        }),
+        lessonIds: z.array(z.string()).min(1, {
+            error: "At least one lesson is required"
+        }).max(5, {
+            error: "A maximum of 5 lessons is allowed"
+        }),
         notes: z.string().max(50, "Notes can only be 50 characters long").toUpperCase(),
         additionalTrainers: z.array(z.object({
-            trainerId: z.string().min(1, {message: "Trainer is required"}),
-            description: z.string().min(1, {message: "Description is required"}).toUpperCase(),
+            trainerId: z.string().min(1, {
+                error: "Trainer is required"
+            }),
+            description: z.string().min(1, {
+                error: "Description is required"
+            }).toUpperCase(),
         })),
     });
 
@@ -151,7 +165,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     if (result.data.additionalTrainers.map((t) => t.trainerId).includes(trainerId)) {
@@ -249,7 +263,7 @@ export const createOrUpdateTrainingAppointment = async (studentId: string, start
     }
 
     const liveLesson = ta.lessons.find((l => l.location === 1));
-    const booking = ta.atcBookingId && await fetchTrainingBooking(ta.atcBookingId);
+    const booking = ta.atcBookingId && (await fetchTrainingBooking(ta.atcBookingId));
     if (liveLesson) {
         const bookingEnd = new Date(ta.start.getTime() + liveLesson.duration * 60000);
 

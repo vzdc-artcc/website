@@ -6,7 +6,9 @@ function NotFound() {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack direction="row" spacing={1} sx={{
+                    alignItems: "center"
+                }}>
                     <Info color="error"/>
                     <Typography>Category not found.</Typography>
                 </Stack>

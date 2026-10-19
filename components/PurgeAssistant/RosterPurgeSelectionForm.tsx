@@ -92,7 +92,7 @@ export default function RosterPurgeSelectionForm({
         });
 
         if (!result.success) {
-            toast(result.error.errors.map((e) => e.message).join(".  "), {type: 'error'})
+            toast(result.error.issues.map((e) => e.message).join(".  "), {type: 'error'})
             return;
         }
 
@@ -114,7 +114,9 @@ export default function RosterPurgeSelectionForm({
     return (
         <Box sx={{my: 2,}}>
             <form action={handleSubmit}>
-                <Stack direction={{xs: 'column', md: 'row',}} spacing={2} alignItems="center">
+                <Stack direction={{xs: 'column', md: 'row',}} spacing={2} sx={{
+                    alignItems: "center"
+                }}>
                     <TextField
                         id="year"
                         required

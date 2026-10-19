@@ -15,7 +15,9 @@ export default async function Page() {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" justifyContent="space-between" spacing={1}>
+                <Stack direction="row" spacing={1} sx={{
+                    justifyContent: "space-between"
+                }}>
                     <Typography variant="h5">Trainer Assignments</Typography>
                     {isTaOrAtaOrWm && <Link href="/training/assignments/new" passHref>
                         <Button variant="contained" startIcon={<Add/>}>Manual Training Assignment</Button>

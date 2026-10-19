@@ -49,7 +49,9 @@ export default async function BroadcastViewer({user, includeSeen}: { user: User,
                         <Box sx={{mt: 2,}}>
                             <Link href={`/publications/${unseenBroadcasts[0].file.id}`} target="_blank"
                                   style={{color: 'inherit',}}>
-                                <Stack direction="row" alignItems="center" spacing={1}>
+                                <Stack direction="row" spacing={1} sx={{
+                                    alignItems: "center"
+                                }}>
                                     <FileOpen/>
                                     <Typography variant="subtitle2">
                                         {unseenBroadcasts[0].file.name}
@@ -73,7 +75,9 @@ export default async function BroadcastViewer({user, includeSeen}: { user: User,
                             <Box sx={{mt: 2,}}>
                                 <Link href={`/publications/${broadcast.file.id}`} target="_blank"
                                       style={{color: 'inherit',}}>
-                                    <Stack direction="row" alignItems="center" spacing={1}>
+                                    <Stack direction="row" spacing={1} sx={{
+                                        alignItems: "center"
+                                    }}>
                                         <FileOpen/>
                                         <Typography variant="subtitle2">
                                             {broadcast.file.name}

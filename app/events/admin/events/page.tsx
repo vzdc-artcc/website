@@ -1,7 +1,7 @@
 import EventTable from "@/components/Event/EventTable";
 import EventTableToggleSwitch from "@/components/Event/EventTableToggleSwitch";
-import { Add } from "@mui/icons-material";
-import { Box, Button, Card, CardContent, Stack, Typography } from "@mui/material";
+import {Add} from "@mui/icons-material";
+import {Box, Button, Card, CardContent, Stack, Typography} from "@mui/material";
 import Link from "next/link";
 
 export default async function EventsPage({ searchParams }: { searchParams: Promise<{ archived?: string, }> }) {
@@ -11,7 +11,9 @@ export default async function EventsPage({ searchParams }: { searchParams: Promi
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" justifyContent="space-between">
+                <Stack direction="row" sx={{
+                    justifyContent: "space-between"
+                }}>
                     <Box>
                         <Typography variant="h5">Events</Typography>
                         <Typography>Events are archived 24 hours after the published end time.</Typography>

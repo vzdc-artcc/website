@@ -34,20 +34,26 @@ export default async function Page() {
     });
 
     return (
-        (<Stack direction="column" spacing={2}>
+        <Stack direction="column" spacing={2}>
             <Card>
                 <CardContent>
                     <Typography variant="h5">Operating Initials Matrix</Typography>
                     <Box sx={{mt: 1, border: 2, borderRadius: 2, color: 'cyan',}}>
-                        <Typography textAlign="center" variant="body2">In Use - HOME (hover/click to inspect
+                        <Typography variant="body2" sx={{
+                            textAlign: "center"
+                        }}>In Use - HOME (hover/click to inspect
                             controller)</Typography>
                     </Box>
                     <Box sx={{mt: 1, border: 2, borderRadius: 2, color: 'purple',}}>
-                        <Typography textAlign="center" variant="body2">In Use - VISITOR (hover/click to inspect
+                        <Typography variant="body2" sx={{
+                            textAlign: "center"
+                        }}>In Use - VISITOR (hover/click to inspect
                             controller)</Typography>
                     </Box>
                     <Box sx={{mt: 1, border: 2, borderRadius: 2,}}>
-                        <Typography textAlign="center" variant="body2">Vacant</Typography>
+                        <Typography variant="body2" sx={{
+                            textAlign: "center"
+                        }}>Vacant</Typography>
                     </Box>
                 </CardContent>
             </Card>
@@ -73,7 +79,9 @@ export default async function Page() {
                                                 borderRadius: 2,
                                                 color: inUse.controllerStatus === "HOME" ? 'cyan' : 'purple',
                                             }}>
-                                                <Typography textAlign="center" variant="body2">{initials}</Typography>
+                                                <Typography variant="body2" sx={{
+                                                    textAlign: "center"
+                                                }}>{initials}</Typography>
                                             </Box>
                                         </Link>
                                     </Tooltip>
@@ -85,7 +93,7 @@ export default async function Page() {
                     </Grid>
                 </CardContent>
             </Card>
-        </Stack>)
+        </Stack>
     );
 
 }

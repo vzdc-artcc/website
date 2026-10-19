@@ -19,7 +19,7 @@ export const upsertDiscordConfig = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     let discordConfig;
@@ -63,7 +63,7 @@ export const upsertChannel = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const channel = await prisma.discordChannel.upsert({
@@ -104,7 +104,7 @@ export const upsertRole = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const role = await prisma.discordRole.upsert({
@@ -145,7 +145,7 @@ export const upsertCategory = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const category = await prisma.discordCategory.upsert({

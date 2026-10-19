@@ -138,7 +138,12 @@ function FinalPositionsTable({ title, positions }: { title: string; positions: a
             <Typography variant="h6" sx={{ mb: 1 }}>{title}</Typography>
 
             {positions.length === 0 ? (
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                <Typography
+                    variant="body2"
+                    sx={{
+                        color: "text.secondary",
+                        mt: 1
+                    }}>
                     No final positions in this category.
                 </Typography>
             ) : (
@@ -177,22 +182,30 @@ function FinalPositionsTable({ title, positions }: { title: string; positions: a
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 <Box sx={{ minWidth: 0 }}>
                                                     <Typography variant="body2" sx={{ fontWeight: 700 }}>{altName}</Typography>
-                                                    {rating ? <Typography variant="caption" color="text.secondary">Rating: {rating}</Typography> : null}
+                                                    {rating ? <Typography variant="caption" sx={{
+                                                        color: "text.secondary"
+                                                    }}>Rating: {rating}</Typography> : null}
                                                 </Box>
                                             </Box>
                                         </TableCell>
 
                                         <TableCell>
                                             <Typography variant="body2" sx={{ fontWeight: 600 }}>{posLabel}</Typography>
-                                            {p.controllingCategory ? <Typography variant="caption" color="text.secondary">{String(p.controllingCategory).toUpperCase()}</Typography> : null}
+                                            {p.controllingCategory ? <Typography variant="caption" sx={{
+                                                color: "text.secondary"
+                                            }}>{String(p.controllingCategory).toUpperCase()}</Typography> : null}
                                         </TableCell>
 
                                         <TableCell>
-                                            <Typography variant="body2" color="text.secondary">{start}</Typography>
+                                            <Typography variant="body2" sx={{
+                                                color: "text.secondary"
+                                            }}>{start}</Typography>
                                         </TableCell>
 
                                         <TableCell>
-                                            <Typography variant="body2" color="text.secondary">{end}</Typography>
+                                            <Typography variant="body2" sx={{
+                                                color: "text.secondary"
+                                            }}>{end}</Typography>
                                         </TableCell>
 
                                         <TableCell sx={{ maxWidth: 420 }}>
@@ -293,16 +306,29 @@ export default async function OpsPlanView({ eventId }: Props) {
         <Grid container spacing={2} columns={12}>
             <Grid size={12}>
                 <Box sx={{ flexGrow: 1 }}>
-                    <Stack spacing={1} direction="row" alignItems="center" justifyContent="space-between">
+                    <Stack
+                        spacing={1}
+                        direction="row"
+                        sx={{
+                            alignItems: "center",
+                            justifyContent: "space-between"
+                        }}>
                         <Box>
                             <Typography variant="h4">{event.name} - OPS Plan</Typography>
                             <Typography>START &nbsp;{formatZuluDate(event.start)} (IN {eventGetDuration(new Date(), event.start, true).toFixed(2)} days)</Typography>
                             <Typography>END &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{formatZuluDate(event.end)} (+{eventGetDuration(event.start, event.end).toFixed(2)} hours)</Typography>
-                            <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 0.5 }}>
+                            <Typography
+                                variant="subtitle2"
+                                sx={{
+                                    color: "text.secondary",
+                                    mt: 0.5
+                                }}>
                                 Event Planner: {formatPlanner(planner)}
                             </Typography>
                         </Box>
-                        <Stack direction="row" spacing={1} alignItems="center">
+                        <Stack direction="row" spacing={1} sx={{
+                            alignItems: "center"
+                        }}>
                             <Tooltip title={event.hidden ? 'You must show the event to view information.' : 'View Event Page'}>
                                 {event.hidden ? (
                                     <IconButton disabled size="large">
@@ -358,7 +384,12 @@ export default async function OpsPlanView({ eventId }: Props) {
                             <Typography variant="h6">Planned Staffing</Typography>
 
                             {preset.length === 0 ? (
-                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        color: "text.secondary",
+                                        mt: 1
+                                    }}>
                                     No preset positions defined for this event.
                                 </Typography>
                             ) : (
@@ -423,7 +454,13 @@ export default async function OpsPlanView({ eventId }: Props) {
                         <Divider sx={{ my: 2 }} />
                         <Grid size={12}>
                             <Paper sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                                <Stack
+                                    direction="row"
+                                    sx={{
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        mb: 1
+                                    }}>
                                     <Typography variant="h6">Other Notes</Typography>
                                 </Stack>
 
@@ -435,11 +472,21 @@ export default async function OpsPlanView({ eventId }: Props) {
                                     </Box>
                                 ) : (
                                     <Box sx={{ mt: 1 }}>
-                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                                        <Typography
+                                            variant="body2"
+                                            sx={{
+                                                color: "text.secondary",
+                                                mb: 1
+                                            }}>
                                             Ops plan is not published — preview (not visible to general users):
                                         </Typography>
                                         <Paper variant="outlined" sx={{ p: 1, bgcolor: 'background.default' }}>
-                                            <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    color: "text.secondary",
+                                                    whiteSpace: 'pre-wrap'
+                                                }}>
                                                 {String(event.opsFreeText)}
                                             </Typography>
                                         </Paper>

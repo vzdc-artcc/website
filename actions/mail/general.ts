@@ -10,7 +10,7 @@ export const sendMail = async (to: string[], subject: string, replyTo: string, b
     const emailZ = z.object({
         to: z.string().array().min(1, "At least one recipient is required"),
         subject: z.string().min(1, "Subject must not be empty"),
-        replyTo: z.string().email("Reply to must be a valid email address"),
+        replyTo: z.email("Reply to must be a valid email address"),
         body: z.string().min(1, "Body is required"),
     });
 
@@ -22,7 +22,7 @@ export const sendMail = async (to: string[], subject: string, replyTo: string, b
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     try {

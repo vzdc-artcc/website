@@ -7,7 +7,14 @@ export default function Page() {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{mb: 2,}}>
+                <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        mb: 2
+                    }}>
                     <CheckCircle color="success" fontSize="large"/>
                     <Typography variant="h5">LOA Submitted</Typography>
                 </Stack>

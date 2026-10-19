@@ -22,21 +22,29 @@ export default async function Home() {
                     <Box>
                         <ul>
                             <li>
-                                <Typography variant="body2" mt={1}>All users must join TeamSpeak using the name
+                                <Typography variant="body2" sx={{
+                                    mt: 1
+                                }}>All users must join TeamSpeak using the name
                                     associated with their VATSIM account.</Typography>
                             </li>
                             <li>
-                                <Typography variant="body2" mt={1}>Anonymous users will be kicked with a warning and
+                                <Typography variant="body2" sx={{
+                                    mt: 1
+                                }}>Anonymous users will be kicked with a warning and
                                     banned upon reconnecting anonymously.</Typography>
                             </li>
                             <li>
-                                <Typography variant="body2" mt={1}>Teamspeak permissions are required to move within
+                                <Typography variant="body2" sx={{
+                                    mt: 1
+                                }}>Teamspeak permissions are required to move within
                                     Teamspeak. Please contact a staff member to
                                     receive appropriate permissions. (If you are not a member of the VATUSA region,
                                     please provide your CID for rating verification).</Typography>
                             </li>
                             <li>
-                                <Typography variant="body2" mt={1}>Streaming while controlling is allowed and encouraged
+                                <Typography variant="body2" sx={{
+                                    mt: 1
+                                }}>Streaming while controlling is allowed and encouraged
                                     although the audio from Teamspeak is
                                     not allowed for the privacy of other controllers. Streaming Teamspeak audio requires
                                     the written permission of the ATM
@@ -47,11 +55,15 @@ export default async function Home() {
                                     privileges.</Typography>
                             </li>
                             <li>
-                                <Typography variant="body2" mt={1}>Controlling rooms are limited to controlling only.
+                                <Typography variant="body2" sx={{
+                                    mt: 1
+                                }}>Controlling rooms are limited to controlling only.
                                     If a controller asks for you to leave, please do so.</Typography>
                             </li>
                             <li>
-                                <Typography variant="body2" mt={1}>Use of Teamspeak is a privilege and can be revoked by
+                                <Typography variant="body2" sx={{
+                                    mt: 1
+                                }}>Use of Teamspeak is a privilege and can be revoked by
                                     a staff member at any time and for any reason.
                                     To appeal teamspeak bans, please contact the DATM at <Link
                                         href="mailto:datm@vzdc.org"
@@ -64,7 +76,9 @@ export default async function Home() {
             </Card>
             {!session && <Card>
                 <CardContent>
-                    <Stack direction="row" spacing={1} alignItems="center">
+                    <Stack direction="row" spacing={1} sx={{
+                        alignItems: "center"
+                    }}>
                         <Error color="error"/>
                         <Typography>Login to access TeamSpeak</Typography>
                     </Stack>

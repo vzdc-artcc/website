@@ -16,7 +16,9 @@ export default function SearchForm({label, q}: { label: string, q?: string, }) {
 
     return (
         <form action={handleSearch}>
-            <Stack direction={{xs: 'column', md: 'row'}} spacing={1} alignItems="center">
+            <Stack direction={{xs: 'column', md: 'row'}} spacing={1} sx={{
+                alignItems: "center"
+            }}>
                 <TextField fullWidth variant="filled" name="q" label={label} defaultValue={q || ''}/>
                 <Box>
                     <Button type="submit" variant="contained">Search</Button>

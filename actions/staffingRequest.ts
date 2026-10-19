@@ -22,7 +22,7 @@ export const createStaffingRequest = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const staffingRequest = await prisma.staffingRequest.create({

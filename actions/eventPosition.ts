@@ -5,7 +5,7 @@ import prisma from "@/lib/db";
 import {Event, EventPosition} from "@/generated/prisma/client";
 import {getServerSession, User} from "next-auth";
 import {after} from "next/server";
-import {SafeParseReturnType, z} from "zod";
+import {z, ZodSafeParseResult} from "zod";
 import {log} from "./log";
 import {revalidatePath} from "next/cache";
 import {
@@ -74,13 +74,29 @@ export const saveEventPosition = async (event: Event, formData: FormData, admin?
     const secondaryPositionRequest = ["Delivery", "Ground", "Tower", "Approach", "Center"]
 
     const eventPositionZ = z.object({
-        controllerId: z.string().min(1, { message: 'Controller is required' }),
-        requestedPosition: z.string().min(1, { message: 'Requested Position is required' }).max(50, { message: 'Requested Position must be less than 50 characters' }),
+        controllerId: z.string().min(1, {
+            error: 'Controller is required'
+        }),
+        requestedPosition: z.string().min(1, {
+            error: 'Requested Position is required'
+        }).max(50, {
+            error: 'Requested Position must be less than 50 characters'
+        }),
         requestedSecondaryPosition: z.string().refine((val) => {
             return secondaryPositionRequest.includes(val);
-        }, {message: 'Requested Secondary Position must be one of the preset positions'}),
-        requestedStartTime: z.date().min(minStart, {message: 'Requested time must be within the event'}).max(maxEnd, {message: 'Requested time must be within the event'}),
-        requestedEndTime: z.date().min(minStart, {message: 'Requested time must be within the event'}).max(maxEnd, {message: 'Requested time must be within the event'}),
+        }, {
+            error: 'Requested Secondary Position must be one of the preset positions'
+        }),
+        requestedStartTime: z.date().min(minStart, {
+            error: 'Requested time must be within the event'
+        }).max(maxEnd, {
+            error: 'Requested time must be within the event'
+        }),
+        requestedEndTime: z.date().min(minStart, {
+            error: 'Requested time must be within the event'
+        }).max(maxEnd, {
+            error: 'Requested time must be within the event'
+        }),
         notes: z.string().optional(),
     });
 
@@ -94,7 +110,7 @@ export const saveEventPosition = async (event: Event, formData: FormData, admin?
     });
 
     if (!result.success) {
-        return { errors: result.error.errors };
+        return {errors: result.error.issues};
     }
 
     const eventPosition = await prisma.eventPosition.create({
@@ -187,15 +203,27 @@ export const deleteEventPosition = async (event: Event, eventPositionId: string,
     
 }
 
-export const validateFinalEventPosition = async (event: Event, formData: FormData, zodResponse?: boolean): Promise<ZodErrorSlimResponse | SafeParseReturnType<any, any>> => {
+export const validateFinalEventPosition = async (event: Event, formData: FormData, zodResponse?: boolean): Promise<ZodErrorSlimResponse | ZodSafeParseResult<any>> => {
 
     const minStart = event.enableBufferTimes ? dayjs.utc(event.start).subtract(2, 'hour').toDate() : event.start;
     const maxEnd = event.enableBufferTimes ? dayjs.utc(event.end).add(2, 'hour').toDate() : event.end;
 
     const eventPositionZ = z.object({
-        finalPosition: z.string().min(1, { message: 'Final Position is required and could not be autofilled.' }).max(50, { message: 'Final Position must be less than 50 characters' }),
-        finalStartTime: z.date().min(minStart, {message: 'Final time must be within the event'}).max(maxEnd, {message: 'Final time must be within the event'}),
-        finalEndTime: z.date().min(minStart, {message: 'Final time must be within the event'}).max(maxEnd, {message: 'Final time must be within the event'}),
+        finalPosition: z.string().min(1, {
+            error: 'Final Position is required and could not be autofilled.'
+        }).max(50, {
+            error: 'Final Position must be less than 50 characters'
+        }),
+        finalStartTime: z.date().min(minStart, {
+            error: 'Final time must be within the event'
+        }).max(maxEnd, {
+            error: 'Final time must be within the event'
+        }),
+        finalEndTime: z.date().min(minStart, {
+            error: 'Final time must be within the event'
+        }).max(maxEnd, {
+            error: 'Final time must be within the event'
+        }),
         finalNotes: z.string().optional(),
         
         controllingCategory: z.enum(['ADMIN','ENROUTE','TERMINAL','LOCAL']).optional(),
@@ -248,7 +276,7 @@ export const validateFinalEventPosition = async (event: Event, formData: FormDat
 
     return {
         success: data.success,
-        errors: data.error ? data.error.errors.map((e) => ({
+        errors: data.error ? data.error.issues.map((e) => ({
             path: e.path.join('.'),
             message: e.message,
         })) : [],
@@ -256,11 +284,11 @@ export const validateFinalEventPosition = async (event: Event, formData: FormDat
 }
 
 export const adminSaveEventPosition = async (event: Event, position: EventPosition, formData: FormData) => {
-    
-    const result = await validateFinalEventPosition(event, formData, true) as SafeParseReturnType<any, any>;
+
+    const result = await validateFinalEventPosition(event, formData, true) as ZodSafeParseResult<any>;
 
     if (!result.success) {
-        return { errors: result.error.errors };
+        return {errors: result.error.issues};
     }
 
     const eventPosition = await prisma.eventPosition.update({
@@ -318,12 +346,12 @@ export const publishEventPosition = async (event: Event, position: EventPosition
     formData.set('isTmu', String(Boolean(position.isTmu)));
     formData.set('isCic', String(Boolean(position.isCic)));
 
-    const result = await validateFinalEventPosition(event, formData, true) as SafeParseReturnType<any, any>;
+    const result = await validateFinalEventPosition(event, formData, true) as ZodSafeParseResult<any>;
 
     if (!result.success) {
         return { error: {
             success: false,
-            errors: result.error.errors.map((e) => ({
+                errors: result.error.issues.map((e) => ({
                 path: e.path.join('.'),
                 message: e.message,
             })),

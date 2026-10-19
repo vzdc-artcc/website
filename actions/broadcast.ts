@@ -95,7 +95,7 @@ export const createOrUpdateBroadcast = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     let broadcast;

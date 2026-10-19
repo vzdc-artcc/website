@@ -55,7 +55,9 @@ export default async function Page({searchParams}: { searchParams: Promise<{ mis
                                 </li>
                             ))}
                         </ul>
-                        <Typography variant="body2" fontWeight="bold" gutterBottom>Extra Information:</Typography>
+                        <Typography variant="body2" gutterBottom sx={{
+                            fontWeight: "bold"
+                        }}>Extra Information:</Typography>
                         <Typography>{suaBlock.details}</Typography>
                         <Divider sx={{my: 2,}}/>
                         <Typography variant="h6" gutterBottom>Disclaimer</Typography>

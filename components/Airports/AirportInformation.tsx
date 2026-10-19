@@ -33,8 +33,13 @@ export default async function AirportInformation({icao}: { icao: string, },) {
     }
 
     return (
-        (<Stack direction="column" spacing={2}>
-            <Typography variant="h5" fontWeight={700} textAlign="center">{airport.name} ({airport.iata})</Typography>
+        <Stack direction="column" spacing={2}>
+            <Typography
+                variant="h5"
+                sx={{
+                    fontWeight: 700,
+                    textAlign: "center"
+                }}>{airport.name} ({airport.iata})</Typography>
             <Grid container spacing={2} columns={2}>
                 <Grid
                     size={{
@@ -43,12 +48,18 @@ export default async function AirportInformation({icao}: { icao: string, },) {
                     <Card>
                         <CardContent>
                             <Stack direction="column" spacing={2}>
-                                <Typography variant="h6" textAlign="center">{airport.icao} Runways</Typography>
+                                <Typography variant="h6" sx={{
+                                    textAlign: "center"
+                                }}>{airport.icao} Runways</Typography>
                                 {airport.runways.map(runway => (
                                     <Card key={runway.id}>
                                         <CardContent>
-                                            <Typography variant="body1" fontWeight={700}
-                                                        textAlign="center">Runway {runway.name}</Typography>
+                                            <Typography
+                                                variant="body1"
+                                                sx={{
+                                                    fontWeight: 700,
+                                                    textAlign: "center"
+                                                }}>Runway {runway.name}</Typography>
                                             <Table size="small" sx={{mt: 1,}}>
                                                 <TableHead>
                                                     <TableRow>
@@ -73,6 +84,6 @@ export default async function AirportInformation({icao}: { icao: string, },) {
                     </Card>
                 </Grid>
             </Grid>
-        </Stack>)
+        </Stack>
     );
 }

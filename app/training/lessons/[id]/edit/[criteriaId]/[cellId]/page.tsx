@@ -59,7 +59,9 @@ export default async function Page(
     return cell.criteria.rubric.Lesson && (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2} sx={{
+                    alignItems: "center"
+                }}>
                     <Link href={`/training/lessons/${criteria.rubric.Lesson?.id}/edit/${criteria.id}/`}
                           style={{color: 'inherit',}}>
                         <Tooltip title="Go Back">

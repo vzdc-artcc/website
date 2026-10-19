@@ -131,7 +131,7 @@ export default function UserDataExportForm({users}: { users: ExportableUser[] })
             {data && <>
                 <Typography variant="h6">{data.subject.name} ({data.subject.cid})</Typography>
                 {data.notes.map((note) => <Alert key={note} severity="info">{note}</Alert>)}
-                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                <Stack direction="row" spacing={1} useFlexGap sx={{flexWrap: 'wrap'}}>
                     <Chip label={`${totalRecords} records`}/>
                     <Chip label={`${data.sections.filter((s) => s.rows.length > 0).length}/${data.sections.length} sections with data`}/>
                     <Chip label={`${signups.length} event signups`}/>
@@ -140,7 +140,7 @@ export default function UserDataExportForm({users}: { users: ExportableUser[] })
                     <Chip label={data.thirdPartiesRedacted ? 'Third parties redacted' : 'Third parties NOT redacted'}
                           color={data.thirdPartiesRedacted ? 'default' : 'warning'}/>
                 </Stack>
-                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                <Stack direction="row" spacing={1} useFlexGap sx={{flexWrap: 'wrap'}}>
                     <Button variant="outlined" color="inherit" startIcon={<Download/>}
                             onClick={() => download(JSON.stringify(data, null, 2), 'application/json', `user_export_${prefix}.json`)}>
                         Full Export (JSON)

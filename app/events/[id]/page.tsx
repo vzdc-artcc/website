@@ -135,10 +135,18 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 { session?.user && session.user.controllerStatus !== 'NONE' && !session.user.noEventSignup && eventPosition?.published && <Card>
                     <CardContent>
                         <Typography variant="h6" gutterBottom>Your Position Assignment</Typography>
-                        <Typography variant="h5" textAlign="center">{eventPosition.finalPosition}</Typography>
-                        <Typography variant="subtitle2" textAlign="center"
-                                    gutterBottom>{formatTimezoneDate(eventPosition.finalStartTime || event.start, session.user.timezone)} - {formatTimezoneDate(eventPosition.finalEndTime || event.end, session.user.timezone)}</Typography>
-                        <Typography textAlign="center" sx={{ mb: 4 }}>{eventPosition.finalNotes}</Typography>
+                        <Typography variant="h5" sx={{
+                            textAlign: "center"
+                        }}>{eventPosition.finalPosition}</Typography>
+                        <Typography variant="subtitle2" gutterBottom
+                                    sx={{
+                                        textAlign: "center"
+                                    }}>{formatTimezoneDate(eventPosition.finalStartTime || event.start, session.user.timezone)} - {formatTimezoneDate(eventPosition.finalEndTime || event.end, session.user.timezone)}</Typography>
+                        <Typography
+                            sx={{
+                                textAlign: "center",
+                                mb: 4
+                            }}>{eventPosition.finalNotes}</Typography>
                         <Typography variant="caption">Contact the events team if you have any questions.</Typography>
                     </CardContent>
                 </Card>}

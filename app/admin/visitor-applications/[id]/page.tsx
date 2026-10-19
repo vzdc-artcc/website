@@ -39,9 +39,11 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
     }
 
     return (
-        (<Card>
+        <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2} sx={{
+                    alignItems: "center"
+                }}>
                     <Typography variant="h5">Visitor Application</Typography>
                     <Chip label={application.status} color={getStatusColor(application.status)}/>
                 </Stack>
@@ -93,6 +95,6 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
                 {application.status === "PENDING" &&
                     <VisitorApplicationDecisionForm application={application} user={application.user as User}/>}
             </CardContent>
-        </Card>)
+        </Card>
     );
 }

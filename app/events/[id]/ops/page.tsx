@@ -1,5 +1,5 @@
 import prisma from "@/lib/db";
-import { notFound } from "next/navigation";
+import {notFound} from "next/navigation";
 import {Box, Divider, Paper, Typography} from "@mui/material";
 import OpsPlanView from "@/components/OpsPlan/OpsPlanView";
 import OpsPlanFiles from "@/components/OpsPlan/OpsPlanFiles";
@@ -61,7 +61,12 @@ export default async function Page({ params }: Params) {
                     The OPS Plan for {event.name} has not been published yet.
                 </Typography>
 
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                <Typography
+                    variant="body2"
+                    sx={{
+                        color: "text.secondary",
+                        mt: 2
+                    }}>
                     Event staff are still preparing the OPS Plan. Once the OPS Plan is published it will be available
                     here for you to view. If you believe this is an error or you need access sooner, please contact
                     the event organizers.

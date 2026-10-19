@@ -1,11 +1,20 @@
 import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
     Box,
     Card,
     CardContent,
+    IconButton,
     Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Tooltip,
     Typography,
-    Tooltip, IconButton, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Accordion, AccordionSummary,
-    AccordionDetails,
 } from "@mui/material";
 import prisma from "@/lib/db";
 import DiscordConfigForm from "@/components/DiscordConfig/DiscordConfigForm";
@@ -39,8 +48,14 @@ export default async function Page() {
             {configs.map((config) => (
                 <Card key={config.id}>
                     <CardContent>
-                        <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="space-between"
-                               sx={{mb: 1,}}>
+                        <Stack
+                            direction="row"
+                            spacing={2}
+                            sx={{
+                                justifyContent: "space-between",
+                                alignItems: "space-between",
+                                mb: 1
+                            }}>
                             <Typography variant="h6">{config.name}</Typography>
                             <Box>
                                 <Tooltip title="Edit Config">
@@ -55,8 +70,14 @@ export default async function Page() {
                         </Stack>
                         <Accordion>
                             <AccordionSummary id="panel-header" aria-controls="panel-content" expandIcon={<ExpandMore />}>
-                                <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center"
-                                       sx={{mb: 1,}}>
+                                <Stack
+                                    direction="row"
+                                    spacing={2}
+                                    sx={{
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        mb: 1
+                                    }}>
                                     <Typography variant="h6">Channels</Typography>
                                     <Tooltip title="Add Channel">
                                         <Link href={`/web-system/discord-configs/channel/new?discordConfigId=${config.id}`}
@@ -103,8 +124,14 @@ export default async function Page() {
                         </Accordion>
                         <Accordion>
                             <AccordionSummary id="panel-header" aria-controls="panel-content" expandIcon={<ExpandMore />}>
-                                <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center"
-                                       sx={{mb: 1,}}>
+                                <Stack
+                                    direction="row"
+                                    spacing={2}
+                                    sx={{
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        mb: 1
+                                    }}>
                                     <Typography variant="h6">Roles</Typography>
                                     <Tooltip title="Add Role">
                                         <Link href={`/web-system/discord-configs/role/new?discordConfigId=${config.id}`}
@@ -151,8 +178,14 @@ export default async function Page() {
                         </Accordion>
                         <Accordion>
                             <AccordionSummary id="panel-header" aria-controls="panel-content" expandIcon={<ExpandMore />}>
-                                <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center"
-                                       sx={{mb: 1,}}>
+                                <Stack
+                                    direction="row"
+                                    spacing={2}
+                                    sx={{
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                        mb: 1
+                                    }}>
                                     <Typography variant="h6">Categories</Typography>
                                     <Tooltip title="Add Category">
                                         <Link href={`/web-system/discord-configs/category/new?discordConfigId=${config.id}`}

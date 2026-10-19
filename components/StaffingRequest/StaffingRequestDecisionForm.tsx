@@ -21,7 +21,11 @@ function StaffingRequestDecisionForm({staffingRequest}: { staffingRequest: Staff
     return (
         <form action={handleSubmit}>
             <StaffingRequestDecisionButton/>
-            <Typography fontWeight="bold" sx={{mt: 1,}}>This will delete the staffing request permanently.</Typography>
+            <Typography
+                sx={{
+                    fontWeight: "bold",
+                    mt: 1
+                }}>This will delete the staffing request permanently.</Typography>
             <Typography>Create a new event <Link href="/events/admin/events/new" target="_blank"
                                                  style={{color: 'inherit',}}>here.</Link></Typography>
         </form>

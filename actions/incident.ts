@@ -15,7 +15,9 @@ export const createIncident = async (formData: FormData) => {
         reporterCallsign: z.string().optional(),
         reason: z.string(),
         reporteeId: z.string(),
-        timestamp: z.date().refine((d) => d < new Date(), {message: 'Date must be in the past.'}),
+        timestamp: z.date().refine((d) => d < new Date(), {
+            error: 'Date must be in the past.'
+        }),
     });
 
     const result = reportZ.safeParse({
@@ -27,7 +29,7 @@ export const createIncident = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const session = await getServerSession(authOptions);

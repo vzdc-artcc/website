@@ -201,7 +201,7 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
     }
 
     return (
-        (<LocalizationProvider dateAdapter={AdapterDayjs}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
             {renderAfterDialogs &&
                 <TrainingSessionAfterSubmitDialogs onAllClose={redirect} release={afterRelease} otsRec={otsRec}
                                                    rosterChanges={afterRosterUpdates}/>}
@@ -291,7 +291,9 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                                 {trainingTickets.map((ticket, index) => (
                                     <Accordion key={index}>
                                         <AccordionSummary expandIcon={<ExpandMore/>}>
-                                            <Stack direction="row" spacing={1} alignItems="center">
+                                            <Stack direction="row" spacing={1} sx={{
+                                                alignItems: "center"
+                                            }}>
                                                 <Typography>{ticket.lesson.identifier} - {ticket.lesson.name}</Typography>
                                                 <IconButton
                                                     onClick={() => setTrainingTickets(trainingTickets.filter((tt, i) => i !== index))}>
@@ -431,7 +433,7 @@ export default function TrainingSessionForm({timeZone, trainingSession,}: {
                     </Grid>
                 </Grid>
             </form>
-        </LocalizationProvider>)
+        </LocalizationProvider>
     );
 
 }

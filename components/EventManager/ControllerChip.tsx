@@ -51,19 +51,19 @@ export default function ControllerChip({
                                            user,
                                            soloCert,
                                            published,
-                                           eventId,
+                                           // eventId,
                                            eventInfo,
                                        }: {
     user: UserShape;
     soloCert?: SoloCertShape;
     published?: boolean;
-    eventId?: string;
+    // eventId?: string;
     eventInfo?: EventInfo | null;
 }) {
     const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [fetched, setFetched] = useState<EventInfo | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const [loading] = useState(false);
+    const [fetched] = useState<EventInfo | null>(null);
+    const [error] = useState<string | null>(null);
 
     const displayEventInfo = useMemo(() => eventInfo ?? fetched ?? null, [eventInfo, fetched]);
 
@@ -81,21 +81,28 @@ export default function ControllerChip({
     const tooltipTitle = soloCert ? `${soloCert.position} • expires ${new Date(soloCert.expires).toUTCString()}` : '';
 
     const renderCertifications = (items?: CertificationShape[] | null) => {
-        if (!items || items.length === 0) return <Typography variant="body2" color="text.secondary">None</Typography>;
+        if (!items || items.length === 0) return (
+            <Typography variant="body2" sx={{
+                color: "text.secondary"
+            }}>None</Typography>
+        );
         return (
-            <Stack direction="column" spacing={1} flexWrap="wrap">
+            <Stack direction="column" spacing={1} sx={{
+                flexWrap: "wrap"
+            }}>
                 {items.map((c) => {
                     const typeName = c.certificationType?.name || c.certificationTypeId || '';
                     const option = c.certificationOption || '';
                     return (
-                        <Typography key={c.id} variant="body2" color="text.secondary">
+                        <Typography key={c.id} variant="body2" sx={{
+                            color: "text.secondary"
+                        }}>
                             {typeName ? <>{typeName}{' — '}</> : null}
                             {option}
                         </Typography>
                     );
                 })}
             </Stack>
-
         );
     };
 
@@ -125,11 +132,15 @@ export default function ControllerChip({
 
             <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md">
                 <DialogTitle>
-                    <Stack direction="row" alignItems="center" spacing={2}>
+                    <Stack direction="row" spacing={2} sx={{
+                        alignItems: "center"
+                    }}>
                         <Avatar src={user?.avatarUrl} alt={nameLabel} />
                         <Box>
                             <Typography variant="h6">{`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || 'Unknown'}</Typography>
-                            <Typography variant="body2" color="text.secondary">{`CID: ${user?.cid ?? 'N/A'} • ${ratingLabel}`}</Typography>
+                            <Typography variant="body2" sx={{
+                                color: "text.secondary"
+                            }}>{`CID: ${user?.cid ?? 'N/A'} • ${ratingLabel}`}</Typography>
                         </Box>
                         <Link href={`/events/admin/controller/${user.cid}`} target="_blank"
                               style={{textDecoration: 'none'}}>
@@ -149,35 +160,68 @@ export default function ControllerChip({
                     ) : (
                         <Grid container spacing={2} columns={12}>
                             <Grid size={6}>
-                                {renderSection('Controller status', <Typography color="text.secondary" variant="body2">{user?.controllerStatus ?? 'N/A'}</Typography>)}
+                                {renderSection('Controller status', <Typography variant="body2" sx={{
+                                    color: "text.secondary"
+                                }}>{user?.controllerStatus ?? 'N/A'}</Typography>)}
                                 {renderSection('Solo cert', soloCert ? (
-                                    <Typography variant="body2" color="text.secondary">{soloCert.position} - Expires: {new Date(soloCert.expires).toLocaleString()}</Typography>
-                                ) : <Typography variant="body2" color="text.secondary">None</Typography>)}
+                                    <Typography variant="body2" sx={{
+                                        color: "text.secondary"
+                                    }}>{soloCert.position} -
+                                        Expires: {new Date(soloCert.expires).toLocaleString()}</Typography>
+                                ) : <Typography variant="body2" sx={{
+                                    color: "text.secondary"
+                                }}>None</Typography>)}
                                 {renderSection('Certifications', renderCertifications(displayEventInfo?.certifications ?? (user as any)?.certifications ?? []))}
                             </Grid>
 
                             <Grid size={6}>
                                 {renderSection('Last controlled event', displayEventInfo?.lastControlledEvent ? (
                                     <Stack spacing={0.5}>
-                                        <Typography variant="body2" color="text.secondary">Name - {displayEventInfo.lastControlledEvent.name}</Typography>
+                                        <Typography variant="body2" sx={{
+                                            color: "text.secondary"
+                                        }}>Name - {displayEventInfo.lastControlledEvent.name}</Typography>
                                         {displayEventInfo.lastControlledEvent.date && (
-                                            <Typography variant="body2" color="text.secondary">Date - {new Date(displayEventInfo.lastControlledEvent.date).toLocaleString()}</Typography>
+                                            <Typography variant="body2" sx={{
+                                                color: "text.secondary"
+                                            }}>Date
+                                                - {new Date(displayEventInfo.lastControlledEvent.date).toLocaleString()}</Typography>
                                         )}
                                         {displayEventInfo.lastControlledEvent.assignedPosition && (
-                                            <Typography variant="body2" color="text.secondary">Position -  {displayEventInfo.lastControlledEvent.assignedPosition}</Typography>
+                                            <Typography variant="body2" sx={{
+                                                color: "text.secondary"
+                                            }}>Position
+                                                - {displayEventInfo.lastControlledEvent.assignedPosition}</Typography>
                                         )}
                                     </Stack>
                                 ) : (
-                                    <Typography variant="body2" color="text.secondary">No recent event</Typography>
+                                    <Typography variant="body2" sx={{
+                                        color: "text.secondary"
+                                    }}>No recent event</Typography>
                                 ))}
 
                                 <Divider sx={{ my: 1 }} />
 
-                                {renderSection('Requested position for this event', <Typography color="text.secondary" variant="body2">{displayEventInfo?.requestedPosition ?? 'N/A'}</Typography>)}
-                                {renderSection('Assigned position for this event', <Typography color="text.secondary" variant="body2">{displayEventInfo?.assignedPosition ?? 'N/A'}</Typography>)}
-                                {renderSection('Notes for this event', <Typography color="text.secondary" variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{displayEventInfo?.eventNotes ?? 'None'}</Typography>)}
-                                {renderSection('Final position for this event', <Typography color="text.secondary" variant="body2">{displayEventInfo?.finalPosition ?? 'N/A'}</Typography>)}
-                                {renderSection('Final notes', <Typography color="text.secondary" variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{displayEventInfo?.finalNotes ?? 'None'}</Typography>)}
+                                {renderSection('Requested position for this event', <Typography variant="body2" sx={{
+                                    color: "text.secondary"
+                                }}>{displayEventInfo?.requestedPosition ?? 'N/A'}</Typography>)}
+                                {renderSection('Assigned position for this event', <Typography variant="body2" sx={{
+                                    color: "text.secondary"
+                                }}>{displayEventInfo?.assignedPosition ?? 'N/A'}</Typography>)}
+                                {renderSection('Notes for this event', <Typography
+                                    variant="body2"
+                                    sx={{
+                                        color: "text.secondary",
+                                        whiteSpace: 'pre-wrap'
+                                    }}>{displayEventInfo?.eventNotes ?? 'None'}</Typography>)}
+                                {renderSection('Final position for this event', <Typography variant="body2" sx={{
+                                    color: "text.secondary"
+                                }}>{displayEventInfo?.finalPosition ?? 'N/A'}</Typography>)}
+                                {renderSection('Final notes', <Typography
+                                    variant="body2"
+                                    sx={{
+                                        color: "text.secondary",
+                                        whiteSpace: 'pre-wrap'
+                                    }}>{displayEventInfo?.finalNotes ?? 'None'}</Typography>)}
                             </Grid>
                         </Grid>
                     )}

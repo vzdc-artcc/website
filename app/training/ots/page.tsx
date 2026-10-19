@@ -51,7 +51,13 @@ export default async function Page() {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} justifyContent="space-between" sx={{mb: 2,}}>
+                <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{
+                        justifyContent: "space-between",
+                        mb: 2
+                    }}>
                     <Typography variant="h5">OTS Recommendations</Typography>
                     {canModify && <Link href="/training/ots/new">
                         <Button variant="contained" size="large" startIcon={<Add/>}>New OTS Recommendation</Button>

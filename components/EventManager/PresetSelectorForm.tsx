@@ -1,13 +1,11 @@
 'use client';
-import { updateEventPresetPositions } from "@/actions/event";
-import { Box, Stack, TextField } from "@mui/material";
-import { Autocomplete } from "@mui/material";
-import { Chip } from "@mui/material";
+import {updateEventPresetPositions} from "@/actions/event";
+import {Autocomplete, Box, Chip, Stack, TextField} from "@mui/material";
 import {Event, EventPositionPreset} from "@/generated/prisma/browser";
 import Form from "next/form";
-import { useState } from "react";
+import {useState} from "react";
 import FormSaveButton from "../Form/FormSaveButton";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 
 export default function EventPresetSelector({ event, presetPositions }: { event: Event, presetPositions: EventPositionPreset[] }) {
 
@@ -27,9 +25,9 @@ export default function EventPresetSelector({ event, presetPositions }: { event:
                     options={[]}
                     value={positions}
                     freeSolo
-                    renderTags={(value: readonly string[], getTagProps) =>
+                    renderValue={(value: readonly string[], getItemProps) =>
                         value.map((option: string, index: number) => {
-                            const {key, ...tagProps} = getTagProps({index});
+                            const {key, ...tagProps} = getItemProps({index});
                             return (
                                 <Chip variant="filled" label={option} key={key} {...tagProps} />
                             );

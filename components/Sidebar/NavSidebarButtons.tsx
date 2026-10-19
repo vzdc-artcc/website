@@ -4,7 +4,8 @@ import Link from "next/link";
 import NavSidebarButton from "@/components/Sidebar/NavSidebarButton";
 import NavSidebar from "@/components/Sidebar/NavSidebar";
 import {NAVIGATION} from "@/lib/navigation";
-import {Box} from "@mui/material";
+import {Box, Divider} from "@mui/material";
+import {ArrowBack} from "@mui/icons-material";
 
 export default function NavSidebarButtons({onButtonClick,}: { onButtonClick: () => void, }) {
 
@@ -25,7 +26,16 @@ export default function NavSidebarButtons({onButtonClick,}: { onButtonClick: () 
                                           isSidebar={!!button.dropdown}/>
                     </Link>
                     {button.dropdown && <NavSidebar open={idx.toString() === openChildSidebar} title={button.label}
-                                                    onClose={() => setOpenChildSidebar(undefined)}>
+                                                    onClose={() => {
+                                                        setOpenChildSidebar(undefined);
+                                                        onButtonClick();
+                                                    }}>
+                        <Divider/>
+                        <NavSidebarButton icon={<ArrowBack/>} text="Back"
+                                          onClick={() => {
+                                              setOpenChildSidebar(undefined);
+                                          }}/>
+                        <Divider/>
                         {button.dropdown.buttons.map((dropdownButton, idx) => (
                             <Link key={idx} href={dropdownButton.link}
                                   style={{textDecoration: 'none', color: 'inherit',}}>

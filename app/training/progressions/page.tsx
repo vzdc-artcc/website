@@ -13,7 +13,13 @@ export default async function Page() {
     return session?.user && (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} justifyContent="space-between" sx={{mb: 2,}}>
+                <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{
+                        justifyContent: "space-between",
+                        mb: 2
+                    }}>
                     <Stack direction="column" spacing={1}>
                         <Typography variant="h5">Training Progressions</Typography>
                     </Stack>

@@ -53,7 +53,9 @@ export default function CertificationForm({cid, certificationTypes, certificatio
         <form action={handleSubmit}>
             <Stack direction="column" spacing={2} sx={{mt: 2,}}>
                 {certificationTypes.length === 0 &&
-                    <Typography textAlign="center">No certification types found. Create certification types <Link
+                    <Typography sx={{
+                        textAlign: "center"
+                    }}>No certification types found. Create certification types <Link
                         href="/admin/certification-types" style={{color: 'inherit',}}>here</Link>.</Typography>}
                 {certificationTypes.map((certificationType) => {
                     const soloCertification = soloCertifications.find(
@@ -73,7 +75,9 @@ export default function CertificationForm({cid, certificationTypes, certificatio
                                 disabled={isSolo}>
                                 {certificationType.certificationOptions.map((certificationOption) => (
                                     <MenuItem key={certificationOption} value={certificationOption}>
-                                        <Stack direction="row" spacing={1} alignItems="center">
+                                        <Stack direction="row" spacing={1} sx={{
+                                            alignItems: "center"
+                                        }}>
                                             {getIconForCertificationOption(certificationOption)}
                                             <Typography>
                                                 {certificationOption}
@@ -82,7 +86,9 @@ export default function CertificationForm({cid, certificationTypes, certificatio
                                     </MenuItem>
                                 ))}
                                 {isSolo && <MenuItem value="SOLO">
-                                    <Stack direction="row" spacing={1} alignItems="center">
+                                    <Stack direction="row" spacing={1} sx={{
+                                        alignItems: "center"
+                                    }}>
                                         {getIconForCertificationOption('SOLO')}
                                         <Typography>
                                             SOLO (revoke solo to change)

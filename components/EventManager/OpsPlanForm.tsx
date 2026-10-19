@@ -133,7 +133,12 @@ export default function OpsPlanForm({ admin, currentUser, event, eventPosition }
                     <Grid size={6}>
                         <Box sx={{ p: 2, borderRadius: 1, bgcolor: "background.paper", boxShadow: 1 }}>
                             <Typography variant="h6">No featured fields</Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: "text.secondary",
+                                    mt: 1
+                                }}>
                                 This event does not have any featured fields configured. Add featured fields on the event configuration page to display per-field options here.
                             </Typography>
                         </Box>

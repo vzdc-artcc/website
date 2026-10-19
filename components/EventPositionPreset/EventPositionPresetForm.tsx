@@ -41,9 +41,9 @@ export default function EventPositionPresetForm({ positionPreset }: { positionPr
                     options={[]}
                     value={positions}
                     freeSolo
-                    renderTags={(value: readonly string[], getTagProps) =>
+                    renderValue={(value: readonly string[], getItemProps) =>
                         value.map((option: string, index: number) => {
-                            const {key, ...tagProps} = getTagProps({index});
+                            const {key, ...tagProps} = getItemProps({index});
                             return (
                                 <Chip variant="filled" label={option} key={key} {...tagProps} />
                             );

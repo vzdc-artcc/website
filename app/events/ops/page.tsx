@@ -2,20 +2,10 @@
 import React from 'react';
 import Link from 'next/link';
 import prisma from '@/lib/db';
-import { formatZuluDate } from '@/lib/date';
+import {formatZuluDate} from '@/lib/date';
 import Placeholder from '@/public/img/logo_large.png';
-import {
-    Box,
-    Card,
-    CardContent,
-    Container,
-    Paper,
-    Stack,
-    Typography,
-} from '@mui/material';
+import {Box, Card, CardContent, Container, Paper, Stack, Typography,} from '@mui/material';
 import Image from "next/image";
-import {getServerSession} from "next-auth";
-import {authOptions} from "@/auth/auth";
 
 export default async function Page() {
     const events = await prisma.event.findMany({
@@ -28,8 +18,6 @@ export default async function Page() {
         },
     });
 
-    const session = await getServerSession(authOptions);
-
     return (
         <Container maxWidth="lg" sx={{ py: 3 }}>
             <Typography variant="h4" sx={{ mb: 2 }}>
@@ -39,7 +27,9 @@ export default async function Page() {
                 <Paper elevation={2} sx={{ p: 4 }}>
                     <Stack spacing={1}>
                         <Typography variant="h6">No published OPS plans</Typography>
-                        <Typography color="text.secondary">
+                        <Typography sx={{
+                            color: "text.secondary"
+                        }}>
                             There are currently no published operations plans. When an event planner publishes an ops plan it will appear here for controllers to view.
                         </Typography>
                     </Stack>

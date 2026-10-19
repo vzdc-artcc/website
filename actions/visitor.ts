@@ -35,7 +35,7 @@ export const addVisitingApplication = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const existing = await prisma.visitorApplication.findFirst({

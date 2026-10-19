@@ -16,10 +16,10 @@ export default function LessonForm({lesson}: { lesson?: Lesson, }) {
     const [traineePreparation, setTraineePreparation] = React.useState<string>(lesson?.traineePreparation || '');
 
     const handleSubmit = async (formData: FormData) => {
-        const {id, error,} = await createOrUpdateLessonDetails(formData);
+        const {id, errors,} = await createOrUpdateLessonDetails(formData);
 
-        if (error) {
-            toast(error.errors.map((e) => e.message).join(".  "), {type: 'error'});
+        if (errors) {
+            toast(errors.map((e) => e.message).join(".  "), {type: 'error'});
             return;
         }
 

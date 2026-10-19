@@ -40,10 +40,11 @@ import {refreshAccountData} from "@/actions/user";
 import {toast} from "react-toastify";
 import TeamspeakUidDialog from "@/components/TeamspeakUID/TeamspeakUidDialog";
 
-export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
+export default function LoginButton({session, sidebar, sidebarButtonClicked, sidebarAdminButtonClicked,}: {
     session: Session | null,
     sidebar?: boolean,
-    sidebarButtonClicked?: () => void
+    sidebarButtonClicked?: () => void,
+    sidebarAdminButtonClicked?: () => void,
 }) {
 
     const [dropdownAnchor, setDropdownAnchor] = React.useState<null | HTMLElement>(null);
@@ -87,6 +88,12 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
         }).then();
     };
 
+    const handleAdminLinkClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setSidebarOpen(false);
+        sidebarAdminButtonClicked && sidebarAdminButtonClicked();
+    };
+
     const closeDropdown = () => {
         setDropdownAnchor(null);
     }
@@ -124,19 +131,23 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                             <NavSidebarButton icon={<Settings/>} text="Profile"/>
                         </Link>}
                     {session?.user.roles.some((r) => ["STAFF"].includes(r)) &&
-                        <Link href="/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <Link href="/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}
+                              onClick={handleAdminLinkClick}>
                             <NavSidebarButton icon={<AdminPanelSettings/>} text="Facility Administration"/>
                         </Link>}
-                    {session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) || session?.user.staffPositions.includes("WM") &&
-                        <Link href="/web-system/overview" style={{textDecoration: 'none', color: 'inherit',}}>
+                    {(session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) || session?.user.staffPositions.includes("WM")) &&
+                        <Link href="/web-system/overview" style={{textDecoration: 'none', color: 'inherit',}}
+                              onClick={handleAdminLinkClick}>
                             <NavSidebarButton icon={<Web/>} text="Web System Administration"/>
                         </Link>}
                     {session?.user.roles.some((r) => ["MENTOR", "INSTRUCTOR", "STAFF"].includes(r)) &&
-                        <Link href="/training/overview" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <Link href="/training/overview" style={{textDecoration: 'none', color: 'inherit',}}
+                              onClick={handleAdminLinkClick}>
                             <NavSidebarButton icon={<Class/>} text="Training Administration"/>
                         </Link>}
                     {session?.user.roles.some((r) => ["EVENT_STAFF", "STAFF"].includes(r)) &&
-                    <Link href="/events/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
+                        <Link href="/events/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}
+                              onClick={handleAdminLinkClick}>
                         <NavSidebarButton icon={<CalendarMonth />} text="Events Administration"/>
                     </Link>}
                     {session && <NavSidebarButton icon={<Radio/>} text="TeamSpeak UID" onClick={() => {
@@ -169,7 +180,7 @@ export default function LoginButton({session, sidebar, sidebarButtonClicked,}: {
                             <ListItemText>Facility Administration</ListItemText>
                         </MenuItem>
                     </Link>}
-                {session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) || session?.user.staffPositions.includes("WM") &&
+                {(session?.user.roles.some((r) => ["WEB_TEAM"].includes(r)) || session?.user.staffPositions.includes("WM")) &&
                     <Link href="/web-system/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                         <MenuItem onClick={closeDropdown}>
                             <ListItemIcon>

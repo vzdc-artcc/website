@@ -61,7 +61,7 @@ export default async function Page(props: { params: Promise<{ year: string }> })
     const controllerLog = getControllerLog(logs);
 
     return (
-        (<Grid container columns={30} spacing={2}>
+        <Grid container columns={30} spacing={2}>
             <Grid size={30}>
                 <Card>
                     <CardContent>
@@ -158,7 +158,9 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                     <Card>
                         <CardContent>
                             <Box sx={{mb: 2,}}>
-                                <Stack direction="row" spacing={1} alignItems="center">
+                                <Stack direction="row" spacing={1} sx={{
+                                    alignItems: "center"
+                                }}>
                                     <Typography
                                         variant="h5">{idx + 1} - {controller.user.preferredName || `${controller.user.firstName} ${controller.user.lastName}`}</Typography>
                                     <Tooltip title="View Statistics for this controller">
@@ -195,6 +197,6 @@ export default async function Page(props: { params: Promise<{ year: string }> })
                     </CardContent>
                 </Card>
             </Grid>
-        </Grid>)
+        </Grid>
     );
 }

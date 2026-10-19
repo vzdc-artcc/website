@@ -1,8 +1,19 @@
 // components/OpsPlan/OpsPlanFiles.tsx
 import React from 'react';
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Typography, Box } from '@mui/material';
-import { format } from 'date-fns';
-import { fetchOpsPlanFiles } from '@/actions/opsPlanFiles';
+import {
+    Box,
+    Button,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography
+} from '@mui/material';
+import {format} from 'date-fns';
+import {fetchOpsPlanFiles} from '@/actions/opsPlanFiles';
 
 type Props = {
     eventId: string;
@@ -16,7 +27,11 @@ export default async function OpsPlanFiles({ eventId }: Props) {
         return (
             <Paper sx={{ p: 2, mt: 2 }}>
                 <Typography variant="h6">OPS Plan Files</Typography>
-                <Typography color="text.secondary" sx={{ mt: 1 }}>
+                <Typography
+                    sx={{
+                        color: "text.secondary",
+                        mt: 1
+                    }}>
                     No files have been uploaded for this event.
                 </Typography>
             </Paper>
@@ -63,13 +78,17 @@ export default async function OpsPlanFiles({ eventId }: Props) {
                                     </TableCell>
 
                                     <TableCell>
-                                        <Typography variant="body2" color="text.secondary">
+                                        <Typography variant="body2" sx={{
+                                            color: "text.secondary"
+                                        }}>
                                             {f.description || '—'}
                                         </Typography>
                                     </TableCell>
 
                                     <TableCell>
-                                        <Typography variant="body2" color="text.secondary">
+                                        <Typography variant="body2" sx={{
+                                            color: "text.secondary"
+                                        }}>
                                             {updated}
                                         </Typography>
                                     </TableCell>

@@ -7,7 +7,9 @@ export default async function Layout({children}: { children: React.ReactNode }) 
         <Stack direction="column" spacing={2}>
             <Accordion>
                 <AccordionSummary expandIcon={<ExpandMore/>}>
-                    <Stack direction="row" spacing={1} alignItems="center">
+                    <Stack direction="row" spacing={1} sx={{
+                        alignItems: "center"
+                    }}>
                         <Info color="info"/>
                         <Typography><b>ATC Booking Policy</b> <span style={{color: "red"}}>(READ BEFORE BOOKING)</span></Typography>
                     </Stack>

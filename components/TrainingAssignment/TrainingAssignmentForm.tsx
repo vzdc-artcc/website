@@ -110,11 +110,14 @@ export default function TrainingAssignmentForm({
                                 setOtherTrainers(newValue.map((trainer) => trainer.id));
                             }
                         }}
-                        renderTags={(value, getTagProps) =>
-                            value.map((option, index) => (
-                                <Chip {...getTagProps({index})} key={index}
-                                      label={`${option.firstName} ${option.lastName}`}/>
-                            ))
+                        renderValue={(value, getItemProps) =>
+                            value.map((option, index) => {
+                                const {key, ...itemProps} = getItemProps({index});
+                                return (
+                                    <Chip {...itemProps} key={key}
+                                          label={`${option.firstName} ${option.lastName}`}/>
+                                );
+                            })
                         }
                         renderInput={(params) => <TextField {...params} label="Other Trainers"
                                                             helperText="Key: <RATING> - <# PRIMARY STUDENTS>P <# SECONDARY STUDENTS>S - <NAME + CID>"/>}

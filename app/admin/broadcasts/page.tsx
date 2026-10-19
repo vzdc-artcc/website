@@ -12,7 +12,13 @@ export default async function Page() {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} justifyContent="space-between" sx={{mb: 2,}}>
+                <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{
+                        justifyContent: "space-between",
+                        mb: 2
+                    }}>
                     <Box>
                         <Typography variant="h5">Active Broadcasts</Typography>
                         <Typography>Broadcasts are automatically deleted 6 months after they were last

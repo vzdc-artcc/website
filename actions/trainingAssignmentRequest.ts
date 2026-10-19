@@ -205,7 +205,7 @@ export const manualTrainingAssignmentRequest = async (userId: string, submittedT
 
     const parsed = requestZ.safeParse({userId, submittedTime});
     if (!parsed.success) {
-        const errors = parsed.error.errors.map((e) => e.message);
+        const errors = parsed.error.issues.map((e) => e.message);
         return {errors};
     }
 

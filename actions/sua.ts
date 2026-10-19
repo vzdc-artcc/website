@@ -28,8 +28,12 @@ export const createSuaRequest = async (formData: FormData) => {
     const staffingRequestZ = z.object({
         userId: z.string(),
         afiliation: z.string().min(1, 'Name must be at least 1 character long'),
-        start: z.date({required_error: "You must select a start date."}),
-        end: z.date({required_error: "You must select an end date."}),
+        start: z.date({
+            error: (issue) => issue.input === undefined ? "You must select a start date." : undefined
+        }),
+        end: z.date({
+            error: (issue) => issue.input === undefined ? "You must select an end date." : undefined
+        }),
         details: z.string().min(1, 'Description must be at least 1 character long'),
     });
 
@@ -42,7 +46,7 @@ export const createSuaRequest = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     if (result.data.start.getTime() >= result.data.end.getTime()) {

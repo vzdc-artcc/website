@@ -14,7 +14,7 @@ export const createOrUpdateCertificationType = async (formData: FormData) => {
         // order: z.number().int("Order must be a whole number"),
         canSoloCert: z.boolean(),
         autoAssignUnrestricted: z.boolean(),
-        certificationOptions: z.array(z.nativeEnum(CertificationOption)),
+        certificationOptions: z.array(z.enum(CertificationOption)),
     });
 
     const result = certificationTypeZ.safeParse({
@@ -27,7 +27,7 @@ export const createOrUpdateCertificationType = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const oldLessonRosterChanges = await prisma.lessonRosterChange.findMany({

@@ -33,7 +33,9 @@ export default async function LessonCard({lessonId}: { lessonId: string }) {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2} sx={{
+                    alignItems: "center"
+                }}>
                     <Link href={`/training/lessons/`}
                           style={{color: 'inherit',}}>
                         <Tooltip title="Go Back">

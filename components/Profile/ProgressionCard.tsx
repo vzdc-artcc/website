@@ -39,8 +39,13 @@ export default async function ProgressionCard({user}: { user: User }) {
                                     xs: 11,
                                     md: 1,
                                 }} key={`progression-arrow-${i}`}>
-                                    <Stack direction="column" justifyContent="center" alignItems="center"
-                                           sx={{height: '100%',}}>
+                                    <Stack
+                                        direction="column"
+                                        sx={{
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            height: '100%'
+                                        }}>
                                         <East fontSize="large" sx={{display: {xs: 'none', md: 'inherit',}}}/>
                                         <South fontSize="large" sx={{display: {md: 'none',}}}/>
                                     </Stack>
@@ -80,7 +85,7 @@ export default async function ProgressionCard({user}: { user: User }) {
                             complete this progression, we strongly encourage you to complete all of the optional steps
                             to reinforce your understanding. The next progression (if applicable) will automatically be
                             assigned.</Typography>
-                        <Typography color="red">You will NOT be able to return to this progression unless it is
+                        <Typography sx={{color: 'red'}}>You will NOT be able to return to this progression unless it is
                             reassigned.</Typography>
                     </Grid>}
                 </Grid>

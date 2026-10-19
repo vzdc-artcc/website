@@ -37,13 +37,46 @@ function ZuluTime() {
 
 
     return (
-        <Stack direction="row" justifyContent="center" sx={{ border: 1, padding: 1, minWidth: '15rem', marginLeft:"auto", marginBottom:"16px"}}>
-            <Typography variant="h4" sx={{ minWidth: '3.5rem', }} textAlign="center" fontFamily={clockFont.style.fontFamily}>{convertToTwoDigit(time.hours)}</Typography>
-            <Typography variant="h4" fontFamily={clockFont.style.fontFamily}>:</Typography>
-            <Typography variant="h4" sx={{ minWidth: '3.5rem', }} textAlign="center" fontFamily={clockFont.style.fontFamily}>{convertToTwoDigit(time.minutes)}</Typography>
-            <Typography variant="h4" fontFamily={clockFont.style.fontFamily}>:</Typography>
-            <Typography variant="h4" sx={{ minWidth: '3.5rem', }} textAlign="center" fontFamily={clockFont.style.fontFamily}>{convertToTwoDigit(time.seconds)}</Typography>
-            <Typography variant="h4" fontFamily={clockFont.style.fontFamily}>z</Typography>
+        <Stack
+            direction="row"
+            sx={{
+                justifyContent: "center",
+                border: 1,
+                padding: 1,
+                minWidth: '15rem',
+                marginLeft: "auto",
+                marginBottom: "16px"
+            }}>
+            <Typography
+                variant="h4"
+                sx={{
+                    textAlign: "center",
+                    fontFamily: clockFont.style.fontFamily,
+                    minWidth: '3.5rem'
+                }}>{convertToTwoDigit(time.hours)}</Typography>
+            <Typography variant="h4" sx={{
+                fontFamily: clockFont.style.fontFamily
+            }}>:</Typography>
+            <Typography
+                variant="h4"
+                sx={{
+                    textAlign: "center",
+                    fontFamily: clockFont.style.fontFamily,
+                    minWidth: '3.5rem'
+                }}>{convertToTwoDigit(time.minutes)}</Typography>
+            <Typography variant="h4" sx={{
+                fontFamily: clockFont.style.fontFamily
+            }}>:</Typography>
+            <Typography
+                variant="h4"
+                sx={{
+                    textAlign: "center",
+                    fontFamily: clockFont.style.fontFamily,
+                    minWidth: '3.5rem'
+                }}>{convertToTwoDigit(time.seconds)}</Typography>
+            <Typography variant="h4" sx={{
+                fontFamily: clockFont.style.fontFamily
+            }}>z</Typography>
         </Stack>
     );
 }

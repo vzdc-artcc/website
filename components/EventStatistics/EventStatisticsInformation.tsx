@@ -220,7 +220,9 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                                 </Box>
                             </AccordionDetails>
                         </Accordion>
-                        <Typography variant="caption" fontSize={10}>*A big event is one of the
+                        <Typography variant="caption" sx={{
+                            fontSize: 10
+                        }}>*A big event is one of the
                             following: {bigEventTypes.join(', ')}.</Typography>
                     </CardContent>
                 </Card>
@@ -249,14 +251,18 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                     <CardContent>
                         <Typography variant="h6" gutterBottom>Roster</Typography>
                         {certificationTypes.map((ct) => (
-                            <Stack key={ct.id} direction="row" spacing={1} alignItems="center">
+                            <Stack key={ct.id} direction="row" spacing={1} sx={{
+                                alignItems: "center"
+                            }}>
                                 <Typography gutterBottom>{ct.name}:</Typography>
                                 {getIconForCertificationOption(certifications.find((c) => c.certificationTypeId === ct.id)?.certificationOption || 'NONE')}
                             </Stack>
                         ))}
                         {soloCertification &&
                             <Box sx={{mt: 2,}}>
-                                <Typography fontWeight="bold">Solo
+                                <Typography sx={{
+                                    fontWeight: "bold"
+                                }}>Solo
                                     Certification: {soloCertification.position}</Typography>
                                 <Typography>Expires: {formatZuluDate(soloCertification.expires)}</Typography>
                             </Box>}
@@ -278,7 +284,9 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                         <Stack direction={{xs: 'column', lg: 'row'}} spacing={1}>
                             <Card variant="outlined" sx={{width: '100%', height: '100%',}}>
                                 <CardContent>
-                                    <Typography gutterBottom fontWeight="bold">Last 60
+                                    <Typography gutterBottom sx={{
+                                        fontWeight: "bold"
+                                    }}>Last 60
                                         days: {totalHoursLast60.toFixed(3)}</Typography>
                                     <Typography>Delivery: {totalDeliveryHoursLast60.toFixed(3)}</Typography>
                                     <Typography>Ground: {totalGroundHoursLast60.toFixed(3)}</Typography>
@@ -289,7 +297,9 @@ export default async function EventStatisticsInformation({cid,}: { cid: string, 
                             </Card>
                             <Card variant="outlined" sx={{width: '100%', height: '100%',}}>
                                 <CardContent>
-                                    <Typography gutterBottom fontWeight="bold">ALL: {totalHours.toFixed(3)}</Typography>
+                                    <Typography gutterBottom sx={{
+                                        fontWeight: "bold"
+                                    }}>ALL: {totalHours.toFixed(3)}</Typography>
                                     <Typography>Delivery: {totalDeliveryHours.toFixed(3)}</Typography>
                                     <Typography>Ground: {totalGroundHours.toFixed(3)}</Typography>
                                     <Typography>Tower: {totalTowerHours.toFixed(3)}</Typography>

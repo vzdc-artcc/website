@@ -13,7 +13,14 @@ export default function Page() {
         <Container maxWidth="md">
             <Card>
                 <CardContent>
-                    <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{mb: 2,}}>
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        sx={{
+                            alignItems: "center",
+                            justifyContent: "center",
+                            mb: 2
+                        }}>
                         <CheckCircle color="success" fontSize="large"/>
                         <Typography variant="h5">Application Submitted</Typography>
                     </Stack>
@@ -24,6 +31,5 @@ export default function Page() {
                 </CardContent>
             </Card>
         </Container>
-
     );
 }

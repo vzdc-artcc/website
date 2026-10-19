@@ -20,7 +20,13 @@ export default async function Page() {
     return (
         <Card>
             <CardContent>
-                <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
+                <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{
+                        alignItems: "center",
+                        justifyContent: "space-between"
+                    }}>
                     <Typography variant="h5" gutterBottom>Your ATC Bookings</Typography>
                     { bookings.length <= 2 && <Link href="/profile/bookings/new" style={{textDecoration: 'none', color: 'inherit',}}>
                         <Button variant="contained" size="large" startIcon={<Add />}>New ATC Booking</Button>

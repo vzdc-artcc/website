@@ -83,7 +83,9 @@ export default async function Page() {
                                             <Box sx={{mt: 2,}}>
                                                 <Link href={`/publications/${broadcast.file.id}`} target="_blank"
                                                       style={{color: 'inherit',}}>
-                                                    <Stack direction="row" alignItems="center" spacing={1}>
+                                                    <Stack direction="row" spacing={1} sx={{
+                                                        alignItems: "center"
+                                                    }}>
                                                         <FileOpen/>
                                                         <Typography variant="subtitle2">
                                                             {broadcast.file.name}

@@ -47,7 +47,9 @@ export default async function Page(props: { params: Promise<{ id: string, }> }) 
         <Stack direction="column" spacing={2}>
             <Card>
                 <CardContent>
-                    <Stack direction="row" justifyContent="space-between" spacing={1}>
+                    <Stack direction="row" spacing={1} sx={{
+                        justifyContent: "space-between"
+                    }}>
                         <Typography variant="h5">Training Request - {request.student.fullName}</Typography>
                         {isTaOrAtaOrWm && <TrainerAssignmentRequestDeleteButton request={request} noTable/>}
                     </Stack>

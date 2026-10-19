@@ -23,7 +23,7 @@ export default function CidForm({basePath, controllers, initialCid}: {
             });
             return;
         }
-        const cidZ = z.number().int().positive("CID must be numbers").min(1, "CID must be positive numbers");
+        const cidZ = z.int().positive("CID must be numbers").min(1, "CID must be positive numbers");
         const result = cidZ.safeParse(Number(controller));
         if (!result.success) {
             const message = result.error.issues.map((issue) => issue.message).join(", ");

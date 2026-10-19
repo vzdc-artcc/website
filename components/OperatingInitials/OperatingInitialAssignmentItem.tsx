@@ -51,7 +51,9 @@ export default function OperatingInitialAssignmentItem({ initials, allController
                 }}>
                 <Box sx={{border: 2, borderRadius: 2, cursor: 'pointer', }}>
                     <div onClick={() => setOpen(true)}>
-                        <Typography textAlign="center" variant="body2">{initials}</Typography>
+                        <Typography variant="body2" sx={{
+                            textAlign: "center"
+                        }}>{initials}</Typography>
                     </div>
                 </Box>
             </Grid>

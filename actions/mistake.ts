@@ -34,7 +34,7 @@ export const createOrUpdateMistake = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return JSON.parse(JSON.stringify(result.error.errors));
+        return JSON.parse(JSON.stringify(result.error.issues));
     }
 
     if (result.data.mistakeId) {

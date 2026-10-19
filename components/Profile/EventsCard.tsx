@@ -74,7 +74,12 @@ export default async function EventsCard({user}: { user: User, }) {
                         </TableBody>
                     </Table>
                 </TableContainer>}
-                <Stack direction="row" justifyContent="flex-end" sx={{mt: 2,}}>
+                <Stack
+                    direction="row"
+                    sx={{
+                        justifyContent: "flex-end",
+                        mt: 2
+                    }}>
                     <Link href="/profile/events" style={{color: 'inherit', textDecoration: 'none',}}>
                         <Button color="inherit" endIcon={<KeyboardArrowRight/>}>Previous events</Button>
                     </Link>

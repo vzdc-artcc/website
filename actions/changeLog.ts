@@ -9,8 +9,12 @@ import {Prisma} from '@/generated/prisma/client'
 export async function createChangeLog(versionNumber: string, changeLogDetails: string, id?: string) {
 
     const changeLogZ = z.object({
-        versionNumber: z.string().min(1, {message: "You must include a version number."}),
-        changeLogDetails: z.string().min(1, {message: "You must include change log details."}),
+        versionNumber: z.string().min(1, {
+            error: "You must include a version number."
+        }),
+        changeLogDetails: z.string().min(1, {
+            error: "You must include change log details."
+        }),
     });
 
     const result = changeLogZ.safeParse({
@@ -19,7 +23,7 @@ export async function createChangeLog(versionNumber: string, changeLogDetails: s
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     if (id) {

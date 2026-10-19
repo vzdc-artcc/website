@@ -83,7 +83,7 @@ export const createOrUpdateEventPreset = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     const positionPreset = await prisma.eventPositionPreset.upsert({

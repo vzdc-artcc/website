@@ -32,7 +32,9 @@ export default function RosterTabs() {
 
     return (
         <Box>
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} sx={{
+                alignItems: "center"
+            }}>
                 <FormControlLabel
                     control={<Switch checked={checked} onChange={toggleVatusa}
                                      color="primary"/>}
@@ -48,6 +50,5 @@ export default function RosterTabs() {
                 <Tab label="Visiting" value="visit"/>
             </Tabs>
         </Box>
-
     );
 }

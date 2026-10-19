@@ -48,7 +48,7 @@ export const createOrUpdateLessonDetails = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {id: null, error: result.error};
+        return {id: null, errors: result.error.issues};
     }
 
     if (result.data.lessonId) {
@@ -90,12 +90,12 @@ export const createOrUpdateLessonDetails = async (formData: FormData) => {
         });
 
         await log("CREATE", "LESSON", `Created lesson ${result.data.identifier} - ${result.data.name}`);
-        return {id: lesson.id, error: null};
+        return {id: lesson.id, errors: null};
     }
 
     revalidatePath(`/training/lessons/`, "layout");
 
-    return {id: result.data.lessonId, error: null};
+    return {id: result.data.lessonId, errors: null};
 }
 
 export const fetchLessons = async (pagination: GridPaginationModel, sort: GridSortModel, filter?: GridFilterItem) => {

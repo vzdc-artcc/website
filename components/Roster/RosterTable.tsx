@@ -185,7 +185,9 @@ export default async function RosterTable({membership, search, includeVatusa,}: 
                                         <Link href={`/controllers/${user.user.cid}`}
                                               style={{color: 'inherit', textDecoration: 'none',}}>
                                             <Typography
-                                                fontWeight="bold">{user.user.preferredName || `${user.user.firstName} ${user.user.lastName}`}
+                                                sx={{
+                                                    fontWeight: "bold"
+                                                }}>{user.user.preferredName || `${user.user.firstName} ${user.user.lastName}`}
                                                 {approvedLoas.length > 0 &&
                                                     <Chip label="LOA" color="primary" size="small" sx={{ml: 1,}}/>}
                                             </Typography>
@@ -207,13 +209,15 @@ export default async function RosterTable({membership, search, includeVatusa,}: 
                                         </TableCell>
                                     ))}
                                 </TableRow>
-                            )
+                            );
                         } else if (user.vatusa) {
                             return (
                                 <TableRow key={user.vatusa.cid}>
                                     <TableCell>
                                         <Typography
-                                            fontWeight="bold">{user.vatusa.fname} {user.vatusa.lname}</Typography>
+                                            sx={{
+                                                fontWeight: "bold"
+                                            }}>{user.vatusa.fname} {user.vatusa.lname}</Typography>
                                         <Typography
                                             variant="body2">{getRating(user.vatusa.rating)} • {user.vatusa.cid}</Typography>
                                         <Typography
@@ -228,7 +232,7 @@ export default async function RosterTable({membership, search, includeVatusa,}: 
                                         </TableCell>
                                     ))}
                                 </TableRow>
-                            )
+                            );
                         }
 
                     })}

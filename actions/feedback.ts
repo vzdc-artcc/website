@@ -24,7 +24,9 @@ export const submitFeedback = async (formData: FormData) => {
         pilotCallsign: z.string().trim().min(1),
         controllerId: z.string().trim().min(1),
         controllerPosition: z.string().min(1),
-        rating: z.number({required_error: 'Rating is required', invalid_type_error: 'Rating is required'}),
+        rating: z.number({
+            error: (issue) => issue.input === undefined ? 'Rating is required' : 'Rating is required'
+        }),
         comments: z.string().trim(),
     });
 
@@ -38,7 +40,7 @@ export const submitFeedback = async (formData: FormData) => {
     });
 
     if (!result.success) {
-        return {errors: result.error.errors};
+        return {errors: result.error.issues};
     }
 
     if (result.data.pilotId === result.data.controllerId) {

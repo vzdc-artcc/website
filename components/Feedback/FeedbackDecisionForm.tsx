@@ -24,10 +24,14 @@ export default function FeedbackDecisionForm({feedback}: { feedback: Feedback, }
     }
 
     return (
-        <Stack direction={{xs: 'column', md: 'row'}} spacing={2} alignItems="center">
+        <Stack direction={{xs: 'column', md: 'row'}} spacing={2} sx={{
+            alignItems: "center"
+        }}>
             <Box sx={{width: '100%',}}>
                 <form action={handleRelease}>
-                    <Stack direction="row" spacing={1} alignItems="center">
+                    <Stack direction="row" spacing={1} sx={{
+                        alignItems: "center"
+                    }}>
                         <TextField variant="filled" rows={4} fullWidth multiline name="reason" label="Staff comments"
                                    value={staffComments}
                                    onChange={(e) => setStaffComments(e.target.value)}

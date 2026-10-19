@@ -8,7 +8,13 @@ function ErrorCard({heading, message}: { heading: string, message: string }) {
             <Card>
                 <CardContent>
                     <Typography variant="h5">{heading}</Typography>
-                    <Stack direction="row" spacing={1} alignItems="center" sx={{mt: 2,}}>
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        sx={{
+                            alignItems: "center",
+                            mt: 2
+                        }}>
                         <Info color="error"/>
                         <Typography>{message}</Typography>
                     </Stack>

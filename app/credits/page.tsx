@@ -8,7 +8,7 @@ const fancyFont = Aguafina_Script({subsets: ['latin'], weight: ["400"]});
 export default async function Home() {
 
     return (
-        (<Grid container columns={6} spacing={4}>
+        <Grid container columns={6} spacing={4}>
             <Grid size={6}>
                 <Card>
                     <CardContent>
@@ -24,8 +24,15 @@ export default async function Home() {
                     <CardContent>
                         <Typography variant="h4" gutterBottom>Main Contributors</Typography>
                         <Stack direction="column" spacing={4} sx={{m: 8,}}>
-                            <Typography color="darkred" variant="h5" fontWeight="bold" fontSize={70}
-                                        letterSpacing={15} {...fancyFont.style}>Aneesh&nbsp;&nbsp;Reddy <Link
+                            <Typography
+                                variant="h5"
+                                {...fancyFont.style}
+                                sx={{
+                                    color: 'darkred',
+                                    fontWeight: "bold",
+                                    fontSize: 70,
+                                    letterSpacing: 15
+                                }}>Aneesh&nbsp;&nbsp;Reddy <Link
                                 href="https://github.com/beabravedude" target="_blank"
                                 style={{color: 'inherit',}}><GitHub fontSize="large"/></Link></Typography>
                             <Typography variant="h5">Carson Berget <Link
@@ -41,6 +48,6 @@ export default async function Home() {
                     </CardContent>
                 </Card>
             </Grid>
-        </Grid>)
+        </Grid>
     );
 }

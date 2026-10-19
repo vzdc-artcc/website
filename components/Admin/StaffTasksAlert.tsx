@@ -3,6 +3,7 @@ import prisma from "@/lib/db";
 import {Alert} from "@mui/material";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
+import StaffTasksSidebarWrapper from "@/components/Admin/StaffTasksSidebarWrapper";
 
 export default async function StaffTasksAlert() {
 
@@ -50,7 +51,7 @@ export default async function StaffTasksAlert() {
     const pendingTrainingTasks = trainingReleaseRequests + pendingOtsRecs;
 
     return (
-        <>
+        <StaffTasksSidebarWrapper>
             {pendingAdminTasks > 0 &&
                 <Alert severity="warning" sx={{my: 1,}}>
                     There {pendingAdminTasks == 1 ? 'is' : 'are'} currently <b>{pendingAdminTasks} pending senior staff
@@ -61,6 +62,6 @@ export default async function StaffTasksAlert() {
                     There {pendingTrainingTasks == 1 ? 'is' : 'are'} currently <b>{pendingTrainingTasks} pending TA
                     task{pendingTrainingTasks == 1 ? '' : 's'}</b> under Training Administration.
                 </Alert>}
-        </>
+        </StaffTasksSidebarWrapper>
     );
 }

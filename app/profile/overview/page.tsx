@@ -109,7 +109,13 @@ export default async function Page() {
             {loa && <Grid size={6}>
                 <Card>
                     <CardContent>
-                        <Stack direction="row" spacing={1} alignItems="center" sx={{mb: 1,}}>
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            sx={{
+                                alignItems: "center",
+                                mb: 1
+                            }}>
                             <Typography variant="h6">Active LOA Request</Typography>
                             <Chip label={loa.status} color={getLoaColor(loa.status)}/>
                         </Stack>
