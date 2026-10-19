@@ -37,7 +37,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
 
-RUN npm i --no-save prisma dotenv --legacy-peer-deps
+# Install production deps (incl. the prisma CLI and dotenv used by prisma.config.ts) from the lockfile,
+# so the image never resolves fresh versions from the registry at build time.
+COPY --from=builder /app/package.json /app/package-lock.json ./
+RUN npm ci --omit=dev --legacy-peer-deps
 
 USER nextjs
 
