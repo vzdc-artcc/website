@@ -3,6 +3,7 @@ import {AgCharts} from 'ag-charts-react';
 import {useEffect, useState} from 'react';
 import {AgCartesianChartOptions} from 'ag-charts-community';
 import {useColorScheme} from '@mui/material/styles';
+import './agChartsModules';
 
 interface LessonDistributionData {
     lesson: string;
