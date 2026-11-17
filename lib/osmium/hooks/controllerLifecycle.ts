@@ -14,7 +14,11 @@ import { OFFERS_KEY } from "@/lib/osmium/hooks/impromptu";
  */
 export function invalidateControllerStatusReaders(queryClient: QueryClient) {
     const keys = [
-        ["osmium", "users"],
+        ["osmium", "users", "roster-controllers"],
+        ["osmium", "users", "all"],
+        ["osmium", "users", "by-role"],
+        ["osmium", "users", "by-cid"],
+        ["osmium", "users", "event-positions"],
         ["osmium", "roster"],
         ["osmium", "training", "assignments"],
         ["osmium", "training", "assignment-requests"],
