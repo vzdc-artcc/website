@@ -44,7 +44,7 @@ export async function syncAppointmentAtcBooking(params: {
             await deleteBooking(existing.id);
         }
     } catch (e) {
-        return {atcBookingId: existingAtcBookingId || null, error: (e as Error).message};
+        return {atcBookingId: existingAtcBookingId || null, error: e instanceof Error ? e.message : bookingErrorMessage(e)};
     }
 
     if (liveLesson) {
