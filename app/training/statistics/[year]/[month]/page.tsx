@@ -8,6 +8,7 @@ import {calculatePassRate} from "@/lib/trainingStats";
 import {useTrainingStats} from "@/lib/osmium/hooks/training";
 import LessonDistributionGraph from "@/components/TrainingStatistics/LessonDistributionGraph";
 import PassFailGraph from "@/components/TrainingStatistics/PassFailGraph";
+import {formatHours} from "@/lib/number";
 
 
 export default function Page() {
@@ -41,7 +42,7 @@ export default function Page() {
         return <Typography>Loading statistics…</Typography>;
     }
 
-    const totalHours = stats.total_hours.toFixed(3);
+    const totalHours = formatHours(stats.total_hours);
     const monthPassRate = calculatePassRate(stats.passed, stats.failed);
 
     return (
@@ -160,7 +161,7 @@ export default function Page() {
                                 </Typography>
                                 <Typography variant="body1">{trainer.cid}</Typography>
                             </Box>
-                            <Typography variant="h6">{trainer.hours.toPrecision(3)} hours</Typography>
+                            <Typography variant="h6">{formatHours(trainer.hours)} hours</Typography>
                         </CardContent>
                     </Card>
                 </Grid>

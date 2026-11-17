@@ -7,6 +7,7 @@ import {StackedLineChart} from "@mui/icons-material";
 import StatisticsTable from "@/components/Statistics/StatisticsTable";
 import {useArtccStats} from "@/lib/osmium/hooks/stats";
 import {useParams} from "next/navigation";
+import {formatHours} from "@/lib/number";
 
 export default function Page() {
     const params = useParams();
@@ -59,7 +60,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>Delivery Hours</Typography>
-                        <Typography variant="h6">{data.summary.delivery_hours.toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{formatHours(data.summary.delivery_hours)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -72,7 +73,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>Ground Hours</Typography>
-                        <Typography variant="h6">{data.summary.ground_hours.toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{formatHours(data.summary.ground_hours)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -85,7 +86,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>Tower Hours</Typography>
-                        <Typography variant="h6">{data.summary.tower_hours.toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{formatHours(data.summary.tower_hours)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -98,7 +99,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>TRACON Hours</Typography>
-                        <Typography variant="h6">{data.summary.tracon_hours.toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{formatHours(data.summary.tracon_hours)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -111,7 +112,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>Center Hours</Typography>
-                        <Typography variant="h6">{data.summary.center_hours.toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{formatHours(data.summary.center_hours)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -124,7 +125,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>Total Hours</Typography>
-                        <Typography variant="h6">{data.summary.active_hours.toPrecision(3)} hours</Typography>
+                        <Typography variant="h6">{formatHours(data.summary.active_hours)} hours</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -150,7 +151,7 @@ export default function Page() {
                                 </Stack>
                                 <Typography variant="body1">{leader.rating} • {leader.cid}</Typography>
                             </Box>
-                            <Typography variant="h6">{leader.online_hours.toPrecision(3)} hours</Typography>
+                            <Typography variant="h6">{formatHours(leader.online_hours)} hours</Typography>
                         </CardContent>
                     </Card>
                 </Grid>

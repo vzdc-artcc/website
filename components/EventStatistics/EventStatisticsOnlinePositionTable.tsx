@@ -12,6 +12,7 @@ import {
     Typography
 } from "@mui/material";
 import {formatZuluDate} from "@/lib/date";
+import {formatHours} from "@/lib/number";
 
 export interface OnlinePositionRow {
     position: string;
@@ -82,14 +83,14 @@ export default function EventStatisticsOnlinePositionTable({allPositions,}: { al
                                     <TableCell>{facilityFromPosition(position.position)}</TableCell>
                                     <TableCell>{position.position}</TableCell>
                                     <TableCell>{formatZuluDate(new Date(position.started_at))}</TableCell>
-                                    <TableCell>{durationHours(position).toFixed(3)}</TableCell>
+                                    <TableCell>{formatHours(durationHours(position))}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
                 </TableContainer>}
             {filteredPositions.length > 0 && <Typography>Total
-                Hours: {filteredPositions.reduce((sum, position) => sum + durationHours(position), 0).toFixed(3)}</Typography>}
+                Hours: {formatHours(filteredPositions.reduce((sum, position) => sum + durationHours(position), 0))}</Typography>}
         </Box>
     );
 }
