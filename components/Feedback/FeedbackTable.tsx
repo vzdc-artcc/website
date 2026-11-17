@@ -101,7 +101,7 @@ export default function FeedbackTable() {
     ];
 
     return (
-        <DataTable columns={columns} initialSort={[{field: 'submitted_at', sort: 'desc'}]}
+        <DataTable queryKey={["osmium", "feedback", "table"]} columns={columns} initialSort={[{field: 'submitted_at', sort: 'desc'}]}
                    fetchData={async (pagination, sortModel, filter) => {
                        let targetCid: number | undefined;
                        let targetName: string | undefined;

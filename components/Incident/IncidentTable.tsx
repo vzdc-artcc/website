@@ -56,7 +56,7 @@ export default function IncidentTable() {
     ];
 
     return (
-        <DataTable columns={columns} initialSort={[{field: 'timestamp', sort: 'desc'}]}
+        <DataTable queryKey={["osmium", "incidents", "table"]} columns={columns} initialSort={[{field: 'timestamp', sort: 'desc'}]}
                    fetchData={async (pagination, sortModel, filter) => {
                        let reporterCid: number | undefined;
                        let reporterName: string | undefined;

@@ -90,7 +90,7 @@ export default function VisitorApplicationTable() {
     ];
 
     return (
-        <DataTable columns={columns} initialSort={[{field: 'submittedAt', sort: 'desc',}]}
+        <DataTable queryKey={["osmium", "visitor-applications", "table"]} columns={columns} initialSort={[{field: 'submittedAt', sort: 'desc',}]}
                    fetchData={async (pagination, sortModel, filter) => {
                        let cid: number | undefined;
                        let displayName: string | undefined;

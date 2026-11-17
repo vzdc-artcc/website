@@ -133,6 +133,7 @@ export function useSaveUserCertifications(cid: number) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["osmium", "users", "certifications", cid] });
             queryClient.invalidateQueries({ queryKey: ["osmium", "users", "dossier", cid] });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "roster-certifications"] });
         },
     });
 }

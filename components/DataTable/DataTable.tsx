@@ -1,5 +1,6 @@
 'use client';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import {keepPreviousData, useQuery} from "@tanstack/react-query";
 import {
     DataGrid,
     getGridStringOperators,
@@ -23,6 +24,7 @@ export default function DataTable<T>(
         pageSizeOptions = [5, 10, 20],
         initialFilter,
         initialSort,
+        queryKey,
         fetchData
     }:
         {
@@ -31,6 +33,11 @@ export default function DataTable<T>(
             pageSizeOptions?: number[],
             initialFilter?: GridFilterItem,
             initialSort?: GridSortModel,
+            /**
+             * Cache key prefix under the table's domain, e.g. ["osmium", "loas", "table"],
+             * so the domain's mutations (which invalidate ["osmium", "loas"]) refresh it.
+             */
+            queryKey: readonly unknown[],
             fetchData: (pagination: GridPaginationModel, sortModel: GridSortModel, filter?: GridFilterItem) => Promise<{
                 data: T[],
                 rowCount: number,
@@ -40,13 +47,11 @@ export default function DataTable<T>(
 
     const searchParams = useSearchParams();
     const router = useRouter();
-    const [data, setData] = useState<T[]>();
     const [pagination, setPagination] = useState<GridPaginationModel>(() => {
         const page = Number(searchParams.get('page')) || initialPagination.page;
         const pageSize = Number(searchParams.get('pageSize')) || initialPagination.pageSize;
         return {page, pageSize};
     });
-    const [rowCount, setRowCount] = useState(0);
     const [filter, setFilter] = useState<GridFilterItem | undefined>(() => {
         const filterField = searchParams.get('filterField');
         const filterValue = searchParams.get('filterValue');
@@ -74,19 +79,16 @@ export default function DataTable<T>(
         router.push(`?${newParams.toString()}`);
     };
 
-    const getData = useCallback(async () => {
-        try {
-            const {data, rowCount} = await fetchData(pagination, sortModel, filter);
-            setData(data);
-            setRowCount(rowCount);
-        } catch (err) {
-            toast('Failed to fetch data', {type: 'error'});
-        }
-    }, [fetchData, filter, pagination, sortModel]);
+    const {data: result, isError} = useQuery({
+        queryKey: [...queryKey, pagination, sortModel, filter],
+        queryFn: () => fetchData(pagination, sortModel, filter),
+        // Keep the current page on screen while the next one loads.
+        placeholderData: keepPreviousData,
+    });
 
     useEffect(() => {
-        getData().then();
-    }, [getData]);
+        if (isError) toast('Failed to fetch data', {type: 'error'});
+    }, [isError]);
 
     const handleFilterChange = (newFilters: GridFilterModel) => {
         if (newFilters.quickFilterValues?.join(',')) {
@@ -148,8 +150,8 @@ export default function DataTable<T>(
         <Box sx={{boxSizing: 'border-box', width: '100%',}}>
             <DataGrid
                 sx={{mt: 2,}}
-                loading={!data}
-                rows={data || []}
+                loading={!result && !isError}
+                rows={result?.data ?? []}
                 autoHeight
                 columns={columns}
                 pagination
@@ -157,7 +159,7 @@ export default function DataTable<T>(
                 filterMode="server"
                 sortingMode="server"
                 paginationModel={pagination}
-                rowCount={rowCount}
+                rowCount={result?.rowCount ?? 0}
                 onPaginationModelChange={handlePaginationModelChange}
                 onFilterModelChange={handleFilterChange}
                 sortModel={sortModel}
