@@ -3,8 +3,10 @@ import React from 'react';
 import {Alert} from "@mui/material";
 import {Turnstile} from "@marsidev/react-turnstile";
 
-// Inlined at build time; an unset key would otherwise render an empty widget
-// that can never produce a token.
+// Inlined at build time into the server and browser bundles alike, which keeps
+// the two renders in agreement; that only holds when the key is present for the
+// build (.env.public), not set on the running server. An unset key would
+// otherwise render an empty widget that can never produce a token.
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() ?? '';
 
 export const captchaConfigured = SITE_KEY !== '';
