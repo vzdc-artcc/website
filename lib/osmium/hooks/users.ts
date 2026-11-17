@@ -1,47 +1,59 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { osmium } from "@/lib/osmium/client";
-import type { components } from "@/lib/osmium/generated/schema";
+import type { components, paths } from "@/lib/osmium/generated/schema";
 
 export type UserListItem = components["schemas"]["UserListItem"];
 
+type ListUsersFilters = Omit<
+    NonNullable<paths["/api/v1/users"]["get"]["parameters"]["query"]>,
+    "page" | "page_size" | "limit" | "offset"
+>;
+
+/** osmium clamps `/users` to 200 per page. */
+const USERS_PAGE_SIZE = 200;
+/** Stops a `has_next` that never turns false from looping forever. */
+const MAX_USER_PAGES = 50;
+
+/**
+ * Every `/users` row matching `filters`, paged through via `has_next`. Throws
+ * if the page cap is hit, since a truncated roster reads as "these controllers
+ * do not exist". The pages are offset-based, so a row can still be repeated or
+ * missed when the roster changes mid-load; repeats are dropped by CID.
+ */
+async function fetchAllUserPages(filters: ListUsersFilters) {
+    const byCid = new Map<number, UserListItem>();
+    let total = 0;
+    for (let page = 1; page <= MAX_USER_PAGES; page++) {
+        const { data, error } = await osmium.GET("/api/v1/users", {
+            params: { query: { ...filters, page, page_size: USERS_PAGE_SIZE } },
+        });
+        if (error) throw error;
+        for (const item of data.items) byCid.set(item.basic.cid, item);
+        total = data.total;
+        if (!data.has_next) return { items: Array.from(byCid.values()), total };
+    }
+    throw new Error(`/api/v1/users still had more pages after ${MAX_USER_PAGES}`);
+}
+
+/** Every HOME or VISITOR controller visible to the viewer, across all pages. */
 export function useRosterControllers() {
     return useQuery({
         queryKey: ["osmium", "users", "roster-controllers"],
-        queryFn: async () => {
-            const { data, error } = await osmium.GET("/api/v1/users", {
-                params: { query: { controllers_only: true, page_size: 200 } },
-            });
-            if (error) throw error;
-            return data;
-        },
+        queryFn: () => fetchAllUserPages({ controllers_only: true }),
     });
 }
 
 /**
  * Loads the ENTIRE user list for client-side search. osmium's `/users` endpoint
- * has no text-search param and caps `page_size` at 200, so we page through it
- * (using `has_next`) and accumulate every user. Cached for 5 minutes since the
- * roster changes slowly. Use with an Autocomplete that filters client-side.
+ * has no text-search param, so this pages through every user. Cached for 5
+ * minutes since the roster changes slowly. Use with an Autocomplete that
+ * filters client-side.
  */
 export function useAllUsers() {
     return useQuery({
         queryKey: ["osmium", "users", "all"],
         staleTime: 5 * 60 * 1000,
-        queryFn: async () => {
-            const items: UserListItem[] = [];
-            let page = 1;
-            // Hard cap the loop so a bad `has_next` can never spin forever.
-            for (let i = 0; i < 50; i++) {
-                const { data, error } = await osmium.GET("/api/v1/users", {
-                    params: { query: { page, page_size: 200 } },
-                });
-                if (error) throw error;
-                items.push(...(data?.items ?? []));
-                if (!data?.has_next) break;
-                page += 1;
-            }
-            return items;
-        },
+        queryFn: async () => (await fetchAllUserPages({})).items,
     });
 }
 

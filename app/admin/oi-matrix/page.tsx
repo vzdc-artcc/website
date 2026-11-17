@@ -1,13 +1,13 @@
 'use client';
 import React from 'react';
-import {Box, Card, CardContent, Grid, Skeleton, Stack, Tooltip, Typography} from "@mui/material";
+import {Alert, Box, Card, CardContent, Grid, Skeleton, Stack, Tooltip, Typography} from "@mui/material";
 import Link from "next/link";
 import OperatingInitialAssignmentItem, {OiController} from '@/components/OperatingInitials/OperatingInitialAssignmentItem';
 import {useRosterControllers} from "@/lib/osmium/hooks/users";
 
 export default function Page() {
 
-    const {data, isLoading} = useRosterControllers();
+    const {data, isLoading, isError} = useRosterControllers();
 
     const allControllers: OiController[] = (data?.items ?? []).map((u) => ({
         id: u.full?.id ?? String(u.basic.cid),
@@ -47,7 +47,16 @@ export default function Page() {
             </Card>
             <Card>
                 <CardContent>
-                    {isLoading ? <Skeleton height={300}/> : (
+                    {isError && data && (
+                        <Alert severity="warning" sx={{mb: 2,}}>
+                            Could not refresh the roster; this matrix may be out of date.
+                        </Alert>
+                    )}
+                    {isLoading ? <Skeleton height={300}/> : isError && !data ? (
+                        <Alert severity="error">
+                            Failed to load the roster, so which operating initials are in use is unknown.
+                        </Alert>
+                    ) : (
                         <Grid container columns={26} spacing={1}>
                             {allPossibleOperatingInitials.map((initials) => {
                                 const inUse = inUseOperatingInitials.find((oi) => oi.operatingInitials === initials);
