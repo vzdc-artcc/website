@@ -34,12 +34,12 @@ export default function Page() {
     const {
         data: history,
         isError: historyError,
-        isLoading: historyLoading,
+        isPending: historyPending,
     } = useControllerHistory(cidNum, Number(year));
     const {
         data: positions,
         isError: positionsError,
-        isLoading: positionsLoading,
+        isPending: positionsPending,
     } = useControllerPositions(cidNum, {
         year: Number(year),
         month: isAllMonths ? undefined : Number(month) + 1,
@@ -87,11 +87,12 @@ export default function Page() {
         active_hours: acc.active_hours + m.active_hours,
     }), {delivery_hours: 0, ground_hours: 0, tower_hours: 0, tracon_hours: 0, center_hours: 0, active_hours: 0});
 
-    const historyFailed = historyError && !history;
+    // isPending (no data yet), not isLoading: a paused first fetch is neither loading nor errored.
+    const historyFailed = !historyPending && !history;
 
     // Zero hours is a real value, so a failed or pending history must not render as one.
     const renderHours = (hours: number) => {
-        if (historyLoading) return <Skeleton width={100}/>;
+        if (historyPending) return <Skeleton width={100}/>;
         if (historyFailed) return '-';
         return `${formatHours(hours)} hours`;
     };
@@ -107,7 +108,8 @@ export default function Page() {
                     </CardContent>
                 </Card>
             </Grid>
-            {historyFailed && <Grid size={30}>
+            {/* The all-months view reports this in the Monthly Totals card instead. */}
+            {historyFailed && !isAllMonths && <Grid size={30}>
                 <Alert severity="error">Failed to load controlling history.</Alert>
             </Grid>}
             {historyError && history && <Grid size={30}>
@@ -200,7 +202,7 @@ export default function Page() {
                                 Could not refresh controlling sessions; this list may be out of date.
                             </Alert>
                         )}
-                        {positionsLoading ? <Skeleton height={200}/> : !positions ? (
+                        {positionsPending ? <Skeleton height={200}/> : !positions ? (
                             <Alert severity="error">Failed to load controlling sessions.</Alert>
                         ) : (
                             <ControllingSessionsTable positions={positions.items}/>
@@ -212,7 +214,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Monthly Totals</Typography>
-                        {historyLoading ? <Skeleton height={200}/> : historyFailed ? (
+                        {historyPending ? <Skeleton height={200}/> : historyFailed ? (
                             <Alert severity="error">Failed to load controlling history.</Alert>
                         ) : (
                             <StatisticsTable heading="Month" logs={monthLog}/>
