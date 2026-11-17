@@ -4,6 +4,7 @@ import {
     Card,
     CardContent,
     Grid,
+    Skeleton,
     Table,
     TableBody,
     TableCell,
@@ -21,21 +22,36 @@ const VATUSA_FACILITY = process.env.NEXT_PUBLIC_VATUSA_FACILITY ?? 'vZDC';
 
 type StaffMember = { cid: number; name: string; rating?: string | null };
 
+/**
+ * A staff list plus its query status, so a vacancy is told apart from loading or a failed request.
+ * Cached data wins over the query status: TanStack sets status 'error' when a background refetch
+ * fails while the last good data is still cached, and that data is still right to show.
+ */
+type StaffList = { status: 'pending' | 'error' | 'success'; members: StaffMember[] };
+
 export default function Page() {
 
-    const useHolders = (position: string): StaffMember[] =>
-        (useStaffPositionHolders(position).data?.holders ?? [])
-            .map((h) => ({cid: h.cid, name: h.display_name, rating: h.rating}));
-    const useRoleUsers = (role: string): StaffMember[] =>
-        (useUsersByRole(role).data?.items ?? [])
-            .map((u) => ({cid: u.basic.cid, name: u.basic.name, rating: u.basic.rating}));
+    const useHolders = (position: string): StaffList => {
+        const {status, data} = useStaffPositionHolders(position);
+        return {
+            status: data ? 'success' : status,
+            members: (data?.holders ?? []).map((h) => ({cid: h.cid, name: h.display_name, rating: h.rating})),
+        };
+    };
+    const useRoleUsers = (role: string): StaffList => {
+        const {status, data} = useUsersByRole(role);
+        return {
+            status: data ? 'success' : status,
+            members: (data?.items ?? []).map((u) => ({cid: u.basic.cid, name: u.basic.name, rating: u.basic.rating})),
+        };
+    };
 
-    const atm = useHolders('ATM')[0];
-    const datm = useHolders('DATM')[0];
-    const ta = useHolders('TA')[0];
-    const fe = useHolders('FE')[0];
-    const wm = useHolders('WM')[0];
-    const ec = useHolders('EC')[0];
+    const atm = useHolders('ATM');
+    const datm = useHolders('DATM');
+    const ta = useHolders('TA');
+    const fe = useHolders('FE');
+    const wm = useHolders('WM');
+    const ec = useHolders('EC');
     const atas = useHolders('ATA');
     const awms = useHolders('AWM');
     const afes = useHolders('AFE');
@@ -53,7 +69,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Air Traffic Manager (ATM)</Typography>
-                        <Typography variant="h3">{atm?.name}</Typography>
+                        <HolderName holders={atm} variant="h3"/>
                         <Typography>atm@vzdc.org</Typography>
                     </CardContent>
                 </Card>
@@ -62,7 +78,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Deputy Air Traffic Manager (DATM)</Typography>
-                        <Typography variant="h3">{datm?.name}</Typography>
+                        <HolderName holders={datm} variant="h3"/>
                         <Typography>datm@vzdc.org</Typography>
                     </CardContent>
                 </Card>
@@ -71,7 +87,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Training Administrator (TA)</Typography>
-                        <Typography variant="h4">{ta?.name}</Typography>
+                        <HolderName holders={ta} variant="h4"/>
                         <Typography>ta@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Training Administrators (ATAs)</Typography>
                         {getAssistantTable(atas)}
@@ -82,7 +98,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Event Coordinator (EC)</Typography>
-                        <Typography variant="h4">{ec?.name}</Typography>
+                        <HolderName holders={ec} variant="h4"/>
                         <Typography>ec@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Event Coordinators (AECs)</Typography>
                         {getAssistantTable(aecs)}
@@ -93,7 +109,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Facility Engineer (FE)</Typography>
-                        <Typography variant="h4">{fe?.name}</Typography>
+                        <HolderName holders={fe} variant="h4"/>
                         <Typography>fe@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Facility Engineers (AFEs)</Typography>
                         {getAssistantTable(afes)}
@@ -104,7 +120,7 @@ export default function Page() {
                 <Card sx={{height: '100%',}}>
                     <CardContent>
                         <Typography variant="subtitle2">Webmaster (WM)</Typography>
-                        <MatrixName firstName={wm?.name ?? ''} lastName={''}/>
+                        <HolderName holders={wm} variant="h4" matrix/>
                         <Typography>wm@vzdc.org</Typography>
                         <Typography variant="subtitle2" sx={{mt: 4,}}>Assistant Webmasters (AWMs)</Typography>
                         {getAssistantTable(awms)}
@@ -139,7 +155,24 @@ export default function Page() {
     );
 }
 
-const getAssistantTable = (users: StaffMember[], extraColumnName?: string, extraColumn?: (user: StaffMember) => ReactNode) => {
+const HolderName = ({holders, variant, matrix}: { holders: StaffList; variant: 'h3' | 'h4'; matrix?: boolean }) => {
+    if (holders.status === 'pending') {
+        return <Typography variant={variant}><Skeleton width="60%"/></Typography>;
+    }
+    if (holders.status === 'error') {
+        return <Typography variant={variant} color="text.secondary">Unavailable</Typography>;
+    }
+    const name = holders.members[0]?.name ?? 'N/A';
+    return matrix ? <MatrixName firstName={name} lastName={''}/> : <Typography variant={variant}>{name}</Typography>;
+}
+
+const getAssistantTable = ({status, members: users}: StaffList, extraColumnName?: string, extraColumn?: (user: StaffMember) => ReactNode) => {
+    if (status === 'pending') {
+        return <Skeleton width="60%"/>;
+    }
+    if (status === 'error') {
+        return <Typography variant="caption" color="text.secondary">Unavailable</Typography>;
+    }
     return users.length > 0 ? (
         <TableContainer sx={{maxHeight: 600}}>
             <Table size="small">
