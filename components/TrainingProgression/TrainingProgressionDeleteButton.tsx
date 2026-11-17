@@ -31,6 +31,7 @@ export default function TrainingProgressionDeleteButton({trainingProgression}: {
     return (
         <Tooltip title="Delete Training Progression">
             <GridActionsCellItem
+                disabled={deleteProgression.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Training Progression"
                 onClick={handleClick}

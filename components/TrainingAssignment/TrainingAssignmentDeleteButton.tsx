@@ -34,7 +34,7 @@ export default function TrainingAssignmentDeleteButton({assignment, noTable = fa
     if (noTable) {
         return (
             <Tooltip title="Delete Training Assignment">
-                <IconButton onClick={handleClick}>
+                <IconButton onClick={handleClick} disabled={deleteAssignment.isPending}>
                     <Delete color={clicked ? "warning" : "inherit"}/>
                 </IconButton>
             </Tooltip>
@@ -44,6 +44,7 @@ export default function TrainingAssignmentDeleteButton({assignment, noTable = fa
     return (
         <Tooltip title="Delete Training Assignment">
             <GridActionsCellItem
+                disabled={deleteAssignment.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Training Assignment"
                 onClick={handleClick}

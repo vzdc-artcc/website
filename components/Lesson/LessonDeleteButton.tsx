@@ -28,6 +28,7 @@ export default function LessonDeleteButton({lesson}: { lesson: { id: string, nam
     return (
         <Tooltip title="Delete Lesson">
             <GridActionsCellItem
+                disabled={deleteLesson.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Lesson"
                 onClick={handleDelete}

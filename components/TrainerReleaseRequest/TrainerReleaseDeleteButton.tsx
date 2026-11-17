@@ -32,6 +32,7 @@ export default function TrainerReleaseDeleteButton({requestId}: { requestId: str
     return (
         <Tooltip title="Delete Trainer Release Request">
             <GridActionsCellItem
+                disabled={deleteRequest.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Trainer Release Request"
                 onClick={handleClick}

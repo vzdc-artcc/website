@@ -29,7 +29,7 @@ export default function LessonRubricCriteriaDeleteButton({lessonId, rubricCriter
     }
 
     return (
-        <IconButton onClick={handleClick}>
+        <IconButton onClick={handleClick} disabled={deleteCriteria.isPending}>
             {clicked ? <Delete color="warning"/> : <Delete/>}
         </IconButton>
     );

@@ -29,6 +29,7 @@ export default function EventDeleteButton({event}: { event: { id: string, title:
     return (
         <Tooltip title="Delete Event">
             <GridActionsCellItem
+                disabled={deleteEvent.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Event"
                 onClick={handleClick}

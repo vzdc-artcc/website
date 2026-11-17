@@ -30,7 +30,7 @@ export default function LessonCriteriaCellDeleteButton({lessonId, criteriaId, cr
     }
 
     return (
-        <IconButton onClick={handleClick}>
+        <IconButton onClick={handleClick} disabled={deleteCell.isPending}>
             {clicked ? <Delete color="warning"/> : <Delete/>}
         </IconButton>
     );

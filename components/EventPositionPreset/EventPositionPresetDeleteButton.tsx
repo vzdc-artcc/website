@@ -28,6 +28,7 @@ export function EventPositionPresetDeleteButton({positionPreset}: { positionPres
     return (
         <Tooltip title="Delete Event Position Preset">
             <GridActionsCellItem
+                disabled={deletePreset.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Event Position Preset"
                 onClick={handleClick}

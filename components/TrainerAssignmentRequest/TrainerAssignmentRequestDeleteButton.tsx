@@ -36,7 +36,7 @@ export default function TrainerAssignmentRequestDeleteButton({request, noTable =
     if (noTable) {
         return (
             <Tooltip title="Delete Trainer Request">
-                <IconButton onClick={handleClick}>
+                <IconButton onClick={handleClick} disabled={deleteRequest.isPending}>
                     <Delete color={clicked ? "warning" : "inherit"}/>
                 </IconButton>
             </Tooltip>
@@ -46,6 +46,7 @@ export default function TrainerAssignmentRequestDeleteButton({request, noTable =
     return (
         <Tooltip title="Delete Trainer Request">
             <GridActionsCellItem
+                disabled={deleteRequest.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Trainer Request"
                 onClick={handleClick}

@@ -28,7 +28,7 @@ export default function PerformanceIndicatorCategoryDeleteButton({category}: {
     }
 
     return (
-        <IconButton onClick={handleClick}>
+        <IconButton onClick={handleClick} disabled={deleteCategory.isPending}>
             {clicked ? <Delete color="warning"/> : <Delete/>}
         </IconButton>
     );

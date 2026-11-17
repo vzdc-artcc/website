@@ -29,7 +29,7 @@ export default function OrderList({items, onSubmit}: {
         try {
             await onSubmit(orderedItems);
         } catch {
-            toast.error("Failed to save the new order.");
+            toast.error("Failed to save the new order. Some positions may have saved; reload to check.");
             return;
         } finally {
             setSubmitting(false);

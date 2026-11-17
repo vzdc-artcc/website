@@ -31,6 +31,7 @@ export default function ProgressionAssignmentDeleteButton({user}: {
     return (
         <Tooltip title="Delete Training Assignment">
             <GridActionsCellItem
+                disabled={deleteAssignment.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Training Assignment"
                 onClick={handleClick}

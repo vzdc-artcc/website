@@ -31,6 +31,7 @@ export default function PerformanceIndicatorDeleteButton({performanceIndicator}:
     return (
         <Tooltip title="Delete Performance Indicator">
             <GridActionsCellItem
+                disabled={deleteTemplate.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Performance Indicator"
                 onClick={handleClick}

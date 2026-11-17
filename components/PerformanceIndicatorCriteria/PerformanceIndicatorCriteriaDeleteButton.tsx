@@ -28,7 +28,7 @@ export default function PerformanceIndicatorCriteriaDeleteButton({criteria}: {
     }
 
     return (
-        <IconButton onClick={handleClick}>
+        <IconButton onClick={handleClick} disabled={deleteCriteria.isPending}>
             {clicked ? <Delete color="warning"/> : <Delete/>}
         </IconButton>
     );

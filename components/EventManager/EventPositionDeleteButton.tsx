@@ -31,7 +31,7 @@ export default function EventPositionDeleteButton({eventId, position}: {
 
     return (
         <Tooltip title="Delete Position">
-            <IconButton onClick={handleClick}>
+            <IconButton onClick={handleClick} disabled={deletePosition.isPending}>
                 <Delete color={clicked ? 'warning' : 'inherit'}/>
             </IconButton>
         </Tooltip>
