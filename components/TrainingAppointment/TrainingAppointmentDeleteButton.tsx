@@ -16,11 +16,18 @@ export default function TrainingAppointmentDeleteButton({trainingAppointment, fr
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteAppointment.mutateAsync(trainingAppointment.id);
-            if (trainingAppointment.atc_booking_id) {
-                await deleteAppointmentAtcBooking(trainingAppointment.atc_booking_id);
+            try {
+                await deleteAppointment.mutateAsync(trainingAppointment.id);
+            } catch {
+                toast(`Failed to delete appointment.`, {type: 'error'});
+                return;
             }
-            toast(`Appointment deleted successfully!`, {type: 'success'});
+            try {
+                await deleteAppointmentAtcBooking(trainingAppointment.atc_booking_id);
+                toast(`Appointment deleted successfully!`, {type: 'success'});
+            } catch {
+                toast(`Appointment deleted, but its ATC booking could not be removed.`, {type: 'error'});
+            }
             onDelete && onDelete();
             setClicked(false);
         } else {
@@ -33,7 +40,7 @@ export default function TrainingAppointmentDeleteButton({trainingAppointment, fr
     return (
         <Tooltip title="Delete Appointment">
             <IconButton size="small" onClick={handleClick}
-                        disabled={!fromAdmin && (new Date()).getTime() > new Date(trainingAppointment.start).getTime()}>
+                        disabled={deleteAppointment.isPending || (!fromAdmin && (new Date()).getTime() > new Date(trainingAppointment.start).getTime())}>
                 <Delete fontSize="small" color={clicked ? "warning" : "inherit"}/>
             </IconButton>
         </Tooltip>

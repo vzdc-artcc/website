@@ -18,7 +18,12 @@ export default function TrainerAssignmentRequestDeleteButton({request, noTable =
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteRequest.mutateAsync(request.id);
+            try {
+                await deleteRequest.mutateAsync(request.id);
+            } catch {
+                toast(`Failed to delete request.`, {type: 'error'});
+                return;
+            }
             toast(`Request deleted successfully!`, {type: 'success'});
             router.replace('/training/requests/home');
         } else {
@@ -31,7 +36,7 @@ export default function TrainerAssignmentRequestDeleteButton({request, noTable =
     if (noTable) {
         return (
             <Tooltip title="Delete Trainer Request">
-                <IconButton onClick={handleClick}>
+                <IconButton onClick={handleClick} disabled={deleteRequest.isPending}>
                     <Delete color={clicked ? "warning" : "inherit"}/>
                 </IconButton>
             </Tooltip>
@@ -41,6 +46,7 @@ export default function TrainerAssignmentRequestDeleteButton({request, noTable =
     return (
         <Tooltip title="Delete Trainer Request">
             <GridActionsCellItem
+                disabled={deleteRequest.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Trainer Request"
                 onClick={handleClick}

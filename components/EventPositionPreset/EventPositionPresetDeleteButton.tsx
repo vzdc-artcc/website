@@ -12,7 +12,12 @@ export function EventPositionPresetDeleteButton({positionPreset}: { positionPres
 
     const handleClick = async () => {
         if (clicked) {
-            await deletePreset.mutateAsync(positionPreset.id);
+            try {
+                await deletePreset.mutateAsync(positionPreset.id);
+            } catch {
+                toast(`Failed to delete position preset.`, {type: 'error'});
+                return;
+            }
             toast(`Position preset '${positionPreset.name}' deleted successfully!`, {type: 'success'});
         } else {
             toast.warn(`Deleting this preset is not reversable.  Click again to confirm.`);
@@ -23,6 +28,7 @@ export function EventPositionPresetDeleteButton({positionPreset}: { positionPres
     return (
         <Tooltip title="Delete Event Position Preset">
             <GridActionsCellItem
+                disabled={deletePreset.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Event Position Preset"
                 onClick={handleClick}

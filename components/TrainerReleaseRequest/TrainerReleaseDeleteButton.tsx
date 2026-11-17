@@ -14,7 +14,12 @@ export default function TrainerReleaseDeleteButton({requestId}: { requestId: str
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteRequest.mutateAsync(requestId);
+            try {
+                await deleteRequest.mutateAsync(requestId);
+            } catch {
+                toast(`Failed to delete training release request.`, {type: 'error'});
+                return;
+            }
             toast(`Training release request deleted successfully!`, {type: 'success'});
             router.replace('/training/releases');
         } else {
@@ -27,6 +32,7 @@ export default function TrainerReleaseDeleteButton({requestId}: { requestId: str
     return (
         <Tooltip title="Delete Trainer Release Request">
             <GridActionsCellItem
+                disabled={deleteRequest.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Trainer Release Request"
                 onClick={handleClick}

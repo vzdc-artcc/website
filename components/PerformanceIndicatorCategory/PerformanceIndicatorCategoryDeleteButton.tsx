@@ -13,7 +13,12 @@ export default function PerformanceIndicatorCategoryDeleteButton({category}: {
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteCategory.mutateAsync(category.id);
+            try {
+                await deleteCategory.mutateAsync(category.id);
+            } catch {
+                toast(`Failed to delete category.`, {type: 'error'});
+                return;
+            }
             toast(`'${category.name}' deleted successfully!`, {type: 'success'});
         } else {
             toast(`This will delete all the entries in it.  Click again to confirm.`, {type: 'warning'});
@@ -23,7 +28,7 @@ export default function PerformanceIndicatorCategoryDeleteButton({category}: {
     }
 
     return (
-        <IconButton onClick={handleClick}>
+        <IconButton onClick={handleClick} disabled={deleteCategory.isPending}>
             {clicked ? <Delete color="warning"/> : <Delete/>}
         </IconButton>
     );

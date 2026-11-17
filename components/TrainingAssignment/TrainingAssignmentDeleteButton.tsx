@@ -17,7 +17,12 @@ export default function TrainingAssignmentDeleteButton({assignment, noTable = fa
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteAssignment.mutateAsync(assignment.id);
+            try {
+                await deleteAssignment.mutateAsync(assignment.id);
+            } catch {
+                toast(`Failed to delete training assignment.`, {type: 'error'});
+                return;
+            }
             toast(`Training assignment deleted successfully!`, {type: 'success'});
             router.replace('/training/assignments');
         } else {
@@ -29,7 +34,7 @@ export default function TrainingAssignmentDeleteButton({assignment, noTable = fa
     if (noTable) {
         return (
             <Tooltip title="Delete Training Assignment">
-                <IconButton onClick={handleClick}>
+                <IconButton onClick={handleClick} disabled={deleteAssignment.isPending}>
                     <Delete color={clicked ? "warning" : "inherit"}/>
                 </IconButton>
             </Tooltip>
@@ -39,6 +44,7 @@ export default function TrainingAssignmentDeleteButton({assignment, noTable = fa
     return (
         <Tooltip title="Delete Training Assignment">
             <GridActionsCellItem
+                disabled={deleteAssignment.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Training Assignment"
                 onClick={handleClick}

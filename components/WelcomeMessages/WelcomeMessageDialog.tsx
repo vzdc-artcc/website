@@ -5,6 +5,7 @@ import Markdown from "react-markdown";
 import {Check} from "@mui/icons-material";
 import {useAcknowledgeWelcomeMessage, useMyWelcomeMessage} from "@/lib/osmium/hooks/welcome-messages";
 import Logo from "@/components/Logo/Logo";
+import {toast} from "react-toastify";
 
 export default function WelcomeMessageDialog() {
 
@@ -20,7 +21,11 @@ export default function WelcomeMessageDialog() {
 
     const onClose = async () => {
         setOpen(false);
-        await acknowledgeWelcomeMessage.mutateAsync();
+        try {
+            await acknowledgeWelcomeMessage.mutateAsync();
+        } catch {
+            toast(`Your acknowledgement was not recorded. The welcome message will show again.`, {type: 'error'});
+        }
     }
 
     if (!data?.show || !data?.text) {

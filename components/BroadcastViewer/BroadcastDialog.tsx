@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import {Check} from "@mui/icons-material";
 import {usePathname} from "next/navigation";
+import {toast} from "react-toastify";
 import {useMarkBroadcastAgreed, useMarkBroadcastSeen} from "@/lib/osmium/hooks/broadcasts";
 
 interface PendingBroadcast {
@@ -42,11 +43,17 @@ export default function BroadcastDialog({broadcasts, children}: {
         setConfirmAction('reviewed');
     }
 
+    // On failure the dialog still closes: osmium refuses these writes while impersonating, and a
+    // full-screen dialog that only closes on success would leave no way back to the page.
     const handleConfirm = async () => {
-        if (confirmAction === 'later') {
-            await Promise.all(broadcasts.map((b) => markSeen.mutateAsync(b.id)));
-        } else if (confirmAction === 'reviewed') {
-            await Promise.all(broadcasts.map((b) => markAgreed.mutateAsync(b.id)));
+        try {
+            if (confirmAction === 'later') {
+                await Promise.all(broadcasts.map((b) => markSeen.mutateAsync(b.id)));
+            } else if (confirmAction === 'reviewed') {
+                await Promise.all(broadcasts.map((b) => markAgreed.mutateAsync(b.id)));
+            }
+        } catch {
+            toast(`Your response was not recorded. The broadcast will show again.`, {type: 'error'});
         }
         setConfirmAction(null);
         setOpen(false);

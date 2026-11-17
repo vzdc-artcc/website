@@ -14,7 +14,12 @@ export default function LessonRubricCriteriaDeleteButton({lessonId, rubricCriter
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteCriteria.mutateAsync(rubricCriteria.id);
+            try {
+                await deleteCriteria.mutateAsync(rubricCriteria.id);
+            } catch {
+                toast(`Failed to delete criteria.`, {type: 'error'});
+                return;
+            }
             toast(`Criteria deleted successfully!`, {type: 'success'});
         } else {
             toast(`Deleting this criteria will remove it from all training tickets.  Click again to confirm.`, {type: 'warning'});
@@ -24,7 +29,7 @@ export default function LessonRubricCriteriaDeleteButton({lessonId, rubricCriter
     }
 
     return (
-        <IconButton onClick={handleClick}>
+        <IconButton onClick={handleClick} disabled={deleteCriteria.isPending}>
             {clicked ? <Delete color="warning"/> : <Delete/>}
         </IconButton>
     );

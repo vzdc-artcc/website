@@ -14,7 +14,12 @@ export default function TrainingProgressionDeleteButton({trainingProgression}: {
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteProgression.mutateAsync(trainingProgression.id);
+            try {
+                await deleteProgression.mutateAsync(trainingProgression.id);
+            } catch {
+                toast(`Failed to delete training progression.`, {type: 'error'});
+                return;
+            }
             toast(`Training progression deleted successfully!`, {type: 'success'});
         } else {
             toast(`Deleting this remove it from all students and delete all the steps.  Click again to confirm.`, {type: 'warning'});
@@ -26,6 +31,7 @@ export default function TrainingProgressionDeleteButton({trainingProgression}: {
     return (
         <Tooltip title="Delete Training Progression">
             <GridActionsCellItem
+                disabled={deleteProgression.isPending}
                 icon={<Delete color={clicked ? "warning" : "inherit"}/>}
                 label="Delete Training Progression"
                 onClick={handleClick}
