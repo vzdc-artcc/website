@@ -211,6 +211,28 @@ export function useUpdateUserFlags() {
     });
 }
 
+/**
+ * User-facing text for a failed `useReassignOperatingInitials` call, keyed on
+ * osmium's error code. A taken pair is `conflict` (409); osmium answers
+ * `forbidden` here for an impersonating session.
+ */
+export function operatingInitialsErrorMessage(error: unknown): string {
+    switch ((error as { error?: string } | null)?.error) {
+        case "conflict":
+            return "These operating initials are already in use.";
+        case "bad_request":
+            return "Operating initials must be two letters.";
+        case "unauthorized":
+            return "You are not authorized to assign operating initials.";
+        case "forbidden":
+            return "Operating initials cannot be changed while impersonating.";
+        case "not_found":
+            return "That controller was not found.";
+        default:
+            return "Failed to assign operating initials.";
+    }
+}
+
 export function useReassignOperatingInitials() {
     const queryClient = useQueryClient();
     return useMutation({
