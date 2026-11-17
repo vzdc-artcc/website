@@ -7,11 +7,12 @@ import TrainerReleaseRequestApproveButton from "@/components/TrainerReleaseReque
 import TrainerReleaseDeleteButton from "@/components/TrainerReleaseRequest/TrainerReleaseDeleteButton";
 import Link from "next/link";
 import {useTrainerReleaseRequests} from "@/lib/osmium/hooks/training";
-import {useHasStaffPosition} from "@/lib/osmium/hooks/staff-positions";
+import {useHasPermission} from "@/lib/osmium/permissions";
 
 export default function TrainerReleaseRequestTable() {
 
-    const {has: manageMode} = useHasStaffPosition(['TA', 'ATA', 'WM']);
+    const {allowed: canApprove} = useHasPermission('training.release_requests.decide');
+    const {allowed: canDelete} = useHasPermission('training.release_requests.delete');
     const {data, isLoading} = useTrainerReleaseRequests();
     // osmium keeps approved and denied requests, so pending ones (the actionable queue) come
     // first, oldest first within each group. Sorted here rather than by the grid's sort model,
@@ -53,12 +54,10 @@ export default function TrainerReleaseRequestTable() {
             headerName: 'Actions',
             // Delete stays on decided rows: osmium allows one request per student, so a decided
             // request left in place blocks that student from ever requesting again.
-            getActions: (params) => manageMode ? [
-                ...(params.row.status === 'PENDING' ? [
-                    <TrainerReleaseRequestApproveButton key={`approve-${params.row.id}`} requestId={params.row.id}/>,
-                ] : []),
-                <TrainerReleaseDeleteButton key={`delete-${params.row.id}`} requestId={params.row.id}/>,
-            ] : [],
+            getActions: (params) => [
+                ...(canApprove && params.row.status === 'PENDING' ? [<TrainerReleaseRequestApproveButton key={`approve-${params.row.id}`} requestId={params.row.id}/>] : []),
+                ...(canDelete ? [<TrainerReleaseDeleteButton key={`delete-${params.row.id}`} requestId={params.row.id}/>] : []),
+            ],
             flex: 1,
         },
     ];

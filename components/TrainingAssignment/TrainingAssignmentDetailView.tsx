@@ -4,13 +4,14 @@ import {Card, CardContent, CircularProgress, Stack, Typography} from "@mui/mater
 import TrainingAssignmentForm from "@/components/TrainingAssignment/TrainingAssignmentForm";
 import TrainingAssignmentDeleteButton from "@/components/TrainingAssignment/TrainingAssignmentDeleteButton";
 import {useTrainingAssignment} from "@/lib/osmium/hooks/training";
-import {useHasStaffPosition} from "@/lib/osmium/hooks/staff-positions";
+import {useHasPermission} from "@/lib/osmium/permissions";
 
 export default function TrainingAssignmentDetailView({assignmentId}: {
     assignmentId: string,
 }) {
 
-    const {has: allowedEdit} = useHasStaffPosition(['TA', 'ATA', 'WM']);
+    const {allowed: canEdit} = useHasPermission('training.assignments.update');
+    const {allowed: canDelete} = useHasPermission('training.assignments.delete');
 
     const {data: assignment, isLoading} = useTrainingAssignment(assignmentId);
 
@@ -33,11 +34,11 @@ export default function TrainingAssignmentDetailView({assignmentId}: {
             <CardContent>
                 <Stack direction="row" justifyContent="space-between" spacing={1}>
                     <Typography variant="h5">Training Assignment</Typography>
-                    {allowedEdit && <TrainingAssignmentDeleteButton assignment={assignment} noTable/>}
+                    {canDelete && <TrainingAssignmentDeleteButton assignment={assignment} noTable/>}
                 </Stack>
                 <Typography variant="subtitle2"
                             sx={{mb: 2,}}>{assignment.student_name} ({assignment.student_cid})</Typography>
-                <TrainingAssignmentForm assignment={assignment} disabled={!allowedEdit}/>
+                <TrainingAssignmentForm assignment={assignment} disabled={!canEdit}/>
             </CardContent>
         </Card>
     );

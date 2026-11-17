@@ -9,7 +9,7 @@ import TrainingAssignmentToggleExpressInterestButton
     from "@/components/TrainingAssignment/TrainingAssignmentToggleExpressInterestButton";
 import {useTrainingAssignmentRequests} from "@/lib/osmium/hooks/training";
 import {useMe} from "@/lib/osmium/hooks/me";
-import {useHasStaffPosition} from "@/lib/osmium/hooks/staff-positions";
+import {useHasPermission} from "@/lib/osmium/permissions";
 
 export default function TrainingAssignmentRequestDetailView({requestId}: {
     requestId: string,
@@ -17,7 +17,11 @@ export default function TrainingAssignmentRequestDetailView({requestId}: {
 
     const {data: me} = useMe();
     const currentUserCid = me ? String(me.cid) : '';
-    const {has: isTaOrAtaOrWm} = useHasStaffPosition(['TA', 'ATA', 'WM']);
+    const {allowed: canDeleteRequest} = useHasPermission('training.assignment_requests.delete');
+    // Assigning creates the assignment and then deletes the request, so it
+    // needs both permissions or it fails halfway.
+    const {allowed: canCreateAssignment} = useHasPermission('training.assignments.create');
+    const canAssign = canCreateAssignment && canDeleteRequest;
 
     const {data, isLoading} = useTrainingAssignmentRequests();
     const request = data?.items.find((r) => r.id === requestId);
@@ -44,7 +48,7 @@ export default function TrainingAssignmentRequestDetailView({requestId}: {
                 <CardContent>
                     <Stack direction="row" justifyContent="space-between" spacing={1}>
                         <Typography variant="h5">Training Request - {request.student_name}</Typography>
-                        {isTaOrAtaOrWm && <TrainerAssignmentRequestDeleteButton request={request} noTable/>}
+                        {canDeleteRequest && <TrainerAssignmentRequestDeleteButton request={request} noTable/>}
                     </Stack>
                     <Typography variant="subtitle2">Student: {request.student_name} ({request.student_cid})</Typography>
                     <Typography variant="subtitle2">Submitted: {formatZuluDate(new Date(request.submitted_at))}</Typography>
@@ -66,7 +70,7 @@ export default function TrainingAssignmentRequestDetailView({requestId}: {
                                                                     hasAlreadyExpressedInterest={hasAlreadyExpressedInterest}/>
                 </CardActions>
             </Card>
-            {isTaOrAtaOrWm && <Card>
+            {canAssign && <Card>
                 <CardContent>
                     <Typography variant="h6" sx={{mb: 2,}}>Training Assignment</Typography>
                     <TrainingAssignmentForm trainingRequest={request}/>

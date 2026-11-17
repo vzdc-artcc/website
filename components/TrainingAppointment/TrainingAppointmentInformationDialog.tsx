@@ -24,13 +24,13 @@ export default function TrainingAppointmentInformationDialog({
                                                                  trainingAppointment,
                                                                  manualOpen,
                                                                  onClose,
-                                                                 isTrainingStaff,
+                                                                 canDelete,
                                                                  timeZone,
                                                              }: {
     trainingAppointment: AppointmentLike,
     manualOpen?: boolean,
     onClose?: () => void,
-    isTrainingStaff: boolean,
+    canDelete: boolean,
     timeZone: string,
 }) {
 
@@ -78,7 +78,7 @@ export default function TrainingAppointmentInformationDialog({
                     ))}
                 </DialogContent>
                 <DialogActions>
-                    {isTrainingStaff &&
+                    {canDelete &&
                         <TrainingAppointmentDeleteButton trainingAppointment={trainingAppointment} fromAdmin
                                                          onDelete={close}/>
                     }
