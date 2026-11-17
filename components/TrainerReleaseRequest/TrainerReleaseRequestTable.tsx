@@ -51,8 +51,12 @@ export default function TrainerReleaseRequestTable() {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',
-            getActions: (params) => manageMode && params.row.status === 'PENDING' ? [
-                <TrainerReleaseRequestApproveButton key={`approve-${params.row.id}`} requestId={params.row.id}/>,
+            // Delete stays on decided rows: osmium allows one request per student, so a decided
+            // request left in place blocks that student from ever requesting again.
+            getActions: (params) => manageMode ? [
+                ...(params.row.status === 'PENDING' ? [
+                    <TrainerReleaseRequestApproveButton key={`approve-${params.row.id}`} requestId={params.row.id}/>,
+                ] : []),
                 <TrainerReleaseDeleteButton key={`delete-${params.row.id}`} requestId={params.row.id}/>,
             ] : [],
             flex: 1,
