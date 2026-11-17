@@ -14,7 +14,12 @@ export default function TrainingProgressionStepDeleteButton({trainingProgression
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteStep.mutateAsync(trainingProgressionStep.id);
+            try {
+                await deleteStep.mutateAsync(trainingProgressionStep.id);
+            } catch {
+                toast(`Failed to delete training progression step.`, {type: 'error'});
+                return;
+            }
             toast(`Training progression step deleted successfully!`, {type: 'success'});
         } else {
             toast(`Deleting this remove it from all students and progressions.  Click again to confirm.`, {type: 'warning'});

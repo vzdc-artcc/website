@@ -10,7 +10,11 @@ export type OrderItem = {
     order: number,
 };
 
-export default function OrderList({items, onSubmit}: { items: OrderItem[], onSubmit: (items: OrderItem[]) => void }) {
+export default function OrderList({items, onSubmit}: {
+    items: OrderItem[],
+    onSubmit: (items: OrderItem[]) => Promise<unknown>,
+}) {
+    const [submitting, setSubmitting] = useState(false);
     const [orderedItems, setOrderedItems] = useState<OrderItem[]>([...items].sort((a, b) => a.order - b.order));
 
     const moveItem = (index: number, direction: 'up' | 'down') => {
@@ -20,8 +24,16 @@ export default function OrderList({items, onSubmit}: { items: OrderItem[], onSub
         setOrderedItems(newItems.map((item, idx) => ({...item, order: idx + 1})));
     };
 
-    const handleSubmit = () => {
-        onSubmit(orderedItems);
+    const handleSubmit = async () => {
+        setSubmitting(true);
+        try {
+            await onSubmit(orderedItems);
+        } catch {
+            toast.error("Failed to save the new order.");
+            return;
+        } finally {
+            setSubmitting(false);
+        }
         toast.success("Order updated successfully!");
     };
 
@@ -50,7 +62,7 @@ export default function OrderList({items, onSubmit}: { items: OrderItem[], onSub
                     </ListItem>
                 ))}
             </List>
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
+            <Button variant="contained" color="primary" onClick={handleSubmit} disabled={submitting}>
                 Submit Order
             </Button>
         </Box>

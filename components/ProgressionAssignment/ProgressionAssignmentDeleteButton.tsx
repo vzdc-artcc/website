@@ -14,7 +14,12 @@ export default function ProgressionAssignmentDeleteButton({user}: {
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteAssignment.mutateAsync(user.user_id);
+            try {
+                await deleteAssignment.mutateAsync(user.user_id);
+            } catch {
+                toast(`Failed to delete training assignment.`, {type: 'error'});
+                return;
+            }
             toast(`Training assign deleted successfully!`, {type: 'success'});
         } else {
             toast(`Deleting this remove it from this user but will NOT affect any existing training sessions.  Click again to confirm.`, {type: 'warning'});

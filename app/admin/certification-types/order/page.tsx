@@ -10,9 +10,8 @@ export default function Page() {
     const reorder = useReorderCertificationTypes();
     const certificationTypes = data?.items ?? [];
 
-    const handleSubmit = (items: OrderItem[]) => {
-        reorder.mutate(items.map((item) => ({id: item.id, order: item.order})));
-    };
+    const handleSubmit = (items: OrderItem[]) =>
+        reorder.mutateAsync(items.map((item) => ({id: item.id, order: item.order})));
 
     return (
         <Card>

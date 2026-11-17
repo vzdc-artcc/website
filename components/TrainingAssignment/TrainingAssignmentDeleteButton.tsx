@@ -17,7 +17,12 @@ export default function TrainingAssignmentDeleteButton({assignment, noTable = fa
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteAssignment.mutateAsync(assignment.id);
+            try {
+                await deleteAssignment.mutateAsync(assignment.id);
+            } catch {
+                toast(`Failed to delete training assignment.`, {type: 'error'});
+                return;
+            }
             toast(`Training assignment deleted successfully!`, {type: 'success'});
             router.replace('/training/assignments');
         } else {

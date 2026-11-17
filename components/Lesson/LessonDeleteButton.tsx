@@ -12,7 +12,12 @@ export default function LessonDeleteButton({lesson}: { lesson: { id: string, nam
 
     const handleDelete = async () => {
         if (clicked) {
-            await deleteLesson.mutateAsync(lesson.id);
+            try {
+                await deleteLesson.mutateAsync(lesson.id);
+            } catch {
+                toast(`Failed to delete lesson.`, {type: 'error'});
+                return;
+            }
             toast(`'${lesson.name}' deleted successfully!`, {type: 'success'});
         } else {
             toast(`Deleting '${lesson.name}' will remove this lesson. Click again to confirm.`, {type: 'warning'});

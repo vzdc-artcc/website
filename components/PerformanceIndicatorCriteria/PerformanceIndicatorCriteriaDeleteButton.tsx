@@ -13,7 +13,12 @@ export default function PerformanceIndicatorCriteriaDeleteButton({criteria}: {
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteCriteria.mutateAsync(criteria.id);
+            try {
+                await deleteCriteria.mutateAsync(criteria.id);
+            } catch {
+                toast(`Failed to delete criteria.`, {type: 'error'});
+                return;
+            }
             toast(`'${criteria.name}' deleted successfully!`, {type: 'success'});
         } else {
             toast(`This will delete the criteria permanently.  Click again to confirm.`, {type: 'warning'});

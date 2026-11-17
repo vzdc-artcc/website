@@ -16,7 +16,12 @@ export default function EventPositionDeleteButton({eventId, position}: {
 
     const handleClick = async () => {
         if (clicked) {
-            await deletePosition.mutateAsync(position.id);
+            try {
+                await deletePosition.mutateAsync(position.id);
+            } catch {
+                toast(`Failed to delete position.`, {type: 'error'});
+                return;
+            }
             toast(`Position '${position.requested_position}' deleted successfully!`, {type: 'success'});
         } else {
             toast.warn(`Deleting this position will remove all signups associated with it.  Click again to confirm.`);

@@ -18,7 +18,12 @@ export default function TrainerAssignmentRequestDeleteButton({request, noTable =
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteRequest.mutateAsync(request.id);
+            try {
+                await deleteRequest.mutateAsync(request.id);
+            } catch {
+                toast(`Failed to delete request.`, {type: 'error'});
+                return;
+            }
             toast(`Request deleted successfully!`, {type: 'success'});
             router.replace('/training/requests/home');
         } else {

@@ -13,7 +13,12 @@ export default function EventDeleteButton({event}: { event: { id: string, title:
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteEvent.mutateAsync(event.id);
+            try {
+                await deleteEvent.mutateAsync(event.id);
+            } catch {
+                toast(`Failed to delete event.`, {type: 'error'});
+                return;
+            }
             toast(`Event '${event.title}' deleted successfully!`, {type: 'success'});
         } else {
             toast.warn(`Deleting this event will remove all positions and signups associated with it.  Click again to confirm.`);

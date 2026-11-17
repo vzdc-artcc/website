@@ -14,7 +14,12 @@ export default function PerformanceIndicatorDeleteButton({performanceIndicator}:
 
     const handleClick = async () => {
         if (clicked) {
-            await deleteTemplate.mutateAsync(performanceIndicator.id);
+            try {
+                await deleteTemplate.mutateAsync(performanceIndicator.id);
+            } catch {
+                toast(`Failed to delete performance indicator.`, {type: 'error'});
+                return;
+            }
             toast(`Performance Indicator '${performanceIndicator.name}' deleted successfully!`, {type: 'success'});
         } else {
             toast.warn(`Deleting this performance indicator will remove all categories and criteria associated with it.  It will also remove it from any lessons and training sessions created in the future.  Click again to confirm.`);
