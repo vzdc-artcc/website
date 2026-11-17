@@ -59,10 +59,36 @@ interface ControllerLifecycleInput {
     cleanupOnNone?: boolean;
 }
 
+const LIFECYCLE_MUTATION_KEY = ["osmium", "controller-lifecycle"];
+const refreshScheduled = new WeakSet<QueryClient>();
+
+/**
+ * The Purge Assistant fires one lifecycle mutation per selected controller in
+ * parallel. Refresh once, after the last of them settles, failed or not,
+ * rather than restarting every refetch per controller.
+ *
+ * A mutation still counts as pending inside its own onSettled, so the check
+ * waits a macrotask for every settled mutation to leave that state. Mutations
+ * settling in the same macrotask share one scheduled check; if one is still
+ * pending when it runs, that mutation's own onSettled schedules the next.
+ */
+function scheduleLifecycleRefresh(queryClient: QueryClient) {
+    if (refreshScheduled.has(queryClient)) return;
+    refreshScheduled.add(queryClient);
+    setTimeout(() => {
+        refreshScheduled.delete(queryClient);
+        if (queryClient.isMutating({ mutationKey: LIFECYCLE_MUTATION_KEY }) > 0) return;
+        invalidateControllerStatusReaders(queryClient);
+        // A move to NONE deletes the controller's LOAs.
+        queryClient.invalidateQueries({ queryKey: ["osmium", "loas"] });
+    }, 0);
+}
+
 export function useUpdateControllerLifecycle() {
     const queryClient = useQueryClient();
 
     return useMutation({
+        mutationKey: LIFECYCLE_MUTATION_KEY,
         mutationFn: async (input: ControllerLifecycleInput) => {
             const { data, error } = await osmium.PATCH("/api/v1/admin/users/{cid}/controller-lifecycle", {
                 params: { path: { cid: input.cid } },
@@ -75,10 +101,6 @@ export function useUpdateControllerLifecycle() {
             if (error) throw error;
             return data;
         },
-        onSuccess: () => {
-            invalidateControllerStatusReaders(queryClient);
-            // A move to NONE deletes the controller's LOAs.
-            queryClient.invalidateQueries({ queryKey: ["osmium", "loas"] });
-        },
+        onSettled: () => scheduleLifecycleRefresh(queryClient),
     });
 }
