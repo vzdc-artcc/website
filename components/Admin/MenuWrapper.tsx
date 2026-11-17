@@ -2,7 +2,7 @@ import { ExpandMore } from "@mui/icons-material";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Card, CardContent, Divider, List, Typography } from "@mui/material";
 import { NAVBAR_HEIGHT } from "@/components/Navbar/height";
 
-export default function MenuWrapper({ title, subheadings, children }: { title: string, subheadings: string[], children: React.ReactNode }) {
+export default function MenuWrapper({ title, subheadings, children }: { title: string, subheadings: React.ReactNode[], children: React.ReactNode }) {
     return (
         <>
             <Box sx={{ display: { xs: 'none', lg: 'inherit', }, position: 'sticky', top: NAVBAR_HEIGHT + 16 }}>

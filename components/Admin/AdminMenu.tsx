@@ -21,19 +21,16 @@ import PendingFeedbackBadge from './PendingFeedbackBadge';
 import PendingIncidentsBadge from './PendingIncidentsBadge';
 import PendingLoaBadge from './PendingLoaBadge';
 import PendingVisitorApplicationsBadge from './PendingVisitorApplicationsBadge';
-import {useStaffPositionHolderName} from "@/lib/osmium/hooks/staff-positions";
+import StaffHolderSubheading from './StaffHolderSubheading';
 
 export default function AdminMenu() {
-
-    const atmName = useStaffPositionHolderName("ATM");
-    const datmName = useStaffPositionHolderName("DATM");
 
     return (
         <MenuWrapper 
             title="Facility Administration" 
             subheadings={[
-                `ATM: ${atmName}`,
-                `DATM: ${datmName}`
+                <StaffHolderSubheading key="ATM" label="ATM" position="ATM"/>,
+                <StaffHolderSubheading key="DATM" label="DATM" position="DATM"/>,
             ]}
         >
             <Link href="/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>

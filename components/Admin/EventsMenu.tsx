@@ -3,14 +3,12 @@ import {CalendarMonth, Home, Insights, ListAlt, RecentActors} from "@mui/icons-m
 import {Link, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import MenuWrapper from "./MenuWrapper";
 import EventsMenuStaffingBadge from "./EventsMenuStaffingBadge";
-import {useStaffPositionHolderName} from "@/lib/osmium/hooks/staff-positions";
+import StaffHolderSubheading from "./StaffHolderSubheading";
 
 export default function EventMenu() {
 
-    const ecName = useStaffPositionHolderName("EC");
-
     return (
-        <MenuWrapper title="Events Administration" subheadings={[`EC: ${ecName}`]}>
+        <MenuWrapper title="Events Administration" subheadings={[<StaffHolderSubheading key="EC" label="EC" position="EC"/>]}>
             <Link href="/events/admin/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>

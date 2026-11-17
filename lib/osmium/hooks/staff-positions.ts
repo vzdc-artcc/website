@@ -41,12 +41,6 @@ export function useStaffPositionHolders(position: string) {
     });
 }
 
-/** The display name of the first holder of a staff position, or 'N/A'. */
-export function useStaffPositionHolderName(position: string): string {
-    const { data } = useStaffPositionHolders(position);
-    return data?.holders?.[0]?.display_name ?? "N/A";
-}
-
 /** The current user's own held staff positions, from osmium (Phase 6). */
 export function useMyStaffPositions() {
     const { data: me } = useMe();
