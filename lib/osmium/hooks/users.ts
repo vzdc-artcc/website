@@ -213,8 +213,8 @@ export function useUpdateUserFlags() {
 
 /**
  * User-facing text for a failed `useReassignOperatingInitials` call, keyed on
- * osmium's error code. A taken pair is `conflict` (409); `forbidden` on this
- * admin route comes only from the impersonation write block.
+ * osmium's error code. A taken pair is `conflict` (409); osmium answers
+ * `forbidden` here for an impersonating session.
  */
 export function operatingInitialsErrorMessage(error: unknown): string {
     switch ((error as { error?: string } | null)?.error) {
