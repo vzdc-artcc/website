@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { osmium } from "@/lib/osmium/client";
+import { invalidateControllerStatusReaders } from "@/lib/osmium/hooks/controllerLifecycle";
 
 export function useMyVisitorApplication() {
     return useQuery({
@@ -93,8 +94,12 @@ export function useDecideVisitorApplication() {
             if (error) throw error;
             return data;
         },
-        onSuccess: () => {
+        onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ["osmium", "visitor-applications"] });
+            // Approval makes the applicant a VISITOR on the roster.
+            if (variables.status === "APPROVED") {
+                invalidateControllerStatusReaders(queryClient);
+            }
         },
     });
 }
