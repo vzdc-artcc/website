@@ -68,95 +68,98 @@ export default function RosterTable({membership, search, includeVatusa,}: {
         return <Typography>Loading roster…</Typography>;
     }
 
-    if (isError) {
+    if (isError && !rosterData) {
         return <Alert severity="error">Failed to load the roster.</Alert>;
     }
 
     return (
-        <TableContainer sx={{maxHeight: '100vh',}}>
-            <Table stickyHeader size="small">
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Controller</TableCell>
-                        <TableCell>OI</TableCell>
-                        {certificationTypes.map((certificationType) => (
-                            <TableCell key={certificationType.id}>{certificationType.name}</TableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {noResults &&
+        <>
+            {isError && <Alert severity="warning" sx={{mb: 1,}}>Could not refresh the roster; it may be out of date.</Alert>}
+            <TableContainer sx={{maxHeight: '100vh',}}>
+                <Table stickyHeader size="small">
+                    <TableHead>
                         <TableRow>
-                            <TableCell colSpan={colSpan}>
-                                <Typography>No results found{search ? ` for ${search}` : ''}</Typography>
-                            </TableCell>
-                        </TableRow>}
-                    {rows.map((item) => {
-                        const profile = item.full;
-                        const certUser = rosterCerts?.find((u) => u.cid === item.basic.cid);
-                        const hasApprovedLoa = certUser?.has_approved_loa ?? false;
-                        const displayName = profile?.preferred_name ||
-                            [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') ||
-                            item.basic.name;
+                            <TableCell>Controller</TableCell>
+                            <TableCell>OI</TableCell>
+                            {certificationTypes.map((certificationType) => (
+                                <TableCell key={certificationType.id}>{certificationType.name}</TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {noResults &&
+                            <TableRow>
+                                <TableCell colSpan={colSpan}>
+                                    <Typography>No results found{search ? ` for ${search}` : ''}</Typography>
+                                </TableCell>
+                            </TableRow>}
+                        {rows.map((item) => {
+                            const profile = item.full;
+                            const certUser = rosterCerts?.find((u) => u.cid === item.basic.cid);
+                            const hasApprovedLoa = certUser?.has_approved_loa ?? false;
+                            const displayName = profile?.preferred_name ||
+                                [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') ||
+                                item.basic.name;
 
-                        return (
-                            <TableRow key={item.basic.cid}>
-                                <TableCell>
-                                    <Link href={`/controllers/${item.basic.cid}`}
-                                          style={{color: 'inherit', textDecoration: 'none',}}>
-                                        <Typography fontWeight="bold">
-                                            {displayName}
-                                            {hasApprovedLoa &&
-                                                <Chip label="LOA" color="primary" size="small" sx={{ml: 1,}}/>}
+                            return (
+                                <TableRow key={item.basic.cid}>
+                                    <TableCell>
+                                        <Link href={`/controllers/${item.basic.cid}`}
+                                              style={{color: 'inherit', textDecoration: 'none',}}>
+                                            <Typography fontWeight="bold">
+                                                {displayName}
+                                                {hasApprovedLoa &&
+                                                    <Chip label="LOA" color="primary" size="small" sx={{ml: 1,}}/>}
+                                            </Typography>
+                                        </Link>
+                                        {profile?.preferred_name &&
+                                            <Typography variant="caption">
+                                                AKA {profile.first_name} {profile.last_name}
+                                            </Typography>}
+                                        <Typography variant="body2">
+                                            {item.basic.rating ?? 'Unknown'} • {item.basic.cid}
                                         </Typography>
-                                    </Link>
-                                    {profile?.preferred_name &&
-                                        <Typography variant="caption">
-                                            AKA {profile.first_name} {profile.last_name}
-                                        </Typography>}
-                                    <Typography variant="body2">
-                                        {item.basic.rating ?? 'Unknown'} • {item.basic.cid}
+                                        {profile?.controller_status === "HOME" &&
+                                            <UserStaffPositionChips cid={item.basic.cid}/>}
+                                        {profile?.controller_status === "VISITOR" && profile.visitor_home_facility &&
+                                            <Typography>{profile.visitor_home_facility}</Typography>}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography variant="h5">{profile?.operating_initials}</Typography>
+                                    </TableCell>
+                                    {certificationTypes.map((certificationType) => (
+                                        <TableCell key={certificationType.id}>
+                                            {getIconForCertificationOption(
+                                                certUser?.certifications.find((c) => c.certification_type_id === certificationType.id)?.certification_option || "NONE",
+                                                certUser?.solos.find((c) => c.certification_type_id === certificationType.id),
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            );
+                        })}
+                        {(vatusaExtra ?? []).map((vatusaUser) => (
+                            <TableRow key={vatusaUser.cid}>
+                                <TableCell>
+                                    <Typography fontWeight="bold">{vatusaUser.fname} {vatusaUser.lname}</Typography>
+                                    <Typography variant="body2">{getRating(vatusaUser.rating)} • {vatusaUser.cid}</Typography>
+                                    <Typography variant="subtitle2">
+                                        {membership === 'visit' ? vatusaUser.facility : ''}
                                     </Typography>
-                                    {profile?.controller_status === "HOME" &&
-                                        <UserStaffPositionChips cid={item.basic.cid}/>}
-                                    {profile?.controller_status === "VISITOR" && profile.visitor_home_facility &&
-                                        <Typography>{profile.visitor_home_facility}</Typography>}
                                 </TableCell>
                                 <TableCell>
-                                    <Typography variant="h5">{profile?.operating_initials}</Typography>
+                                    <Typography variant="h5">-</Typography>
                                 </TableCell>
                                 {certificationTypes.map((certificationType) => (
                                     <TableCell key={certificationType.id}>
-                                        {getIconForCertificationOption(
-                                            certUser?.certifications.find((c) => c.certification_type_id === certificationType.id)?.certification_option || "NONE",
-                                            certUser?.solos.find((c) => c.certification_type_id === certificationType.id),
-                                        )}
+                                        {getIconForCertificationOption("NONE")}
                                     </TableCell>
                                 ))}
                             </TableRow>
-                        );
-                    })}
-                    {(vatusaExtra ?? []).map((vatusaUser) => (
-                        <TableRow key={vatusaUser.cid}>
-                            <TableCell>
-                                <Typography fontWeight="bold">{vatusaUser.fname} {vatusaUser.lname}</Typography>
-                                <Typography variant="body2">{getRating(vatusaUser.rating)} • {vatusaUser.cid}</Typography>
-                                <Typography variant="subtitle2">
-                                    {membership === 'visit' ? vatusaUser.facility : ''}
-                                </Typography>
-                            </TableCell>
-                            <TableCell>
-                                <Typography variant="h5">-</Typography>
-                            </TableCell>
-                            {certificationTypes.map((certificationType) => (
-                                <TableCell key={certificationType.id}>
-                                    {getIconForCertificationOption("NONE")}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </>
     );
 }

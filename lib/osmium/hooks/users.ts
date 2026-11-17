@@ -16,25 +16,26 @@ const MAX_USER_PAGES = 50;
 
 /**
  * Every `/users` row matching `filters`, paged through via `has_next`. Throws
- * rather than returning a partial list if the page cap is hit, because a
- * truncated roster reads as "these controllers do not exist".
+ * if the page cap is hit, since a truncated roster reads as "these controllers
+ * do not exist". The pages are offset-based, so a row can still be repeated or
+ * missed when the roster changes mid-load; repeats are dropped by CID.
  */
 async function fetchAllUserPages(filters: ListUsersFilters) {
-    const items: UserListItem[] = [];
+    const byCid = new Map<number, UserListItem>();
     let total = 0;
     for (let page = 1; page <= MAX_USER_PAGES; page++) {
         const { data, error } = await osmium.GET("/api/v1/users", {
             params: { query: { ...filters, page, page_size: USERS_PAGE_SIZE } },
         });
         if (error) throw error;
-        items.push(...data.items);
+        for (const item of data.items) byCid.set(item.basic.cid, item);
         total = data.total;
-        if (!data.has_next) return { items, total };
+        if (!data.has_next) return { items: Array.from(byCid.values()), total };
     }
     throw new Error(`/api/v1/users still had more pages after ${MAX_USER_PAGES}`);
 }
 
-/** Every active HOME or VISITOR controller, across all pages. */
+/** Every HOME or VISITOR controller visible to the viewer, across all pages. */
 export function useRosterControllers() {
     return useQuery({
         queryKey: ["osmium", "users", "roster-controllers"],

@@ -47,7 +47,12 @@ export default function Page() {
             </Card>
             <Card>
                 <CardContent>
-                    {isLoading ? <Skeleton height={300}/> : isError ? (
+                    {isError && data && (
+                        <Alert severity="warning" sx={{mb: 2,}}>
+                            Could not refresh the roster; this matrix may be out of date.
+                        </Alert>
+                    )}
+                    {isLoading ? <Skeleton height={300}/> : isError && !data ? (
                         <Alert severity="error">
                             Failed to load the roster, so which operating initials are in use is unknown.
                         </Alert>
