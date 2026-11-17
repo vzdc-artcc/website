@@ -7,7 +7,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "codegen:osmium": "openapi-typescript \"${OSMIUM_OPENAPI_URL:-http://127.0.0.1:3000/docs/api/v1/openapi.json}\" -o lib/osmium/generated/schema.d.ts"
   },
   "dependencies": {
