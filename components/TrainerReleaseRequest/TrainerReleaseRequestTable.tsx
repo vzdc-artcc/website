@@ -14,13 +14,19 @@ export default function TrainerReleaseRequestTable() {
     const {allowed: canApprove} = useHasPermission('training.release_requests.decide');
     const {allowed: canDelete} = useHasPermission('training.release_requests.delete');
     const {data, isLoading} = useTrainerReleaseRequests();
-    const rows = data?.items ?? [];
+    // osmium keeps approved and denied requests, so pending ones (the actionable queue) come
+    // first, oldest first within each group. Sorted here rather than by the grid's sort model,
+    // which can only order by one visible column.
+    const rows = [...(data?.items ?? [])].sort((a, b) =>
+        Number(b.status === 'PENDING') - Number(a.status === 'PENDING')
+        || new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime());
 
     const columns: GridColDef[] = [
         {
             field: 'student',
             flex: 1,
             headerName: 'Student',
+            valueGetter: (_value, row) => row.student_name,
             renderCell: (params) => (
                 <Tooltip title={params.row.student_controller_status}>
                     <Link href={`/training/controller/${params.row.student_cid}`} target="_blank"
@@ -46,8 +52,10 @@ export default function TrainerReleaseRequestTable() {
             field: 'actions',
             type: 'actions',
             headerName: 'Actions',
+            // Delete stays on decided rows: osmium allows one request per student, so a decided
+            // request left in place blocks that student from ever requesting again.
             getActions: (params) => [
-                ...(canApprove ? [<TrainerReleaseRequestApproveButton key={`approve-${params.row.id}`} requestId={params.row.id}/>] : []),
+                ...(canApprove && params.row.status === 'PENDING' ? [<TrainerReleaseRequestApproveButton key={`approve-${params.row.id}`} requestId={params.row.id}/>] : []),
                 ...(canDelete ? [<TrainerReleaseDeleteButton key={`delete-${params.row.id}`} requestId={params.row.id}/>] : []),
             ],
             flex: 1,
@@ -61,7 +69,6 @@ export default function TrainerReleaseRequestTable() {
                 columns={columns}
                 rows={rows}
                 initialState={{
-                    sorting: {sortModel: [{field: 'submitted_at', sort: 'asc'}]},
                     pagination: {paginationModel: {pageSize: 25}},
                 }}
                 pageSizeOptions={[10, 25, 50]}

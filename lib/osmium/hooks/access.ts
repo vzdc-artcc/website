@@ -145,6 +145,9 @@ export function useUpdateUserAccess() {
         },
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ["osmium", "access", "user", variables.cid] });
+            // An admin may edit their own access; refresh what gates their UI.
+            queryClient.invalidateQueries({ queryKey: ["osmium", "access", "me"] });
+            queryClient.invalidateQueries({ queryKey: ["osmium", "me"] });
         },
     });
 }

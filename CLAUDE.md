@@ -90,7 +90,8 @@ was green before you touched anything.
 ## Before you say it is done
 
 - `npm run build` passes.
-- `npm run lint` is clean.
+- `npm run lint` adds no new lint findings in the files you touched (the
+  pre-existing ones are #244 and #245).
 - Every new API call goes through a hook in `lib/osmium/hooks/`, with a query
   key starting `"osmium"` that includes every parameter affecting the result.
 - Every mutation invalidates the right prefix, and you saw the UI actually

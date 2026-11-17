@@ -115,8 +115,8 @@ export default function RosterTable({membership, search, includeVatusa,}: {
                                     </Typography>
                                     {profile?.controller_status === "HOME" &&
                                         <UserStaffPositionChips cid={item.basic.cid}/>}
-                                    {profile?.controller_status === "VISITOR" &&
-                                        <Typography>{profile.artcc}</Typography>}
+                                    {profile?.controller_status === "VISITOR" && profile.visitor_home_facility &&
+                                        <Typography>{profile.visitor_home_facility}</Typography>}
                                 </TableCell>
                                 <TableCell>
                                     <Typography variant="h5">{profile?.operating_initials}</Typography>
