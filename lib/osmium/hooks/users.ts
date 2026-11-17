@@ -66,12 +66,12 @@ export interface TrainingStaffOption {
 }
 
 /**
- * Merged, de-duplicated MENTOR + INSTRUCTOR roster for the training-statistics
- * trainer selector.
+ * Merged, de-duplicated mentor (`MTR`) + instructor (`INS`) roster for the
+ * training-statistics trainer selector.
  */
 export function useTrainingStaff(): { data: TrainingStaffOption[]; isLoading: boolean } {
-    const mentors = useUsersByRole("MENTOR");
-    const instructors = useUsersByRole("INSTRUCTOR");
+    const mentors = useUsersByRole("MTR");
+    const instructors = useUsersByRole("INS");
 
     const byCid = new Map<string, TrainingStaffOption>();
     for (const list of [mentors.data, instructors.data]) {
