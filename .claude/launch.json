@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "website-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["dotenv", "-e", ".env.local", "--", "next", "dev", "--turbopack"],
+      "port": 3000
+    }
+  ]
+}

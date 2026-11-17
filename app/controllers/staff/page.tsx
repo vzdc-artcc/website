@@ -152,6 +152,17 @@ export default async function Page() {
         },
     });
 
+    const eps = await prisma.user.findMany({
+        where: {
+            staffPositions: {
+                has: 'EP',
+            },
+        },
+        orderBy: {
+            lastName: 'asc',
+        },
+    });
+
     return (
         (<Grid container columns={12} spacing={2}>
             <Grid size={12}>
@@ -284,6 +295,17 @@ export default async function Page() {
                     <CardContent>
                         <Typography variant="h6">Financial Committee</Typography>
                         {getAssistantTable(fcs as User[], "Staff Position(s)", getChips)}
+                    </CardContent>
+                </Card>
+            </Grid>
+            <Grid
+                size={{
+                    xs: 12,
+                }}>
+                <Card sx={{height: '100%',}}>
+                    <CardContent>
+                        <Typography variant="h6">Event Planners</Typography>
+                        {getAssistantTable(eps as User[], "Staff Position(s)", getChips)}
                     </CardContent>
                 </Card>
             </Grid>
