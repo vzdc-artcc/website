@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import {Autocomplete, Box, Grid, Rating, TextField, Typography} from "@mui/material";
 import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
-import {Turnstile} from "@marsidev/react-turnstile";
+import CaptchaField, {captchaConfigured} from "@/components/Captcha/CaptchaField";
 import FeedbackFormSubmitButton from "@/components/Feedback/FeedbackFormSubmitButton";
 import {checkCaptcha} from "@/lib/captcha";
 import Form from "next/form";
@@ -212,15 +212,10 @@ export default function FeedbackForm() {
                                    label="Additional Comments"/>
                     </Grid>
                     <Grid size={2}>
-                        <Turnstile
-                            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''}
-                            onSuccess={setCaptchaToken}
-                            onExpire={() => setCaptchaToken('')}
-                            onError={() => setCaptchaToken('')}
-                        />
+                        <CaptchaField onToken={setCaptchaToken}/>
                     </Grid>
                     <Grid size={2}>
-                        <FeedbackFormSubmitButton/>
+                        <FeedbackFormSubmitButton disabled={!captchaConfigured}/>
                     </Grid>
                 </Grid>
             </Form>
