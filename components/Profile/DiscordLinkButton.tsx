@@ -6,6 +6,25 @@ import {toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {useMyDiscordLink, useStartDiscordLink, useUnlinkDiscord} from "@/lib/osmium/hooks/discord-link";
 
+// `discord_error` values from osmium's GET /api/v1/me/discord/link/callback redirect. The callback
+// also forwards Discord's own OAuth `error` unchanged, which is where `access_denied` comes from.
+const DISCORD_LINK_ERROR_MESSAGES = new Map<string, string>([
+    ["session_mismatch", "Discord wasn't linked. Finish linking in the same browser where you're signed in to your own account (not while impersonating), then try again."],
+    ["already_linked", "That Discord account is already linked to another vZDC account. Unlink it there, or authorize with a different Discord account."],
+    ["expired", "The Discord link request expired. Click Link Discord to try again."],
+    ["invalid_state", "That Discord link request wasn't recognized or was already used. Click Link Discord to try again."],
+    ["missing_state", "That Discord link request wasn't recognized or was already used. Click Link Discord to try again."],
+    ["missing_code", "Discord didn't finish the authorization. Click Link Discord to try again."],
+    ["link_failed", "We couldn't confirm your account with Discord. Try again in a few minutes."],
+    ["server_error", "Something went wrong on our end while linking Discord. Try again later, and contact staff if it keeps happening."],
+]);
+
+const DISCORD_LINK_GENERIC_ERROR = "Discord linking failed. Try again, and contact staff if it keeps happening.";
+
+function discordLinkErrorMessage(code: string): string {
+    return DISCORD_LINK_ERROR_MESSAGES.get(code) ?? DISCORD_LINK_GENERIC_ERROR;
+}
+
 export default function DiscordLinkButton() {
     const {data: link, isLoading} = useMyDiscordLink();
     const startLink = useStartDiscordLink();
@@ -23,15 +42,17 @@ export default function DiscordLinkButton() {
             toast.success(msg);
             params.delete("discord_linked");
             params.delete("discord_username");
+        } else if (errParam === "access_denied") {
+            toast.info("Discord linking was cancelled.");
+            params.delete("discord_error");
         } else if (errParam) {
-            toast.error(`Discord link failed: ${errParam}`);
+            toast.error(discordLinkErrorMessage(errParam));
             params.delete("discord_error");
         } else {
             return;
         }
         const newUrl = window.location.pathname + (params.toString() ? `?${params.toString()}` : "");
         window.history.replaceState({}, "", newUrl);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const openConfirm = () => setConfirmOpen(true);
