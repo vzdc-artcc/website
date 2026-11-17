@@ -21,6 +21,7 @@ export default function TrainingAssignmentTable() {
             field: 'student',
             flex: 1,
             headerName: 'Student',
+            valueGetter: (_value, row) => row.student_name,
             renderCell: (params) => {
                 const color = params.row.student_controller_status === "HOME" ? 'default' : 'secondary';
                 return (
@@ -37,6 +38,7 @@ export default function TrainingAssignmentTable() {
         {
             field: 'primaryTrainer',
             headerName: 'Primary Trainer',
+            valueGetter: (_value, row) => row.primary_trainer_name,
             renderCell: (params) => (
                 <Link href={`/training/controller/${params.row.primary_trainer_cid}`} target="_blank">
                     <Chip label={params.row.primary_trainer_name} size="small"/>
@@ -48,6 +50,7 @@ export default function TrainingAssignmentTable() {
         {
             field: 'otherTrainers',
             headerName: 'Other Trainers',
+            valueGetter: (_value, row) => row.other_trainers.map((trainer: { name: string }) => trainer.name).join(', '),
             renderCell: (params) => (
                 <Stack direction="row" spacing={1}>
                     {params.row.other_trainers.map((trainer: { id: string, cid: number, name: string }) => (

@@ -29,13 +29,19 @@ export default function OtsRecommendationsView() {
 
     const instructors = (instructorsData?.items ?? [])
         .filter((u) => !!u.full)
-        .map((u) => ({ id: u.full!.id, cid: u.basic.cid, name: `${u.full!.first_name ?? ''} ${u.full!.last_name ?? ''} (${u.basic.cid})`.trim() }));
+        .sort((a, b) => (a.full!.last_name ?? '').localeCompare(b.full!.last_name ?? ''))
+        .map((u) => ({
+            id: u.full!.id,
+            cid: u.basic.cid,
+            name: `${u.full!.operating_initials ?? '--'} - ${u.full!.first_name ?? ''} ${u.full!.last_name ?? ''}`.trim(),
+        }));
 
     if (isLoading) {
         return <CircularProgress />;
     }
 
-    const items = recommendations?.items ?? [];
+    // Oldest first: the recommendation waiting longest is the next to schedule.
+    const items = [...(recommendations?.items ?? [])].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
     return (
         <Card>
