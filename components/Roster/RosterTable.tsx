@@ -1,7 +1,7 @@
 'use client';
 
 import React, {useMemo} from 'react';
-import {Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
+import {Alert, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
 import {useQuery} from "@tanstack/react-query";
 import {getIconForCertificationOption} from "@/lib/certification";
 import {getRating} from "@/lib/vatsim";
@@ -16,7 +16,7 @@ export default function RosterTable({membership, search, includeVatusa,}: {
     search?: string,
     includeVatusa?: boolean,
 }) {
-    const {data: rosterData, isLoading} = useRosterControllers();
+    const {data: rosterData, isLoading, isError} = useRosterControllers();
 
     const rows = useMemo(() => {
         const items = rosterData?.items ?? [];
@@ -66,6 +66,10 @@ export default function RosterTable({membership, search, includeVatusa,}: {
 
     if (isLoading) {
         return <Typography>Loading roster…</Typography>;
+    }
+
+    if (isError) {
+        return <Alert severity="error">Failed to load the roster.</Alert>;
     }
 
     return (
