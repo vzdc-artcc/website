@@ -22,7 +22,11 @@ const VATUSA_FACILITY = process.env.NEXT_PUBLIC_VATUSA_FACILITY ?? 'vZDC';
 
 type StaffMember = { cid: number; name: string; rating?: string | null };
 
-/** A staff list plus its query status, so a vacancy is told apart from loading or a failed request. */
+/**
+ * A staff list plus its query status, so a vacancy is told apart from loading or a failed request.
+ * Cached data wins over the query status: TanStack sets status 'error' when a background refetch
+ * fails while the last good data is still cached, and that data is still right to show.
+ */
 type StaffList = { status: 'pending' | 'error' | 'success'; members: StaffMember[] };
 
 export default function Page() {
@@ -30,14 +34,14 @@ export default function Page() {
     const useHolders = (position: string): StaffList => {
         const {status, data} = useStaffPositionHolders(position);
         return {
-            status,
+            status: data ? 'success' : status,
             members: (data?.holders ?? []).map((h) => ({cid: h.cid, name: h.display_name, rating: h.rating})),
         };
     };
     const useRoleUsers = (role: string): StaffList => {
         const {status, data} = useUsersByRole(role);
         return {
-            status,
+            status: data ? 'success' : status,
             members: (data?.items ?? []).map((u) => ({cid: u.basic.cid, name: u.basic.name, rating: u.basic.rating})),
         };
     };
