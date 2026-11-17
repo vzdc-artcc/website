@@ -1,6 +1,6 @@
 'use client';
 import React, {useMemo} from 'react';
-import {Alert, Card, CardActions, CardContent, Chip, CircularProgress, Typography} from "@mui/material";
+import {Alert, Card, CardActions, CardContent, Chip, Typography} from "@mui/material";
 import {formatTimezoneDate, getTimeIn} from "@/lib/date";
 import SessionJoinInstructionsButton from "@/components/TrainingAppointment/SessionJoinInstructionsButton";
 import CompletePreparationButton from "@/components/TrainingAppointment/CompletePreparationButton";
@@ -22,7 +22,7 @@ export default function UpcomingTrainingAppointmentCard({timeZone}: { timeZone: 
     }, [appointmentsData]);
 
     if (meLoading || appointmentsLoading) {
-        return <CircularProgress/>;
+        return null;
     }
 
     if (!trainingAppointment) {

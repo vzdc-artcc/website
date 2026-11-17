@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import {Box, CircularProgress, Grid, Typography} from "@mui/material";
+import {Box, CircularProgress, Grid, Stack, Typography} from "@mui/material";
 import ProfileCard, {ProfileCardUser} from "@/components/Profile/ProfileCard";
 import CertificationsCard from "@/components/Profile/CertificationsCard";
 import FeedbackCard from "@/components/Profile/FeedbackCard";
@@ -41,13 +41,12 @@ export default function Page() {
     return (
         <Grid container columns={6} spacing={2}>
             <Grid size={6}>
-                <Typography variant="h4">Your Profile</Typography>
-            </Grid>
-            <Grid size={6}>
-                <UpcomingTrainingAppointmentCard timeZone={me.profile.timezone}/>
-            </Grid>
-            <Grid size={6}>
-                <ActiveLoaCard/>
+                {/* One Stack, so a card with nothing to show leaves no gap. */}
+                <Stack spacing={2}>
+                    <Typography variant="h4">Your Profile</Typography>
+                    <UpcomingTrainingAppointmentCard timeZone={me.profile.timezone}/>
+                    <ActiveLoaCard/>
+                </Stack>
             </Grid>
             <Grid
                 size={{
