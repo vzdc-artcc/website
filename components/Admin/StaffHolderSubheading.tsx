@@ -1,5 +1,4 @@
 'use client';
-import React from 'react';
 import {Box, Skeleton} from "@mui/material";
 import {useStaffPositionHolders} from "@/lib/osmium/hooks/staff-positions";
 
