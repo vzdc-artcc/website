@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import {getMonth} from "@/lib/date";
-import {Card, CardContent, Grid, Typography} from "@mui/material";
+import {Alert, Card, CardContent, Grid, Skeleton, Typography} from "@mui/material";
 import StatisticsTable from "@/components/Statistics/StatisticsTable";
 import ControllingSessionsTable from "@/components/Statistics/ControllingSessionsTable";
 import {useControllerHistory, useControllerPositions, useControllerTotals} from "@/lib/osmium/hooks/stats";
@@ -31,8 +31,16 @@ export default function Page() {
     const cidNum = Number(cid);
 
     const {data: totals, isError, isLoading} = useControllerTotals(cidNum);
-    const {data: history} = useControllerHistory(cidNum, Number(year));
-    const {data: positions} = useControllerPositions(cidNum, {
+    const {
+        data: history,
+        isError: historyError,
+        isPending: historyPending,
+    } = useControllerHistory(cidNum, Number(year));
+    const {
+        data: positions,
+        isError: positionsError,
+        isPending: positionsPending,
+    } = useControllerPositions(cidNum, {
         year: Number(year),
         month: isAllMonths ? undefined : Number(month) + 1,
     });
@@ -79,6 +87,16 @@ export default function Page() {
         active_hours: acc.active_hours + m.active_hours,
     }), {delivery_hours: 0, ground_hours: 0, tower_hours: 0, tracon_hours: 0, center_hours: 0, active_hours: 0});
 
+    // isPending (no data yet), not isLoading: a paused first fetch is neither loading nor errored.
+    const historyFailed = !historyPending && !history;
+
+    // Zero hours is a real value, so a failed or pending history must not render as one.
+    const renderHours = (hours: number) => {
+        if (historyPending) return <Skeleton width={100}/>;
+        if (historyFailed) return '-';
+        return `${formatHours(hours)} hours`;
+    };
+
     return (
         (<Grid container columns={30} spacing={2}>
             <Grid size={30}>
@@ -90,6 +108,13 @@ export default function Page() {
                     </CardContent>
                 </Card>
             </Grid>
+            {/* The all-months view reports this in the Monthly Totals card instead. */}
+            {historyFailed && !isAllMonths && <Grid size={30}>
+                <Alert severity="error">Failed to load controlling history.</Alert>
+            </Grid>}
+            {historyError && history && <Grid size={30}>
+                <Alert severity="warning">Could not refresh controlling history; these totals may be out of date.</Alert>
+            </Grid>}
             <Grid
                 size={{
                     xs: 30,
@@ -99,7 +124,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>Delivery Hours</Typography>
-                        <Typography variant="h6">{formatHours(summary.delivery_hours)} hours</Typography>
+                        <Typography variant="h6">{renderHours(summary.delivery_hours)}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -112,7 +137,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>Ground Hours</Typography>
-                        <Typography variant="h6">{formatHours(summary.ground_hours)} hours</Typography>
+                        <Typography variant="h6">{renderHours(summary.ground_hours)}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -125,7 +150,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>Tower Hours</Typography>
-                        <Typography variant="h6">{formatHours(summary.tower_hours)} hours</Typography>
+                        <Typography variant="h6">{renderHours(summary.tower_hours)}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -138,7 +163,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>TRACON Hours</Typography>
-                        <Typography variant="h6">{formatHours(summary.tracon_hours)} hours</Typography>
+                        <Typography variant="h6">{renderHours(summary.tracon_hours)}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -151,7 +176,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>Center Hours</Typography>
-                        <Typography variant="h6">{formatHours(summary.center_hours)} hours</Typography>
+                        <Typography variant="h6">{renderHours(summary.center_hours)}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -164,7 +189,7 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography>Total Hours</Typography>
-                        <Typography variant="h6">{formatHours(summary.active_hours)} hours</Typography>
+                        <Typography variant="h6">{renderHours(summary.active_hours)}</Typography>
                     </CardContent>
                 </Card>
             </Grid>
@@ -172,7 +197,16 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Controlling Sessions</Typography>
-                        <ControllingSessionsTable positions={positions?.items ?? []}/>
+                        {positionsError && positions && (
+                            <Alert severity="warning" sx={{mb: 1,}}>
+                                Could not refresh controlling sessions; this list may be out of date.
+                            </Alert>
+                        )}
+                        {positionsPending ? <Skeleton height={200}/> : !positions ? (
+                            <Alert severity="error">Failed to load controlling sessions.</Alert>
+                        ) : (
+                            <ControllingSessionsTable positions={positions.items}/>
+                        )}
                     </CardContent>
                 </Card>
             </Grid>
@@ -180,7 +214,11 @@ export default function Page() {
                 <Card>
                     <CardContent>
                         <Typography variant="h6">Monthly Totals</Typography>
-                        <StatisticsTable heading="Month" logs={monthLog}/>
+                        {historyPending ? <Skeleton height={200}/> : historyFailed ? (
+                            <Alert severity="error">Failed to load controlling history.</Alert>
+                        ) : (
+                            <StatisticsTable heading="Month" logs={monthLog}/>
+                        )}
                     </CardContent>
                 </Card>
             </Grid>}
