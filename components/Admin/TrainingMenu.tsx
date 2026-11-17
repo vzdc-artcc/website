@@ -23,7 +23,7 @@ import {
 } from "@mui/icons-material";
 import MenuWrapper from './MenuWrapper';
 import TrainingMenuLiveBadges from './TrainingMenuLiveBadges';
-import {useStaffPositionHolderName} from "@/lib/osmium/hooks/staff-positions";
+import StaffHolderSubheading from './StaffHolderSubheading';
 import {useAdminSoloCertifications} from "@/lib/osmium/hooks/certifications";
 
 export default function TrainingMenu() {
@@ -31,10 +31,8 @@ export default function TrainingMenu() {
     const {data: soloData} = useAdminSoloCertifications();
     const soloCertifications = soloData?.items?.length ?? 0;
 
-    const taName = useStaffPositionHolderName("TA");
-
     return (
-        <MenuWrapper title="Training Administration" subheadings={[`TA: ${taName}`]}>
+        <MenuWrapper title="Training Administration" subheadings={[<StaffHolderSubheading key="TA" label="TA" position="TA"/>]}>
             <Link href="/training/overview" style={{textDecoration: 'none', color: 'inherit',}}>
                 <ListItemButton>
                     <ListItemIcon>
