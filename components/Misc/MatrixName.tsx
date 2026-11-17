@@ -2,17 +2,20 @@
 import React, {useEffect, useState} from 'react';
 import {Typography} from '@mui/material';
 
+const matrixChars: string =
+    'アァイィウヴエカキクケコサシスセソタチツテトナニヌネノハヒフホミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
 interface MatrixNameProps {
     firstName: string;
     lastName: string;
 }
 
 const MatrixName: React.FC<MatrixNameProps> = ({firstName, lastName}) => {
-    const [displayText, setDisplayText] = useState<string>(`${firstName} ${lastName}`);
+    const fullName = `${firstName} ${lastName}`;
+    // Only the scrambled frames live in state; at rest the name is read from props,
+    // so a name that arrives after the first render (a query resolving) still shows.
+    const [scrambled, setScrambled] = useState<string | null>(null);
     const [isMatrix, setIsMatrix] = useState<boolean>(false);
-
-    const matrixChars: string =
-        'アァイィウヴエカキクケコサシスセソタチツテトナニヌネノハヒフホミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -20,23 +23,22 @@ const MatrixName: React.FC<MatrixNameProps> = ({firstName, lastName}) => {
         if (isMatrix) {
             let count = 0;
             interval = setInterval(() => {
-                const length = `${firstName} ${lastName}`.length;
-                const newText = Array.from({length}, () =>
+                const newText = Array.from({length: fullName.length}, () =>
                     matrixChars.charAt(Math.floor(Math.random() * matrixChars.length))
                 ).join('');
-                setDisplayText(newText);
+                setScrambled(newText);
 
                 count++;
                 if (count > 10) {
                     clearInterval(interval);
-                    setDisplayText(`${firstName} ${lastName}`);
+                    setScrambled(null);
                     setIsMatrix(false);
                 }
             }, 75);
         }
 
         return () => clearInterval(interval);
-    }, [isMatrix, firstName, lastName]);
+    }, [isMatrix, fullName]);
 
     return (
         <Typography
@@ -50,7 +52,7 @@ const MatrixName: React.FC<MatrixNameProps> = ({firstName, lastName}) => {
                 cursor: 'pointer',
             }}
         >
-            {displayText}
+            {isMatrix && scrambled !== null ? scrambled : fullName}
         </Typography>
     );
 };

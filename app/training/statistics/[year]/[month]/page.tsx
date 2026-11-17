@@ -60,7 +60,7 @@ export default function Page() {
                     sm: 15,
                     md: 5
                 }}>
-                <Card>
+                <Card sx={{height: '100%'}}>
                     <CardContent>
                         <Typography>Sessions</Typography>
                         <Typography variant="h4">{stats.sessions}</Typography>
@@ -73,7 +73,7 @@ export default function Page() {
                     sm: 15,
                     md: 5
                 }}>
-                <Card>
+                <Card sx={{height: '100%'}}>
                     <CardContent>
                         <Typography>Training Hours</Typography>
                         <Typography variant="h4">{totalHours}</Typography>
@@ -86,7 +86,7 @@ export default function Page() {
                     sm: 15,
                     md: 5
                 }}>
-                <Card>
+                <Card sx={{height: '100%'}}>
                     <CardContent>
                         <Typography>Sessions Passed</Typography>
                         <Typography variant="h4">{stats.passed}</Typography>
@@ -99,7 +99,7 @@ export default function Page() {
                     sm: 15,
                     md: 5
                 }}>
-                <Card>
+                <Card sx={{height: '100%'}}>
                     <CardContent>
                         <Typography>Sessions Failed</Typography>
                         <Typography variant="h4">{stats.failed}</Typography>
@@ -112,7 +112,7 @@ export default function Page() {
                     sm: 15,
                     md: 5
                 }}>
-                <Card>
+                <Card sx={{height: '100%'}}>
                     <CardContent>
                         <Typography gutterBottom>Pass Rate</Typography>
                         <Chip
@@ -130,7 +130,7 @@ export default function Page() {
                     sm: 15,
                     md: 5
                 }}>
-                <Card>
+                <Card sx={{height: '100%'}}>
                     <CardContent>
                         <Typography gutterBottom>Most Run Session</Typography>
                         {stats.most_run_lesson.identifier ? (
@@ -153,7 +153,7 @@ export default function Page() {
                         xs: 30,
                         md: 10
                     }}>
-                    <Card>
+                    <Card sx={{height: '100%'}}>
                         <CardContent>
                             <Box sx={{ mb: 2 }}>
                                 <Typography
@@ -168,7 +168,7 @@ export default function Page() {
             ))}
             {(stats.passed > 0 || stats.failed > 0) && (
                 <Grid size={{xs: 30, md: 12}}>
-                    <Card>
+                    <Card sx={{height: '100%'}}>
                         <CardContent>
                             <PassFailGraph passed={stats.passed} failed={stats.failed} />
                         </CardContent>
@@ -176,7 +176,7 @@ export default function Page() {
                 </Grid>
             )}
             <Grid size={{xs: 30, md: (stats.passed > 0 || stats.failed > 0) ? 18 : 30}}>
-                <Card>
+                <Card sx={{height: '100%'}}>
                     <CardContent>
                         {stats.lesson_distribution.length > 0 ? (
                             <LessonDistributionGraph data={stats.lesson_distribution} />

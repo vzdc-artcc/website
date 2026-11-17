@@ -145,7 +145,7 @@ When the honest answer is "I do not know yet", that is the finding. Say so.
 npm ci --legacy-peer-deps   # install, matching CI
 npm run dev                 # Next dev server with turbopack
 npm run build               # production build — the CI gate
-npm run lint                # eslint (next/core-web-vitals)
+npm run lint                # eslint . (eslint.config.mjs, next core-web-vitals)
 npm run codegen:osmium      # regenerate lib/osmium/generated/schema.d.ts
 ```
 
@@ -308,7 +308,9 @@ the whole of the verification budget.
 Before calling a UI change done:
 
 1. `npm run build` passes with no new warnings you introduced.
-2. `npm run lint` is clean.
+2. `npm run lint` adds no new lint findings in the files you touched. The
+   tree still carries pre-existing findings (#244, #245), so the command exits
+   non-zero until those land; compare against `origin/next`.
 3. You loaded the page against a running osmium and a real session.
 4. You checked the states that are not the happy path: loading, empty result,
    error response, and no-permission. A page that only works when the data is

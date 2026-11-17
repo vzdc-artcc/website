@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { type QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { osmium } from "@/lib/osmium/client";
 
 // --- Training statistics ---
@@ -749,6 +749,19 @@ interface TrainingSessionInput {
     additional_trainers?: AdditionalTrainerInput[];
 }
 
+/**
+ * A saved session can grant certifications, remove solo certifications, write
+ * dossier entries and advance progressions for its student. Those are keyed per
+ * user, so refresh any of them that are mounted.
+ */
+function invalidateSessionSideEffects(queryClient: QueryClient) {
+    for (const key of ["certifications", "dossier", "solo-certifications", "progression"]) {
+        queryClient.invalidateQueries({ queryKey: ["osmium", "users", key] });
+    }
+    queryClient.invalidateQueries({ queryKey: ["osmium", "admin", "solo-certifications"] });
+    queryClient.invalidateQueries({ queryKey: ["osmium", "roster-certifications"] });
+}
+
 export function useCreateTrainingSession() {
     const queryClient = useQueryClient();
     return useMutation({
@@ -761,6 +774,7 @@ export function useCreateTrainingSession() {
             queryClient.invalidateQueries({ queryKey: ["osmium", "training", "sessions"] });
             queryClient.invalidateQueries({ queryKey: ["osmium", "training", "ots-recommendations"] });
             queryClient.invalidateQueries({ queryKey: ["osmium", "training", "release-requests"] });
+            invalidateSessionSideEffects(queryClient);
         },
     });
 }
@@ -781,6 +795,7 @@ export function useUpdateTrainingSession() {
             queryClient.invalidateQueries({ queryKey: ["osmium", "training", "sessions", "item", variables.sessionId] });
             queryClient.invalidateQueries({ queryKey: ["osmium", "training", "ots-recommendations"] });
             queryClient.invalidateQueries({ queryKey: ["osmium", "training", "release-requests"] });
+            invalidateSessionSideEffects(queryClient);
         },
     });
 }

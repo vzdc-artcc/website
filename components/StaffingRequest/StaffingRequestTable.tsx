@@ -52,7 +52,7 @@ export default function StaffingRequestTable() {
     ];
 
     return (
-        <DataTable columns={columns} initialSort={[{field: 'name', sort: 'asc'}]}
+        <DataTable queryKey={["osmium", "staffing-requests", "table"]} columns={columns} initialSort={[{field: 'name', sort: 'asc'}]}
                    fetchData={async (pagination, sortModel, filter) => {
                        let cid: number | undefined;
                        let displayName: string | undefined;
