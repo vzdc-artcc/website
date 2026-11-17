@@ -7,7 +7,12 @@ import {toast} from "react-toastify";
 import {useRouter} from "next/navigation";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {useMe, useUpdateMe} from "@/lib/osmium/hooks/me";
-import {useAdminUpdateProfile, useReassignOperatingInitials, useUserByCid} from "@/lib/osmium/hooks/users";
+import {
+    operatingInitialsErrorMessage,
+    useAdminUpdateProfile,
+    useReassignOperatingInitials,
+    useUserByCid
+} from "@/lib/osmium/hooks/users";
 import {useCreateDossierEntry} from "@/lib/osmium/hooks/training";
 
 export default function ProfileEditCard({cid, admin = false}: {
@@ -79,13 +84,15 @@ export default function ProfileEditCard({cid, admin = false}: {
                         timezone: result.data.timezone,
                     },
                 });
+            } catch {
+                toast('Failed to update profile.', {type: 'error'});
+                return;
+            }
+
+            try {
                 await reassignOi.mutateAsync({cid, operatingInitials: result.data.operatingInitials});
             } catch (e) {
-                const status = (e as { status?: number })?.status;
-                toast(
-                    status === 400 ? 'Those operating initials are already in use.' : 'Failed to update profile.',
-                    {type: 'error'},
-                );
+                toast(operatingInitialsErrorMessage(e), {type: 'error'});
                 return;
             }
 

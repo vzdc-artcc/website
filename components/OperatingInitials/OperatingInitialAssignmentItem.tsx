@@ -1,5 +1,5 @@
 'use client';
-import {useReassignOperatingInitials} from "@/lib/osmium/hooks/users";
+import {operatingInitialsErrorMessage, useReassignOperatingInitials} from "@/lib/osmium/hooks/users";
 import {
     Autocomplete,
     Box,
@@ -39,8 +39,8 @@ export default function OperatingInitialAssignmentItem({ initials, allController
 
         try {
             await reassign.mutateAsync({cid: Number(u.cid), operatingInitials: initials});
-        } catch {
-            toast.error('These operating initials are already in use.');
+        } catch (e) {
+            toast.error(operatingInitialsErrorMessage(e));
             return;
         }
 
@@ -78,7 +78,7 @@ export default function OperatingInitialAssignmentItem({ initials, allController
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>
-                    <Button onClick={handleSubmit} variant="contained">Assign</Button>
+                    <Button onClick={handleSubmit} variant="contained" disabled={reassign.isPending}>Assign</Button>
                 </DialogActions>
             </Dialog>
         </>
