@@ -1,7 +1,7 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {osmium} from "@/lib/osmium/client";
 
-const OFFERS_KEY = ["osmium", "impromptu-offers"];
+export const OFFERS_KEY = ["osmium", "impromptu-offers"];
 
 export function useImpromptuOffers() {
     return useQuery({
