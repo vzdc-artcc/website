@@ -16,7 +16,7 @@ export interface CreateOrUpdateAtcBookingInput {
 }
 
 /** Pull the user-facing message out of an osmium error body (400 `{message}`, or a coded error). */
-function bookingErrorMessage(error: unknown): string {
+export function bookingErrorMessage(error: unknown): string {
     const e = error as { message?: string; error?: string } | undefined;
     if (e?.message) return e.message;
     if (e?.error === "service_unavailable") return "The ATC booking service is currently unavailable.";
