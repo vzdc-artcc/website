@@ -139,7 +139,7 @@ model User {
   trainingSessionAdditionalTrainers TrainingSessionAdditionalTrainer[]
 
   trainingAppointmentAdditionalTrainers TrainingAppointmentAdditionalTrainer[]
-  onboarding Onboarding?
+  onboarding                            Onboarding?
 }
 
 model TrainingAssignment {
@@ -473,6 +473,9 @@ model File {
   key            String
   updatedAt      DateTime
   highlightColor HighlightColorType @default(INHERIT)
+
+  isGoap          Boolean @default(false)
+  isTrainingOrder Boolean @default(false)
 
   changes ChangeBroadcast[]
 }

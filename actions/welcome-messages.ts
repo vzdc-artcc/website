@@ -15,14 +15,6 @@ export const updateWelcomeMessages = async (home: string, visitor: string) => {
     await log('UPDATE', 'WELCOME_MESSAGES', 'Updated welcome messages');
 }
 
-export const acknowledgeWelcomeMessage = async (userId: string) => {
-    await prisma.user.update({
-        where: {
-            id: userId
-        },
-        data: {
-            showWelcomeMessage: false
-        }
-    });
-
+export const fetchWelcomeMessages = async () => {
+    return prisma.welcomeMessages.findFirst();
 }

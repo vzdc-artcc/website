@@ -17,8 +17,7 @@ import InitColorSchemeScript from "@mui/system/InitColorSchemeScript";
 import BroadcastViewer from "@/components/BroadcastViewer/BroadcastViewer";
 import {getServerSession} from "next-auth";
 import {authOptions} from "@/auth/auth";
-import WelcomeMessageDialog from "@/components/WelcomeMessages/WelcomeMessageDialog";
-import prisma from "@/lib/db";
+import Onboarding from "@/components/Onboarding/Onboarding";
 import StaffTasksAlert from "@/components/Admin/StaffTasksAlert";
 import LayoutContainerResolver from "@/components/Layout/LayoutContainerResolver";
 import {AdminSidebarProvider} from "@/components/Admin/AdminSidebarContext";
@@ -43,8 +42,6 @@ export default async function RootLayout({
 
     const session = await getServerSession(authOptions);
 
-    const welcomeMessages = await prisma.welcomeMessages.findFirst();
-
   return (
       <html lang="en" suppressHydrationWarning>
       <body className={roboto.variable}>
@@ -54,8 +51,8 @@ export default async function RootLayout({
             <CssBaseline/>
             <div>
                 {session?.user && <BroadcastViewer user={session.user}/>}
-                {session?.user && session.user.controllerStatus !== 'NONE' && welcomeMessages &&
-                    <WelcomeMessageDialog user={session.user} welcomeMessages={welcomeMessages}/>}
+                {session?.user && session.user.controllerStatus !== 'NONE' &&
+                    <Onboarding user={session.user}/>}
                 <AdminSidebarProvider>
                     <Stack direction="column" sx={{minHeight: '100dvh',}}>
                         <Navbar/>

@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import {File as DBFile, FileCategory, HighlightColorType} from '@/generated/prisma/browser';
-import {Box, MenuItem, Stack, TextField} from "@mui/material";
+import {Box, FormControlLabel, MenuItem, Stack, Switch, TextField} from "@mui/material";
 import FormSaveButton from "@/components/Form/FormSaveButton";
 import {toast} from "react-toastify";
 import {createOrUpdateFile} from "@/actions/files";
@@ -45,6 +45,12 @@ export default function FileForm({ file, category }: { file?: DBFile, category: 
                         <MenuItem key={type} value={type}>{type}</MenuItem>
                     ))}
                 </TextField>
+                <FormControlLabel name="isGoap"
+                                  control={<Switch defaultChecked={file?.isGoap}/>}
+                                  label="Is GOAP?"/>
+                <FormControlLabel name="isTrainingOrder"
+                                  control={<Switch defaultChecked={file?.isTrainingOrder}/>}
+                                  label="Is Training Order?"/>
                 <input type="file" name="file" required={!file} />
                 <Box>
                     <FormSaveButton />

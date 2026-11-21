@@ -11,6 +11,22 @@ import {sendTrainingRequestDeletedEmail} from "@/actions/mail/training";
 import {z} from "zod";
 import {formatZuluDate} from "@/lib/date";
 
+export const canRequestTraining = async (userId: string) => {
+    const requestCount = await prisma.trainingAssignmentRequest.count({
+        where: {
+            studentId: userId,
+        },
+    });
+
+    const assignmentCount = await prisma.trainingAssignment.count({
+        where: {
+            studentId: userId,
+        },
+    });
+
+    return requestCount > 0 && assignmentCount === 0;
+}
+
 export const submitTrainingAssignmentRequest = async () => {
     const session = await getServerSession(authOptions);
 

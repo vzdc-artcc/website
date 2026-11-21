@@ -94,6 +94,8 @@ export const createOrUpdateFile = async (formData: FormData) => {
         id: z.string().optional(),
         name: z.string().min(1, 'Name is required').max(100, 'Name is too long'),
         alias: z.string().optional(),
+        isGoap: z.boolean().optional(),
+        isTrainingOrder: z.boolean().optional(),
         description: z.string().max(255, 'Description is too long'),
         highlightColor: z.string().min(1, "Highlight color is required"),
     });
@@ -103,6 +105,8 @@ export const createOrUpdateFile = async (formData: FormData) => {
         id: formData.get('id') as string,
         name: formData.get('name') as string,
         alias: formData.get('alias') as string,
+        isGoap: formData.get('isGoap') === 'on',
+        isTrainingOrder: formData.get('isTrainingOrder') === 'on',
         description: formData.get('description') as string,
         highlightColor: formData.get('highlightColor') as string
     });
@@ -153,6 +157,8 @@ export const createOrUpdateFile = async (formData: FormData) => {
             key: fileKey,
             updatedAt: new Date(),
             highlightColor: result.data.highlightColor as HighlightColorType,
+            isGoap: result.data.isGoap || false,
+            isTrainingOrder: result.data.isTrainingOrder || false,
         },
         create: {
             name: result.data.name,
@@ -166,6 +172,8 @@ export const createOrUpdateFile = async (formData: FormData) => {
             },
             updatedAt: new Date(),
             highlightColor: result.data.highlightColor as HighlightColorType,
+            isGoap: result.data.isGoap || false,
+            isTrainingOrder: result.data.isTrainingOrder || false,
         },
         include: {
             category: true,
@@ -222,4 +230,23 @@ export const deleteFile = async (id: string) => {
     await log("DELETE", "FILE", `Deleted file ${file.name}`);
     revalidatePath(`/admin/files/${file.category.id}`);
     revalidatePath('/admin/files');
+}
+
+export const fetchAdminDocs = async () => {
+    const goap = await prisma.file.findFirst({
+        where: {
+            isGoap: true,
+        },
+    });
+
+    const trainingOrder = await prisma.file.findFirst({
+        where: {
+            isTrainingOrder: true,
+        },
+    });
+
+    return {
+        goap: goap?.key,
+        trainingOrder: trainingOrder?.key,
+    }
 }
