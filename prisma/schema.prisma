@@ -139,6 +139,7 @@ model User {
   trainingSessionAdditionalTrainers TrainingSessionAdditionalTrainer[]
 
   trainingAppointmentAdditionalTrainers TrainingAppointmentAdditionalTrainer[]
+  onboarding Onboarding?
 }
 
 model TrainingAssignment {
@@ -1092,4 +1093,12 @@ model InnovationLabProject {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Onboarding {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  step Int @default(0)
 }
